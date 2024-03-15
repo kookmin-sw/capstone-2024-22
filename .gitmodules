@@ -1,0 +1,3 @@
+[submodule "moment-server"]
+	path = moment-server
+	url = https://github.com/kmu-moment/moment-server.git
