@@ -1,0 +1,20 @@
+server:
+    port: 8761
+spring:
+  application:
+    name: eureka
+#  # config server
+#  cloud:
+#    config:
+#      uri: http://localhost:8888
+#      fail-fast: true
+#      name: msa
+#      profile: eureka
+# eureka server
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+#      defaultZone: http://host.docker.internal:${server.port}/eureka/
+      defaultZone: http://localhost:${server.port}/eureka/

@@ -1,0 +1,94 @@
+version: '1.0'
+
+services:
+
+  eureka-server:
+    image: eureka:0.0.1  # 스프링부트 어플리케이션의 이미지 이름과 태그
+    container_name: eureka-server  # 컨테이너 이름
+    build:
+      context: eureka/.
+    ports:
+      - "8761:8761"  # 호스트 머신의 8080 포트와 컨테이너 내부의 8080 포트를 매핑
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    networks:
+      - moment-net
+
+  gateway-server:
+    image: gateway:0.0.1  # 스프링부트 어플리케이션의 이미지 이름과 태그
+    container_name: gateway-server  # 컨테이너 이름
+#    depends_on:
+#      eureka-server:
+#        condition: service_healthy
+#
+    build:
+      context: gateway/.
+    ports:
+      - "8000:8000"  # 호스트 머신의 8080 포트와 컨테이너 내부의 8080 포트를 매핑
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    networks:
+      - moment-net
+
+  core:
+    image: moment-core:0.0.1  # 스프링부트 어플리케이션의 이미지 이름과 태그
+    container_name: moment-core-server  # 컨테이너 이름
+    build:
+      context: core/.
+    ports:
+      - "8080:8080"  # 호스트 머신의 8080 포트와 컨테이너 내부의 8080 포트를 매핑
+    depends_on:
+      db:  # db 서비스가 먼저 실행되어야 함
+        condition: service_healthy
+#      eureka-server:
+#        condition: service_healthy
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl -f http://eureka-server:8761/ || exit 1" ]
+#      interval: 10s
+#      retries: 5
+#    restart: on-failure
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/moment_core?createDatabaseIfNotExist=TRUE&useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root1234
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    networks:
+      - moment-net
+  #    volumes:
+  #      - /c/Users/jykim/TheWayHome_Server/src/main/resources/static/images:/app/src/main/resources/static/images
+
+  db:
+    image: mysql:8.0  # MySQL 이미지 이름과 태그
+    container_name: moment-core-db  # 컨테이너 이름
+    ports:
+      - "13306:3306"  # 호스트 머신의 13306 포트와 컨테이너 내부의 3306 포트를 매핑
+    command: --default-authentication-plugin=mysql_native_password  # MySQL 8.0 이상 버전일 경우 인증 방식 지정
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: moment_core
+    networks:
+      - moment-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    volumes:
+      - moment_core_data:/var/lib/mysql
+
+volumes:
+    moment_core_data:
+
+
+networks:
+  moment-net:
+    driver: bridge
