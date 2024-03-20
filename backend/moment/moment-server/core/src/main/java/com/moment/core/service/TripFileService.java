@@ -55,10 +55,9 @@ public class TripFileService {
         tripFileRepository.save(tripFile);
     }
 
-    public TripFileResponseDTO.GetAllTripFile getTripFiles(Long userId, Long tripId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
+    public TripFileResponseDTO.GetAllTripFile getTripFiles(Long tripId) {
         List<TripFileResponseDTO.GetTripFile> rtnList = new ArrayList<>();
-        List<TripFile> tripFiles = tripFileRepository.findByUserAndTrip_Id(user, tripId);
+        List<TripFile> tripFiles = tripFileRepository.findByTrip_Id(tripId);
         for (TripFile tripFile : tripFiles) {
             rtnList.add(TripFileResponseDTO.GetTripFile.fromEntity(tripFile));
         }
