@@ -1,7 +1,7 @@
 package com.moment.auth.client;
 
 
-import com.moment.auth.dto.request.EmailMessage;
+import com.moment.auth.dto.request.EmailMessageDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,5 +10,5 @@ import org.springframework.web.bind.annotation.PostMapping;
 public interface MailClient {
 
     @PostMapping("/email")
-    ResponseEntity<String> sendMail(EmailMessage emailMessage);
+    ResponseEntity<String> sendMail(EmailMessageDTO emailMessageDTO);
 }

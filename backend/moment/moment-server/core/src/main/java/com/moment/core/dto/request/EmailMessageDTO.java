@@ -1,4 +1,4 @@
-package com.moment.auth.dto.request;
+package com.moment.core.dto.request;
 
 import lombok.*;
 
@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmailMessage {
+public class EmailMessageDTO {
     private String to;
 
     private String subject;
