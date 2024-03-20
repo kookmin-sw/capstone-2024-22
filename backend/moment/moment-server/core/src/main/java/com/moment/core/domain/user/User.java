@@ -14,15 +14,12 @@ import lombok.*;
 public class User extends BaseEntity{
     // 유저 아이디
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
     // 유저 로그인 ID
-    @Column(name = "login_id", nullable = false, unique = true)
-    private String loginId;
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
 
-    // 유저 비밀번호
-    @Column(name = "password", nullable = false)
-    private String password;
+
 }

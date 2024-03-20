@@ -1,5 +1,6 @@
 package com.moment.core.service;
 
+import com.moment.core.domain.cardView.CardViewRepository;
 import com.moment.core.domain.trip.Trip;
 import com.moment.core.domain.tripFile.TripFile;
 import com.moment.core.domain.tripFile.TripFileRepository;
@@ -9,6 +10,7 @@ import com.moment.core.dto.response.TripFileResponseDTO;
 import com.moment.core.exception.UserNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.Optional;
 public class TripFileService {
     private final TripFileRepository tripFileRepository;
     private final UserRepository userRepository;
+    private final CardViewRepository cardViewRepository;
 
     // 날짜를 받아서 이미 존재하면 해당 여행으로 업데이트, 없으면 새로 생성
     public Integer findByDateAndUpdate(Trip trip, LocalDate date) {
@@ -52,10 +55,9 @@ public class TripFileService {
         tripFileRepository.save(tripFile);
     }
 
-    public TripFileResponseDTO.GetAllTripFile getTripFiles(Long userId, Long tripId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
+    public TripFileResponseDTO.GetAllTripFile getTripFiles(Long tripId) {
         List<TripFileResponseDTO.GetTripFile> rtnList = new ArrayList<>();
-        List<TripFile> tripFiles = tripFileRepository.findByUserAndTrip_Id(user, tripId);
+        List<TripFile> tripFiles = tripFileRepository.findByTrip_Id(tripId);
         for (TripFile tripFile : tripFiles) {
             rtnList.add(TripFileResponseDTO.GetTripFile.fromEntity(tripFile));
         }
@@ -63,4 +65,18 @@ public class TripFileService {
     }
 
 
+    // 여행 삭제 시 여행에 연결된 여행파일들을 삭제하거나 untitled 여행으로 옮긴다.
+    // 카드뷰가 하나도 없는 여행파일은 삭제, 하나라도 있다면 untitled 여행으로 옮긴다.
+    @Transactional
+    public void deleteByTripOrUntitled(Trip trip, Trip untitledTrip) {
+        tripFileRepository.findByTrip(trip).forEach(tripFile -> {
+                    if (cardViewRepository.findByTripFile(tripFile).isEmpty()) {
+                        tripFileRepository.delete(tripFile);
+                    } else {
+                        tripFile.setTrip(untitledTrip);
+                        tripFileRepository.save(tripFile);
+                    }
+                }
+        );
+    }
 }
