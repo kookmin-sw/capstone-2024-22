@@ -1,5 +1,6 @@
 package com.moment.core.domain.tripFile;
 
+import com.moment.core.domain.trip.Trip;
 import com.moment.core.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,4 +14,6 @@ public interface TripFileRepository extends JpaRepository<TripFile, Long> {
 
 
     List<TripFile> findByUserAndTrip_Id(User user, Long tripId);
+
+    List<TripFile> findByTrip(Trip trip);
 }
