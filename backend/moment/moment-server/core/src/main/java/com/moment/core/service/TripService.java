@@ -7,6 +7,7 @@ import com.moment.core.domain.user.UserRepository;
 import com.moment.core.dto.request.TripRequestDTO;
 import com.moment.core.dto.response.TripResponseDTO;
 import com.moment.core.exception.AlreadyBookedDateException;
+import com.moment.core.exception.UntitledTripDeleteException;
 import com.moment.core.exception.UserNotFoundException;
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
@@ -39,6 +40,9 @@ public class TripService {
     @Transactional
     public Trip delete(Long tripId) {
         Trip trip = tripRepository.findById(tripId).orElseThrow(() -> new RuntimeException("존재하지 않는 여행입니다."));
+        if(trip.getIsNotTitled()){
+            throw new UntitledTripDeleteException("묶이지 않은 여행은 삭제할 수 없습니다.");
+        }
         Trip untitledTrip = getUntitledTrip(trip.getUser());
         tripFileService.deleteByTripOrUntitled(trip, untitledTrip);
         alreadyBookedDateService.deleteAll(trip.getUser(), trip.getStartDate(), trip.getEndDate());

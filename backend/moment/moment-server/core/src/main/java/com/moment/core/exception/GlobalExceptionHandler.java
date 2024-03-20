@@ -250,6 +250,17 @@ public class GlobalExceptionHandler {
         final ErrorResponse response = ErrorResponse.of(ErrorCode.UNAUTHORIZED_ERROR, ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
+
+    /*
+    * [Exception] untitled 여행 삭제 시도
+
+     */
+    @ExceptionHandler(UntitledTripDeleteException.class)
+    protected ResponseEntity<ErrorResponse> UntitledTripDeleteExceptionHandler(UntitledTripDeleteException ex) {
+        log.error("UntitledTripDeleteException", ex);
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.UNTITLED_TRIP_DELETE_ERROR, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 //    토큰 401에러
 //    @ExceptionHandler({
 //            io.jsonwebtoken.security.SecurityException.class,

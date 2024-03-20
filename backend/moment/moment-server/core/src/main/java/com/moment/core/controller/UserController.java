@@ -34,10 +34,9 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "이미 존재하는 유저아이디일 경우",content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     public ResponseEntity<APIResponse> registerUser(
-            @RequestParam String password,
-            @RequestParam String loginId
+            @RequestParam String email
     ) {
-        userService.save(loginId, password);
+        userService.save(email);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.INSERT_SUCCESS));
     }
 }

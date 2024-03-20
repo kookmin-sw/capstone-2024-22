@@ -20,18 +20,15 @@ public class UserService {
     private final EntityManager em;
 
     @Transactional
-    public User save(String loginId, String password) {
-        Boolean isAlreadyExist = userRepository.existsByLoginId(loginId);
+    public User save(String email) {
+        Boolean isAlreadyExist = userRepository.existsByEmail(email);
         if (isAlreadyExist) {
             throw new UserAlreadyExistException("이미 존재하는 아이디입니다.");
         }
         User user = User.builder()
-                .loginId(loginId)
-                .password(password)
+                .email(email)
                 .build();
-
         em.persist(user);
-
         tripService.save(Trip.builder()
                 .user(user)
                         .analyzingCount(0)
