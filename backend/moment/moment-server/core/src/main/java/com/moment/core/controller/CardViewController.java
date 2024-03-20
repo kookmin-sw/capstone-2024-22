@@ -36,10 +36,11 @@ public class CardViewController {
             @ApiResponse(responseCode = "400", description = "옳바르지 않은 요청 방식, 존재하지 않는 유저, 이미 등록된 여행날짜",content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     public ResponseEntity<APIResponse<CardViewResponseDTO.GetCardView>> uploadRecord(
+            @RequestHeader Long userId,
             @RequestPart CardViewRequestDTO.UploadRecord uploadRecord,
             @RequestPart MultipartFile recordFile
     ) throws IOException {
-        CardViewResponseDTO.GetCardView response = cardViewService.uploadRecord(uploadRecord, recordFile);
+        CardViewResponseDTO.GetCardView response = cardViewService.uploadRecord(uploadRecord, recordFile, userId);
 
         return ResponseEntity.ok(APIResponse.of(SuccessCode.INSERT_SUCCESS, response));
     }
@@ -52,10 +53,11 @@ public class CardViewController {
             @ApiResponse(responseCode = "400", description = "옳바르지 않은 요청 방식",content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     public ResponseEntity<APIResponse<CardViewResponseDTO.GetAllCardView>> getAllCardView(
-            @RequestParam Long userId,
+            @RequestHeader Long userId,
             @PathVariable Long tripFileId
     ) {
         CardViewResponseDTO.GetAllCardView allCardView = cardViewService.getAllCardView(userId, tripFileId);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.SELECT_SUCCESS, allCardView));
     }
 }
+

@@ -49,6 +49,14 @@ spring:
         - id: auth-service
           uri: lb://auth-service
           predicates:
+            - Path=/auth/password
+          filters:
+            - RemoveRequestHeader=Cookie
+            - AuthorizedUserJwtFilter
+
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
             - Path=/auth/**
 
 

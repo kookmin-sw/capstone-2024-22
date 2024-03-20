@@ -13,9 +13,6 @@ public class TripRequestDTO {
     @Builder
     public static class RegisterTrip {
 
-        @Schema(description = "유저 ID")
-        private final Long userId;
-
         @Schema(description = "출발일")
         private LocalDate startDate;
 

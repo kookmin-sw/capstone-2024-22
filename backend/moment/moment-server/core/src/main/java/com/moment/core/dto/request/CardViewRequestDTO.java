@@ -13,9 +13,6 @@ public class CardViewRequestDTO {
     @Builder
     public static class UploadRecord {
 
-        @Schema(description = "유저 ID")
-        private final Long userId;
-
         @Schema(description = "녹음본 장소")
         private final String location;
 

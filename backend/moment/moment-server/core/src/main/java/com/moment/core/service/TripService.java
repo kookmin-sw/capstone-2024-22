@@ -54,17 +54,16 @@ public class TripService {
     public void update(Long userId, TripRequestDTO.UpdateTrip trip) {
         Trip oldTrip = this.delete(trip.getTripId());
         this.register(TripRequestDTO.RegisterTrip.builder()
-                .userId(userId)
                 .startDate(oldTrip.getStartDate())
                 .endDate(oldTrip.getEndDate())
                 .tripName(oldTrip.getTripName())
-                .build());
+                .build(), userId);
     }
 
 
     // 여행 등록
     @Transactional
-    public void register(TripRequestDTO.RegisterTrip registerTrip) {
+    public void register(TripRequestDTO.RegisterTrip registerTrip, Long userId) {
         LocalDate stDate = registerTrip.getStartDate();
         LocalDate endDate = registerTrip.getEndDate();
         Integer analyzingCount = 0;
@@ -73,7 +72,7 @@ public class TripService {
         }
 
         // 유저 검증
-        User user = userRepository.findById(registerTrip.getUserId()).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
 
         // 여행 등록 날짜를 이미 등록했는지 검증
         if (alreadyBookedDateService.isAlreadyBookedDate(user.getId(), stDate, endDate)) {

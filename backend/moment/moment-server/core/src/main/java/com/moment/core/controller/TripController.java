@@ -38,7 +38,7 @@ public class TripController {
             @RequestHeader Long userId,
             @RequestBody TripRequestDTO.RegisterTrip registerTrip
     ) {
-        tripService.register(registerTrip);
+        tripService.register(registerTrip, userId);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.INSERT_SUCCESS));
     }
 

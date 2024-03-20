@@ -48,8 +48,8 @@ public class CardViewService {
     // 여행 파일이 존재한다면 해당 여행파일에 등록
     // 없다면 새로운 여행파일을 생성, untitled에 저장
     @Transactional
-    public CardViewResponseDTO.GetCardView uploadRecord(CardViewRequestDTO.UploadRecord uploadRecord, MultipartFile recordFile) throws IOException {
-        User user = userRepository.findById(uploadRecord.getUserId()).orElseThrow(() -> new UserNotFoundException("해당 유저가 없습니다."));
+    public CardViewResponseDTO.GetCardView uploadRecord(CardViewRequestDTO.UploadRecord uploadRecord, MultipartFile recordFile, Long userId) throws IOException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("해당 유저가 없습니다."));
 
         // 여행파일이 존재하는지 확인 없다면 untitled 여행안에 생성
         Optional<TripFile> tf = tripFileService.findByUserAndYearDate(user, uploadRecord.getRecordedAt().toLocalDate());

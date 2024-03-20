@@ -1,10 +1,9 @@
 package com.moment.auth.service;
 
 import com.moment.auth.client.MailClient;
-import com.moment.auth.dto.request.EmailMessage;
+import com.moment.auth.dto.request.EmailMessageDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -15,7 +14,7 @@ public class MailService {
 
 
     public String sendMail(String to, String subject, String message) {
-        return mailClient.sendMail(EmailMessage.builder()
+        return mailClient.sendMail(EmailMessageDTO.builder()
                         .message(message)
                         .subject(subject)
                         .to(to)
