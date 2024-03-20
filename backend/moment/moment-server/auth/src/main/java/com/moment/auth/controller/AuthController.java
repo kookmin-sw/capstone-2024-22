@@ -36,18 +36,19 @@ public class AuthController {
     @PatchMapping("/verify")
     public ResponseEntity<APIResponse> verifyCode(
             @RequestBody AuthRequest.VerifyCode verifyCode,
-            @RequestHeader String userId
+            @RequestHeader Long userId
             ) {
-        authService.verifyCode(verifyCode, Long.parseLong(userId));
+        authService.verifyCode(verifyCode, userId);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.UPDATE_SUCCESS));
     }
 
     // 비밀번호 변경
     @PatchMapping("/password")
     public ResponseEntity<APIResponse> changePassword(
-            @RequestBody AuthRequest.ChangePassword changePassword
+            @RequestBody AuthRequest.ChangePassword changePassword,
+            @RequestHeader Long userId
             ) {
-        authService.changePassword(changePassword);
+        authService.changePassword(changePassword, userId);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.UPDATE_SUCCESS));
     }
 }
