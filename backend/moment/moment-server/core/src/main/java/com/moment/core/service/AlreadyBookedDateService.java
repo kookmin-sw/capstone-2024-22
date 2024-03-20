@@ -42,4 +42,8 @@ public class AlreadyBookedDateService {
         // stDate부터 endDate까지의 날짜사이에 이미 예약된 여행이 있는지 확인
         return alreadyBookedDateRepository.existsByUserIdAndYearDateBetween(userId, stDate, endDate);
     }
+
+    public void deleteAll(User user, LocalDate startDate, LocalDate endDate) {
+        alreadyBookedDateRepository.deleteByUserAndYearDateBetween(user, startDate, endDate);
+    }
 }
