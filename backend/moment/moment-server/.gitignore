@@ -58,3 +58,5 @@ replay_pid*
 /.gradle/8.5/checksums/sha1-checksums.bin
 /.idea/vcs.xml
 /ai/gradlew
+.DS_Store
+*/.DS_Store
