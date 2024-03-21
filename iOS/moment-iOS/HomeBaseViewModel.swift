@@ -18,6 +18,7 @@ class HomeBaseViewModel: ObservableObject {//클래스가 구현되어있고 옵
   @Published var todosCount: Int // Int 타음을 지정하나봄 즉 데이터가 변화하는 todosCount의 데이터가 변화할대 그 데이터의 형식은 Int 안에서 찾아봐라 그래야한다 라는 의미인듯
   @Published var memosCount: Int//
   @Published var voiceRecordersCount: Int//
+    @Published var isRecording = false
   
   init(
     selectedTab: Tab = .Home,
