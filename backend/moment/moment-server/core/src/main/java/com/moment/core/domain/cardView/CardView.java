@@ -27,9 +27,9 @@ public class CardView extends BaseEntity {
     @JoinColumn(name = "trip_file_id", nullable = false)
     private TripFile tripFile;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id", nullable = false)
+//    private User user;
 
     // 녹음한 시점
     @Column(name = "recorded_at", nullable = false)

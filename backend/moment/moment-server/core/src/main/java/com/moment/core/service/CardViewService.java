@@ -81,7 +81,7 @@ public class CardViewService {
                 .recordFileLength(length)
                 .recordFileUrl("")
                 .recordFileName(fileName)
-                .user(user)
+//                .user(user)
                 .tripFile(tripFile)
                 .weather(uploadRecord.getWeather())
                 .temperature(uploadRecord.getTemperature())

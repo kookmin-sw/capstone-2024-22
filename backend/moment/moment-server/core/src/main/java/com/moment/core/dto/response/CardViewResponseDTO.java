@@ -21,8 +21,8 @@ public class CardViewResponseDTO {
         @Schema(description = "tripFile ID")
         private final Long tripFileId;
 
-        @Schema(description = "user email")
-        private final String email;
+//        @Schema(description = "user email")
+//        private final String email;
 
         @Schema(description = "녹음한 시점")
         private final LocalDateTime recordedAt;
@@ -65,7 +65,7 @@ public class CardViewResponseDTO {
             return GetCardView.builder()
                     .Id(cardView.getId())
                     .tripFileId(cardView.getTripFile().getId())
-                    .email(cardView.getUser().getEmail())
+//                    .email(cardView.getUser().getEmail())
                     .recordedAt(cardView.getRecordedAt())
                     .recordFileName(cardView.getRecordFileName())
                     .recordFileUrl(cardView.getRecordFileUrl())
