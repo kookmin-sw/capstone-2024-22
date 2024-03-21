@@ -231,73 +231,181 @@ extension VoiceRecorderViewModel {
 }
 
 
-
 struct HomeBaseView: View {
     @EnvironmentObject private var pathModel: PathModel
     var edges = UIApplication.shared.windows.first?.safeAreaInsets
     @StateObject private var homeBaseViewModel = HomeBaseViewModel()
     @Namespace var animation // 탭 전환 애니메이션을 위한 네임스페이스
-    
+    @State private var showPartialSheet = false // 커스텀 시트 표시 여부
+
     var body: some View {
-        VStack {
-            Spacer() // 상단 컨텐츠를 위한 공간
-            
-            // 현재 선택된 탭에 따라 표시되는 뷰
-            ZStack {
-                switch homeBaseViewModel.selectedTab {
-                case .Home:
-                    HomeView()
-                case .Bill:
-                    BillListView()
-               case .voiceRecorder:
-                    VoiceRecorderView()
-//                    VoiceRecorderView()
-                case .Like:
-                    LikeView()
-                case .setting:
-                    SettingView()
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            
-            
-            
-            // 커스텀 탭 바
-            ZStack(alignment: .bottom) {
-                
-                Rectangle()
-                    .fill(Color.black) // 구분선 색상 설정
-                    .frame(width: UIScreen.main.bounds.width, height: 1) // 화면 너비에 맞춘 구분선
-                    .offset(y: -edges!.bottom - 70) // 이미지와 동일한 오프셋으로 조정
-                // 전체를 ZStack으로 감쌈
-                HStack(spacing: 0) {
-                    
-                    ForEach(Tab.allCases, id: \.self) { tab in
-                        TabButton(title: tab, selectedTab: $homeBaseViewModel.selectedTab, animation: animation, isRecording: $homeBaseViewModel.isRecording)
-                        
-                        if tab != Tab.allCases.last {
-                            Spacer(minLength: -1) // 탭 버튼 사이의 공간
-                        }
+        ZStack {
+            VStack {
+                Spacer() // 상단 컨텐츠를 위한 공간
+
+                // 현재 선택된 탭에 따라 표시되는 뷰
+                ZStack {
+                    switch homeBaseViewModel.selectedTab {
+                    case .Home:
+                        HomeView()
+                    case .Bill:
+                        BillListView()
+                    case .voiceRecorder:
+                        VoiceRecorderView()
+                    case .Like:
+                        LikeView()
+                    case .setting:
+                        SettingView()
                     }
                 }
-                .padding(.horizontal, 30)
-                .padding(.bottom, edges?.bottom == 0 ? 15 : edges!.bottom)
-                
-               
-                // 중앙 이미지 추가
-                Image("Recode") // 여기에 원하는 이미지를 넣으세요.
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 50, height: 50) // 이미지 크기 조정
-                    .offset(y: -edges!.bottom - 40) // 탭 바 위에 위치하도록 조정
-                
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                // 커스텀 탭 바
+                ZStack(alignment: .bottom) {
+                    Rectangle()
+                        .fill(Color.black) // 구분선 색상 설정
+                        .frame(width: UIScreen.main.bounds.width, height: 1) // 화면 너비에 맞춘 구분선
+                        .offset(y: -edges!.bottom - 70) // 구분선 조정
+                    
+                    HStack(spacing: 0) {
+                        ForEach(Tab.allCases, id: \.self) { tab in
+                            TabButton(title: tab, selectedTab: $homeBaseViewModel.selectedTab, animation: animation, isRecording: $homeBaseViewModel.isRecording)
+                            
+                            if tab != Tab.allCases.last {
+                                Spacer(minLength: 0) // 탭 버튼 사이의 공간
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 30)
+                    .padding(.bottom, edges?.bottom == 0 ? 15 : edges!.bottom)
+
+                    // 중앙 이미지 추가
+                    Image("Recode") // 중앙 버튼 이미지
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 50, height: 50)
+                        .offset(y: -edges!.bottom - 40) // 이미지 위치 조정
+                }
+                .background(Color.homeBack) // 탭 바 배경색
             }
-            .background(Color.homeBack)
+            .edgesIgnoringSafeArea(.bottom)
+            .background(Color.homeBack.ignoresSafeArea(.all, edges: .all))
+
+            // 커스텀 시트 부분
+            if showPartialSheet {
+                BottomSheetView1(isPresented: $showPartialSheet)
+            }
         }
-        .edgesIgnoringSafeArea(.bottom)
-        .background(Color.homeBack.ignoresSafeArea(.all, edges: .all))
+        .onChange(of: homeBaseViewModel.isRecording) { newValue in
+            withAnimation {
+                showPartialSheet = newValue
+            }
+        }
     }
 }
+
+
+struct BottomSheetView1: View {
+    @Binding var isPresented: Bool
+    var body: some View {
+        VStack {
+            Spacer() // 상단 부분을 비워 뷰의 하단에만 내용이 표시되도록 합니다.
+            
+            VStack {
+                // 여기에 Bottom Sheet 내부에 표시할 내용을 넣습니다.
+                Text("녹음 중...")
+                    .font(.title)
+                    .padding()
+                Button("닫기") {
+                    withAnimation {
+                        isPresented = false
+                    }
+                }
+                .padding()
+            }
+            .frame(maxWidth: .infinity)
+            .background(Color.white) // 시트의 배경색
+            .cornerRadius(20) // 상단 모서리 둥글게
+            .shadow(radius: 10) // 그림자 효과
+        }
+        .transition(.move(edge: .bottom)) // 하단에서 올라오는 애니메이션 효과
+        .onTapGesture {
+            withAnimation {
+                isPresented = false // 시트 외부를 탭하면 시트를 닫습니다.
+            }
+        }
+    }
+}
+
+//
+//struct BottomSheetView: View {
+//    @Environment(\.presentationMode) var presentationMode
+//    @Binding var isAgree1: Bool
+//    @Binding var isAgree2: Bool
+//    @Binding var isAgree3 : Bool
+//    @Binding var showingSheet: Bool
+//    @State private var showingTermsSheet: Bool = false
+//      @State private var selectedTermsIndex: Int = 0
+//    
+//    let termsTitles = ["이용 약관 동의", "개인정보 수집 및 이용 동의", "위치정보 이용 동의"]
+//      
+//      let Important = ["필수","필수","선택"]
+//    
+//    var body: some View {
+//        VStack(spacing: 20) {
+//            Spacer()
+//            ForEach(0..<3) { index in
+//                HStack {
+//                    Text(Important[index])
+//                        .font(.caption)
+//                        .foregroundColor(Important[index] == "선택" ? .gray : .homeRed)
+//                        .foregroundColor(.homeRed)
+//                    
+//                    Text(termsTitles[index])
+//                        .font(.caption)
+//                        .foregroundColor(.gray)
+//                    
+//                    Spacer()
+//                    
+//                    Button("보기") {
+//                        selectedTermsIndex = index
+//                                               showingTermsSheet = true
+//                    }
+//                    .foregroundColor(.homeRed)
+//                    .font(.caption)
+//                    
+//                    Button(action: {
+//                        switch index {
+//                        case 0: isAgree1.toggle()
+//                        case 1: isAgree2.toggle()
+//                        case 2: isAgree3.toggle()
+//                        default: break
+//                        }
+//                    }) {
+//                        Image(systemName: isAgree1 && index == 0 || isAgree2 && index == 1 || isAgree3 && index == 2 ? "checkmark.square" : "square")
+//                            .foregroundColor(.homeRed)
+//                    }
+//                }
+//                .padding(.horizontal, 20)
+//            }
+//            Spacer()
+//        }
+//        .background(Color.white)
+//        .cornerRadius(10)
+//        .shadow(radius: 5)
+//        .onDisappear {
+//            if !(isAgree1 && isAgree2) {
+//                showingSheet = false // Close the bottom sheet if not all required are agreed
+//            }
+//        }
+//        .sheet(isPresented: $showingTermsSheet) {
+//                  // 약관 내용 보기
+//                  TermsContentSheetView(content: termsContents[selectedTermsIndex])
+//              }
+//    }
+//}
+
+
 // 탭 버튼 컴포넌트
 struct TabButton: View {
     let title: Tab
