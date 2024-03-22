@@ -3,16 +3,21 @@ package com.moment.core.service;
 import com.moment.core.domain.alreadyBookedDate.AlreadyBookedDate;
 import com.moment.core.domain.alreadyBookedDate.AlreadyBookedDateRepository;
 import com.moment.core.domain.user.User;
+import com.moment.core.domain.user.UserRepository;
+import com.moment.core.dto.response.AlreadyBookedDateResponseDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class AlreadyBookedDateService {
     private final AlreadyBookedDateRepository alreadyBookedDateRepository;
+    private final UserRepository userRepository;
 
 
     // save
@@ -30,6 +35,21 @@ public class AlreadyBookedDateService {
                     .build();
             alreadyBookedDateRepository.save(alreadyBookedDate);
         }
+    }
+
+    // 전부 가져오기
+    public AlreadyBookedDateResponseDTO.GetAllCardView getAll(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("해당 유저가 없습니다."));
+        List<AlreadyBookedDate> alreadyBookedDates = alreadyBookedDateRepository.findAllByUser(user);
+        List<AlreadyBookedDateResponseDTO.GetCardView> cardViews = new ArrayList<>();
+        for (AlreadyBookedDate alreadyBookedDate : alreadyBookedDates) {
+            cardViews.add(AlreadyBookedDateResponseDTO.GetCardView.builder()
+                    .bookedDate(alreadyBookedDate.getYearDate())
+                    .build());
+        }
+        return AlreadyBookedDateResponseDTO.GetAllCardView.builder()
+                .cardViews(cardViews)
+                .build();
     }
 
     // delete
