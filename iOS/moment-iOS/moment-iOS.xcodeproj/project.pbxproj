@@ -57,6 +57,9 @@
 		8E8C17522BAAB65700BF1E1C /* CustomToolTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17512BAAB65700BF1E1C /* CustomToolTip.swift */; };
 		8E8C17542BAAC59400BF1E1C /* AddUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17532BAAC59400BF1E1C /* AddUser.swift */; };
 		8E8C17562BAAC8F000BF1E1C /* AuthComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17552BAAC8F000BF1E1C /* AuthComplete.swift */; };
+		8E8C17CA2BABF1A800BF1E1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */; };
+		8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C18052BAC379700BF1E1C /* SwipeItem.swift */; };
+		8E8C18082BAC41C600BF1E1C /* TravelItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C18072BAC41C600BF1E1C /* TravelItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -128,6 +131,9 @@
 		8E8C17512BAAB65700BF1E1C /* CustomToolTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomToolTip.swift; sourceTree = "<group>"; };
 		8E8C17532BAAC59400BF1E1C /* AddUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddUser.swift; sourceTree = "<group>"; };
 		8E8C17552BAAC8F000BF1E1C /* AuthComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthComplete.swift; sourceTree = "<group>"; };
+		8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8E8C18052BAC379700BF1E1C /* SwipeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeItem.swift; sourceTree = "<group>"; };
+		8E8C18072BAC41C600BF1E1C /* TravelItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +166,7 @@
 		8E15C8642B6527E3001468C7 = {
 			isa = PBXGroup;
 			children = (
+				8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */,
 				8E15C8702B6527E3001468C7 /* moment_iOSApp.swift */,
 				8E5CAE712B970EE700A483B4 /* AppDelegate.swift */,
 				8E8C17502BAAB64D00BF1E1C /* ToolTip */,
@@ -242,6 +249,8 @@
 			children = (
 				8E5CAE4F2B970D6A00A483B4 /* HomeViewModel.swift */,
 				8E5CAE512B970DB600A483B4 /* HomeView.swift */,
+				8E8C18072BAC41C600BF1E1C /* TravelItem.swift */,
+				8E8C18052BAC379700BF1E1C /* SwipeItem.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -422,6 +431,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8E8C17CA2BABF1A800BF1E1C /* Assets.xcassets in Resources */,
 				8E5CAE362B970C4500A483B4 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -453,11 +463,13 @@
 				8E5CAE442B970CFF00A483B4 /* HomeBaseViewModel.swift in Sources */,
 				8E5CAE602B970E2800A483B4 /* MemoViewModel.swift in Sources */,
 				8E5CAE642B970E5B00A483B4 /* Double+Extensions.swift in Sources */,
+				8E8C18082BAC41C600BF1E1C /* TravelItem.swift in Sources */,
 				8E2D273B2BA57DE7006248EA /* FSCalendarWrapper.swift in Sources */,
 				8E5CAE402B970CD800A483B4 /* PathModel.swift in Sources */,
 				8E5CAE622B970E4300A483B4 /* MemoView.swift in Sources */,
 				8E5CAE6E2B970EC600A483B4 /* LikeView.swift in Sources */,
 				8E5CAE5E2B970E1800A483B4 /* Memo.swift in Sources */,
+				8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */,
 				8E5CAE502B970D6B00A483B4 /* HomeViewModel.swift in Sources */,
 				8E5CAE482B970D2700A483B4 /* Date+Extensions.swift in Sources */,
 				8E5CAE462B970D1000A483B4 /* Tab.swift in Sources */,

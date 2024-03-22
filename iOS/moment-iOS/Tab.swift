@@ -5,7 +5,7 @@
 //  Created by 양시관 on 3/5/24.
 //
 enum Tab: Int, CaseIterable, Identifiable, Comparable {
-    case Home, Bill, voiceRecorder, Like, setting
+    case Home, Bill,voiceRecorder, Like, setting
 
     var id: Int { self.rawValue }
 
