@@ -138,7 +138,7 @@ extension VoiceRecorderViewModel {
     }
   }
   
-  private func stopRecording() {
+   func stopRecording() {
     audioRecorder?.stop()
     self.recordedFiles.append(self.audioRecorder!.url)
     self.isRecording = false

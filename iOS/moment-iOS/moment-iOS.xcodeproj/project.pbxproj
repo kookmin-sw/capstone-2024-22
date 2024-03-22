@@ -61,6 +61,7 @@
 		8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C18052BAC379700BF1E1C /* SwipeItem.swift */; };
 		8E8C18082BAC41C600BF1E1C /* TravelItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C18072BAC41C600BF1E1C /* TravelItem.swift */; };
 		8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA922BAD6B3200C39125 /* PasswordView.swift */; };
+		8ECCFA962BADDF9C00C39125 /* RecordedFilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA952BADDF9C00C39125 /* RecordedFilesView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -136,6 +137,7 @@
 		8E8C18052BAC379700BF1E1C /* SwipeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeItem.swift; sourceTree = "<group>"; };
 		8E8C18072BAC41C600BF1E1C /* TravelItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelItem.swift; sourceTree = "<group>"; };
 		8ECCFA922BAD6B3200C39125 /* PasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordView.swift; sourceTree = "<group>"; };
+		8ECCFA952BADDF9C00C39125 /* RecordedFilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordedFilesView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -334,6 +336,7 @@
 			children = (
 				8E5CAE432B970CFF00A483B4 /* HomeBaseViewModel.swift */,
 				8E5CAE412B970CEA00A483B4 /* HomeBaseView.swift */,
+				8ECCFA952BADDF9C00C39125 /* RecordedFilesView.swift */,
 			);
 			path = HomeBase;
 			sourceTree = "<group>";
@@ -516,6 +519,7 @@
 				8E15C8712B6527E3001468C7 /* moment_iOSApp.swift in Sources */,
 				8E5CAE6A2B970E9900A483B4 /* Int-Extensions.swift in Sources */,
 				8E5CAE542B970DC600A483B4 /* WriteBtn.swift in Sources */,
+				8ECCFA962BADDF9C00C39125 /* RecordedFilesView.swift in Sources */,
 				8E5CAE342B970C2C00A483B4 /* Color+Extensions.swift in Sources */,
 				8E8C174C2BA86BF200BF1E1C /* ButtonStyle.swift in Sources */,
 				8E5CAE5A2B970DF600A483B4 /* BillListViewModel.swift in Sources */,
