@@ -67,6 +67,10 @@ struct OnboardingView: View {
                     case .AuthComplete:
                         AuthComplete()
                             .environmentObject(homeViewModel)
+                        
+                    case .PasswordView:
+                        PasswordView()
+                            .environmentObject(homeViewModel)
                     }
                 }
                 )

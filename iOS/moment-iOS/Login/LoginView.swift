@@ -93,7 +93,7 @@ private struct StartHomeBtnView: View {
             
             HStack {
                 Button("비밀번호 찾기") {
-                    // 비밀번호 찾기 동작 구현
+                    pathModel.paths.append(.PasswordView)
                 }
                 .font(.caption)
                 .foregroundColor(.black)

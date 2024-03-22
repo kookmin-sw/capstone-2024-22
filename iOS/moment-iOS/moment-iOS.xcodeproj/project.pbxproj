@@ -60,6 +60,7 @@
 		8E8C17CA2BABF1A800BF1E1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */; };
 		8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C18052BAC379700BF1E1C /* SwipeItem.swift */; };
 		8E8C18082BAC41C600BF1E1C /* TravelItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C18072BAC41C600BF1E1C /* TravelItem.swift */; };
+		8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA922BAD6B3200C39125 /* PasswordView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -134,6 +135,7 @@
 		8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8E8C18052BAC379700BF1E1C /* SwipeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeItem.swift; sourceTree = "<group>"; };
 		8E8C18072BAC41C600BF1E1C /* TravelItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelItem.swift; sourceTree = "<group>"; };
+		8ECCFA922BAD6B3200C39125 /* PasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -173,6 +175,7 @@
 				8E8C174D2BA86BFD00BF1E1C /* Style */,
 				8E8C174A2BA85B8700BF1E1C /* Path */,
 				8E8C17492BA85AE600BF1E1C /* Auth */,
+				8ECCFA912BAD6B2200C39125 /* PasswordView */,
 				8E8C17462BA8575500BF1E1C /* Login */,
 				8E2D273F2BA57E60006248EA /* Onboarding */,
 				8E2D273D2BA57E35006248EA /* Home */,
@@ -317,6 +320,14 @@
 				8E8C17512BAAB65700BF1E1C /* CustomToolTip.swift */,
 			);
 			path = ToolTip;
+			sourceTree = "<group>";
+		};
+		8ECCFA912BAD6B2200C39125 /* PasswordView */ = {
+			isa = PBXGroup;
+			children = (
+				8ECCFA922BAD6B3200C39125 /* PasswordView.swift */,
+			);
+			path = PasswordView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -471,6 +482,7 @@
 				8E5CAE5E2B970E1800A483B4 /* Memo.swift in Sources */,
 				8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */,
 				8E5CAE502B970D6B00A483B4 /* HomeViewModel.swift in Sources */,
+				8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */,
 				8E5CAE482B970D2700A483B4 /* Date+Extensions.swift in Sources */,
 				8E5CAE462B970D1000A483B4 /* Tab.swift in Sources */,
 				8E5CAE682B970E8700A483B4 /* VoiceRecorderView.swift in Sources */,

@@ -22,4 +22,6 @@ enum PathType: Hashable { // 이넘은 열거형으로 써본결과 가장 제�
     case AuthNumView
     case AddUser
     case AuthComplete
+    case PasswordView
+    
 }
