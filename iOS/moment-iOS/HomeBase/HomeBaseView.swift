@@ -105,6 +105,7 @@ struct BottomSheetView1: View {
     @State private var timeElapsed = 0
     @State private var timerRunning = false
     @State private var recordBtn = false
+    @State private var tooltipOpacity = 1.0
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -121,10 +122,22 @@ struct BottomSheetView1: View {
                         .frame(width: 24, height: 12) // 삼각형 크기 지정
                         .offset(x: 10, y: 53)
                     
-                    CustomRectangleShapeLeftdown(text: "녹음은 한번에 최대 10분까지 가능해요 최대시간을 넘어가면 자동 종료 후 저장됩니다")
+                    
+                    CustomRectangleShapeLeftdown(text: "녹음은 한번에 최대 10분까지 가능해요 \n최대시간을 넘어가면 자동 종료 후 저장됩니다")
+                        .multilineTextAlignment(.center)
                         .frame(width: 340, height: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/)
-                        //.padding(.bottom, 72)
+                       
                 }
+                .opacity(tooltipOpacity)  // 투명도 적용
+                                       .onAppear {
+                                           // 5초 후에 투명도를 0으로 변경하여 툴팁을 서서히 사라지게 함
+                                           DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                               withAnimation(.easeOut(duration: 2.0)) {
+                                                   tooltipOpacity = 0
+                                               }
+                                           }
+                                       }
+                
                 
                 Text("\(timeString(time: timeElapsed))")
                     .font(.caption)
@@ -149,7 +162,7 @@ struct BottomSheetView1: View {
                     }
 
                 Text("열심히 듣고 있어요")  // 여기에 원하는 텍스트를 추가하세요.
-                    .padding()
+                   
                     .frame(height: 44)
                     .overlay(Rectangle().frame(height: 1), alignment: .bottom)
                     .padding(.horizontal,20)
