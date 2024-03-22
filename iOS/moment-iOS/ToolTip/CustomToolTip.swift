@@ -65,7 +65,7 @@ struct TooltipShapeRightup: View {
                 .fill(.gray500)
                 .padding(.leading, 135)
             
-            CustomRectangleShapeRightup(text: "Tooltip 입니다!")
+            CustomRectangleShapeRightup(text: "Tooltip 입니다1!")
         }
         .frame(width: 210, height: 25)
     }
@@ -80,7 +80,7 @@ struct TooltipShapeLeftdown: View {
                 .frame(width: 24, height: 12) // 삼각형 크기 지정
                 .offset(x: 0, y: 20)
             
-            CustomRectangleShapeLeftdown(text: "Tooltip 입니다!")
+            CustomRectangleShapeLeftdown(text: "Tooltip 입니다!3")
                 .padding(.bottom, 12)
         }
         .frame(width: 210, height: 25)

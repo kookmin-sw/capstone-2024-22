@@ -100,26 +100,78 @@ struct HomeBaseView: View {
     }
 }
 
-
 struct BottomSheetView1: View {
     @Binding var isPresented: Bool
+    @State private var timeElapsed = 0
+    @State private var timerRunning = false
+    @State private var recordBtn = false
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
     var body: some View {
         VStack {
-            Spacer() // 상단 부분을 비워 뷰의 하단에만 내용이 표시되도록 합니다.
-            
+            Spacer()
+
             VStack {
-                // 여기에 Bottom Sheet 내부에 표시할 내용을 넣습니다.
-                Text("녹음 중...")
-                    .font(.title)
-                    .padding()
-                Button("닫기") {
-                    withAnimation {
-                        isPresented = false
-                    }
+               
+                Spacer()
+                ZStack{
+                    
+                    CustomTriangleShapeLeftdown()
+                        .fill(.gray500)
+                        .frame(width: 24, height: 12) // 삼각형 크기 지정
+                        .offset(x: 10, y: 53)
+                    
+                    CustomRectangleShapeLeftdown(text: "녹음은 한번에 최대 10분까지 가능해요 최대시간을 넘어가면 자동 종료 후 저장됩니다")
+                        .frame(width: 340, height: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/)
+                        //.padding(.bottom, 72)
                 }
-                .padding()
+                
+                Text("\(timeString(time: timeElapsed))")
+                    .font(.caption)
+                    .padding()
+                    .frame(height: 44)
+                    .overlay(Rectangle().frame(height: 1), alignment: .bottom)
+                    .padding(.horizontal,15)
+                
+                    .onReceive(timer) { _ in
+                        if timerRunning {
+                            timeElapsed += 1
+                        }
+                    }
+                    .onAppear {
+                        // 시트가 나타날 때 타이머 시작
+                        timerRunning = true
+                    }
+                    .onDisappear {
+                        // 시트가 사라질 때 타이머 중지
+                        timerRunning = false
+                        timeElapsed = 0  // 시간 초기화
+                    }
+
+                Text("열심히 듣고 있어요")  // 여기에 원하는 텍스트를 추가하세요.
+                    .padding()
+                    .frame(height: 44)
+                    .overlay(Rectangle().frame(height: 1), alignment: .bottom)
+                    .padding(.horizontal,20)
+                
+
+                // 녹음 버튼
+                Button(action: {
+                    recordBtn.toggle()
+                    timerRunning.toggle()  // 버튼을 눌러 타이머 시작/정지
+                }) {
+                    Image(systemName: recordBtn ? "stop.fill" : "record.circle")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 50, height: 50)
+                        .foregroundColor(.red)
+                        .padding(.bottom, 10)
+                }
+                    .padding()
+
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: 284)
+
             .background(Color.homeBack) // 시트의 배경색
         }
         .transition(.move(edge: .bottom)) // 하단에서 올라오는 애니메이션 효과
@@ -129,7 +181,15 @@ struct BottomSheetView1: View {
             }
         }
     }
+
+    func timeString(time: Int) -> String {
+        let minutes = time / 60 % 60
+        let seconds = time % 60
+        return String(format:"%02i:%02i", minutes, seconds)
+    }
+
 }
+
 
 
 // 탭 버튼 컴포넌트

@@ -171,6 +171,7 @@
 				8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */,
 				8E15C8702B6527E3001468C7 /* moment_iOSApp.swift */,
 				8E5CAE712B970EE700A483B4 /* AppDelegate.swift */,
+				8ECCFA942BADC97F00C39125 /* HomeBase */,
 				8E8C17502BAAB64D00BF1E1C /* ToolTip */,
 				8E8C174D2BA86BFD00BF1E1C /* Style */,
 				8E8C174A2BA85B8700BF1E1C /* Path */,
@@ -200,8 +201,6 @@
 				8E5CAE532B970DC600A483B4 /* WriteBtn.swift */,
 				8E5CAE4D2B970D5D00A483B4 /* Todo.swift */,
 				8E5CAE452B970D1000A483B4 /* Tab.swift */,
-				8E5CAE432B970CFF00A483B4 /* HomeBaseViewModel.swift */,
-				8E5CAE412B970CEA00A483B4 /* HomeBaseView.swift */,
 				8E15C8722B6527E3001468C7 /* ContentView.swift */,
 				8E5CAE352B970C4500A483B4 /* Assets.xcassets */,
 				8E15C8802B6527E7001468C7 /* moment-iOSTests */,
@@ -328,6 +327,15 @@
 				8ECCFA922BAD6B3200C39125 /* PasswordView.swift */,
 			);
 			path = PasswordView;
+			sourceTree = "<group>";
+		};
+		8ECCFA942BADC97F00C39125 /* HomeBase */ = {
+			isa = PBXGroup;
+			children = (
+				8E5CAE432B970CFF00A483B4 /* HomeBaseViewModel.swift */,
+				8E5CAE412B970CEA00A483B4 /* HomeBaseView.swift */,
+			);
+			path = HomeBase;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
