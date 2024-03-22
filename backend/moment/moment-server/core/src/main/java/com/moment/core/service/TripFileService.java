@@ -38,6 +38,11 @@ public class TripFileService {
         }
     }
 
+    // 해당 TripFile의 카드뷰 개수 반환
+    public Long getCardViewCount(TripFile tripFile) {
+        return cardViewRepository.countByTripFile(tripFile);
+    }
+
     public Optional<TripFile> findByUserAndYearDate(User user, LocalDate localDate) {
         return tripFileRepository.findByUserAndYearDate(user, localDate);
     }
@@ -78,5 +83,9 @@ public class TripFileService {
                     }
                 }
         );
+    }
+
+    public void delete(TripFile tripFile) {
+        tripFileRepository.delete(tripFile);
     }
 }

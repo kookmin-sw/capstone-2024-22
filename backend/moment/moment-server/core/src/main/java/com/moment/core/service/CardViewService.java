@@ -30,17 +30,19 @@ public class CardViewService {
     private final UserRepository userRepository;
     private final TripService tripService;
     private final TripFileService tripFileService;
+    private final ImageFileService imageFileService;
 
 
     @Value("${file.path}")
     private String filePath;
 
     @Autowired
-    public CardViewService(CardViewRepository cardViewRepository, UserRepository userRepository, TripService tripService, TripFileService tripFileService) {
+    public CardViewService(CardViewRepository cardViewRepository, UserRepository userRepository, TripService tripService, TripFileService tripFileService, ImageFileService imageFileService) {
         this.cardViewRepository = cardViewRepository;
         this.userRepository = userRepository;
         this.tripService = tripService;
         this.tripFileService = tripFileService;
+        this.imageFileService = imageFileService;
     }
 
 
@@ -119,5 +121,52 @@ public class CardViewService {
             rtnList.add(CardViewResponseDTO.GetCardView.fromEntity(cardView));
         }
         return CardViewResponseDTO.GetAllCardView.builder().cardViews(rtnList).build();
+    }
+
+    public void updateRecord(Long cardViewId, CardViewRequestDTO.UpdateRecord updateRecord) {
+        CardView cardView = cardViewRepository.findById(cardViewId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카드뷰입니다."));
+
+        // update
+        if (updateRecord.getLocation() != null)
+            cardView.setEmotion(updateRecord.getLocation());
+        if (updateRecord.getStt() != null)
+            cardView.setStt(updateRecord.getStt());
+        if (updateRecord.getQuestion() != null)
+            cardView.setQuestion(updateRecord.getQuestion());
+        if (updateRecord.getWeather() != null)
+            cardView.setWeather(updateRecord.getWeather());
+        if (updateRecord.getTemperature() != null)
+            cardView.setTemperature(updateRecord.getTemperature());
+
+        cardViewRepository.save(cardView);
+    }
+
+    @Transactional
+    public void deleteRecord(Long cardViewId) {
+        CardView cardView = cardViewRepository.findById(cardViewId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카드뷰입니다."));
+        // cardView에 엮인 사진들 먼저 삭제
+        imageFileService.deleteAll(cardView);
+        boolean isAnalyzed = cardView.getRecordFileStatus().equals("WAIT");
+        // 만약 tripfile의 Trip이 untitled일 경우
+        //     만약 tripfile의 크기가 1이라면 tripFile과 cardView 전부 삭제, untitledTrip의 analyzingCount 감소
+        TripFile tripFile = cardView.getTripFile();
+        if (tripFile.getTrip().getIsNotTitled()) {
+            if (tripFileService.getCardViewCount(tripFile) == 1) {
+                cardViewRepository.delete(cardView);
+                tripFileService.delete(cardView.getTripFile());
+                if (isAnalyzed)
+                    tripService.decreaseAnalyzingCount(cardView.getTripFile().getTrip());
+            }
+        }
+        // 만약 tripfile의 trip이 untitled가 아닐경우
+        // cardView만 삭제, tripFile의 analyzingCount 감소
+        // trip의 analyzingCount 감소
+        else {
+            cardViewRepository.delete(cardView);
+            if (isAnalyzed){
+                tripFileService.decreaseAnalyzingCount(cardView.getTripFile());
+                tripService.decreaseAnalyzingCount(cardView.getTripFile().getTrip());
+            }
+        }
     }
 }
