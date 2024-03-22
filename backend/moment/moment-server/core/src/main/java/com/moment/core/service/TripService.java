@@ -7,6 +7,7 @@ import com.moment.core.domain.user.UserRepository;
 import com.moment.core.dto.request.TripRequestDTO;
 import com.moment.core.dto.response.TripResponseDTO;
 import com.moment.core.exception.AlreadyBookedDateException;
+import com.moment.core.exception.UntitledTripDeleteException;
 import com.moment.core.exception.UserNotFoundException;
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
@@ -32,18 +33,37 @@ public class TripService {
         tripRepository.save(trip);
     }
 
-    public void delete(Long tripId) {
-        tripRepository.deleteById(tripId);
+    // 1. 여행을 삭제한다.
+    // 2. 엮여있는 여행파일들 탐색
+    // 3. 내부가 비어있는 여행파일들은 그냥 삭제, 내부가 비어있지 않다면 untitled 여행으로 넣는다.
+    // 4. alreadyBookedDate에서 삭제한다.
+    @Transactional
+    public Trip delete(Long tripId) {
+        Trip trip = tripRepository.findById(tripId).orElseThrow(() -> new RuntimeException("존재하지 않는 여행입니다."));
+        if(trip.getIsNotTitled()){
+            throw new UntitledTripDeleteException("묶이지 않은 여행은 삭제할 수 없습니다.");
+        }
+        Trip untitledTrip = getUntitledTrip(trip.getUser());
+        tripFileService.deleteByTripOrUntitled(trip, untitledTrip);
+        alreadyBookedDateService.deleteAll(trip.getUser(), trip.getStartDate(), trip.getEndDate());
+        tripRepository.delete(trip);
+        return trip;
     }
 
-    public void update(Trip trip) {
-        tripRepository.save(trip);
+    @Transactional
+    public void update(Long userId, TripRequestDTO.UpdateTrip trip) {
+        Trip oldTrip = this.delete(trip.getTripId());
+        this.register(TripRequestDTO.RegisterTrip.builder()
+                .startDate(oldTrip.getStartDate())
+                .endDate(oldTrip.getEndDate())
+                .tripName(oldTrip.getTripName())
+                .build(), userId);
     }
 
 
     // 여행 등록
     @Transactional
-    public void register(TripRequestDTO.RegisterTrip registerTrip) {
+    public void register(TripRequestDTO.RegisterTrip registerTrip, Long userId) {
         LocalDate stDate = registerTrip.getStartDate();
         LocalDate endDate = registerTrip.getEndDate();
         Integer analyzingCount = 0;
@@ -52,7 +72,7 @@ public class TripService {
         }
 
         // 유저 검증
-        User user = userRepository.findById(registerTrip.getUserId()).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
 
         // 여행 등록 날짜를 이미 등록했는지 검증
         if (alreadyBookedDateService.isAlreadyBookedDate(user.getId(), stDate, endDate)) {

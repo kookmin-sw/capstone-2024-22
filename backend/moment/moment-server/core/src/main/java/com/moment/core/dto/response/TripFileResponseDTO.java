@@ -20,8 +20,8 @@ public class TripFileResponseDTO {
         @Schema(description = "여행 ID")
         private final Long tripId;
 
-        @Schema(description = "유저 로그인 ID")
-        private final String userLoginId;
+        @Schema(description = "유저 email")
+        private final String email;
 
         @Schema(description = "연월일")
         private LocalDate yearDate;
@@ -34,7 +34,7 @@ public class TripFileResponseDTO {
             return GetTripFile.builder()
                     .id(tripFile.getId())
                     .tripId(tripFile.getTrip().getId())
-                    .userLoginId(tripFile.getUser().getLoginId())
+                    .email(tripFile.getUser().getEmail())
                     .yearDate(tripFile.getYearDate())
                     .analyzingCount(tripFile.getAnalyzingCount())
                     .build();

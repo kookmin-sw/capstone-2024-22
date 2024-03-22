@@ -1,0 +1,2 @@
+emotion2vec/emobion2vec_base.tar.gz filter=lfs diff=lfs merge=lfs -text
+emotion2vec/emotion2vec_base.tar.gz filter=lfs diff=lfs merge=lfs -text

@@ -36,7 +36,7 @@ public class AuthRequest {
     @Getter
     @Setter
     public static class ChangePassword {
-        private Long userId;
+
         private String code;
         private String newPassword;
     }

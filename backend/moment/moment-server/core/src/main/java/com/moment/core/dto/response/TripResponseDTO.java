@@ -17,8 +17,8 @@ public class TripResponseDTO {
         @Schema(description = "여행 ID")
         private final Long id;
 
-        @Schema(description = "유저 ID")
-        private final String userLoginId;
+        @Schema(description = "유저 email")
+        private final String email;
 
         @Schema(description = "출발일")
         private final LocalDate startDate;
@@ -36,7 +36,7 @@ public class TripResponseDTO {
         public static GetTrip fromEntity(Trip trip) {
             return GetTrip.builder()
                     .id(trip.getId())
-                    .userLoginId(trip.getUser().getLoginId())
+                    .email(trip.getUser().getEmail())
                     .startDate(trip.getStartDate())
                     .endDate(trip.getEndDate())
                     .analyzingCount(trip.getAnalyzingCount())

@@ -70,7 +70,7 @@ public class AuthorizedUserJwtFilter extends AbstractGatewayFilterFactory<Author
             // 토큰 ROLE 확인
             if(!role.equals(Role.ROLE_AUTH_USER)){
                 // /auth/verify로 들어온 요청일 경우 role이 TemptUser여도 허가
-                if(!request.getURI().getPath().equals("/auth/verify")){
+                if(!request.getURI().getPath().equals("/auth/verify") && !request.getURI().getPath().equals("/auth/password")){
                     return HandleInvalidRole(exchange);
                 }
             }

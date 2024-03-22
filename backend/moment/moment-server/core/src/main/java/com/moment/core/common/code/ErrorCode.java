@@ -51,6 +51,9 @@ public enum ErrorCode {
     // @RequestBody 및 @RequestParam, @PathVariable 값이 유효하지 않음
     NOT_VALID_HEADER_ERROR(404, "Header에 데이터가 존재하지 않는 경우 "),
 
+    // Untitled 여행 삭제 시도
+    UNTITLED_TRIP_DELETE_ERROR(400, "Untitled Trip Delete Exception"),
+
 //토큰 관련 에러
     UNAUTHORIZED_ERROR(401, "Forbidden Exception"),
 
