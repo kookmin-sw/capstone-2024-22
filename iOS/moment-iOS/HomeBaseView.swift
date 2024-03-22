@@ -77,6 +77,15 @@ struct HomeBaseView: View {
             .edgesIgnoringSafeArea(.bottom)
             .background(Color.homeBack.ignoresSafeArea(.all, edges: .all))
             
+            if showPartialSheet {
+                  Color.black.opacity(0.5) // 어두운 배경 적용
+                      .edgesIgnoringSafeArea(.all)
+                      .onTapGesture {
+                          withAnimation {
+                              showPartialSheet = false // 어두운 배경을 탭하면 시트 닫기
+                          }
+                      }
+              }
 
             // 커스텀 시트 부분
             if showPartialSheet {
@@ -111,9 +120,7 @@ struct BottomSheetView1: View {
                 .padding()
             }
             .frame(maxWidth: .infinity)
-            .background(Color.white) // 시트의 배경색
-            .cornerRadius(20) // 상단 모서리 둥글게
-            .shadow(radius: 10) // 그림자 효과
+            .background(Color.homeBack) // 시트의 배경색
         }
         .transition(.move(edge: .bottom)) // 하단에서 올라오는 애니메이션 효과
         .onTapGesture {
