@@ -174,6 +174,7 @@
 				8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */,
 				8E15C8702B6527E3001468C7 /* moment_iOSApp.swift */,
 				8E5CAE712B970EE700A483B4 /* AppDelegate.swift */,
+				8ECCFAA22BB01F4300C39125 /* Setting */,
 				8ECCFA942BADC97F00C39125 /* HomeBase */,
 				8E8C17502BAAB64D00BF1E1C /* ToolTip */,
 				8E8C174D2BA86BFD00BF1E1C /* Style */,
@@ -187,7 +188,6 @@
 				8E2D273C2BA57E23006248EA /* Callender */,
 				8E5CAE5B2B970E0400A483B4 /* BillListView.swift */,
 				8E5CAE592B970DF600A483B4 /* BillListViewModel.swift */,
-				8E5CAE732B970EF400A483B4 /* SettingView.swift */,
 				8E5CAE6D2B970EC600A483B4 /* LikeView.swift */,
 				8E5CAE6B2B970EAE00A483B4 /* LikeViewModel.swift */,
 				8E5CAE312B970BC800A483B4 /* Time.swift */,
@@ -347,6 +347,14 @@
 				8E5CAE672B970E8700A483B4 /* VoiceRecorderView.swift */,
 			);
 			path = VoiceRecorder_EX;
+			sourceTree = "<group>";
+		};
+		8ECCFAA22BB01F4300C39125 /* Setting */ = {
+			isa = PBXGroup;
+			children = (
+				8E5CAE732B970EF400A483B4 /* SettingView.swift */,
+			);
+			path = Setting;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
