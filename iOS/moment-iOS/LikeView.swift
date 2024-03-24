@@ -13,10 +13,31 @@ import SwiftUI
 
 struct LikeView: View {
     @StateObject var likeViewModel = LikeViewModel()
+    @State var isPresentedFloating: Bool = false
     
     var body: some View {
-       TitleView()
-        
+        VStack{
+            TitleView()
+            
+            Button(
+                action: { isPresentedFloating.toggle() },
+                label: {
+                    Text("Show Floating")
+                }
+            )
+            
+        }
+        .popup(isPresented: $isPresentedFloating) {
+          FloatingToastView()
+        } customize: {
+          $0
+            .type(.floater())
+            .position(.bottom)
+            .autohideIn(1.0)
+            .animation(.spring())
+            .closeOnTapOutside(true)
+            .backgroundColor(.clear)
+        }
     }
 }
 

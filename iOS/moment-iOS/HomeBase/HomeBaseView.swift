@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import PopupView
 
 //
 //  VoiceRecorderViewModel.swift
@@ -24,6 +25,8 @@ struct HomeBaseView: View {
     @Namespace var animation // 탭 전환 애니메이션을 위한 네임스페이스
     @State private var showPartialSheet = false // 커스텀 시트 표시 여부
     @ObservedObject  var audioRecorderManager: AudioRecorderManager
+    @State var isPresentedFloating: Bool = false
+    @State private var wasDeleted = false
     
     var body: some View {
         ZStack {
@@ -90,7 +93,7 @@ struct HomeBaseView: View {
             
             // 커스텀 시트 부분
             if showPartialSheet {
-                BottomSheetView1(isPresented: $showPartialSheet, audioRecorderManager: audioRecorderManager)
+                BottomSheetView1(isPresented: $showPartialSheet, audioRecorderManager: audioRecorderManager, wasDeleted: $wasDeleted)
             }
         }
         .onChange(of: homeBaseViewModel.isRecording) { newValue in
@@ -98,6 +101,30 @@ struct HomeBaseView: View {
                 showPartialSheet = newValue
             }
         }
+        .onChange(of: wasDeleted) { newValue in
+                    if newValue {
+                        // 토스트 메시지를 표시하는 로직
+                        withAnimation {
+                            isPresentedFloating = true
+                        }
+                        // 3초 후 토스트 메시지 숨김
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            isPresentedFloating = false
+                            wasDeleted = false // 상태 초기화
+                        }
+                    }
+                }
+                // PopupView 토스트 메시지 구성
+                .popup(isPresented: $isPresentedFloating) {
+                    FloatingToastView() // 사용자 정의 토스트 뷰
+                } customize: {
+                    $0.type(.floater())
+                      .position(.bottom)
+                      .autohideIn(3.0)
+                      .animation(.spring())
+                      .closeOnTapOutside(true)
+                      .backgroundColor(.clear)
+                }
     }
 }
 
@@ -109,6 +136,8 @@ struct BottomSheetView1: View {
     @State private var tooltipOpacity = 1.0
     //@StateObject private var voiceRecorderViewModel = VoiceRecorderViewModel()
     @ObservedObject  var audioRecorderManager: AudioRecorderManager
+    @State var isPresentedFloating : Bool = false
+    @Binding var wasDeleted: Bool
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -147,96 +176,103 @@ struct BottomSheetView1: View {
                 
                 
                 Text(timeString(time: timeElapsed))
-                                    .font(.caption)
-                                    .padding()
-                                    .frame(height: 44)
-                                    .overlay(Rectangle().frame(height: 1), alignment: .bottom)
-                                    .padding(.horizontal,15)
-                                    .onReceive(timer) { _ in
-                                        if timerRunning {
-                                            timeElapsed += 1
-                                        }
-                                    }
-                                    .onAppear {
-                                        timerRunning = true
-                                    }
-                                    .onDisappear {
-                                        timerRunning = false
-                                        timeElapsed = 0
-                                    }
-
-                                // 추가 텍스트
-                                Text("열심히 듣고 있어요")
-                                    .frame(height: 44)
-                                    .overlay(Rectangle().frame(height: 1), alignment: .bottom)
-                                    .padding(.horizontal,20)
-
-                                // 녹음 및 취소/저장 버튼
-                                HStack {
-                                    if recordBtn {
-                                        Button(action: {
-                                            // 취소 로직
-                                            print("녹음 취소")
-                                            isPresented = false
-                                        }) {
-                                            Image(systemName: "trash")
-                                                .foregroundColor(.red)
-                                                .frame(width: 30, height: 30)
-                                        }
-                                        .padding(.trailing, 20)
-                                    }
-
-                                    Button(action: {
-                                        recordBtn.toggle()
-                                        timerRunning.toggle()
-                                        //voiceRecorderViewModel.recordBtnTapped()
-                                        audioRecorderManager.isRecording
-                                        ? audioRecorderManager.stopRecording()
-                                        : audioRecorderManager.startRecording()
-                                       
-                                        
-                                    }) {
-                                        Image(systemName: audioRecorderManager.isRecording ? "stop.fill" : "record.circle")
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fit)
-                                            .frame(width: 50, height: 50)
-                                            .foregroundColor(.red)
-                                    }
-
-                                    if recordBtn {
-                                        Button(action: {
-                                            // 저장 로직
-                                            print("녹음 저장")
-                                            isPresented = false
-                                          //  voiceRecorderViewModel.stopRecording()  // ViewModel에서 녹음 중지
-                                                                       recordBtn = false  // 버튼 상태 업데이트
-                                                                       timerRunning = false  // 타이머 중지
-                                            if let lastRecordedFile = audioRecorderManager.recordedFiles.last {
-                                                    print(lastRecordedFile.lastPathComponent) // 마지막으로 레코드된 녹음 파일의 이름 확인함
-                                                } else {
-                                                    print("No recordings available")
-                                                }
-                                            
-                                            //TODO: - 이제 여기에서 서버에다가 내 녹음파일을 보내는 작업을 추가 해야하고
-                                            //TODO: - 녹음파일을 보냄과 동시에로다가 오픈 소스에서 받아온 기온과 온도들도 같이 보내야함
-                                        }) {
-                                            Image(systemName: "square.and.arrow.down")
-                                                .foregroundColor(.blue)
-                                                .frame(width: 30, height: 30)
-                                        }
-                                        .padding(.leading, 20)
-                                    }
-                                }
-                                .padding()
+                    .font(.caption)
+                    .padding()
+                    .frame(height: 44)
+                    .overlay(Rectangle().frame(height: 1), alignment: .bottom)
+                    .padding(.horizontal,15)
+                    .onReceive(timer) { _ in
+                        if timerRunning {
+                            timeElapsed += 1
+                        }
+                    }
+                    .onAppear {
+                        timerRunning = true
+                    }
+                    .onDisappear {
+                        timerRunning = false
+                        timeElapsed = 0
+                    }
+                
+                // 추가 텍스트
+                Text("열심히 듣고 있어요")
+                    .frame(height: 44)
+                    .overlay(Rectangle().frame(height: 1), alignment: .bottom)
+                    .padding(.horizontal,20)
+                
+                // 녹음 및 취소/저장 버튼
+                HStack {
+                    if recordBtn {
+                        Button(action: {
+                            // 취소 로직
+                            print("녹음 취소")
+                            isPresented = false
+                            wasDeleted = true
+                        
+                        }) {
+                            Image(systemName: "trash")
+                                .foregroundColor(.red)
+                                .frame(width: 30, height: 30)
+                        }
+                        .padding(.trailing, 20)
+                    }
+                    
+                    Button(action: {
+                        recordBtn.toggle()
+                        timerRunning.toggle()
+                        //voiceRecorderViewModel.recordBtnTapped()
+                        audioRecorderManager.isRecording
+                        ? audioRecorderManager.stopRecording()
+                        : audioRecorderManager.startRecording()
+                        
+                        
+                    }) {
+                        Image(systemName: audioRecorderManager.isRecording ? "stop.fill" : "record.circle")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 50, height: 50)
+                            .foregroundColor(.red)
+                    }
+                    
+                    if recordBtn {
+                        Button(action: {
+                            // 저장 로직
+                            print("녹음 저장")
+                            isPresented = false
+                            //  voiceRecorderViewModel.stopRecording()  // ViewModel에서 녹음 중지
+                            recordBtn = false  // 버튼 상태 업데이트
+                            timerRunning = false  // 타이머 중지
+                            if let lastRecordedFile = audioRecorderManager.recordedFiles.last {
+                                print(lastRecordedFile.lastPathComponent) // 마지막으로 레코드된 녹음 파일의 이름 확인함
+                            } else {
+                                print("No recordings available")
+                            }
+                            
+                            
+                            
+                            //TODO: - 이제 여기에서 서버에다가 내 녹음파일을 보내는 작업을 추가 해야하고
+                            //TODO: - 녹음파일을 보냄과 동시에로다가 오픈 소스에서 받아온 기온과 온도들도 같이 보내야함
+                        }) {
+                            Image(systemName: "square.and.arrow.down")
+                                .foregroundColor(.blue)
+                                .frame(width: 30, height: 30)
+                        }
+                        .padding(.leading, 20)
+                    }
+                }
+                .padding()
+                
                 //TODO: - 저장파일 확인용
                 
-              
-                            }
-                            .frame(maxWidth: .infinity, maxHeight: 284)
-                            .background(Color.homeBack)
+                
+            }
+            .frame(maxWidth: .infinity, maxHeight: 284)
+            .background(Color.homeBack)
+            
         }
         .transition(.move(edge: .bottom)) // 하단에서 올라오는 애니메이션 효과
-
+        
+        
     }
     
     func timeString(time: Int) -> String {
@@ -309,6 +345,5 @@ struct CustomShape: Shape {
         return Path(path.cgPath)
     }
 }
-
 
 

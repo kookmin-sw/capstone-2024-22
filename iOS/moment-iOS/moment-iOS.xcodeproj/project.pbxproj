@@ -62,6 +62,8 @@
 		8E8C18082BAC41C600BF1E1C /* TravelItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C18072BAC41C600BF1E1C /* TravelItem.swift */; };
 		8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA922BAD6B3200C39125 /* PasswordView.swift */; };
 		8ECCFA982BAFE3BD00C39125 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */; };
+		8ECCFADF2BB066D600C39125 /* FloatingToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */; };
+		8ECCFAE32BB0672C00C39125 /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECCFAE22BB0672C00C39125 /* PopupView */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -138,6 +140,7 @@
 		8E8C18072BAC41C600BF1E1C /* TravelItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelItem.swift; sourceTree = "<group>"; };
 		8ECCFA922BAD6B3200C39125 /* PasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordView.swift; sourceTree = "<group>"; };
 		8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
+		8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingToastView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +148,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8ECCFAE32BB0672C00C39125 /* PopupView in Frameworks */,
 				8E747AF72B84DC1400D9302D /* SafeAreaBrush in Frameworks */,
 				8E747AFC2B860E3C00D9302D /* FSCalendar in Frameworks */,
 			);
@@ -174,6 +178,7 @@
 				8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */,
 				8E15C8702B6527E3001468C7 /* moment_iOSApp.swift */,
 				8E5CAE712B970EE700A483B4 /* AppDelegate.swift */,
+				8ECCFAE02BB066F900C39125 /* CustomToast */,
 				8ECCFAA22BB01F4300C39125 /* Setting */,
 				8ECCFA942BADC97F00C39125 /* HomeBase */,
 				8E8C17502BAAB64D00BF1E1C /* ToolTip */,
@@ -357,6 +362,14 @@
 			path = Setting;
 			sourceTree = "<group>";
 		};
+		8ECCFAE02BB066F900C39125 /* CustomToast */ = {
+			isa = PBXGroup;
+			children = (
+				8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */,
+			);
+			path = CustomToast;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -376,6 +389,7 @@
 			packageProductDependencies = (
 				8E747AF62B84DC1400D9302D /* SafeAreaBrush */,
 				8E747AFB2B860E3C00D9302D /* FSCalendar */,
+				8ECCFAE22BB0672C00C39125 /* PopupView */,
 			);
 			productName = "moment-iOS";
 			productReference = 8E15C86D2B6527E3001468C7 /* moment-iOS.app */;
@@ -452,6 +466,7 @@
 			packageReferences = (
 				8E747AF52B84DC1400D9302D /* XCRemoteSwiftPackageReference "SafeAreaBrush" */,
 				8E747AFA2B860E3C00D9302D /* XCRemoteSwiftPackageReference "FSCalendar" */,
+				8ECCFAE12BB0672B00C39125 /* XCRemoteSwiftPackageReference "PopupView" */,
 			);
 			productRefGroup = 8E15C86E2B6527E3001468C7 /* Products */;
 			projectDirPath = "";
@@ -496,6 +511,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8E5CAE3E2B970CCA00A483B4 /* PathType.swift in Sources */,
+				8ECCFADF2BB066D600C39125 /* FloatingToastView.swift in Sources */,
 				8E8C174F2BA97B4500BF1E1C /* AuthNumView.swift in Sources */,
 				8E5CAE702B970ED700A483B4 /* NotificationService.swift in Sources */,
 				8E5CAE442B970CFF00A483B4 /* HomeBaseViewModel.swift in Sources */,
@@ -890,6 +906,14 @@
 				minimumVersion = 2.8.4;
 			};
 		};
+		8ECCFAE12BB0672B00C39125 /* XCRemoteSwiftPackageReference "PopupView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/PopupView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -902,6 +926,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8E747AFA2B860E3C00D9302D /* XCRemoteSwiftPackageReference "FSCalendar" */;
 			productName = FSCalendar;
+		};
+		8ECCFAE22BB0672C00C39125 /* PopupView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8ECCFAE12BB0672B00C39125 /* XCRemoteSwiftPackageReference "PopupView" */;
+			productName = PopupView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
