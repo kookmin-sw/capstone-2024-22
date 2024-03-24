@@ -23,6 +23,7 @@ struct HomeBaseView: View {
     @StateObject private var homeBaseViewModel = HomeBaseViewModel()
     @Namespace var animation // 탭 전환 애니메이션을 위한 네임스페이스
     @State private var showPartialSheet = false // 커스텀 시트 표시 여부
+    @ObservedObject  var audioRecorderManager: AudioRecorderManager
     
     var body: some View {
         ZStack {
@@ -89,7 +90,7 @@ struct HomeBaseView: View {
             
             // 커스텀 시트 부분
             if showPartialSheet {
-                BottomSheetView1(isPresented: $showPartialSheet)
+                BottomSheetView1(isPresented: $showPartialSheet, audioRecorderManager: audioRecorderManager)
             }
         }
         .onChange(of: homeBaseViewModel.isRecording) { newValue in
@@ -106,9 +107,12 @@ struct BottomSheetView1: View {
     @State private var timerRunning = false
     @State private var recordBtn = false
     @State private var tooltipOpacity = 1.0
-    @StateObject private var voiceRecorderViewModel = VoiceRecorderViewModel()
+    //@StateObject private var voiceRecorderViewModel = VoiceRecorderViewModel()
+    @ObservedObject  var audioRecorderManager: AudioRecorderManager
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
+    
     
     var body: some View {
         VStack {
@@ -185,9 +189,14 @@ struct BottomSheetView1: View {
                                     Button(action: {
                                         recordBtn.toggle()
                                         timerRunning.toggle()
-                                        voiceRecorderViewModel.recordBtnTapped()
+                                        //voiceRecorderViewModel.recordBtnTapped()
+                                        audioRecorderManager.isRecording
+                                        ? audioRecorderManager.stopRecording()
+                                        : audioRecorderManager.startRecording()
+                                       
+                                        
                                     }) {
-                                        Image(systemName: recordBtn ? "stop.fill" : "record.circle")
+                                        Image(systemName: audioRecorderManager.isRecording ? "stop.fill" : "record.circle")
                                             .resizable()
                                             .aspectRatio(contentMode: .fit)
                                             .frame(width: 50, height: 50)
@@ -199,9 +208,17 @@ struct BottomSheetView1: View {
                                             // 저장 로직
                                             print("녹음 저장")
                                             isPresented = false
-                                            voiceRecorderViewModel.stopRecording()  // ViewModel에서 녹음 중지
+                                          //  voiceRecorderViewModel.stopRecording()  // ViewModel에서 녹음 중지
                                                                        recordBtn = false  // 버튼 상태 업데이트
                                                                        timerRunning = false  // 타이머 중지
+                                            if let lastRecordedFile = audioRecorderManager.recordedFiles.last {
+                                                    print(lastRecordedFile.lastPathComponent) // 마지막으로 레코드된 녹음 파일의 이름 확인함
+                                                } else {
+                                                    print("No recordings available")
+                                                }
+                                            
+                                            //TODO: - 이제 여기에서 서버에다가 내 녹음파일을 보내는 작업을 추가 해야하고
+                                            //TODO: - 녹음파일을 보냄과 동시에로다가 오픈 소스에서 받아온 기온과 온도들도 같이 보내야함
                                         }) {
                                             Image(systemName: "square.and.arrow.down")
                                                 .foregroundColor(.blue)
@@ -211,6 +228,9 @@ struct BottomSheetView1: View {
                                     }
                                 }
                                 .padding()
+                //TODO: - 저장파일 확인용
+                
+              
                             }
                             .frame(maxWidth: .infinity, maxHeight: 284)
                             .background(Color.homeBack)
@@ -289,7 +309,6 @@ struct CustomShape: Shape {
         return Path(path.cgPath)
     }
 }
-
 
 
 
