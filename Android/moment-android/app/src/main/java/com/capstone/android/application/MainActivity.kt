@@ -14,6 +14,7 @@ import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,6 +48,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -76,6 +79,15 @@ import com.capstone.android.application.ui.PostTripActivity
 import com.capstone.android.application.ui.TripFileActivity
 import com.capstone.android.application.ui.theme.ApplicationTheme
 import com.capstone.android.application.ui.theme.FontMoment
+import com.capstone.android.application.ui.theme.P_Medium14
+import com.capstone.android.application.ui.theme.P_Medium18
+import com.capstone.android.application.ui.theme.PretendardFamily
+import com.capstone.android.application.ui.theme.black
+import com.capstone.android.application.ui.theme.neutral_500
+import com.capstone.android.application.ui.theme.primary_500
+import com.capstone.android.application.ui.theme.secondary_50
+import com.capstone.android.application.ui.theme.tertiary_500
+import com.capstone.android.application.ui.theme.white
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -953,10 +965,154 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun Setting(){
-        Box(contentAlignment = Alignment.Center) {
-            Text(text = "설정")
+
+        val alarmbtnState = remember{ mutableStateOf(false) }
+
+        Box(
+            Modifier
+                .background(tertiary_500)
+                .fillMaxSize()
+                .padding(horizontal = 30.dp)) {
+            Column(
+                Modifier
+                    .padding(top = 136.dp)) {
+
+                Column(modifier = Modifier
+                    .width(83.dp)
+                    .clickable { alarmbtnState.value = !alarmbtnState.value }){
+                        Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+                            P_Medium18(
+                                content = "알림 설정",
+                                color = black
+                            )
+                        }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Divider(color = black)
+                }
+                if (alarmbtnState.value){
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Toggle()
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                else{
+                    Spacer(modifier = Modifier.height(40.dp))
+                }
+
+                Column(modifier = Modifier
+                    .width(134.dp)
+                    .clickable { }){
+                    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+                        P_Medium18(
+                            content = "계정 이메일 변경",
+                            color = black
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Divider(color = black)
+                }
+                Spacer(modifier = Modifier.height(40.dp))
+
+
+                Column(modifier = Modifier
+                    .width(99.dp)
+                    .clickable { }){
+                    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+                        P_Medium18(
+                            content = "데이터 허용",
+                            color = black
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Divider(color = black)
+                }
+                Spacer(modifier = Modifier.height(40.dp))
+
+
+                Column(modifier = Modifier
+                    .width(79.dp)
+                    .clickable { }){
+                    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+                        P_Medium18(
+                            content = "문의하기",
+                            color = black
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Divider(color = black)
+                }
+                Spacer(modifier = Modifier.height(40.dp))
+
+
+                Column(modifier = Modifier
+                    .width(79.dp)
+                    .clickable { }){
+                    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+                        P_Medium18(
+                            content = "버전안내",
+                            color = black
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Divider(color = black)
+                }
+                Spacer(modifier = Modifier.height(40.dp))
         }
+
+            Column(
+                Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 158.dp)) {
+                Column(Modifier.clickable {  }) {
+                    P_Medium14("로그아웃", black)
+                }
+                Spacer(modifier = Modifier.height(28.dp))
+                Column(Modifier.clickable {  }) {
+                    P_Medium14("탈퇴하기", black)
+                }
+            }
     }
+}
+
+    @Composable
+    fun Toggle(){
+        val states = listOf(
+            "켜기",
+            "끄기"
+        )
+        var selectedOption by remember { mutableStateOf(states[0])}
+
+        val onSelectionChange = { text: String ->
+            selectedOption = text
+        }
+
+        Row(modifier = Modifier
+            .width(120.dp)
+            .height(40.dp)
+            .clip(shape = RoundedCornerShape(3.dp))
+            .background(secondary_50)
+            ) {
+                states.forEach { text ->
+                    Column(  modifier = Modifier
+                        .width(60.dp)
+                        .height(40.dp)
+                        .clip(shape = RoundedCornerShape(3.dp))
+                        .clickable {
+                            onSelectionChange(text)
+                        }
+                        .background(
+                            if (text == selectedOption) { primary_500} else {secondary_50}
+                        ),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        P_Medium14(content = text,
+                            color = if (text == selectedOption) white else neutral_500 )
+                    }
+
+                }
+            }
+    }
+
 
     @Preview(apiLevel = 33)
     @Composable
@@ -965,13 +1121,10 @@ class MainActivity : ComponentActivity() {
 //            ReceiptCardChoice()
 //            Home()
 //            ItemTrip()
-            RecordDaily()
+//            RecordDaily()
+            Toggle()
         }
     }
-}
-
-
-
 
 
 
@@ -982,6 +1135,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         modifier = modifier
     )
 }
-
+}
 
 
