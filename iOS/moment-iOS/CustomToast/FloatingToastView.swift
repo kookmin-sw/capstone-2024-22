@@ -13,14 +13,15 @@ import PopupView
          ZStack{
              HStack {
                  Spacer()
-                 Text("This is Floating")
-                     .font(.headline)
+                 Text("녹음이 삭제되었습니다.")
+                     .font(.caption)
                      .padding(.vertical, 10)
                  Spacer()
              }
-             .background(Color.white)
-             .cornerRadius(20)
+             .background(Color.toastColor)
+             .cornerRadius(4)
              .padding(.horizontal, 20)
+             .offset(y: -90)
          }
      }
 }

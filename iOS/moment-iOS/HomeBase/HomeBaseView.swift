@@ -102,29 +102,29 @@ struct HomeBaseView: View {
             }
         }
         .onChange(of: wasDeleted) { newValue in
-                    if newValue {
-                        // 토스트 메시지를 표시하는 로직
-                        withAnimation {
-                            isPresentedFloating = true
-                        }
-                        // 3초 후 토스트 메시지 숨김
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                            isPresentedFloating = false
-                            wasDeleted = false // 상태 초기화
-                        }
-                    }
+            if newValue {
+                // 토스트 메시지를 표시하는 로직
+                withAnimation {
+                    isPresentedFloating = true
                 }
-                // PopupView 토스트 메시지 구성
-                .popup(isPresented: $isPresentedFloating) {
-                    FloatingToastView() // 사용자 정의 토스트 뷰
-                } customize: {
-                    $0.type(.floater())
-                      .position(.bottom)
-                      .autohideIn(3.0)
-                      .animation(.spring())
-                      .closeOnTapOutside(true)
-                      .backgroundColor(.clear)
+                // 3초 후 토스트 메시지 숨김
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    isPresentedFloating = false
+                    wasDeleted = false // 상태 초기화
                 }
+            }
+        }
+        // PopupView 토스트 메시지 구성
+        .popup(isPresented: $isPresentedFloating) {
+            FloatingToastView() // 사용자 정의 토스트 뷰
+        } customize: {
+            $0.type(.floater())
+                .position(.bottom)
+                .autohideIn(3.0)
+                .animation(.spring())
+                .closeOnTapOutside(true)
+                .backgroundColor(.clear)
+        }
     }
 }
 
@@ -208,7 +208,7 @@ struct BottomSheetView1: View {
                             print("녹음 취소")
                             isPresented = false
                             wasDeleted = true
-                        
+                            
                         }) {
                             Image(systemName: "trash")
                                 .foregroundColor(.red)

@@ -52,6 +52,18 @@ struct CustomHomeMainDivider: View {
             .edgesIgnoringSafeArea(.horizontal)
     }
 }
+struct CustomHomeMainDividerthick: View {
+    var color: Color = .black // 여기에서 색상을 변경할 수 있습니다.
+    var width: CGFloat = 335 // 길이 조절
+    var thickness: CGFloat = 1.5 // 굵기 조절
+    
+    var body: some View {
+        Rectangle()
+            .fill(color)
+            .frame(width: width, height: thickness)
+            .edgesIgnoringSafeArea(.horizontal)
+    }
+}
 
 
 

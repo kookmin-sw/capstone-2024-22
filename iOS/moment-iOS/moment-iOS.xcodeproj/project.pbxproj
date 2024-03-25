@@ -59,11 +59,11 @@
 		8E8C17562BAAC8F000BF1E1C /* AuthComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17552BAAC8F000BF1E1C /* AuthComplete.swift */; };
 		8E8C17CA2BABF1A800BF1E1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */; };
 		8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C18052BAC379700BF1E1C /* SwipeItem.swift */; };
-		8E8C18082BAC41C600BF1E1C /* TravelItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C18072BAC41C600BF1E1C /* TravelItem.swift */; };
 		8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA922BAD6B3200C39125 /* PasswordView.swift */; };
 		8ECCFA982BAFE3BD00C39125 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */; };
 		8ECCFADF2BB066D600C39125 /* FloatingToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */; };
 		8ECCFAE32BB0672C00C39125 /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECCFAE22BB0672C00C39125 /* PopupView */; };
+		8ECCFB1F2BB1CA5600C39125 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB1E2BB1CA5600C39125 /* Item.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -137,10 +137,10 @@
 		8E8C17552BAAC8F000BF1E1C /* AuthComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthComplete.swift; sourceTree = "<group>"; };
 		8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8E8C18052BAC379700BF1E1C /* SwipeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeItem.swift; sourceTree = "<group>"; };
-		8E8C18072BAC41C600BF1E1C /* TravelItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelItem.swift; sourceTree = "<group>"; };
 		8ECCFA922BAD6B3200C39125 /* PasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordView.swift; sourceTree = "<group>"; };
 		8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
 		8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingToastView.swift; sourceTree = "<group>"; };
+		8ECCFB1E2BB1CA5600C39125 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -258,8 +258,8 @@
 			children = (
 				8E5CAE4F2B970D6A00A483B4 /* HomeViewModel.swift */,
 				8E5CAE512B970DB600A483B4 /* HomeView.swift */,
-				8E8C18072BAC41C600BF1E1C /* TravelItem.swift */,
 				8E8C18052BAC379700BF1E1C /* SwipeItem.swift */,
+				8ECCFB1E2BB1CA5600C39125 /* Item.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -517,7 +517,6 @@
 				8E5CAE442B970CFF00A483B4 /* HomeBaseViewModel.swift in Sources */,
 				8E5CAE602B970E2800A483B4 /* MemoViewModel.swift in Sources */,
 				8E5CAE642B970E5B00A483B4 /* Double+Extensions.swift in Sources */,
-				8E8C18082BAC41C600BF1E1C /* TravelItem.swift in Sources */,
 				8E2D273B2BA57DE7006248EA /* FSCalendarWrapper.swift in Sources */,
 				8E5CAE402B970CD800A483B4 /* PathModel.swift in Sources */,
 				8E5CAE622B970E4300A483B4 /* MemoView.swift in Sources */,
@@ -540,6 +539,7 @@
 				8E5CAE662B970E6B00A483B4 /* VoiceRecorderViewModel.swift in Sources */,
 				8E5CAE4A2B970D3B00A483B4 /* CustomNavigationBar.swift in Sources */,
 				8E5CAE422B970CEA00A483B4 /* HomeBaseView.swift in Sources */,
+				8ECCFB1F2BB1CA5600C39125 /* Item.swift in Sources */,
 				8E5CAE3A2B970C9D00A483B4 /* OnboardingViewModel.swift in Sources */,
 				8E5CAE382B970C5600A483B4 /* OnboardingContent.swift in Sources */,
 				8E5CAE4E2B970D5D00A483B4 /* Todo.swift in Sources */,
