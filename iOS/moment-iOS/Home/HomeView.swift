@@ -200,7 +200,7 @@ extension ItemViewCell {
                     .font(.caption)
                     .foregroundColor(.black)
                 //.frame(width: geometry.size.width / 2, height: geometry.size.height)
-                  //  .frame(width: 90, height: 50)
+                    .frame(width: 50, height: 50)
                     .background(Color.homeBack) // 즐겨찾기 버튼 색상 설정
                   
             }
@@ -217,13 +217,14 @@ extension ItemViewCell {
                 Text("삭제")
                     .font(.caption)
                     .foregroundColor(.homeRed)
-                  //  .frame(width: 90, height: 50)
+                    .frame(width: 50, height: 50)
                     .background(Color.homeBack) // 삭제 버튼 색상 설정
                    
             }
         }.background(Color.homeBack)
     }
 }
+//TODO: - 버튼 두개를 패딩으로 좀 더 밀어주고 스와이프 부분을 좀더 조정해야할듯 
 
 
 
