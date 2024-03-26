@@ -27,6 +27,7 @@ struct HomeBaseView: View {
     @ObservedObject  var audioRecorderManager: AudioRecorderManager
     @State var isPresentedFloating: Bool = false
     @State private var wasDeleted = false
+    @State private var wasLoad = false
     
     var body: some View {
         ZStack {
@@ -93,7 +94,7 @@ struct HomeBaseView: View {
             
             // 커스텀 시트 부분
             if showPartialSheet {
-                BottomSheetView1(isPresented: $showPartialSheet, audioRecorderManager: audioRecorderManager, wasDeleted: $wasDeleted)
+                BottomSheetView1(isPresented: $showPartialSheet, audioRecorderManager: audioRecorderManager, wasDeleted: $wasDeleted,wasLoad : $wasLoad)
             }
         }
         .onChange(of: homeBaseViewModel.isRecording) { newValue in
@@ -113,10 +114,29 @@ struct HomeBaseView: View {
                     wasDeleted = false // 상태 초기화
                 }
             }
+        }.popup(isPresented: $isPresentedFloating) {
+            FloatingToastDeleteView() // 사용자 정의 토스트 뷰
+        } customize: {
+            $0.type(.floater())
+                .position(.bottom)
+                .autohideIn(3.0)
+                .animation(.spring())
+                .closeOnTapOutside(true)
+                .backgroundColor(.clear)
         }
-        // PopupView 토스트 메시지 구성
-        .popup(isPresented: $isPresentedFloating) {
-            FloatingToastView() // 사용자 정의 토스트 뷰
+        .onChange(of: wasLoad) {
+            newValue in
+            if newValue {
+                withAnimation{
+                    isPresentedFloating = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    isPresentedFloating = false
+                    wasLoad = false // 상태 초기화
+                }
+            }
+        }.popup(isPresented: $isPresentedFloating) {
+            FloatingToastLoadView() // 사용자 정의 토스트 뷰
         } customize: {
             $0.type(.floater())
                 .position(.bottom)
@@ -138,6 +158,7 @@ struct BottomSheetView1: View {
     @ObservedObject  var audioRecorderManager: AudioRecorderManager
     @State var isPresentedFloating : Bool = false
     @Binding var wasDeleted: Bool
+    @Binding var wasLoad : Bool
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -210,9 +231,10 @@ struct BottomSheetView1: View {
                             wasDeleted = true
                             
                         }) {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red)
-                                .frame(width: 30, height: 30)
+                            Text("삭제")
+                                .fontWeight(.bold)
+                                .tint(.black)
+                                .frame(width: 60, height: 30)
                         }
                         .padding(.trailing, 20)
                     }
@@ -242,6 +264,7 @@ struct BottomSheetView1: View {
                             //  voiceRecorderViewModel.stopRecording()  // ViewModel에서 녹음 중지
                             recordBtn = false  // 버튼 상태 업데이트
                             timerRunning = false  // 타이머 중지
+                            wasDeleted = true
                             if let lastRecordedFile = audioRecorderManager.recordedFiles.last {
                                 print(lastRecordedFile.lastPathComponent) // 마지막으로 레코드된 녹음 파일의 이름 확인함
                             } else {
@@ -253,9 +276,10 @@ struct BottomSheetView1: View {
                             //TODO: - 이제 여기에서 서버에다가 내 녹음파일을 보내는 작업을 추가 해야하고
                             //TODO: - 녹음파일을 보냄과 동시에로다가 오픈 소스에서 받아온 기온과 온도들도 같이 보내야함
                         }) {
-                            Image(systemName: "square.and.arrow.down")
-                                .foregroundColor(.blue)
-                                .frame(width: 30, height: 30)
+                            Text("저장")
+                                .fontWeight(.bold)
+                                .tint(.homeRed)
+                                .frame(width: 60, height: 30)
                         }
                         .padding(.leading, 20)
                     }

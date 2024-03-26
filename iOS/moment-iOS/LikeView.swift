@@ -28,7 +28,7 @@ struct LikeView: View {
             
         }
         .popup(isPresented: $isPresentedFloating) {
-          FloatingToastView()
+          FloatingToastDeleteView()
         } customize: {
           $0
             .type(.floater())

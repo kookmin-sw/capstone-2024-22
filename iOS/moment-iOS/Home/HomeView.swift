@@ -228,49 +228,6 @@ extension ItemViewCell {
 
 
 
-//
-//struct CustomListItem: View {
-//    var date1: String
-//    var date2: String
-//    var title: String
-//
-//    var body: some View {
-//        VStack{
-//
-//            HStack {
-//                VStack(alignment: .leading, spacing: 6) {
-//                    Text(date1)
-//                        .font(.caption)
-//                        .foregroundColor(.black)
-//                    Text(date2)
-//                        .font(.caption)
-//                        .foregroundColor(.black)
-//                }
-//                .padding(.trailing, 5)
-//
-//                Rectangle()
-//                    .fill(Color.homeRed)
-//                    .frame(width: 1, height: 42)
-//                    .padding(.leading, 5)
-//                    .padding(.trailing, 0)
-//
-//                Spacer().frame(width: 130)
-//
-//                Text(title)
-//                    .font(.headline)
-//
-//                Rectangle()
-//                    .fill(Color.homeRed)
-//                    .frame(width: 1, height: 42)
-//                    .padding(.trailing, 1)
-//            }
-//
-//            .background(Color.homeBack) // 이렇게 배경색을 설정할 수 있습니다.
-//
-//        }
-//    }
-//}
-
 
 #Preview {
     HomeView()
