@@ -22,7 +22,7 @@
 **예시)** 2023년 0조  https://kookmin-sw.github.io/capstone-2023-00/
 
 
-##  🛠 프로잭트 소개
+##  🛠 프로젝트 소개
 
 
 
@@ -44,9 +44,17 @@
 5. 고유한 여행 산출물 생성
 여행이 끝난 후 각 여행의 산출물인 "여행 영수증"을 만드는 기능을 제공해 여행에 대한 고유한 결과물을 생성할 수 있습니다.
 
-## 2. 소개 영상
+
+
+
+
+## 소개 영상
 
 프로젝트 소개하는 영상을 추가하세요
+
+
+
+
 
  ## 👩🏻‍💻 팀 소개  
  
@@ -71,13 +79,23 @@
 |APi 문서|<img src="https://img.shields.io/badge/swagger-%2385EA2D.svg?&style=for-the-badge&logo=swagger&logoColor=black" />|
 |형상관리|<img src="https://img.shields.io/badge/git-%23F05032.svg?&style=for-the-badge&logo=git&logoColor=white" />|    
 
-## 4. 사용법
+
+
+
+
+## 사용법
 
 소스코드제출시 설치법이나 사용법을 작성하세요.
 
-## 5. 기타
+
+
+
+
+## 기타
 
 추가적인 내용은 자유롭게 작성하세요.
+
+
 
 
 
