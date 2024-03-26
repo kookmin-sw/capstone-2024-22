@@ -5,13 +5,7 @@
 ////  Created by 양시관 on 3/5/24.
 ////
 //
-////
-////  TodoListView.swift
-////  moment-iOS
-////
-////  Created by 양시관 on 3/5/24.
-////
-//
+
 
 import SwiftUI
 import Foundation
@@ -22,13 +16,19 @@ struct HomeView: View {
     @StateObject var calendarViewModel = CalendarViewModel()
     @State private var selectedSlideIndex = 0
     @StateObject var homeviewModel = HomeViewModel()
-    
+    @State private var showingCustomAlert = false
+    @State private var itemToDelete: Item? // 삭제할 아이템을 저장하기 위한 상태변수
     
     
     var body: some View {
         NavigationView {
             ZStack {
-                Color.homeBack.edgesIgnoringSafeArea(.all) // 전체 배경색 설정
+                Color(showingCustomAlert ? .black : .clear)
+                                    .opacity(showingCustomAlert ? 0.5 : 1)
+                                    .edgesIgnoringSafeArea(.all)
+                                    .animation(.easeInOut, value: showingCustomAlert)
+
+                
                 VStack {
                     // '추가' 버튼
                     HStack {
@@ -59,27 +59,40 @@ struct HomeView: View {
                     CustomHomeMainDividerthick()
                         .padding()
                     // 항목 리스트
+                    CustomHomeSubDivider()
                     ScrollView(.vertical, showsIndicators: false) {
                         LazyVStack(spacing: 0) {
-                            //TODO: - devider 넣으면?
-                            CustomHomeSubDivider()
                             ForEach(homeviewModel.items) { item in
-                                ItemViewCell(item: $homeviewModel.items[homeviewModel.getIndex(item: item)], deleteDidTapClosure: {
-                                    homeviewModel.deleteItem(myItem: $0)
-                                    
+                                ItemViewCell(item: $homeviewModel.items[homeviewModel.getIndex(item: item)], deleteAction: {
+                                    self.itemToDelete = item // 사용자가 삭제할 항목을 설정합니다.
+                                    self.showingCustomAlert = true // 삭제 확인 다이얼로그를 표시합니다.
                                 })
                                 CustomHomeSubDivider()
                             }
-                            CustomHomeSubDivider()
                         }
                     }
                     Spacer()
+                }  .background(Color.homeBack)
+                
+                if showingCustomAlert {
+                    CustomDialog(
+                        isActive: $showingCustomAlert,
+                        title: "여행을 삭제하시겠습니까?",
+                        message: "해당 파일에 기록된 정보는 모두 사라집니다.",
+                        yesAction: {
+                            if let item = itemToDelete {
+                                homeviewModel.deleteItem(myItem: item) // 항목 삭제 실행
+                                itemToDelete = nil // 삭제할 아이템 초기화
+                            }
+                            showingCustomAlert = false
+                        },
+                        noAction: {
+                            showingCustomAlert = false // 다이얼로그 닫기
+                            itemToDelete = nil // 삭제할 아이템 초기화
+                        }
+                    )
                 }
-                
-                
-                
             }
-            
         }
     }
 }
@@ -89,7 +102,8 @@ struct HomeView: View {
 struct ItemViewCell: View {
     
     @Binding var item: Item
-    var deleteDidTapClosure: (Item) -> ()
+    var deleteAction: () -> Void
+    
     
     var body: some View {
         
@@ -139,9 +153,9 @@ struct ItemViewCell: View {
                         
                     }
                 }
-                    
                 
-
+                
+                
             }
             .padding()
             .background(Color.homeBack)
@@ -195,6 +209,9 @@ extension ItemViewCell {
             Button {
                 // 여기에 '즐겨찾기' 버튼을 눌렀을 때 수행할 동작을 추가합니다.
                 print("즐겨찾기 버튼이 눌렸습니다.")
+                withAnimation {
+                    self.item.offset = 0
+                }
             } label: {
                 Text("수정")
                     .font(.caption)
@@ -202,7 +219,7 @@ extension ItemViewCell {
                 //.frame(width: geometry.size.width / 2, height: geometry.size.height)
                     .frame(width: 50, height: 50)
                     .background(Color.homeBack) // 즐겨찾기 버튼 색상 설정
-                  
+                
             }
             Rectangle()
                 .fill(Color.homeRed)
@@ -212,114 +229,101 @@ extension ItemViewCell {
             
             Button {
                 // 여기에 '삭제' 버튼을 눌렀을 때 수행할 동작을 추가합니다.
-                deleteDidTapClosure(item)
+                //deleteDidTapClosure(item)
+                self.deleteAction()
+                withAnimation {
+                    self.item.offset = 0
+                }
             } label: {
                 Text("삭제")
                     .font(.caption)
                     .foregroundColor(.homeRed)
                     .frame(width: 50, height: 50)
                     .background(Color.homeBack) // 삭제 버튼 색상 설정
-                   
+                
             }
         }.background(Color.homeBack)
     }
 }
-//TODO: - 버튼 두개를 패딩으로 좀 더 밀어주고 스와이프 부분을 좀더 조정해야할듯 
+//TODO: - 버튼 두개를 패딩으로 좀 더 밀어주고 스와이프 부분을 좀더 조정해야할듯
 
 
+struct CustomDialog: View {
+    @Binding var isActive: Bool
+    
+    let title: String
+    let message: String
+    let yesAction: () -> Void
+    let noAction: () -> Void
+    
+    @State private var offset: CGFloat = 1000
+    
+    var body: some View {
+        
+        
+        VStack {
+            Text(title)
+                .font(.title2)
+                .bold()
+                .padding()
+            
+            Text(message)
+                .font(.body)
+                .padding(.bottom)
+            
+            HStack {
+                Button {
+                    yesAction()
+                    close()
+                } label: {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 20)
+                            .foregroundColor(.green)
+                        Text("네")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding()
+                    }
+                    .frame(width: 120, height: 44) // 버튼의 크기 조절
+                }
+                .padding()
+                
+                Button {
+                    noAction()
+                    close()
+                } label: {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 20)
+                            .foregroundColor(.gray)
+                        Text("아니요")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding()
+                    }
+                    .frame(width: 120, height: 44) // 버튼의 크기 조절
+                }
+                .padding()
+            }
+            
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .padding()
+        .background(.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        
+        
+        // .ignoresSafeArea()
+    }
+    
+    func close() {
+        withAnimation(.spring()) {
+            offset = 1000
+            isActive = false
+        }
+    }
+}
 
 
 #Preview {
     HomeView()
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
