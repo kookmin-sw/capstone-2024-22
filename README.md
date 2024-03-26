@@ -99,10 +99,18 @@
 
 
 
-
 ## 기타
+### 인공지능
 
-추가적인 내용은 자유롭게 작성하세요.
+인공지능 모델은 해당 논문 및 깃헙을 참고하여 구현하였습니다.
+
+Whisper
+- [[Paper]](https://cdn.openai.com/papers/whisper.pdf)
+- [[github]](https://github.com/openai/whisper)
+
+emotion2vec
+- [[Paper]](https://arxiv.org/pdf/2312.15185.pdf)
+- [[github]](https://github.com/ddlBoJack/emotion2vec)
 
 
 
