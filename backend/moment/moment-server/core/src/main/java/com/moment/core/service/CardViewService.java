@@ -174,4 +174,13 @@ public class CardViewService {
         cardView.setIsLoved(!cardView.getIsLoved());
         cardViewRepository.save(cardView);
     }
+
+    public CardViewResponseDTO.GetAllCardView getLikeCardView(Long userId) {
+        List<CardViewResponseDTO.GetCardView> rtnList = new ArrayList<>();
+        List<CardView> cardViews = cardViewRepository.findAllByUser_IdAndIsLovedTrue(userId);
+        for (CardView cardView : cardViews) {
+            rtnList.add(CardViewResponseDTO.GetCardView.fromEntity(cardView));
+        }
+        return CardViewResponseDTO.GetAllCardView.builder().cardViews(rtnList).build();
+    }
 }
