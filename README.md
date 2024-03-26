@@ -37,6 +37,8 @@
 
 **iOS 설계**
 
+Clean arcitecture
+<img width="1032" alt="아키텍쳐 설계" src="https://github.com/kookmin-sw/capstone-2024-22/assets/105967852/e8a2e7cd-17c3-41d0-aa89-361439d7dc51">
 
 
 
