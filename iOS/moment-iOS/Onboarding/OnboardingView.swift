@@ -71,6 +71,12 @@ struct OnboardingView: View {
                     case .PasswordView:
                         PasswordView()
                             .environmentObject(homeViewModel)
+                    case .PasswordfindView:
+                        PasswordfindView()
+                            .environmentObject(homeViewModel)
+                    case .PasswordinsertView:
+                        PasswordinsertView()
+                            .environmentObject(homeViewModel)
                     }
                 }
                 )

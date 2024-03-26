@@ -64,6 +64,8 @@
 		8ECCFADF2BB066D600C39125 /* FloatingToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */; };
 		8ECCFAE32BB0672C00C39125 /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECCFAE22BB0672C00C39125 /* PopupView */; };
 		8ECCFB1F2BB1CA5600C39125 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB1E2BB1CA5600C39125 /* Item.swift */; };
+		8ECCFB612BB29D9100C39125 /* PasswordfindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB602BB29D9100C39125 /* PasswordfindView.swift */; };
+		8ECCFB632BB29FC000C39125 /* PasswordinsertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB622BB29FC000C39125 /* PasswordinsertView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -141,6 +143,8 @@
 		8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
 		8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingToastView.swift; sourceTree = "<group>"; };
 		8ECCFB1E2BB1CA5600C39125 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		8ECCFB602BB29D9100C39125 /* PasswordfindView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordfindView.swift; sourceTree = "<group>"; };
+		8ECCFB622BB29FC000C39125 /* PasswordinsertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordinsertView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -332,6 +336,8 @@
 			isa = PBXGroup;
 			children = (
 				8ECCFA922BAD6B3200C39125 /* PasswordView.swift */,
+				8ECCFB602BB29D9100C39125 /* PasswordfindView.swift */,
+				8ECCFB622BB29FC000C39125 /* PasswordinsertView.swift */,
 			);
 			path = PasswordView;
 			sourceTree = "<group>";
@@ -510,6 +516,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8ECCFB612BB29D9100C39125 /* PasswordfindView.swift in Sources */,
 				8E5CAE3E2B970CCA00A483B4 /* PathType.swift in Sources */,
 				8ECCFADF2BB066D600C39125 /* FloatingToastView.swift in Sources */,
 				8E8C174F2BA97B4500BF1E1C /* AuthNumView.swift in Sources */,
@@ -556,6 +563,7 @@
 				8E8C174C2BA86BF200BF1E1C /* ButtonStyle.swift in Sources */,
 				8E5CAE5A2B970DF600A483B4 /* BillListViewModel.swift in Sources */,
 				8E5CAE742B970EF400A483B4 /* SettingView.swift in Sources */,
+				8ECCFB632BB29FC000C39125 /* PasswordinsertView.swift in Sources */,
 				8E5CAE6C2B970EAE00A483B4 /* LikeViewModel.swift in Sources */,
 				8E5CAE722B970EE700A483B4 /* AppDelegate.swift in Sources */,
 				8E5CAE3C2B970CB300A483B4 /* OnboardingView.swift in Sources */,
