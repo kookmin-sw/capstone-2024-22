@@ -114,7 +114,6 @@ public class CardViewService {
     }
 
     public CardViewResponseDTO.GetAllCardView getAllCardView(Long userId, Long tripFileId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
         List<CardViewResponseDTO.GetCardView> rtnList = new ArrayList<>();
         List<CardView> cardViews = cardViewRepository.findAllByTripFile_Id(tripFileId);
         for (CardView cardView : cardViews) {
@@ -168,5 +167,11 @@ public class CardViewService {
                 tripService.decreaseAnalyzingCount(cardView.getTripFile().getTrip());
             }
         }
+    }
+
+    public void likeCardView(Long cardViewId) {
+        CardView cardView = cardViewRepository.findById(cardViewId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카드뷰입니다."));
+        cardView.setIsLoved(!cardView.getIsLoved());
+        cardViewRepository.save(cardView);
     }
 }
