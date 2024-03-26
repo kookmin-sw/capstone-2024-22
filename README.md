@@ -42,8 +42,11 @@
 
 
 **BackEnd 설계**
+- ERD
+- ![](./src/momenterd.png)
 
-
+- Architecture
+- ![](./src/Momentarc.png)
 
 
 **AI 설계**
