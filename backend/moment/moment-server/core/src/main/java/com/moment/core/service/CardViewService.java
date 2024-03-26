@@ -177,7 +177,7 @@ public class CardViewService {
 
     public CardViewResponseDTO.GetAllCardView getLikeCardView(Long userId) {
         List<CardViewResponseDTO.GetCardView> rtnList = new ArrayList<>();
-        List<CardView> cardViews = cardViewRepository.findAllByUser_IdAndIsLovedTrue(userId);
+        List<CardView> cardViews = cardViewRepository.findByTripFile_User_IdAndIsLoved(userId, true);
         for (CardView cardView : cardViews) {
             rtnList.add(CardViewResponseDTO.GetCardView.fromEntity(cardView));
         }
