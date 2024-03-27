@@ -100,7 +100,7 @@ struct HomeBaseView: View {
             if showPartialSheet {
                 BottomSheetView1(isPresented: $showPartialSheet, audioRecorderManager: audioRecorderManager, wasDeleted: $wasDeleted,wasLoad : $wasLoad)
             }
-        }.background(showingCustomAlertInHome ? Color.black.opacity(0.5) : Color.clear)
+        }.background(showingCustomAlertInHome ? Color.black.opacity(0.5) : Color.homeBack)
             .edgesIgnoringSafeArea(.all)
         
         .onChange(of: homeBaseViewModel.isRecording) { newValue in

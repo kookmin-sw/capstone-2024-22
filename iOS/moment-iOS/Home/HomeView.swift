@@ -43,7 +43,7 @@ struct HomeView: View {
                         Text("어디로 떠나면 좋을까요?")
                             .tag(0)
                         NavigationLink(destination: SelectDayView(calendarViewModel: calendarViewModel)) {
-                            Text("여행 계획하기")
+                            Text("일상기록")
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
                         .tag(1)
@@ -112,7 +112,7 @@ struct ItemViewCell: View {
             
             deleteButton
             
-            NavigationLink(destination: DateRangeView(startDate: item.startdate, endDate: item.enddate), isActive: $isLinkActive) {
+            NavigationLink(destination:  DateRangeView1(item: item), isActive: $isLinkActive) {
                            EmptyView()
                        }
             
@@ -341,56 +341,95 @@ struct CustomDialog: View {
 }
 
 
-
-
-import SwiftUI
-
-struct DateRangeView: View {
-    var startDate: String
-    var endDate: String
-    
+struct DateRangeView : View {
+    var item: Item
     var body: some View {
-        VStack {
-            // 시작 날짜와 종료 날짜 출력
-            Text("시작 날짜: \(startDate)")
-            Text("끝 날짜: \(endDate)")
+        VStack{
             
-            // 날짜 차이 계산 및 각 날짜 출력
-            if let start = convertToDate(dateString: startDate),
-               let end = convertToDate(dateString: endDate) {
-                let dayCount = Calendar.current.dateComponents([.day], from: start, to: end).day ?? 0
-                
-                Text("총 일수: \(dayCount) 일")
-                
-                ForEach(0..<dayCount, id: \.self) { day in
-                    if let date = Calendar.current.date(byAdding: .day, value: day, to: start) {
-                        Text("Day \(day + 1): \(date, formatter: yearSpecificFormatter)")
-                    }
-                }
-            } else {
-                Text("날짜 형식이 잘못되었습니다.")
-            }
         }
     }
 }
 
-// YYYY:MM:DD 형식의 문자열을 Date로 변환하는 함수
-func convertToDate(dateString: String) -> Date? {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "YYYY:MM:dd"
-    return dateFormatter.date(from: dateString)
-}
+struct DateRangeView1: View {
+    var item: Item
 
-// 년도를 2024년으로 고정하여 출력하기 위한 DateFormatter 설정
-let yearSpecificFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "2024:MM:dd"
-    return formatter
-}()
+    var body: some View {
+        VStack {
+            CustomHomeMainDividerthick()
+            Text(item.name)
+                .font(.headline)
+                .padding()
+            CustomHomeMainDividerthick()
+            
+            ScrollView{
+                VStack {
+                   
+                        if let startDate = convertToDate(dateString: item.startdate),
+                           let endDate = convertToDate(dateString: item.enddate) {
+                            let days = generateDateRange(from: startDate, to: endDate)
+                            
+                            ForEach(days.indices, id: \.self) { index in
+                                let day = days[index]
+                                let dayNumber = index + 1
+                               
+                                    
+                                    VStack {
+                                        
+                                        CustomHomeSubDivider()
+                                        HStack{
+                                            VStack{
+                                                Text("Day \(dayNumber)")
+                                                    .font(.subheadline)
+                                                    .foregroundColor(.gray)
+                                                
+                                                Text("\(day, formatter: monthDayFormatter)")
+                                                    .font(.subheadline)
+                                                    .padding(.bottom, 5)
+                                            }.padding()
+                                           
+                                            Text("카드가 몇개 있어용")
+                                        }
+                                        CustomHomeSubDivider()
+                                    }
+                                    .padding(.vertical, 4)
+                                    
 
-// 예시 사용
-struct DateRangeView_Previews: PreviewProvider {
-    static var previews: some View {
-        DateRangeView(startDate: "2024:01:01", endDate: "2024:01:31")
+                                
+                            }
+                           
+                        } else {
+                            Text("날짜 형식이 잘못되었습니다.")
+                        }
+                    
+                }
+            }
+        }
+    }
+    
+    // 날짜 문자열을 Date로 변환
+    func convertToDate(dateString: String) -> Date? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy. MM. dd"
+        return dateFormatter.date(from: dateString)
+    }
+    
+    // 시작 날짜부터 종료 날짜까지의 Date 배열 생성
+    func generateDateRange(from startDate: Date, to endDate: Date) -> [Date] {
+        var dates: [Date] = []
+        var date = startDate
+        
+        while date <= endDate {
+            dates.append(date)
+            date = Calendar.current.date(byAdding: .day, value: 1, to: date)!
+        }
+        
+        return dates
     }
 }
+
+// 날짜 형식 지정
+let monthDayFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "MMMM dd"
+    return formatter
+}()

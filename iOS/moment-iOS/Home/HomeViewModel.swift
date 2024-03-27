@@ -23,7 +23,7 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
     
     @Published var items = [
         Item(name: "선유도여행", startdate: "2024. 03. 05", enddate: "2024. 03. 13"),
-        Item(name: "일본여행", startdate: "2024. 03. 05", enddate: "2024. 03. 13"),
+        Item(name: "일본여행", startdate: "2024. 03. 07", enddate: "2024. 03. 19"),
         Item(name: "뭐하기 여행", startdate: "2024. 03. 05", enddate: "2024. 03. 13"),
         Item(name: "좋은여행", startdate: "2024. 03. 05", enddate: "2024. 03. 13")
         
