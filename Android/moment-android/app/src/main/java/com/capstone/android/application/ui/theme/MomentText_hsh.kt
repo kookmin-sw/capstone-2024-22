@@ -65,6 +65,19 @@ fun P_Medium18(content: String, color: Color){
 }
 
 @Composable
+fun P_ExtraBold16(content: String, color: Color){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 16.sp)
+    )
+}
+
+
+@Composable
 fun P_Bold30(content: String, color: Color, textAlign: TextAlign){
     Text(
         text = content,
@@ -74,6 +87,17 @@ fun P_Bold30(content: String, color: Color, textAlign: TextAlign){
             fontFamily = PretendardFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 30.sp)
+    )
+}
+@Composable
+fun YJ_Bold15(content: String, color: Color){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = FontMoment.obangFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = 15.sp)
     )
 }
 
