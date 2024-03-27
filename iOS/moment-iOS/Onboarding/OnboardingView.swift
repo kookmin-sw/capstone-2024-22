@@ -15,7 +15,7 @@ struct OnboardingView: View {
     @StateObject private var homeViewModel = HomeViewModel()
     @StateObject private var billListViewModel = BillListViewModel()
     @StateObject var audioRecorderManager = AudioRecorderManager()
-   
+    @State private var showingCustomAlert = false
     
     var body: some View {
         

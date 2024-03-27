@@ -16,18 +16,15 @@ struct HomeView: View {
     @StateObject var calendarViewModel = CalendarViewModel()
     @State private var selectedSlideIndex = 0
     @StateObject var homeviewModel = HomeViewModel()
-    @State private var showingCustomAlert = false
+    //@State private var showingCustomAlert = false
+    @Binding var showingCustomAlert: Bool
     @State private var itemToDelete: Item? // 삭제할 아이템을 저장하기 위한 상태변수
     
     
     var body: some View {
         NavigationView {
             ZStack {
-                Color(showingCustomAlert ? .black : .clear)
-                                    .opacity(showingCustomAlert ? 0.5 : 1)
-                                    .edgesIgnoringSafeArea(.all)
-                                    .animation(.easeInOut, value: showingCustomAlert)
-
+              
                 
                 VStack {
                     // '추가' 버튼
@@ -75,22 +72,25 @@ struct HomeView: View {
                 }  .background(Color.homeBack)
                 
                 if showingCustomAlert {
-                    CustomDialog(
-                        isActive: $showingCustomAlert,
-                        title: "여행을 삭제하시겠습니까?",
-                        message: "해당 파일에 기록된 정보는 모두 사라집니다.",
-                        yesAction: {
-                            if let item = itemToDelete {
-                                homeviewModel.deleteItem(myItem: item) // 항목 삭제 실행
+                  
+                        CustomDialog(
+                            isActive: $showingCustomAlert,
+                            title: "여행을 삭제하시겠습니까?",
+                            message: "해당 파일에 기록된 정보는 모두 사라집니다.",
+                            yesAction: {
+                                if let item = itemToDelete {
+                                    homeviewModel.deleteItem(myItem: item) // 항목 삭제 실행
+                                    itemToDelete = nil // 삭제할 아이템 초기화
+                                }
+                                showingCustomAlert = false
+                            },
+                            noAction: {
+                                showingCustomAlert = false // 다이얼로그 닫기
                                 itemToDelete = nil // 삭제할 아이템 초기화
                             }
-                            showingCustomAlert = false
-                        },
-                        noAction: {
-                            showingCustomAlert = false // 다이얼로그 닫기
-                            itemToDelete = nil // 삭제할 아이템 초기화
-                        }
-                    )
+                        )
+                    .transition(.opacity) // 다이얼로그 등장과 사라짐에 투명도 변화 적용
+                        .zIndex(1) // 다이얼로그가 다른 요소들 위에 오도록 설정
                 }
             }
         }
@@ -103,7 +103,7 @@ struct ItemViewCell: View {
     
     @Binding var item: Item
     var deleteAction: () -> Void
-    
+    @State private var isLinkActive = false
     
     var body: some View {
         
@@ -112,28 +112,34 @@ struct ItemViewCell: View {
             
             deleteButton
             
+            NavigationLink(destination: DateRangeView(startDate: item.startdate, endDate: item.enddate), isActive: $isLinkActive) {
+                           EmptyView()
+                       }
             
             HStack(spacing: 15) {
                 
-                
-                HStack{
-                    VStack(alignment: .leading, spacing: 10) {
-                        
-                        Text("\(item.enddate)")
-                            .font(.caption)
-                            .foregroundColor(.black)
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack{
                         
                         
-                        Text(item.startdate)
-                            .font(.caption)
-                            .foregroundColor(.black)
+                        VStack{
+                            Text(item.startdate)
+                                .font(.caption)
+                                .foregroundColor(.black)
+                         
+                            
+                            Text(item.enddate)
+                                .font(.caption)
+                                .foregroundColor(.black)
+                        }
+                            Rectangle()
+                                .fill(Color.homeRed)
+                                .frame(width: 1, height: 42)
+                                .padding(.leading, 5)
+                                .padding(.trailing, 0)
+                        
                     }
-                    Rectangle()
-                        .fill(Color.homeRed)
-                        .frame(width: 1, height: 42)
-                        .padding(.leading, 5)
-                        .padding(.trailing, 0)
-                }
+                }.padding(.bottom,10)
                 
                 VStack{
                     HStack(spacing: 15) {
@@ -148,7 +154,7 @@ struct ItemViewCell: View {
                         Rectangle()
                             .fill(Color.homeRed)
                             .frame(width: 1, height: 42)
-                            .padding(.leading, 5)
+                            .padding(.leading, 3)
                             .padding(.trailing, 0)
                         
                     }
@@ -157,6 +163,9 @@ struct ItemViewCell: View {
                 
                 
             }
+            .onTapGesture {
+              self.isLinkActive = true // 사용자가 셀을 탭하면 네비게이션 링크 활성화
+          }
             .padding()
             .background(Color.homeBack)
             .contentShape(Rectangle())
@@ -201,6 +210,7 @@ struct ItemViewCell: View {
 }
 
 extension ItemViewCell {
+    
     var deleteButton: some View {
         HStack {
             Spacer()
@@ -216,7 +226,7 @@ extension ItemViewCell {
                 Text("수정")
                     .font(.caption)
                     .foregroundColor(.black)
-                //.frame(width: geometry.size.width / 2, height: geometry.size.height)
+               
                     .frame(width: 50, height: 50)
                     .background(Color.homeBack) // 즐겨찾기 버튼 색상 설정
                 
@@ -255,62 +265,69 @@ struct CustomDialog: View {
     let message: String
     let yesAction: () -> Void
     let noAction: () -> Void
+    @State private var showingCustomAlert = false
     
     @State private var offset: CGFloat = 1000
     
     var body: some View {
         
-        
-        VStack {
-            Text(title)
-                .font(.title2)
-                .bold()
-                .padding()
+        ZStack{
+            Color(showingCustomAlert ? .black : .black)
+                .opacity(showingCustomAlert ? 1.0 : 0.5)
+                              .edgesIgnoringSafeArea(.all)
+                              .animation(.easeInOut, value: showingCustomAlert)
             
-            Text(message)
-                .font(.body)
-                .padding(.bottom)
-            
-            HStack {
-                Button {
-                    yesAction()
-                    close()
-                } label: {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 20)
-                            .foregroundColor(.green)
-                        Text("네")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.white)
-                            .padding()
-                    }
-                    .frame(width: 120, height: 44) // 버튼의 크기 조절
-                }
-                .padding()
+            VStack {
+                Text(title)
+                    .font(.title2)
+                    .bold()
+                    .padding()
                 
-                Button {
-                    noAction()
-                    close()
-                } label: {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 20)
-                            .foregroundColor(.gray)
-                        Text("아니요")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.white)
-                            .padding()
+                Text(message)
+                    .font(.body)
+                    .padding(.bottom)
+                
+                HStack {
+                    Button {
+                        yesAction()
+                        close()
+                    } label: {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 20)
+                                .foregroundColor(.green)
+                            Text("네")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding()
+                        }
+                        .frame(width: 120, height: 44) // 버튼의 크기 조절
                     }
-                    .frame(width: 120, height: 44) // 버튼의 크기 조절
+                    .padding()
+                    
+                    Button {
+                        noAction()
+                        close()
+                    } label: {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 20)
+                                .foregroundColor(.gray)
+                            Text("아니요")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding()
+                        }
+                        .frame(width: 120, height: 44) // 버튼의 크기 조절
+                    }
+                    .padding()
                 }
-                .padding()
+                
             }
+            .fixedSize(horizontal: false, vertical: true)
+            .padding()
+            .background(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
             
         }
-        .fixedSize(horizontal: false, vertical: true)
-        .padding()
-        .background(.white)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        
         
         // .ignoresSafeArea()
     }
@@ -324,6 +341,56 @@ struct CustomDialog: View {
 }
 
 
-#Preview {
-    HomeView()
+
+
+import SwiftUI
+
+struct DateRangeView: View {
+    var startDate: String
+    var endDate: String
+    
+    var body: some View {
+        VStack {
+            // 시작 날짜와 종료 날짜 출력
+            Text("시작 날짜: \(startDate)")
+            Text("끝 날짜: \(endDate)")
+            
+            // 날짜 차이 계산 및 각 날짜 출력
+            if let start = convertToDate(dateString: startDate),
+               let end = convertToDate(dateString: endDate) {
+                let dayCount = Calendar.current.dateComponents([.day], from: start, to: end).day ?? 0
+                
+                Text("총 일수: \(dayCount) 일")
+                
+                ForEach(0..<dayCount, id: \.self) { day in
+                    if let date = Calendar.current.date(byAdding: .day, value: day, to: start) {
+                        Text("Day \(day + 1): \(date, formatter: yearSpecificFormatter)")
+                    }
+                }
+            } else {
+                Text("날짜 형식이 잘못되었습니다.")
+            }
+        }
+    }
+}
+
+// YYYY:MM:DD 형식의 문자열을 Date로 변환하는 함수
+func convertToDate(dateString: String) -> Date? {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "YYYY:MM:dd"
+    return dateFormatter.date(from: dateString)
+}
+
+// 년도를 2024년으로 고정하여 출력하기 위한 DateFormatter 설정
+let yearSpecificFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "2024:MM:dd"
+    return formatter
+}()
+
+// 예시 사용
+struct DateRangeView_Previews: PreviewProvider {
+    static var previews: some View {
+        DateRangeView(startDate: "2024:01:01", endDate: "2024:01:31")
+    }
 }

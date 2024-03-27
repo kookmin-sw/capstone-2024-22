@@ -28,9 +28,13 @@ struct HomeBaseView: View {
     @State var isPresentedFloating: Bool = false
     @State private var wasDeleted = false
     @State private var wasLoad = false
+    @State private var showingCustomAlertInHome = false
+
+
     
     var body: some View {
         ZStack {
+            
             VStack {
                 Spacer() // 상단 컨텐츠를 위한 공간
                 
@@ -38,7 +42,7 @@ struct HomeBaseView: View {
                 ZStack {
                     switch homeBaseViewModel.selectedTab {
                     case .Home:
-                        HomeView()
+                        HomeView(showingCustomAlert: $showingCustomAlertInHome)
                     case .Bill:
                         BillListView()
                     case .voiceRecorder:
@@ -77,10 +81,10 @@ struct HomeBaseView: View {
                         .frame(width: 50, height: 50)
                         .offset(y: -edges!.bottom - 40) // 이미지 위치 조정
                 }
-                .background(Color.homeBack) // 탭 바 배경색
+               // .background(Color.homeBack) // 탭 바 배경색
             }
             .edgesIgnoringSafeArea(.bottom)
-            .background(Color.homeBack.ignoresSafeArea(.all, edges: .all))
+            //.background(Color.homeBack.ignoresSafeArea(.all, edges: .all))
             
             if showPartialSheet {
                 Color.black.opacity(0.5) // 어두운 배경 적용
@@ -96,7 +100,9 @@ struct HomeBaseView: View {
             if showPartialSheet {
                 BottomSheetView1(isPresented: $showPartialSheet, audioRecorderManager: audioRecorderManager, wasDeleted: $wasDeleted,wasLoad : $wasLoad)
             }
-        }
+        }.background(showingCustomAlertInHome ? Color.black.opacity(0.5) : Color.clear)
+            .edgesIgnoringSafeArea(.all)
+        
         .onChange(of: homeBaseViewModel.isRecording) { newValue in
             withAnimation {
                 showPartialSheet = newValue
