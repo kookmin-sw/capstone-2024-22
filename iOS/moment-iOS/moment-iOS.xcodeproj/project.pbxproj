@@ -66,6 +66,7 @@
 		8ECCFB1F2BB1CA5600C39125 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB1E2BB1CA5600C39125 /* Item.swift */; };
 		8ECCFB612BB29D9100C39125 /* PasswordfindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB602BB29D9100C39125 /* PasswordfindView.swift */; };
 		8ECCFB632BB29FC000C39125 /* PasswordinsertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB622BB29FC000C39125 /* PasswordinsertView.swift */; };
+		8ECCFBA72BB59F0100C39125 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFBA62BB59F0100C39125 /* CardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -145,6 +146,7 @@
 		8ECCFB1E2BB1CA5600C39125 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		8ECCFB602BB29D9100C39125 /* PasswordfindView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordfindView.swift; sourceTree = "<group>"; };
 		8ECCFB622BB29FC000C39125 /* PasswordinsertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordinsertView.swift; sourceTree = "<group>"; };
+		8ECCFBA62BB59F0100C39125 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -195,8 +197,8 @@
 				8E2D273D2BA57E35006248EA /* Home */,
 				8E2D273E2BA57E47006248EA /* Devider */,
 				8E2D273C2BA57E23006248EA /* Callender */,
-				8E5CAE5B2B970E0400A483B4 /* BillListView.swift */,
-				8E5CAE592B970DF600A483B4 /* BillListViewModel.swift */,
+				8ECCFBA82BB59F0C00C39125 /* CardView */,
+				8ECCFBA92BB5A06500C39125 /* Bill */,
 				8E5CAE6D2B970EC600A483B4 /* LikeView.swift */,
 				8E5CAE6B2B970EAE00A483B4 /* LikeViewModel.swift */,
 				8E5CAE312B970BC800A483B4 /* Time.swift */,
@@ -374,6 +376,23 @@
 				8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */,
 			);
 			path = CustomToast;
+			sourceTree = "<group>";
+		};
+		8ECCFBA82BB59F0C00C39125 /* CardView */ = {
+			isa = PBXGroup;
+			children = (
+				8ECCFBA62BB59F0100C39125 /* CardView.swift */,
+			);
+			path = CardView;
+			sourceTree = "<group>";
+		};
+		8ECCFBA92BB5A06500C39125 /* Bill */ = {
+			isa = PBXGroup;
+			children = (
+				8E5CAE592B970DF600A483B4 /* BillListViewModel.swift */,
+				8E5CAE5B2B970E0400A483B4 /* BillListView.swift */,
+			);
+			path = Bill;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -562,6 +581,7 @@
 				8E5CAE342B970C2C00A483B4 /* Color+Extensions.swift in Sources */,
 				8E8C174C2BA86BF200BF1E1C /* ButtonStyle.swift in Sources */,
 				8E5CAE5A2B970DF600A483B4 /* BillListViewModel.swift in Sources */,
+				8ECCFBA72BB59F0100C39125 /* CardView.swift in Sources */,
 				8E5CAE742B970EF400A483B4 /* SettingView.swift in Sources */,
 				8ECCFB632BB29FC000C39125 /* PasswordinsertView.swift in Sources */,
 				8E5CAE6C2B970EAE00A483B4 /* LikeViewModel.swift in Sources */,

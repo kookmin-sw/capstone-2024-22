@@ -341,22 +341,15 @@ struct CustomDialog: View {
 }
 
 
-struct DateRangeView : View {
-    var item: Item
-    var body: some View {
-        VStack{
-            
-        }
-    }
-}
-
 
 struct DateRangeView1: View {
     var item: Item
     
     var body: some View {
         VStack {
+        
             CustomHomeMainDividerthick()
+                .padding(.bottom, -10)
             HStack {
                 Spacer() // 좌측 공간을 만들어줌으로써 Text를 우측으로 밀어냄
                 Text(item.name)
@@ -366,6 +359,7 @@ struct DateRangeView1: View {
             }
             
             CustomHomeMainDividerthick()
+                .padding(.top, -7)
             
             ScrollView{
                 VStack {
@@ -374,56 +368,23 @@ struct DateRangeView1: View {
                        let endDate = convertToDate(dateString: item.enddate) {
                         let days = generateDateRange(from: startDate, to: endDate)
                         
-                        ForEach(days.indices, id: \.self) { index in
-                            let day = days[index]
-                            let dayNumber = index + 1
-                            
-                            
-                            VStack {
-                                
-                                
-                                HStack{
-                                    VStack{
-                                        Text("\(dayNumber) 일차")
-                                            .font(.subheadline)
-                                            .foregroundColor(.black)
-                                            .padding(.bottom, 5)
-                                        
-                                        Text("\(day, formatter: monthDayFormatter)")
-                                            .font(.subheadline)
-                                            .padding(.bottom, 5)
-                                    }
-                                    
-                                    
-                                    Rectangle()
-                                        .fill(Color.homeRed)
-                                        .frame(width: 1, height: 42)
-                                        .padding(.leading, 3)
-                                        .padding(.trailing, 0)
-                                    
-                                    
-                                    Text("몇개의 파일이 있어요.")
-                                        .font(.caption)
-                                    
-                                    Spacer()
-                                }
-                                .padding()
-                                CustomHomeSubDivider()
+                        ForEach(Array(days.enumerated()), id: \.element) { index, day in
+                            NavigationLink(destination: CardView(day: day, item: item)) {
+                                DayView(day: day, dayIndex: index, item: item) // 'dayIndex' 인자를 전달합니다.
                             }
-                            .padding(.vertical, 4)
-                            
-                            
+                        }
+                                .padding(.vertical, 4)
+                                
+                                
+                                
+                            }
                             
                         }
-                        
-                    } else {
-                        Text("날짜 형식이 잘못되었습니다.")
                     }
-                    
                 }
             }
-        }
-    }
+        
+    
     
     // 날짜 문자열을 Date로 변환
     func convertToDate(dateString: String) -> Date? {
@@ -452,3 +413,47 @@ let monthDayFormatter: DateFormatter = {
     formatter.dateFormat = "yyyy. MM. dd"
     return formatter
 }()
+
+
+struct DayView: View {
+    var day: Date
+    var dayIndex: Int
+    var item: Item
+    
+    var body: some View {
+        VStack {
+            
+            
+            HStack{
+                VStack{
+                    Text("\(dayIndex + 1) 일차")
+                        .font(.subheadline)
+                        .foregroundColor(.black)
+                        .padding(.bottom, 5)
+                    
+                    Text("\(day, formatter: monthDayFormatter)")
+                        .font(.caption)
+                        .foregroundColor(.black)
+                        .padding(.bottom, 5)
+                }
+                
+                
+                Rectangle()
+                    .fill(Color.homeRed)
+                    .frame(width: 1, height: 42)
+                    .padding(.leading, 3)
+                    .padding(.trailing, 0)
+                
+                
+                Text("몇개의 파일이 있어요.")
+                    .foregroundColor(.black)
+                    .font(.caption)
+                
+                Spacer()
+            }
+            .padding()
+            CustomHomeSubDivider()
+                .padding(.vertical, 4)
+        }
+    }
+}
