@@ -14,4 +14,6 @@ struct Item: Identifiable {
     let enddate : String
     var offset: CGFloat = 0
     var isSwiped: Bool = false
+   
+   
 }

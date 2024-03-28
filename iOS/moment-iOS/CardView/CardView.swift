@@ -18,6 +18,7 @@ struct CardView: View {
         }.background(Color.homeBack)
     }
 }
+
 struct AccordionView: View {
     @State private var isExpanded = false
 
@@ -25,9 +26,30 @@ struct AccordionView: View {
         VStack {
             DisclosureGroup(isExpanded: $isExpanded) {
                 // 카드 펼쳐졌을 때 보여질 내용
-                Text("여기에 카드 내용을 넣어주세요.")
-                    .padding()
-                    // 카드에 들어갈 추가 내용
+               //TODO: - 여기에다가 이제 텍스트랑 녹음 뷰 만들어서 넣어야함
+                VStack{
+                    Spacer().frame(height: 40)
+                    HStack{
+                        Image("Location")
+                        Text("선유도 공영주차장")
+                            .font(.caption)
+                        Spacer()
+                        Text("해가 쨍쨍한날")
+                            .font(.caption)
+                        Image("Weather_Sunny")
+                    }
+                    
+                    HStack{
+                        Image("CardTime")
+                        Text("2024. 03. 05. 화요일")
+                            .font(.caption)
+                        Spacer()
+                        Image("bar")
+                       
+                        Text("15:03")
+                            .font(.caption)
+                    }
+                }
             } label: {
                 // 접혀있을 때 보여질 커스텀 뷰
                 HeaderView()

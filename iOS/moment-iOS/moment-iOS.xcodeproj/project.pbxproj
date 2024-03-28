@@ -198,9 +198,8 @@
 				8E2D273E2BA57E47006248EA /* Devider */,
 				8E2D273C2BA57E23006248EA /* Callender */,
 				8ECCFBA82BB59F0C00C39125 /* CardView */,
+				8ECCFBAD2BB5C91D00C39125 /* LikeView */,
 				8ECCFBA92BB5A06500C39125 /* Bill */,
-				8E5CAE6D2B970EC600A483B4 /* LikeView.swift */,
-				8E5CAE6B2B970EAE00A483B4 /* LikeViewModel.swift */,
 				8E5CAE312B970BC800A483B4 /* Time.swift */,
 				8E5CAE6F2B970ED700A483B4 /* NotificationService.swift */,
 				8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */,
@@ -393,6 +392,15 @@
 				8E5CAE5B2B970E0400A483B4 /* BillListView.swift */,
 			);
 			path = Bill;
+			sourceTree = "<group>";
+		};
+		8ECCFBAD2BB5C91D00C39125 /* LikeView */ = {
+			isa = PBXGroup;
+			children = (
+				8E5CAE6B2B970EAE00A483B4 /* LikeViewModel.swift */,
+				8E5CAE6D2B970EC600A483B4 /* LikeView.swift */,
+			);
+			path = LikeView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
