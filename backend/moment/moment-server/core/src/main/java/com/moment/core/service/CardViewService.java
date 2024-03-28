@@ -3,18 +3,15 @@ package com.moment.core.service;
 import com.moment.core.domain.cardView.CardView;
 import com.moment.core.domain.cardView.CardViewRepository;
 import com.moment.core.domain.tripFile.TripFile;
-import com.moment.core.domain.tripFile.TripFileRepository;
 import com.moment.core.domain.user.User;
 import com.moment.core.domain.user.UserRepository;
 import com.moment.core.dto.request.CardViewRequestDTO;
 import com.moment.core.dto.response.CardViewResponseDTO;
 import com.moment.core.exception.UserNotFoundException;
-import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -115,7 +112,7 @@ public class CardViewService {
 
     public CardViewResponseDTO.GetAllCardView getAllCardView(Long userId, Long tripFileId) {
         List<CardViewResponseDTO.GetCardView> rtnList = new ArrayList<>();
-        List<CardView> cardViews = cardViewRepository.findAllByTripFile_Id(tripFileId);
+        List<CardView> cardViews = cardViewRepository.findAllByTripFile_IdOrderByRecordedAt(tripFileId);
         for (CardView cardView : cardViews) {
             rtnList.add(CardViewResponseDTO.GetCardView.fromEntity(cardView));
         }
@@ -177,7 +174,7 @@ public class CardViewService {
 
     public CardViewResponseDTO.GetAllCardView getLikeCardView(Long userId) {
         List<CardViewResponseDTO.GetCardView> rtnList = new ArrayList<>();
-        List<CardView> cardViews = cardViewRepository.findByTripFile_User_IdAndIsLoved(userId, true);
+        List<CardView> cardViews = cardViewRepository.findByTripFile_User_IdAndIsLovedOrderByRecordedAt(userId, true);
         for (CardView cardView : cardViews) {
             rtnList.add(CardViewResponseDTO.GetCardView.fromEntity(cardView));
         }
