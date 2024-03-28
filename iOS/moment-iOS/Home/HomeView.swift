@@ -24,7 +24,7 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             ZStack {
-              
+                
                 
                 VStack {
                     // '추가' 버튼
@@ -72,25 +72,25 @@ struct HomeView: View {
                 }  .background(Color.homeBack)
                 
                 if showingCustomAlert {
-                  
-                        CustomDialog(
-                            isActive: $showingCustomAlert,
-                            title: "여행을 삭제하시겠습니까?",
-                            message: "해당 파일에 기록된 정보는 모두 사라집니다.",
-                            yesAction: {
-                                if let item = itemToDelete {
-                                    homeviewModel.deleteItem(myItem: item) // 항목 삭제 실행
-                                    itemToDelete = nil // 삭제할 아이템 초기화
-                                }
-                                showingCustomAlert = false
-                            },
-                            noAction: {
-                                showingCustomAlert = false // 다이얼로그 닫기
+                    
+                    CustomDialog(
+                        isActive: $showingCustomAlert,
+                        title: "여행을 삭제하시겠습니까?",
+                        message: "해당 파일에 기록된 정보는 모두 사라집니다.",
+                        yesAction: {
+                            if let item = itemToDelete {
+                                homeviewModel.deleteItem(myItem: item) // 항목 삭제 실행
                                 itemToDelete = nil // 삭제할 아이템 초기화
                             }
-                        )
+                            showingCustomAlert = false
+                        },
+                        noAction: {
+                            showingCustomAlert = false // 다이얼로그 닫기
+                            itemToDelete = nil // 삭제할 아이템 초기화
+                        }
+                    )
                     .transition(.opacity) // 다이얼로그 등장과 사라짐에 투명도 변화 적용
-                        .zIndex(1) // 다이얼로그가 다른 요소들 위에 오도록 설정
+                    .zIndex(1) // 다이얼로그가 다른 요소들 위에 오도록 설정
                 }
             }
         }
@@ -113,8 +113,8 @@ struct ItemViewCell: View {
             deleteButton
             
             NavigationLink(destination:  DateRangeView1(item: item), isActive: $isLinkActive) {
-                           EmptyView()
-                       }
+                EmptyView()
+            }
             
             HStack(spacing: 15) {
                 
@@ -126,17 +126,17 @@ struct ItemViewCell: View {
                             Text(item.startdate)
                                 .font(.caption)
                                 .foregroundColor(.black)
-                         
+                            
                             
                             Text(item.enddate)
                                 .font(.caption)
                                 .foregroundColor(.black)
                         }
-                            Rectangle()
-                                .fill(Color.homeRed)
-                                .frame(width: 1, height: 42)
-                                .padding(.leading, 5)
-                                .padding(.trailing, 0)
+                        Rectangle()
+                            .fill(Color.homeRed)
+                            .frame(width: 1, height: 42)
+                            .padding(.leading, 5)
+                            .padding(.trailing, 0)
                         
                     }
                 }.padding(.bottom,10)
@@ -164,8 +164,8 @@ struct ItemViewCell: View {
                 
             }
             .onTapGesture {
-              self.isLinkActive = true // 사용자가 셀을 탭하면 네비게이션 링크 활성화
-          }
+                self.isLinkActive = true // 사용자가 셀을 탭하면 네비게이션 링크 활성화
+            }
             .padding()
             .background(Color.homeBack)
             .contentShape(Rectangle())
@@ -226,7 +226,7 @@ extension ItemViewCell {
                 Text("수정")
                     .font(.caption)
                     .foregroundColor(.black)
-               
+                
                     .frame(width: 50, height: 50)
                     .background(Color.homeBack) // 즐겨찾기 버튼 색상 설정
                 
@@ -274,8 +274,8 @@ struct CustomDialog: View {
         ZStack{
             Color(showingCustomAlert ? .black : .black)
                 .opacity(showingCustomAlert ? 1.0 : 0.5)
-                              .edgesIgnoringSafeArea(.all)
-                              .animation(.easeInOut, value: showingCustomAlert)
+                .edgesIgnoringSafeArea(.all)
+                .animation(.easeInOut, value: showingCustomAlert)
             
             VStack {
                 Text(title)
@@ -350,56 +350,75 @@ struct DateRangeView : View {
     }
 }
 
+
 struct DateRangeView1: View {
     var item: Item
-
+    
     var body: some View {
         VStack {
             CustomHomeMainDividerthick()
-            Text(item.name)
-                .font(.headline)
-                .padding()
+            HStack {
+                Spacer() // 좌측 공간을 만들어줌으로써 Text를 우측으로 밀어냄
+                Text(item.name)
+                    .font(.headline)
+                    .padding()
+                Spacer().frame(width: 20) // 우측에 조금 더 공간을 추가하여 Text를 중앙으로 조금 이동시킴
+            }
+            
             CustomHomeMainDividerthick()
             
             ScrollView{
                 VStack {
-                   
-                        if let startDate = convertToDate(dateString: item.startdate),
-                           let endDate = convertToDate(dateString: item.enddate) {
-                            let days = generateDateRange(from: startDate, to: endDate)
+                    
+                    if let startDate = convertToDate(dateString: item.startdate),
+                       let endDate = convertToDate(dateString: item.enddate) {
+                        let days = generateDateRange(from: startDate, to: endDate)
+                        
+                        ForEach(days.indices, id: \.self) { index in
+                            let day = days[index]
+                            let dayNumber = index + 1
                             
-                            ForEach(days.indices, id: \.self) { index in
-                                let day = days[index]
-                                let dayNumber = index + 1
-                               
-                                    
-                                    VStack {
-                                        
-                                        CustomHomeSubDivider()
-                                        HStack{
-                                            VStack{
-                                                Text("Day \(dayNumber)")
-                                                    .font(.subheadline)
-                                                    .foregroundColor(.gray)
-                                                
-                                                Text("\(day, formatter: monthDayFormatter)")
-                                                    .font(.subheadline)
-                                                    .padding(.bottom, 5)
-                                            }.padding()
-                                           
-                                            Text("카드가 몇개 있어용")
-                                        }
-                                        CustomHomeSubDivider()
-                                    }
-                                    .padding(.vertical, 4)
-                                    
-
+                            
+                            VStack {
                                 
+                                
+                                HStack{
+                                    VStack{
+                                        Text("\(dayNumber) 일차")
+                                            .font(.subheadline)
+                                            .foregroundColor(.black)
+                                            .padding(.bottom, 5)
+                                        
+                                        Text("\(day, formatter: monthDayFormatter)")
+                                            .font(.subheadline)
+                                            .padding(.bottom, 5)
+                                    }
+                                    
+                                    
+                                    Rectangle()
+                                        .fill(Color.homeRed)
+                                        .frame(width: 1, height: 42)
+                                        .padding(.leading, 3)
+                                        .padding(.trailing, 0)
+                                    
+                                    
+                                    Text("몇개의 파일이 있어요.")
+                                        .font(.caption)
+                                    
+                                    Spacer()
+                                }
+                                .padding()
+                                CustomHomeSubDivider()
                             }
-                           
-                        } else {
-                            Text("날짜 형식이 잘못되었습니다.")
+                            .padding(.vertical, 4)
+                            
+                            
+                            
                         }
+                        
+                    } else {
+                        Text("날짜 형식이 잘못되었습니다.")
+                    }
                     
                 }
             }
@@ -430,6 +449,6 @@ struct DateRangeView1: View {
 // 날짜 형식 지정
 let monthDayFormatter: DateFormatter = {
     let formatter = DateFormatter()
-    formatter.dateFormat = "MMMM dd"
+    formatter.dateFormat = "yyyy. MM. dd"
     return formatter
 }()
