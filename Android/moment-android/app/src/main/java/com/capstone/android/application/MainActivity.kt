@@ -29,18 +29,26 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,15 +78,19 @@ import androidx.navigation.compose.rememberNavController
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.screen.BottomNavItem
 import com.capstone.android.application.ui.CardActivity
+import com.capstone.android.application.ui.OnboardingScreen
 import com.capstone.android.application.ui.PostTripActivity
 import com.capstone.android.application.ui.TripFileActivity
 import com.capstone.android.application.ui.theme.ApplicationTheme
+import com.capstone.android.application.ui.theme.CheckButton
 import com.capstone.android.application.ui.theme.FontMoment
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
 import com.capstone.android.application.ui.theme.P_Medium18
 import com.capstone.android.application.ui.theme.PretendardFamily
+import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
+import com.capstone.android.application.ui.theme.negative_600
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.primary_500
@@ -95,6 +107,8 @@ import kotlin.math.roundToInt
 class MainActivity : ComponentActivity() {
     lateinit var navController: NavHostController
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -105,6 +119,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun MainRoot(){
 
@@ -125,8 +140,18 @@ class MainActivity : ComponentActivity() {
         val currentSelectedBottomRoute = remember{
             mutableStateOf("홈")
         }
+        //bottomsheet
+        val sheetState = rememberModalBottomSheetState(/*
+            initialValue = ModalBottomSheetValue.Hidden,
+            confirmStateChange = {false}*/
+        )
+        var recordOpen = remember { mutableStateOf(false)}
 
-
+        if(recordOpen.value) {
+            RecordNavigatesheet(recordOpen,
+                sheetState = sheetState,
+                closeSheet = { recordOpen.value = false })
+        }
 
         Scaffold(
             modifier = Modifier
@@ -160,11 +185,10 @@ class MainActivity : ComponentActivity() {
                                             .height(35.dp)
                                     ) {
                                         Text(
-                                            text =screen.label,
+                                            text = screen.label,
                                             fontSize = 12.sp
                                         )
                                     }
-
                                 },
                                 icon = {
                                     Column(
@@ -178,7 +202,6 @@ class MainActivity : ComponentActivity() {
                                                 .height(6.dp)
                                         ){
                                             Divider(
-
                                                 modifier = Modifier.fillMaxWidth(),
                                                 thickness = (0.8).dp, color = Color.Black
                                             )
@@ -190,19 +213,18 @@ class MainActivity : ComponentActivity() {
                                                     thickness = 4.dp, color = Color("#99342E".toColorInt())
                                                 )
                                             }
-
                                         }
                                         Spacer(modifier = Modifier.height(6.dp))
-                                        if(screen.selectedDrawableId!=0){
+                                        if(screen.selectedDrawableId!=0) {
                                             Image(
                                                 modifier = Modifier.size(20.dp),
                                                 painter =
-                                                if(screen?.screenRoute==currentSelectedBottomRoute.value) painterResource(id = screen.selectedDrawableId) else painterResource(id = screen.unselectedDrawableId),
+                                                if (screen?.screenRoute == currentSelectedBottomRoute.value) painterResource(
+                                                    id = screen.selectedDrawableId
+                                                ) else painterResource(id = screen.unselectedDrawableId),
                                                 contentDescription = "search"
                                             )
                                         }
-
-
                                     }
                                 },
                                 selected = false,
@@ -224,26 +246,23 @@ class MainActivity : ComponentActivity() {
                                             restoreState = true
                                         }
                                     }
-
-
                                 }
                             )
                         }
                     }
-
                     Column(
-                        modifier = Modifier.height(90.dp)
+                        modifier = Modifier
+                            .height(90.dp)
+                            .clickable {
+                                recordOpen.value = true
+                            }
                     ) {
                         Image(
                             modifier = Modifier.size(50.dp),
                             painter = painterResource(id = R.drawable.ic_record), contentDescription = ""
                         )
                     }
-
-
                 }
-
-
             },
             topBar = {
                 TopAppBar(
@@ -620,7 +639,6 @@ class MainActivity : ComponentActivity() {
 
     }
 
-
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun ItemTrip(type:Int){
@@ -871,8 +889,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
-
     @Composable
     fun Receipt(){
         Column(
@@ -937,22 +953,101 @@ class MainActivity : ComponentActivity() {
     fun Record(){
 
 
+    }
 
-      /*  val sheetState = rememberModalBottomSheetState()
-        var isSheetOpen = rememberSaveable() {
-            mutableStateOf(false)
-        }
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun  RecordNavigatesheet(recordOpen : MutableState<Boolean>, sheetState: SheetState, closeSheet: () -> Unit
+    ){
 
-        Box(){
-            Text(
-                modifier = Modifier.clickable { isSheetOpen.value=true } ,
-                text = "녹음"
-            )
-            if(isSheetOpen.value){
-                BottomSheetRecord(sheetState = sheetState, onClicked = { isSheetOpen.value=false },onDismiss={isSheetOpen.value=false})
+        val coroutineScope = rememberCoroutineScope()
+
+        ModalBottomSheet(
+            onDismissRequest = closeSheet,
+            sheetState = sheetState,
+            shape = RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp),
+            containerColor = tertiary_500,
+            dragHandle = null
+        ){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(tertiary_500)
+                    .height(248.dp),
+            ) {
+                Column(modifier = Modifier
+                    .padding(top = 17.dp)
+                    .align(Alignment.TopCenter)) {
+                    Box(
+                        modifier = Modifier.width(213.dp),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Image(modifier = Modifier
+                            .height(42.dp)
+                            .width(213.dp),
+                            painter =  painterResource(R.drawable.img_alarm_center_grey),
+                            contentDescription = "record")
+                        P_Medium11(content = "녹음은 한번에 최대 10분까지 가능해요\n" +
+                                "최대 시간을 넘어가면 자동 종료 후 저장됩니다", color = white )
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 63.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    P_Medium18(content = "0:03", color = black)
+                    Column(modifier = Modifier.width(45.dp)) {
+                        Divider(color = black)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    P_Medium18(content = "열심히 듣고 있어요", color = black)
+                    Column(modifier = Modifier.width(150.dp)) {
+                        Divider(color = black)
+                    }
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.clickable {
+                            coroutineScope
+                                .launch {
+                                    sheetState.hide()
+                                }
+                                .invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        recordOpen.value = false
+                                    }
+                                }
+                        }) {
+                            YJ_Bold15("삭제", black)
+                        }
+                         Spacer(modifier = Modifier.width(46.dp))
+                        Image(modifier = Modifier.size(50.dp),
+                            painter =  painterResource(R.drawable.ic_record_ing),
+                            contentDescription = "record")
+                        Spacer(modifier = Modifier.width(46.dp))
+
+                        Column(Modifier.clickable {
+                            coroutineScope
+                                .launch {
+                                    sheetState.hide()
+                                }
+                                .invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        recordOpen.value = false
+                                    }
+                                }
+                        }) {
+                            YJ_Bold15("저장", primary_500)
+                        }
+
+                    }
+
+                }
             }
-        }*/
-
+        }
     }
 
     @Composable
