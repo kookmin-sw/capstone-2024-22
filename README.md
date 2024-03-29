@@ -52,6 +52,14 @@
 
 
 **AI 설계**
+- 음성인식 모델
+
+![](./src/whisper.png)
+
+
+- 감정분석 모델
+
+![](./src/emotion2vec.png)
 
 
 
