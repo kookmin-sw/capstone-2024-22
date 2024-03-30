@@ -1,0 +1,175 @@
+//
+//  CardView.swift
+//  moment-iOS
+//
+//  Created by 양시관 on 3/28/24.
+//
+
+import SwiftUI
+
+struct CardView: View {
+    var day: Date
+       var item: Item
+
+    @ObservedObject var audioRecorderManager: AudioRecorderManager
+    
+    var body: some View {
+        ZStack{
+          
+            AccordionView(audioRecorderManager: audioRecorderManager)
+        }.background(Color.homeBack)
+    }
+}
+
+struct AccordionView: View {
+    @State private var isExpanded = false
+    @ObservedObject var audioRecorderManager: AudioRecorderManager
+    
+
+    var body: some View {
+        VStack {
+            DisclosureGroup(isExpanded: $isExpanded) {
+                // 카드 펼쳐졌을 때 보여질 내용
+               //TODO: - 여기에다가 이제 텍스트랑 녹음 뷰 만들어서 넣어야함
+                VStack{
+                    Spacer().frame(height: 40)
+                    HStack{
+                        Image("Location")
+                        Text("선유도 공영주차장")
+                            .font(.caption)
+                        Spacer()
+                        Text("해가 쨍쨍한날")
+                            .font(.caption)
+                        Image("Weather_Sunny")
+                    }
+                    
+                    HStack{
+                        Image("CardTime")
+                        Text("2024. 03. 05. 화요일")
+                            .font(.caption)
+                        Spacer()
+                        Image("bar")
+                       
+                        Text("15:03")
+                            .font(.caption)
+                    }
+                    AudioPlayerControls(audioRecorderManager: audioRecorderManager)
+                }
+            } label: {
+                // 접혀있을 때 보여질 커스텀 뷰
+                HeaderView()
+            }
+            .accentColor(.black) // 확장/축소 버튼의 색상
+            .padding()
+            .background(Color.homeBack) // 배경색
+            .cornerRadius(10)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10) // 스트로크를 적용할 사각형
+                    .stroke(Color.toastColor, lineWidth: 2) // 스트로크 색상과 두께 설정
+            )
+            .onTapGesture {
+                withAnimation {
+                    isExpanded.toggle()
+                }
+            }
+            Spacer()
+        }
+        .padding()
+    }
+}
+
+
+struct HeaderView: View {
+   
+    @State private var isHeartFilled = false // 하트가 채워졌는지 여부
+
+    var body: some View {
+        VStack{
+            HStack {
+                Button(action: {
+                    // 하트 버튼을 눌렀을 때의 액션
+                    isHeartFilled.toggle()
+                }) {
+                    Image(isHeartFilled ? "HeartFill" : "HeartEmpty")
+                       
+                }
+                Text("15:03") // 타이틀 예시
+                    .foregroundColor(.black)
+                    .fontWeight(.bold)
+                Spacer()
+                Text("001")
+                    .foregroundColor(.black)
+            }
+            .padding(.horizontal,10)
+            .background(Color.homeBack) // 헤더 배경색
+            .cornerRadius(10)
+            CustomHomeVDividerCard()
+            
+            HStack{
+                Text("꽤나 즐거운 대화였네요")
+                    .font(.caption)
+                    .foregroundColor(.black)
+                    .padding(.horizontal,10)
+                    .padding(.top,10)
+                Spacer()
+                Text("해가 쨍쨍한날")
+                    .font(.caption)
+                    .foregroundColor(.black)
+                    .padding(.top,10)
+              
+                Image("Weather_Sunny")
+                    
+                    .padding(.top,10)
+            }
+        }
+    }
+}
+
+struct AudioPlayerControls: View {
+    @ObservedObject var audioRecorderManager: AudioRecorderManager
+   
+    var body: some View {
+        // 녹음 파일 재생 관련 UI 구성
+        // 예시: 재생, 정지 버튼 등
+        VStack {
+            ProgressView(value: audioRecorderManager.playbackProgress)
+           .progressViewStyle(LinearProgressViewStyle())
+           .frame(height: 20)
+           .padding()
+            HStack{
+                if let lastRecording = audioRecorderManager.recordedFiles.last {
+                    Button("재생") {
+                        audioRecorderManager.startPlaying(recordingURL: lastRecording)
+                    }
+                }
+                Button("정지") {
+                    audioRecorderManager.stopPlaying()
+                }
+            }
+         Spacer()
+        }
+    
+    }
+}
+
+private struct ProgressBar: View {
+    private var progress : Float
+    
+    fileprivate init(progress: Float) {
+        self.progress = progress
+    }
+    
+    fileprivate var body: some View{
+        GeometryReader{ geometry in
+            ZStack(alignment: .leading){
+                Rectangle()
+                    .fill(Color.customGray2)
+                
+                Rectangle()
+                    .fill(Color.green)
+                    .frame(width: CGFloat(self.progress) * geometry.size.width)
+                
+            }
+        }
+    }
+}

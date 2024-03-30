@@ -26,7 +26,7 @@ extension Color { // 왜 extension 을 썼지? : extension 은 원래있던 클�
     static let customSky = Color("SkyBlue")
     static let customWhite = Color("White")
     static let homeRed = Color("homeRed1")
-    
+    static let toastColor = Color("ToastColor")
     
     
 }

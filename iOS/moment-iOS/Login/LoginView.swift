@@ -9,6 +9,7 @@ import SwiftUI
 import Foundation
 import UIKit
 
+
 struct LoginView: View {
     @EnvironmentObject private var pathModel: PathModel
     @State private var isLoading: Bool = false
@@ -93,7 +94,7 @@ private struct StartHomeBtnView: View {
             
             HStack {
                 Button("비밀번호 찾기") {
-                    // 비밀번호 찾기 동작 구현
+                    pathModel.paths.append(.PasswordView)
                 }
                 .font(.caption)
                 .foregroundColor(.black)
@@ -195,6 +196,7 @@ struct LoadingView: View {
         .edgesIgnoringSafeArea(.all) // Safe area 무시하고 전체 화면에 표시
     }
 }
+
 
 #Preview {
     LoginView()
