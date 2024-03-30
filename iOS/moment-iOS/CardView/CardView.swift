@@ -6,82 +6,156 @@
 //
 
 import SwiftUI
-
 struct CardView: View {
     var day: Date
-       var item: Item
-
+    var item: Item
+    @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioRecorderManager: AudioRecorderManager
-    
+    @State private var isDeleteMode = false // 삭제 모드 상태
+
     var body: some View {
-        ZStack{
-            ScrollView{
-                AccordionView(audioRecorderManager: audioRecorderManager)
+        ZStack {
+            VStack {
+                HStack {
+                    backButton
+                    Spacer()
+                    deleteButton
+                }
+                .padding(.horizontal)
+                
+                CustomTitleMainDivider()
+                
+                HStack {
+                    Spacer()
+                    Text(item.name)
+                        .font(.headline)
+                        .foregroundColor(.black)
+                }
+                .padding(.horizontal, 10)
+                
+                CustomTitleMainDivider()
+                
+                ScrollView {
+                    AccordionView(audioRecorderManager: audioRecorderManager, isDeleteMode: $isDeleteMode)
+                        .padding()
+                }
             }
-        }.background(Color.homeBack)
+        }
+        .background(Color.homeBack)
+        .navigationBarHidden(true)
+    }
+
+    private var backButton: some View {
+        Button("뒤로") {
+            presentationMode.wrappedValue.dismiss()
+        }
+        .foregroundColor(.black)
+    }
+
+    private var deleteButton: some View {
+        Button("삭제") {
+            withAnimation {
+                isDeleteMode.toggle()
+            }
+        }
+        .foregroundColor(.black)
     }
 }
 
+
 struct AccordionView: View {
     @State private var isExpanded = false
+    @State private var isSelected = false
     @ObservedObject var audioRecorderManager: AudioRecorderManager
+    @Binding var isDeleteMode: Bool
     
-
     var body: some View {
         VStack {
-            DisclosureGroup(isExpanded: $isExpanded) {
-                // 카드 펼쳐졌을 때 보여질 내용
-               //TODO: - 여기에다가 이제 텍스트랑 녹음 뷰 만들어서 넣어야함
-                VStack{
-                    Spacer().frame(height: 40)
-                    HStack{
-                        Image("Location")
-                        Text("선유도 공영주차장")
-                            .font(.caption)
-                        Spacer()
-                        Text("해가 쨍쨍한날")
-                            .font(.caption)
-                        Image("Weather_Sunny")
+            // 삭제 모드 활성화 시 체크박스와 함께 컨텐츠를 표시하는 로직
+            if isDeleteMode {
+                HStack {
+                    Button(action: { isSelected.toggle() }) {
+                        Image(systemName: isSelected ? "checkmark.square.fill" : "square")
+                            .foregroundColor(.blue)
                     }
-                    
-                    HStack{
-                        Image("CardTime")
-                        Text("2024. 03. 05. 화요일")
-                            .font(.caption)
-                        Spacer()
-                        Image("bar")
-                       
-                        Text("15:03")
-                            .font(.caption)
+                    .transition(.move(edge: .leading))
+                    .padding(.leading, 20)
+
+                    DisclosureGroup(isExpanded: $isExpanded) {
+                        contentVStack
+                    } label: {
+                        HeaderView()
                     }
-                    DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, longText: "머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어")
-                  
-                    DynamicGradientImagePicker()
-                    Spacer().frame(height: 30)
-                    EmotionView()
+                    .accentColor(.black)
+                    .padding()
+                    .background(Color.homeBack)
+                    .cornerRadius(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.toastColor, lineWidth: 2)
+                    )
+                    .offset(x: 20) // 삭제 모드일 때 오른쪽으로 이동
                 }
-            } label: {
-                // 접혀있을 때 보여질 커스텀 뷰
-                HeaderView()
+            } else {
+                // 기본 모드에서는 컨텐츠만 표시
+                DisclosureGroup(isExpanded: $isExpanded) {
+                    contentVStack
+                } label: {
+                    HeaderView()
+                }
+                .accentColor(.black)
+                .padding()
+                .background(Color.homeBack)
+                .cornerRadius(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.toastColor, lineWidth: 2)
+                )
             }
-            .accentColor(.black) // 확장/축소 버튼의 색상
-            .padding()
-            .background(Color.homeBack) // 배경색
-            .cornerRadius(10)
-            .overlay(
-                RoundedRectangle(cornerRadius: 10) // 스트로크를 적용할 사각형
-                    .stroke(Color.toastColor, lineWidth: 2) // 스트로크 색상과 두께 설정
-            )
-            .onTapGesture {
+        }
+        .animation(.default, value: isDeleteMode)
+        .onTapGesture {
+            if !isDeleteMode {
                 withAnimation {
                     isExpanded.toggle()
                 }
             }
-            Spacer()
         }
-        .padding()
+    }
+
+    // 컨텐츠 VStack을 별도의 ViewBuilder로 추출하여 재사용
+    @ViewBuilder
+    private var contentVStack: some View {
+        VStack {
+            Spacer().frame(height: 40)
+            locationAndTimeInfo
+            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, longText: "긴 텍스트 예시")
+            DynamicGradientImagePicker()
+            Spacer().frame(height: 30)
+            EmotionView()
+        }
+    }
+
+    // 위치 및 시간 정보를 보여주는 HStack을 별도의 ViewBuilder로 추출
+    @ViewBuilder
+    private var locationAndTimeInfo: some View {
+        HStack {
+            Image("Location")
+            Text("선유도 공영주차장").font(.caption)
+            Spacer()
+            Text("해가 쨍쨍한날").font(.caption)
+            Image("Weather_Sunny")
+        }
+        HStack {
+            Image("CardTime")
+            Text("2024. 03. 05. 화요일").font(.caption)
+            Spacer()
+            Image("bar")
+            Text("15:03").font(.caption)
+        }
     }
 }
+
 
 
 struct HeaderView: View {
@@ -147,7 +221,7 @@ struct DynamicGradientRectangleView: View {
                 LinearGradient(gradient: Gradient(colors: [.homeBack, .toastColor]), startPoint: .top, endPoint: .bottom)
             )
             .cornerRadius(3)
-            .padding(.horizontal,3)
+           // .padding(.horizontal,3)
             .frame(width: 340)
         //}
     }
@@ -155,52 +229,65 @@ struct DynamicGradientRectangleView: View {
 
 struct DynamicGradientImagePicker: View {
     @State private var showingImagePicker = false
-    @State private var selectedImages = [UIImage?](repeating: nil, count: 5)
+    @State private var showingAddButton = false // 처음에는 추가 버튼이 보이지 않음
+    @State private var selectedImages: [UIImage?] = []
 
     var body: some View {
         VStack {
-            CustomDividerCardView()
-            ScrollView(.horizontal, showsIndicators: false) {
-                
-                HStack(spacing: 10) {
-                   
+          
+            HStack {
+                Spacer() // HStack의 왼쪽에 Spacer를 추가하여 오른쪽으로 요소를 밀어냄
+                if !showingAddButton {
+                    // '이미지 추가하기' 텍스트 버튼
+                    Group{
+                        Button(action: {
+                            showingAddButton = true // '이미지 추가하기' 버튼을 누르면 추가 버튼 생성
+                            selectedImages.append(nil) // 추가 버튼에 해당하는 nil 추가
+                        }) {
+                            HStack {
+                                Text("이미지 추가하기")
+                                    .foregroundColor(.black)
+                                Image("Imageadd")
+                                    .foregroundColor(.white)
+                            }
+                            .padding(.horizontal,10)
                        
-                    // 선택된 이미지들을 보여주는 뷰
-                    ForEach(selectedImages.indices, id: \.self) { index in
-                        if let image = selectedImages[index] {
-                            Image(uiImage: image)
-                                .resizable()
-                                .frame(width: 66, height: 77)
-                                .cornerRadius(3)
-                        } else {
-                            addButton()
+                          
                         }
-                    }
-                    
-                    // 모든 슬롯이 이미지로 채워진 경우, 추가 버튼을 하나 더 보여줍니다.
-                    if !selectedImages.contains(nil) {
-                        addButton()
+
                     }
                 }
             }
-            .background(Color.homeBack)
-            .cornerRadius(3)
-            .frame(width: 340) // 가로 크기 고정
-           
-        
+            
+            if showingAddButton {
+                // 이미지들과 추가 버튼을 보여주는 스크롤 뷰
+                CustomDividerCardView()
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(0..<selectedImages.count, id: \.self) { index in
+                            if let image = selectedImages[index] {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .frame(width: 66, height: 77)
+                                    .cornerRadius(3)
+                            } else {
+                                addButton(index: index)
+                            }
+                        }
+                    }
+                }
+                .background(Color.homeBack)
+                .cornerRadius(3)
+                .frame(width: 340) // 가로 크기 고정
+            }
         }
         .sheet(isPresented: $showingImagePicker) {
             ImagePicker(selectedImage: Binding(
                 get: { UIImage() },
                 set: { image in
-                    if let image = image {
-                        // 이미지가 선택되었을 때, 첫 번째 빈 위치에 이미지를 추가합니다.
-                        if let firstEmptyIndex = selectedImages.firstIndex(where: { $0 == nil }) {
-                            selectedImages[firstEmptyIndex] = image
-                        } else {
-                            // 모든 슬롯이 이미 채워져 있는 경우, 배열에 새 이미지 추가
-                            selectedImages.append(image)
-                        }
+                    if let image = image, let index = selectedImages.lastIndex(where: { $0 == nil }) {
+                        selectedImages[index] = image // 이미지 추가
+                        selectedImages.append(nil) // 새로운 추가 버튼 생성
                     }
                 }
             ))
@@ -208,7 +295,7 @@ struct DynamicGradientImagePicker: View {
     }
     
     @ViewBuilder
-    private func addButton() -> some View {
+    private func addButton(index: Int) -> some View {
         Button(action: {
             showingImagePicker = true
         }) {
