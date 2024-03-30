@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+
 struct CardView: View {
     var day: Date
     var item: Item
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @State private var isDeleteMode = false // 삭제 모드 상태
+    @State private var isSelected = false // 체크박스 선택 여부
+    @State private var showConfirmationDialog = false // 커스텀 다이얼로그 표시 여부
 
     var body: some View {
         ZStack {
@@ -19,7 +22,7 @@ struct CardView: View {
                 HStack {
                     backButton
                     Spacer()
-                    deleteButton
+                    editOrDeleteButton
                 }
                 .padding(.horizontal)
                 
@@ -36,13 +39,29 @@ struct CardView: View {
                 CustomTitleMainDivider()
                 
                 ScrollView {
-                    AccordionView(audioRecorderManager: audioRecorderManager, isDeleteMode: $isDeleteMode)
+                    AccordionView(audioRecorderManager: audioRecorderManager, isDeleteMode: $isDeleteMode, showConfirmationDialog: $showConfirmationDialog)
                         .padding()
                 }
             }
         }
         .background(Color.homeBack)
         .navigationBarHidden(true)
+        .alert(isPresented: $showConfirmationDialog) {
+            Alert(
+                title: Text("삭제 확인"),
+                message: Text("정말로 삭제하시겠습니까?"),
+                primaryButton: .destructive(Text("삭제"), action: {
+                    // 여기에 삭제 로직 추가
+                    // 삭제를 확정하는 작업을 수행할 수 있습니다.
+                    // 예: deleteSelectedItems()
+                    isDeleteMode = false // 삭제 모드 종료
+                    isSelected = false // 체크박스 선택 해제
+                }),
+                secondaryButton: .cancel(Text("취소"), action: {
+                    // 취소를 선택한 경우 실행할 작업이 있다면 추가할 수 있습니다.
+                })
+            )
+        }
     }
 
     private var backButton: some View {
@@ -52,9 +71,16 @@ struct CardView: View {
         .foregroundColor(.black)
     }
 
-    private var deleteButton: some View {
-        Button("삭제") {
+    private var editOrDeleteButton: some View {
+        Button(isDeleteMode ? "삭제" : "삭제") {
             withAnimation {
+                if isDeleteMode {
+                    // 삭제 모드에서 삭제 버튼을 누를 때 다이얼로그 표시
+                    showConfirmationDialog = true
+                } else {
+                    // 편집 모드로 전환하면서 체크박스 선택 해제
+                    isSelected = false
+                }
                 isDeleteMode.toggle()
             }
         }
@@ -62,12 +88,12 @@ struct CardView: View {
     }
 }
 
-
 struct AccordionView: View {
     @State private var isExpanded = false
     @State private var isSelected = false
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @Binding var isDeleteMode: Bool
+    @Binding var showConfirmationDialog: Bool
     
     var body: some View {
         VStack {
@@ -155,6 +181,90 @@ struct AccordionView: View {
         }
     }
 }
+
+struct CustomDialogRecordCard: View {
+    @Binding var isActive: Bool
+    
+    let title: String
+    let message: String
+    let yesAction: () -> Void
+    let noAction: () -> Void
+    @State private var showingCustomAlert = false
+    
+    @State private var offset: CGFloat = 1000
+    
+    var body: some View {
+        
+        ZStack{
+            Color(showingCustomAlert ? .black : .black)
+                .opacity(showingCustomAlert ? 1.0 : 0.5)
+                .edgesIgnoringSafeArea(.all)
+                .animation(.easeInOut, value: showingCustomAlert)
+            
+            VStack {
+                Text(title)
+                    .font(.title2)
+                    .bold()
+                    .padding()
+                
+                Text(message)
+                    .font(.body)
+                    .padding(.bottom)
+                
+                HStack {
+                    Button {
+                        yesAction()
+                        close()
+                    } label: {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 20)
+                                .foregroundColor(.green)
+                            Text("네")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding()
+                        }
+                        .frame(width: 120, height: 44) // 버튼의 크기 조절
+                    }
+                    .padding()
+                    
+                    Button {
+                        noAction()
+                        close()
+                    } label: {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 20)
+                                .foregroundColor(.gray)
+                            Text("아니요")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding()
+                        }
+                        .frame(width: 120, height: 44) // 버튼의 크기 조절
+                    }
+                    .padding()
+                }
+                
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .padding()
+            .background(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            
+        }
+        
+        // .ignoresSafeArea()
+    }
+    
+    func close() {
+        withAnimation(.spring()) {
+            offset = 1000
+            isActive = false
+        }
+    }
+}
+
+
 
 
 
