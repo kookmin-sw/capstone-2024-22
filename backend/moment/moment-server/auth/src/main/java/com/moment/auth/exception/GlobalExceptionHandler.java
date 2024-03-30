@@ -238,6 +238,17 @@ public class GlobalExceptionHandler {
         final ErrorResponse response = ErrorResponse.of(ErrorCode.ALREADY_BOOKED_DATE, ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    /*
+    * [Exception] 이미 등록된 email
+
+     */
+    @ExceptionHandler(AlreadyRegisteredEmailException.class)
+    protected ResponseEntity<ErrorResponse> AlreadyRegisteredEmailExceptionHandler(AlreadyRegisteredEmailException ex) {
+        log.error("AlreadyRegisteredEmailException", ex);
+        final ErrorResponse response = ErrorResponse.of(ErrorCode.ALREADY_REGISTERED_EMAIL, ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(402));
+    }
 //    토큰 401에러
 //    @ExceptionHandler({
 //            io.jsonwebtoken.security.SecurityException.class,

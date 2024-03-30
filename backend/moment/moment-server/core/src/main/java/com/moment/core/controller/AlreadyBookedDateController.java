@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/core/alreadyBookedDate")
 public class AlreadyBookedDateController {
     private final AlreadyBookedDateService alreadyBookedDateService;
-    private final UserService userService;
+
 
     // 예약일 전부 가져오기
     @GetMapping("/all")

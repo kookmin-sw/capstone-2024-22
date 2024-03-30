@@ -7,7 +7,6 @@ import com.moment.core.domain.tripFile.TripFileRepository;
 import com.moment.core.domain.user.User;
 import com.moment.core.domain.user.UserRepository;
 import com.moment.core.dto.response.TripFileResponseDTO;
-import com.moment.core.exception.UserNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +61,7 @@ public class TripFileService {
 
     public TripFileResponseDTO.GetAllTripFile getTripFiles(Long tripId) {
         List<TripFileResponseDTO.GetTripFile> rtnList = new ArrayList<>();
-        List<TripFile> tripFiles = tripFileRepository.findByTrip_Id(tripId);
+        List<TripFile> tripFiles = tripFileRepository.findByTrip_IdOrderByYearDate(tripId);
         for (TripFile tripFile : tripFiles) {
             rtnList.add(TripFileResponseDTO.GetTripFile.fromEntity(tripFile));
         }

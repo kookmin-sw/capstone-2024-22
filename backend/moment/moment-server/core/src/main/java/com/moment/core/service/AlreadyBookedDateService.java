@@ -40,7 +40,7 @@ public class AlreadyBookedDateService {
     // 전부 가져오기
     public AlreadyBookedDateResponseDTO.GetAllCardView getAll(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("해당 유저가 없습니다."));
-        List<AlreadyBookedDate> alreadyBookedDates = alreadyBookedDateRepository.findAllByUser(user);
+        List<AlreadyBookedDate> alreadyBookedDates = alreadyBookedDateRepository.findAllByUserOrderByYearDate(user);
         List<AlreadyBookedDateResponseDTO.GetCardView> cardViews = new ArrayList<>();
         for (AlreadyBookedDate alreadyBookedDate : alreadyBookedDates) {
             cardViews.add(AlreadyBookedDateResponseDTO.GetCardView.builder()

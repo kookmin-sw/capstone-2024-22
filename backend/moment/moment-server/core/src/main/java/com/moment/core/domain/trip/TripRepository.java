@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TripRepository extends JpaRepository<Trip, Long> {
-    Optional<Trip> findByUserAndIsNotTitled(User user, boolean b);
-    Optional<Trip> findByUser_IdAndIsNotTitled(Long userId, boolean b);
+    Optional<Trip> findByUserAndIsNotTitledOrderByStartDate(User user, boolean b);
+    Optional<Trip> findByUser_IdAndIsNotTitledOrderByStartDate(Long userId, boolean b);
 
     List<Trip> findAllByUserAndIsNotTitledOrderByStartDate(User user, boolean b);
 }

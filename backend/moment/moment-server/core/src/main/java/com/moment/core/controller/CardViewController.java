@@ -95,5 +95,35 @@ public class CardViewController {
         cardViewService.deleteRecord(cardViewId);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.DELETE_SUCCESS));
     }
+
+    // 카드뷰 좋아요
+    @PutMapping("/like/{cardViewId}")
+    @Operation(summary = "카드뷰 좋아요", description = "카드뷰에 좋아요를 누릅니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "옳바르지 않은 요청 방식, 존재하지 않는 카드뷰",content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    public ResponseEntity<APIResponse> likeCardView(
+            @RequestHeader Long userId,
+            @PathVariable Long cardViewId
+    ) {
+        userService.validateUserWithCardView(userId, cardViewId);
+        cardViewService.likeCardView(cardViewId);
+        return ResponseEntity.ok(APIResponse.of(SuccessCode.UPDATE_SUCCESS));
+    }
+
+    // 좋아요 누른 카드뷰 조회
+    @GetMapping("/like")
+    @Operation(summary = "좋아요 누른 카드뷰 조회", description = "좋아요 누른 카드뷰를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "옳바르지 않은 요청 방식",content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    public ResponseEntity<APIResponse<CardViewResponseDTO.GetAllCardView>> getLikeCardView(
+            @RequestHeader Long userId
+    ) {
+        CardViewResponseDTO.GetAllCardView allCardView = cardViewService.getLikeCardView(userId);
+        return ResponseEntity.ok(APIResponse.of(SuccessCode.SELECT_SUCCESS, allCardView));
+    }
 }
 
