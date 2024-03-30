@@ -15,8 +15,9 @@ struct CardView: View {
     
     var body: some View {
         ZStack{
-          
-            AccordionView(audioRecorderManager: audioRecorderManager)
+            ScrollView{
+                AccordionView(audioRecorderManager: audioRecorderManager)
+            }
         }.background(Color.homeBack)
     }
 }
@@ -53,7 +54,11 @@ struct AccordionView: View {
                         Text("15:03")
                             .font(.caption)
                     }
-                    AudioPlayerControls(audioRecorderManager: audioRecorderManager)
+                    DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, longText: "머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어머이ㅏ럼ㄴ어")
+                  
+                    DynamicGradientImagePicker()
+                    Spacer().frame(height: 30)
+                    EmotionView()
                 }
             } label: {
                 // 접혀있을 때 보여질 커스텀 뷰
@@ -125,6 +130,160 @@ struct HeaderView: View {
     }
 }
 
+struct DynamicGradientRectangleView: View {
+    @ObservedObject var audioRecorderManager: AudioRecorderManager
+    let longText: String
+    
+    var body: some View {
+        //ScrollView {
+            VStack {
+                AudioPlayerControls(audioRecorderManager: audioRecorderManager)
+                    .padding()
+                
+                Text(longText)
+                    .padding()
+            }
+            .background(
+                LinearGradient(gradient: Gradient(colors: [.homeBack, .toastColor]), startPoint: .top, endPoint: .bottom)
+            )
+            .cornerRadius(3)
+            .padding(.horizontal,3)
+            .frame(width: 340)
+        //}
+    }
+}
+
+struct DynamicGradientImagePicker: View {
+    @State private var showingImagePicker = false
+    @State private var selectedImages = [UIImage?](repeating: nil, count: 5)
+
+    var body: some View {
+        VStack {
+            CustomDividerCardView()
+            ScrollView(.horizontal, showsIndicators: false) {
+                
+                HStack(spacing: 10) {
+                   
+                       
+                    // 선택된 이미지들을 보여주는 뷰
+                    ForEach(selectedImages.indices, id: \.self) { index in
+                        if let image = selectedImages[index] {
+                            Image(uiImage: image)
+                                .resizable()
+                                .frame(width: 66, height: 77)
+                                .cornerRadius(3)
+                        } else {
+                            addButton()
+                        }
+                    }
+                    
+                    // 모든 슬롯이 이미지로 채워진 경우, 추가 버튼을 하나 더 보여줍니다.
+                    if !selectedImages.contains(nil) {
+                        addButton()
+                    }
+                }
+            }
+            .background(Color.homeBack)
+            .cornerRadius(3)
+            .frame(width: 340) // 가로 크기 고정
+           
+        
+        }
+        .sheet(isPresented: $showingImagePicker) {
+            ImagePicker(selectedImage: Binding(
+                get: { UIImage() },
+                set: { image in
+                    if let image = image {
+                        // 이미지가 선택되었을 때, 첫 번째 빈 위치에 이미지를 추가합니다.
+                        if let firstEmptyIndex = selectedImages.firstIndex(where: { $0 == nil }) {
+                            selectedImages[firstEmptyIndex] = image
+                        } else {
+                            // 모든 슬롯이 이미 채워져 있는 경우, 배열에 새 이미지 추가
+                            selectedImages.append(image)
+                        }
+                    }
+                }
+            ))
+        }
+    }
+    
+    @ViewBuilder
+    private func addButton() -> some View {
+        Button(action: {
+            showingImagePicker = true
+        }) {
+            RoundedRectangle(cornerRadius: 3)
+                .fill(Color.gray)
+                .frame(width: 66, height: 77)
+                .overlay(
+                    Image(systemName: "plus")
+                        .foregroundColor(.white)
+                )
+        }
+    }
+}
+
+
+struct EmotionView : View {
+    var body: some View {
+        VStack{
+            HStack{
+                Text("꽤나 즐거운 대화였어요")
+                Spacer()
+                Text("감정분석")
+               
+
+            }
+            CustomEmotionViewDivider()
+            
+            HStack{
+                Text("즐거워요")
+                    .font(.caption)
+                //물차는 뷰
+                ProgressView(value: 0.6, total: 1.0)
+                              .progressViewStyle(LinearProgressViewStyle(tint: .homeRed)) // 빨간색으로 진행률 표시
+                              .frame(width: 200, height: 20) // 크기 조절
+                              .padding()
+                Text("60 %")
+                    .font(.caption)
+            }
+            HStack{
+                Text("걱정돼요")
+                    .font(.caption)
+                //물차는 뷰
+                ProgressView(value: 0.2, total: 1.0)
+                              .progressViewStyle(LinearProgressViewStyle(tint: .black)) // 빨간색으로 진행률 표시
+                              .frame(width: 200, height: 20) // 크기 조절
+                              .padding()
+                Text("20 %")
+                    .font(.caption)
+            }
+            HStack{
+                Text("낮설어요")
+                    .font(.caption)
+                //물차는 뷰
+                ProgressView(value: 0.15, total: 1.0)
+                              .progressViewStyle(LinearProgressViewStyle(tint: .StrangeColor)) // 빨간색으로 진행률 표시
+                              .frame(width: 200, height: 20) // 크기 조절
+                              .padding()
+                Text("15 %")
+                    .font(.caption)
+            }
+            HStack{
+                Text("불안해요")
+                    .font(.caption)
+                //물차는 뷰
+                ProgressView(value: 0.05, total: 1.0)
+                              .progressViewStyle(LinearProgressViewStyle(tint: .unsafeColor)) // 빨간색으로 진행률 표시
+                              .frame(width: 200, height: 20) // 크기 조절
+                              .padding()
+                Text("5 %")
+                    .font(.caption)
+            }
+        }
+    }
+}
+
 struct AudioPlayerControls: View {
     @ObservedObject var audioRecorderManager: AudioRecorderManager
    
@@ -152,24 +311,3 @@ struct AudioPlayerControls: View {
     }
 }
 
-private struct ProgressBar: View {
-    private var progress : Float
-    
-    fileprivate init(progress: Float) {
-        self.progress = progress
-    }
-    
-    fileprivate var body: some View{
-        GeometryReader{ geometry in
-            ZStack(alignment: .leading){
-                Rectangle()
-                    .fill(Color.customGray2)
-                
-                Rectangle()
-                    .fill(Color.green)
-                    .frame(width: CGFloat(self.progress) * geometry.size.width)
-                
-            }
-        }
-    }
-}

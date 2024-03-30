@@ -67,6 +67,7 @@
 		8ECCFB612BB29D9100C39125 /* PasswordfindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB602BB29D9100C39125 /* PasswordfindView.swift */; };
 		8ECCFB632BB29FC000C39125 /* PasswordinsertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB622BB29FC000C39125 /* PasswordinsertView.swift */; };
 		8ECCFBA72BB59F0100C39125 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFBA62BB59F0100C39125 /* CardView.swift */; };
+		8ECCFBB22BB804B900C39125 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFBB12BB804B900C39125 /* ImagePicker.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -147,6 +148,7 @@
 		8ECCFB602BB29D9100C39125 /* PasswordfindView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordfindView.swift; sourceTree = "<group>"; };
 		8ECCFB622BB29FC000C39125 /* PasswordinsertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordinsertView.swift; sourceTree = "<group>"; };
 		8ECCFBA62BB59F0100C39125 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
+		8ECCFBB12BB804B900C39125 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,6 +182,7 @@
 		8E15C8642B6527E3001468C7 = {
 			isa = PBXGroup;
 			children = (
+				8ECCFBB12BB804B900C39125 /* ImagePicker.swift */,
 				8ECCFA992BAFE4A300C39125 /* VoiceRecorder_EX */,
 				8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */,
 				8E15C8702B6527E3001468C7 /* moment_iOSApp.swift */,
@@ -602,6 +605,7 @@
 				8ECCFB632BB29FC000C39125 /* PasswordinsertView.swift in Sources */,
 				8E5CAE6C2B970EAE00A483B4 /* LikeViewModel.swift in Sources */,
 				8E5CAE722B970EE700A483B4 /* AppDelegate.swift in Sources */,
+				8ECCFBB22BB804B900C39125 /* ImagePicker.swift in Sources */,
 				8E5CAE3C2B970CB300A483B4 /* OnboardingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

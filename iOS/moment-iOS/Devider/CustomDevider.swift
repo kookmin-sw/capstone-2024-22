@@ -40,6 +40,19 @@ struct CustomHomeVDividerCard: View {
     }
 }
 
+struct CustomDividerCardView: View {
+    var color: Color = .gray600 // 여기에서 색상을 변경할 수 있습니다.
+    var width: CGFloat = 340 // 길이 조절
+    var thickness: CGFloat = 1 // 굵기 조절
+    
+    var body: some View {
+        Rectangle()
+            .fill(color)
+            .frame(width: width, height: thickness)
+            .edgesIgnoringSafeArea(.horizontal)
+    }
+}
+
 struct CustomHomeSubDivider: View {
     var color: Color = .gray // 여기에서 색상을 변경할 수 있습니다.
     var width: CGFloat = 300 // 길이 조절
@@ -77,6 +90,20 @@ struct CustomHomeMainDividerthick: View {
             .edgesIgnoringSafeArea(.horizontal)
     }
 }
+
+struct CustomEmotionViewDivider: View {
+    var color: Color = .gray600 // 여기에서 색상을 변경할 수 있습니다.
+    var width: CGFloat = 312 // 길이 조절
+    var thickness: CGFloat = 2 // 굵기 조절
+    
+    var body: some View {
+        Rectangle()
+            .fill(color)
+            .frame(width: width, height: thickness)
+            .edgesIgnoringSafeArea(.horizontal)
+    }
+}
+
 
 
 
