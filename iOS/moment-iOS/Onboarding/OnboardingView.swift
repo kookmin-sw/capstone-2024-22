@@ -17,6 +17,7 @@ struct OnboardingView: View {
     @StateObject var audioRecorderManager = AudioRecorderManager()
     @State private var showingCustomAlert = false
     
+    
     var body: some View {
         
        

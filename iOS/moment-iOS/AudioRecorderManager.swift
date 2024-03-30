@@ -13,7 +13,7 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
   /// 음성메모 녹음 관련 프로퍼티
   var audioRecorder: AVAudioRecorder?
   @Published var isRecording = false
-  
+  @Published var playbackProgress: Double = 0.0
   /// 음성메모 재생 관련 프로퍼티
   var audioPlayer: AVAudioPlayer?
   @Published var isPlaying = false
@@ -88,4 +88,18 @@ extension AudioRecorderManager {
     self.isPlaying = false
     self.isPaused = false
   }
+    
+    private func updatePlaybackProgress() {
+            guard let player = audioPlayer, player.duration > 0 else {
+                return
+            }
+
+            Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] (timer) in
+                guard let self = self, self.isPlaying else {
+                    timer.invalidate()
+                    return
+                }
+                self.playbackProgress = player.currentTime / player.duration
+            }
+        }
 }

@@ -19,6 +19,8 @@ struct HomeView: View {
     //@State private var showingCustomAlert = false
     @Binding var showingCustomAlert: Bool
     @State private var itemToDelete: Item? // 삭제할 아이템을 저장하기 위한 상태변수
+    @ObservedObject var audioRecorderManager: AudioRecorderManager
+ 
     
     
     var body: some View {
@@ -63,7 +65,7 @@ struct HomeView: View {
                                 ItemViewCell(item: $homeviewModel.items[homeviewModel.getIndex(item: item)], deleteAction: {
                                     self.itemToDelete = item // 사용자가 삭제할 항목을 설정합니다.
                                     self.showingCustomAlert = true // 삭제 확인 다이얼로그를 표시합니다.
-                                })
+                                }, audioRecorderManager: audioRecorderManager)
                                 CustomHomeSubDivider()
                             }
                         }
@@ -104,7 +106,8 @@ struct ItemViewCell: View {
     @Binding var item: Item
     var deleteAction: () -> Void
     @State private var isLinkActive = false
-    
+    @ObservedObject var audioRecorderManager: AudioRecorderManager
+  
     var body: some View {
         
         ZStack {
@@ -112,7 +115,7 @@ struct ItemViewCell: View {
             
             deleteButton
             
-            NavigationLink(destination:  DateRangeView1(item: item), isActive: $isLinkActive) {
+            NavigationLink(destination:  DateRangeView1(item: item, audioRecorderManager: audioRecorderManager), isActive: $isLinkActive) {
                 EmptyView()
             }
             
@@ -344,6 +347,8 @@ struct CustomDialog: View {
 
 struct DateRangeView1: View {
     var item: Item
+    @ObservedObject var audioRecorderManager: AudioRecorderManager
+   
     
     var body: some View {
         VStack {
@@ -369,7 +374,7 @@ struct DateRangeView1: View {
                         let days = generateDateRange(from: startDate, to: endDate)
                         
                         ForEach(Array(days.enumerated()), id: \.element) { index, day in
-                            NavigationLink(destination: CardView(day: day, item: item)) {
+                            NavigationLink(destination: CardView(day: day, item: item, audioRecorderManager: audioRecorderManager)) {
                                 DayView(day: day, dayIndex: index, item: item) // 'dayIndex' 인자를 전달합니다.
                             }
                         }

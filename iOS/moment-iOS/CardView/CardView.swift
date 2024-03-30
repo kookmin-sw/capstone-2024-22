@@ -10,17 +10,21 @@ import SwiftUI
 struct CardView: View {
     var day: Date
        var item: Item
+
+    @ObservedObject var audioRecorderManager: AudioRecorderManager
     
     var body: some View {
         ZStack{
           
-            AccordionView()
+            AccordionView(audioRecorderManager: audioRecorderManager)
         }.background(Color.homeBack)
     }
 }
 
 struct AccordionView: View {
     @State private var isExpanded = false
+    @ObservedObject var audioRecorderManager: AudioRecorderManager
+    
 
     var body: some View {
         VStack {
@@ -49,6 +53,7 @@ struct AccordionView: View {
                         Text("15:03")
                             .font(.caption)
                     }
+                    AudioPlayerControls(audioRecorderManager: audioRecorderManager)
                 }
             } label: {
                 // 접혀있을 때 보여질 커스텀 뷰
@@ -110,11 +115,60 @@ struct HeaderView: View {
                 Text("해가 쨍쨍한날")
                     .font(.caption)
                     .foregroundColor(.black)
-                  
                     .padding(.top,10)
+              
                 Image("Weather_Sunny")
                     
                     .padding(.top,10)
+            }
+        }
+    }
+}
+
+struct AudioPlayerControls: View {
+    @ObservedObject var audioRecorderManager: AudioRecorderManager
+   
+    var body: some View {
+        // 녹음 파일 재생 관련 UI 구성
+        // 예시: 재생, 정지 버튼 등
+        VStack {
+            ProgressView(value: audioRecorderManager.playbackProgress)
+           .progressViewStyle(LinearProgressViewStyle())
+           .frame(height: 20)
+           .padding()
+            HStack{
+                if let lastRecording = audioRecorderManager.recordedFiles.last {
+                    Button("재생") {
+                        audioRecorderManager.startPlaying(recordingURL: lastRecording)
+                    }
+                }
+                Button("정지") {
+                    audioRecorderManager.stopPlaying()
+                }
+            }
+         Spacer()
+        }
+    
+    }
+}
+
+private struct ProgressBar: View {
+    private var progress : Float
+    
+    fileprivate init(progress: Float) {
+        self.progress = progress
+    }
+    
+    fileprivate var body: some View{
+        GeometryReader{ geometry in
+            ZStack(alignment: .leading){
+                Rectangle()
+                    .fill(Color.customGray2)
+                
+                Rectangle()
+                    .fill(Color.green)
+                    .frame(width: CGFloat(self.progress) * geometry.size.width)
+                
             }
         }
     }

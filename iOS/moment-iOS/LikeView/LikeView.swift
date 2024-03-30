@@ -18,7 +18,7 @@ struct LikeView: View {
     var body: some View {
         VStack{
        
-            AccordionView()
+           // AccordionView()
         }
         
     }
