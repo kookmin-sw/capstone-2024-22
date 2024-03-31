@@ -59,7 +59,14 @@
 		8E8C17562BAAC8F000BF1E1C /* AuthComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17552BAAC8F000BF1E1C /* AuthComplete.swift */; };
 		8E8C17CA2BABF1A800BF1E1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */; };
 		8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C18052BAC379700BF1E1C /* SwipeItem.swift */; };
-		8E8C18082BAC41C600BF1E1C /* TravelItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C18072BAC41C600BF1E1C /* TravelItem.swift */; };
+		8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA922BAD6B3200C39125 /* PasswordView.swift */; };
+		8ECCFA982BAFE3BD00C39125 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */; };
+		8ECCFADF2BB066D600C39125 /* FloatingToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */; };
+		8ECCFAE32BB0672C00C39125 /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECCFAE22BB0672C00C39125 /* PopupView */; };
+		8ECCFB1F2BB1CA5600C39125 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB1E2BB1CA5600C39125 /* Item.swift */; };
+		8ECCFB612BB29D9100C39125 /* PasswordfindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB602BB29D9100C39125 /* PasswordfindView.swift */; };
+		8ECCFB632BB29FC000C39125 /* PasswordinsertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB622BB29FC000C39125 /* PasswordinsertView.swift */; };
+		8ECCFBA72BB59F0100C39125 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFBA62BB59F0100C39125 /* CardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -133,7 +140,13 @@
 		8E8C17552BAAC8F000BF1E1C /* AuthComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthComplete.swift; sourceTree = "<group>"; };
 		8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8E8C18052BAC379700BF1E1C /* SwipeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeItem.swift; sourceTree = "<group>"; };
-		8E8C18072BAC41C600BF1E1C /* TravelItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelItem.swift; sourceTree = "<group>"; };
+		8ECCFA922BAD6B3200C39125 /* PasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordView.swift; sourceTree = "<group>"; };
+		8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
+		8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingToastView.swift; sourceTree = "<group>"; };
+		8ECCFB1E2BB1CA5600C39125 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		8ECCFB602BB29D9100C39125 /* PasswordfindView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordfindView.swift; sourceTree = "<group>"; };
+		8ECCFB622BB29FC000C39125 /* PasswordinsertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordinsertView.swift; sourceTree = "<group>"; };
+		8ECCFBA62BB59F0100C39125 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +154,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8ECCFAE32BB0672C00C39125 /* PopupView in Frameworks */,
 				8E747AF72B84DC1400D9302D /* SafeAreaBrush in Frameworks */,
 				8E747AFC2B860E3C00D9302D /* FSCalendar in Frameworks */,
 			);
@@ -166,27 +180,30 @@
 		8E15C8642B6527E3001468C7 = {
 			isa = PBXGroup;
 			children = (
+				8ECCFA992BAFE4A300C39125 /* VoiceRecorder_EX */,
 				8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */,
 				8E15C8702B6527E3001468C7 /* moment_iOSApp.swift */,
 				8E5CAE712B970EE700A483B4 /* AppDelegate.swift */,
+				8ECCFAE02BB066F900C39125 /* CustomToast */,
+				8ECCFAA22BB01F4300C39125 /* Setting */,
+				8ECCFA942BADC97F00C39125 /* HomeBase */,
 				8E8C17502BAAB64D00BF1E1C /* ToolTip */,
 				8E8C174D2BA86BFD00BF1E1C /* Style */,
-				8E8C174A2BA85B8700BF1E1C /* Path */,
 				8E8C17492BA85AE600BF1E1C /* Auth */,
+				8E8C174A2BA85B8700BF1E1C /* Path */,
+				8ECCFA912BAD6B2200C39125 /* PasswordView */,
 				8E8C17462BA8575500BF1E1C /* Login */,
 				8E2D273F2BA57E60006248EA /* Onboarding */,
+				8ECCFBB02BB6C07600C39125 /* Data */,
 				8E2D273D2BA57E35006248EA /* Home */,
 				8E2D273E2BA57E47006248EA /* Devider */,
 				8E2D273C2BA57E23006248EA /* Callender */,
-				8E5CAE5B2B970E0400A483B4 /* BillListView.swift */,
-				8E5CAE592B970DF600A483B4 /* BillListViewModel.swift */,
-				8E5CAE732B970EF400A483B4 /* SettingView.swift */,
-				8E5CAE6D2B970EC600A483B4 /* LikeView.swift */,
-				8E5CAE6B2B970EAE00A483B4 /* LikeViewModel.swift */,
+				8ECCFBA82BB59F0C00C39125 /* CardView */,
+				8ECCFBAD2BB5C91D00C39125 /* LikeView */,
+				8ECCFBA92BB5A06500C39125 /* Bill */,
 				8E5CAE312B970BC800A483B4 /* Time.swift */,
 				8E5CAE6F2B970ED700A483B4 /* NotificationService.swift */,
-				8E5CAE672B970E8700A483B4 /* VoiceRecorderView.swift */,
-				8E5CAE652B970E6B00A483B4 /* VoiceRecorderViewModel.swift */,
+				8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */,
 				8E5CAE632B970E5B00A483B4 /* Double+Extensions.swift */,
 				8E5CAE692B970E9900A483B4 /* Int-Extensions.swift */,
 				8E5CAE5F2B970E2800A483B4 /* MemoViewModel.swift */,
@@ -197,8 +214,6 @@
 				8E5CAE532B970DC600A483B4 /* WriteBtn.swift */,
 				8E5CAE4D2B970D5D00A483B4 /* Todo.swift */,
 				8E5CAE452B970D1000A483B4 /* Tab.swift */,
-				8E5CAE432B970CFF00A483B4 /* HomeBaseViewModel.swift */,
-				8E5CAE412B970CEA00A483B4 /* HomeBaseView.swift */,
 				8E15C8722B6527E3001468C7 /* ContentView.swift */,
 				8E5CAE352B970C4500A483B4 /* Assets.xcassets */,
 				8E15C8802B6527E7001468C7 /* moment-iOSTests */,
@@ -249,8 +264,8 @@
 			children = (
 				8E5CAE4F2B970D6A00A483B4 /* HomeViewModel.swift */,
 				8E5CAE512B970DB600A483B4 /* HomeView.swift */,
-				8E8C18072BAC41C600BF1E1C /* TravelItem.swift */,
 				8E8C18052BAC379700BF1E1C /* SwipeItem.swift */,
+				8ECCFB1E2BB1CA5600C39125 /* Item.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -319,6 +334,83 @@
 			path = ToolTip;
 			sourceTree = "<group>";
 		};
+		8ECCFA912BAD6B2200C39125 /* PasswordView */ = {
+			isa = PBXGroup;
+			children = (
+				8ECCFA922BAD6B3200C39125 /* PasswordView.swift */,
+				8ECCFB602BB29D9100C39125 /* PasswordfindView.swift */,
+				8ECCFB622BB29FC000C39125 /* PasswordinsertView.swift */,
+			);
+			path = PasswordView;
+			sourceTree = "<group>";
+		};
+		8ECCFA942BADC97F00C39125 /* HomeBase */ = {
+			isa = PBXGroup;
+			children = (
+				8E5CAE432B970CFF00A483B4 /* HomeBaseViewModel.swift */,
+				8E5CAE412B970CEA00A483B4 /* HomeBaseView.swift */,
+			);
+			path = HomeBase;
+			sourceTree = "<group>";
+		};
+		8ECCFA992BAFE4A300C39125 /* VoiceRecorder_EX */ = {
+			isa = PBXGroup;
+			children = (
+				8E5CAE652B970E6B00A483B4 /* VoiceRecorderViewModel.swift */,
+				8E5CAE672B970E8700A483B4 /* VoiceRecorderView.swift */,
+			);
+			path = VoiceRecorder_EX;
+			sourceTree = "<group>";
+		};
+		8ECCFAA22BB01F4300C39125 /* Setting */ = {
+			isa = PBXGroup;
+			children = (
+				8E5CAE732B970EF400A483B4 /* SettingView.swift */,
+			);
+			path = Setting;
+			sourceTree = "<group>";
+		};
+		8ECCFAE02BB066F900C39125 /* CustomToast */ = {
+			isa = PBXGroup;
+			children = (
+				8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */,
+			);
+			path = CustomToast;
+			sourceTree = "<group>";
+		};
+		8ECCFBA82BB59F0C00C39125 /* CardView */ = {
+			isa = PBXGroup;
+			children = (
+				8ECCFBA62BB59F0100C39125 /* CardView.swift */,
+			);
+			path = CardView;
+			sourceTree = "<group>";
+		};
+		8ECCFBA92BB5A06500C39125 /* Bill */ = {
+			isa = PBXGroup;
+			children = (
+				8E5CAE592B970DF600A483B4 /* BillListViewModel.swift */,
+				8E5CAE5B2B970E0400A483B4 /* BillListView.swift */,
+			);
+			path = Bill;
+			sourceTree = "<group>";
+		};
+		8ECCFBAD2BB5C91D00C39125 /* LikeView */ = {
+			isa = PBXGroup;
+			children = (
+				8E5CAE6B2B970EAE00A483B4 /* LikeViewModel.swift */,
+				8E5CAE6D2B970EC600A483B4 /* LikeView.swift */,
+			);
+			path = LikeView;
+			sourceTree = "<group>";
+		};
+		8ECCFBB02BB6C07600C39125 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -338,6 +430,7 @@
 			packageProductDependencies = (
 				8E747AF62B84DC1400D9302D /* SafeAreaBrush */,
 				8E747AFB2B860E3C00D9302D /* FSCalendar */,
+				8ECCFAE22BB0672C00C39125 /* PopupView */,
 			);
 			productName = "moment-iOS";
 			productReference = 8E15C86D2B6527E3001468C7 /* moment-iOS.app */;
@@ -414,6 +507,7 @@
 			packageReferences = (
 				8E747AF52B84DC1400D9302D /* XCRemoteSwiftPackageReference "SafeAreaBrush" */,
 				8E747AFA2B860E3C00D9302D /* XCRemoteSwiftPackageReference "FSCalendar" */,
+				8ECCFAE12BB0672B00C39125 /* XCRemoteSwiftPackageReference "PopupView" */,
 			);
 			productRefGroup = 8E15C86E2B6527E3001468C7 /* Products */;
 			projectDirPath = "";
@@ -457,13 +551,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8ECCFB612BB29D9100C39125 /* PasswordfindView.swift in Sources */,
 				8E5CAE3E2B970CCA00A483B4 /* PathType.swift in Sources */,
+				8ECCFADF2BB066D600C39125 /* FloatingToastView.swift in Sources */,
 				8E8C174F2BA97B4500BF1E1C /* AuthNumView.swift in Sources */,
 				8E5CAE702B970ED700A483B4 /* NotificationService.swift in Sources */,
 				8E5CAE442B970CFF00A483B4 /* HomeBaseViewModel.swift in Sources */,
 				8E5CAE602B970E2800A483B4 /* MemoViewModel.swift in Sources */,
 				8E5CAE642B970E5B00A483B4 /* Double+Extensions.swift in Sources */,
-				8E8C18082BAC41C600BF1E1C /* TravelItem.swift in Sources */,
 				8E2D273B2BA57DE7006248EA /* FSCalendarWrapper.swift in Sources */,
 				8E5CAE402B970CD800A483B4 /* PathModel.swift in Sources */,
 				8E5CAE622B970E4300A483B4 /* MemoView.swift in Sources */,
@@ -471,6 +566,7 @@
 				8E5CAE5E2B970E1800A483B4 /* Memo.swift in Sources */,
 				8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */,
 				8E5CAE502B970D6B00A483B4 /* HomeViewModel.swift in Sources */,
+				8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */,
 				8E5CAE482B970D2700A483B4 /* Date+Extensions.swift in Sources */,
 				8E5CAE462B970D1000A483B4 /* Tab.swift in Sources */,
 				8E5CAE682B970E8700A483B4 /* VoiceRecorderView.swift in Sources */,
@@ -485,6 +581,7 @@
 				8E5CAE662B970E6B00A483B4 /* VoiceRecorderViewModel.swift in Sources */,
 				8E5CAE4A2B970D3B00A483B4 /* CustomNavigationBar.swift in Sources */,
 				8E5CAE422B970CEA00A483B4 /* HomeBaseView.swift in Sources */,
+				8ECCFB1F2BB1CA5600C39125 /* Item.swift in Sources */,
 				8E5CAE3A2B970C9D00A483B4 /* OnboardingViewModel.swift in Sources */,
 				8E5CAE382B970C5600A483B4 /* OnboardingContent.swift in Sources */,
 				8E5CAE4E2B970D5D00A483B4 /* Todo.swift in Sources */,
@@ -494,12 +591,15 @@
 				8E8C17562BAAC8F000BF1E1C /* AuthComplete.swift in Sources */,
 				8E8C17482BA85AE200BF1E1C /* AuthView.swift in Sources */,
 				8E15C8712B6527E3001468C7 /* moment_iOSApp.swift in Sources */,
+				8ECCFA982BAFE3BD00C39125 /* AudioRecorderManager.swift in Sources */,
 				8E5CAE6A2B970E9900A483B4 /* Int-Extensions.swift in Sources */,
 				8E5CAE542B970DC600A483B4 /* WriteBtn.swift in Sources */,
 				8E5CAE342B970C2C00A483B4 /* Color+Extensions.swift in Sources */,
 				8E8C174C2BA86BF200BF1E1C /* ButtonStyle.swift in Sources */,
 				8E5CAE5A2B970DF600A483B4 /* BillListViewModel.swift in Sources */,
+				8ECCFBA72BB59F0100C39125 /* CardView.swift in Sources */,
 				8E5CAE742B970EF400A483B4 /* SettingView.swift in Sources */,
+				8ECCFB632BB29FC000C39125 /* PasswordinsertView.swift in Sources */,
 				8E5CAE6C2B970EAE00A483B4 /* LikeViewModel.swift in Sources */,
 				8E5CAE722B970EE700A483B4 /* AppDelegate.swift in Sources */,
 				8E5CAE3C2B970CB300A483B4 /* OnboardingView.swift in Sources */,
@@ -850,6 +950,14 @@
 				minimumVersion = 2.8.4;
 			};
 		};
+		8ECCFAE12BB0672B00C39125 /* XCRemoteSwiftPackageReference "PopupView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/PopupView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -862,6 +970,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8E747AFA2B860E3C00D9302D /* XCRemoteSwiftPackageReference "FSCalendar" */;
 			productName = FSCalendar;
+		};
+		8ECCFAE22BB0672C00C39125 /* PopupView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8ECCFAE12BB0672B00C39125 /* XCRemoteSwiftPackageReference "PopupView" */;
+			productName = PopupView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

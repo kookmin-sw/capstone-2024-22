@@ -20,9 +20,27 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
     @Published var tripEndDate: Date?
     @Published var showingDeleteAlert: Bool = false
     @Published var indexToDelete: Int? = nil
-    //@Published var tripInfo: (name: String, startDate: Date?, endDate: Date?) = ("", nil, nil)
-   
     
+    @Published var items = [
+        Item(name: "선유도여행", startdate: "2024. 03. 05", enddate: "2024. 03. 13"),
+        Item(name: "일본여행", startdate: "2024. 03. 07", enddate: "2024. 03. 19"),
+        Item(name: "뭐하기 여행", startdate: "2024. 03. 05", enddate: "2024. 03. 13"),
+        Item(name: "좋은여행", startdate: "2024. 03. 05", enddate: "2024. 03. 13")
+        
+        
+    ]
+    
+    
+    func getIndex(item: Item) -> Int {
+        return items.firstIndex { item1 -> Bool in
+            return item.id == item1.id
+        } ?? 0
+    }
+    func deleteItem(myItem: Item) {
+        items.removeAll { item in
+            return item.id == myItem.id
+        }
+    }
     var removeTodosCount : Int {
         return removeTodos.count // 여기 카운트는 그냥 제공하는녀석이네 이걸 왜의심했냐면 removeTodos 에 갔는데 데이터셋 Todo 를 가지고있어서 가봤더니 count 가 없네 그래서 count 를 의심했음
         // 여튼 그렇게 해서 INt 형식으로 이번엔 값을 저장을 해주네 ㅇㅇ 아까 전에는 저장안하고 변하면 바로계산해서 쏴주기만했자나
@@ -32,33 +50,33 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
     }
     init(
         todos: [Todo] = [], // 이소스코드는 Todo 클래스를 타입으로 가지는 녀석을 빈배열로 초기화하는 소스코드임
-         isEditModeTodoMode: Bool = false,
-         removeTodos: [Todo] = [],// 이소스코드는 Todo 클래스를 타입으로 가지는 녀석을 빈배열로 초기화하는 소스코드임
-         isDisplayRemoveTodoAlert: Bool = false
+        isEditModeTodoMode: Bool = false,
+        removeTodos: [Todo] = [],// 이소스코드는 Todo 클래스를 타입으로 가지는 녀석을 빈배열로 초기화하는 소스코드임
+        isDisplayRemoveTodoAlert: Bool = false
         
-        )
+    )
     {
         self.todos = todos
         self.isEditTodoMode = isEditModeTodoMode
         self.removeTodos = removeTodos
         self.isDisplayRemoveTodoAlert = isDisplayRemoveTodoAlert
-       
+        
     }
     
     func updateTripInfo(name: String, startDate: Date?, endDate: Date?) {
-           self.tripName = name
-           self.tripStartDate = startDate
-           self.tripEndDate = endDate
-       }
+        self.tripName = name
+        self.tripStartDate = startDate
+        self.tripEndDate = endDate
+    }
     
     func prepareForDeletion(index: Int) {
         indexToDelete = index
         showingDeleteAlert = true
     }
-
+    
     func deleteItem() {
         if let index = indexToDelete {
-           // items.remove(at: index)
+            // items.remove(at: index)
             indexToDelete = nil
             showingDeleteAlert = false
         }
@@ -107,7 +125,7 @@ extension HomeViewModel { //TodoListViewModel의 새로운 기능을 추가하�
     
     func removeBtnTapped() {
         todos.removeAll {
-             todo in
+            todo in
             removeTodos.contains(todo)
         }
         removeTodos.removeAll()

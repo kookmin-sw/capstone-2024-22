@@ -107,13 +107,13 @@ public class TripService {
 
     // 묶이지 않은 여행 가져오기
     public Trip getUntitledTrip(User user) {
-        return tripRepository.findByUserAndIsNotTitled(user, true)
+        return tripRepository.findByUserAndIsNotTitledOrderByStartDate(user, true)
                 .orElseThrow(() -> new RuntimeException("묶이지 않은 기록이 존재하지 않음."));
     }
 
     // 묶이지 않은 여행 가져오기 userId로
     public Trip getUntitledTripById(Long userId) {
-        return tripRepository.findByUser_IdAndIsNotTitled(userId, true)
+        return tripRepository.findByUser_IdAndIsNotTitledOrderByStartDate(userId, true)
                 .orElseThrow(() -> new RuntimeException("묶이지 않은 기록이 존재하지 않음."));
     }
 

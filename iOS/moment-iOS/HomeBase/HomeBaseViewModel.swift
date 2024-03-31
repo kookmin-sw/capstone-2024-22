@@ -19,6 +19,7 @@ class HomeBaseViewModel: ObservableObject {//클래스가 구현되어있고 옵
   @Published var memosCount: Int//
   @Published var voiceRecordersCount: Int//
     @Published var isRecording = false
+    
   
   init(
     selectedTab: Tab = .Home,

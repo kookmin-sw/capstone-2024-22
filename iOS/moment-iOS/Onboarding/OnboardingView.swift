@@ -14,8 +14,9 @@ struct OnboardingView: View {
     @StateObject private var pathModel = PathModel()
     @StateObject private var homeViewModel = HomeViewModel()
     @StateObject private var billListViewModel = BillListViewModel()
+    @StateObject var audioRecorderManager = AudioRecorderManager()
+    @State private var showingCustomAlert = false
     
-   
     
     var body: some View {
         
@@ -29,7 +30,7 @@ struct OnboardingView: View {
                     PathType in
                     switch PathType {
                     case .homeBaseView :
-                        HomeBaseView()
+                        HomeBaseView(audioRecorderManager: audioRecorderManager)
                             .navigationBarBackButtonHidden()
                             .environmentObject(homeViewModel)// 이렇게. environment 를 달아놧다는것은 해당뷰에서도
                             .environmentObject(billListViewModel)//안에 들어가있는 녀석을 호출햇 ㅓ사용할수있다는 말을 뜻한다
@@ -66,6 +67,16 @@ struct OnboardingView: View {
                         
                     case .AuthComplete:
                         AuthComplete()
+                            .environmentObject(homeViewModel)
+                        
+                    case .PasswordView:
+                        PasswordView()
+                            .environmentObject(homeViewModel)
+                    case .PasswordfindView:
+                        PasswordfindView()
+                            .environmentObject(homeViewModel)
+                    case .PasswordinsertView:
+                        PasswordinsertView()
                             .environmentObject(homeViewModel)
                     }
                 }

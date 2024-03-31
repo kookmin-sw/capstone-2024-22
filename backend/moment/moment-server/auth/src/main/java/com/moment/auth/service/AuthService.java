@@ -5,6 +5,7 @@ import com.moment.auth.domain.user.User;
 import com.moment.auth.domain.user.UserRepository;
 import com.moment.auth.dto.request.AuthRequest;
 import com.moment.auth.dto.response.TokenResponseDTO;
+import com.moment.auth.exception.AlreadyRegisteredEmailException;
 import com.moment.auth.utils.JwtTokenUtils;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -37,28 +38,50 @@ public class AuthService {
 
     @Transactional
     public TokenResponseDTO.GetTempToken sendCode(AuthRequest.SendCode sendCode) {
-        String randomCode = RandomStringUtils.randomAlphanumeric(6);
-        String randomPassword = RandomStringUtils.randomAlphanumeric(10);
-        String email = sendCode.getEmail();
-        String code = mailService.sendMail(email, "Moment 인증코드", "인증코드 : " + randomCode);
-        if (Objects.equals(code, "success")) {
-            User user = User.builder()
-                    .email(email)
-                    .password(passwordEncoder.encode(randomPassword))
-                    .role(Role.ROLE_TEMP_USER)
-                    .verificationCode(randomCode)
-                    .build();
-            userService.save(user);
-            String accessToken = jwtTokenUtils.generateAccessToken(provider, iss, user.getId(), Role.ROLE_TEMP_USER);
-            return TokenResponseDTO.GetTempToken.builder()
-                    .grantType("Bearer")
-                    .accessToken(accessToken)
-                    .role(Role.ROLE_TEMP_USER)
-                    .userId(user.getId())
-                    .build();
+        if (sendCode.isSignUp()) {
+            if(userRepository.existsByEmail(sendCode.getEmail())){
+                throw new AlreadyRegisteredEmailException("이미 가입된 이메일");
+            }
+            String randomCode = RandomStringUtils.randomAlphanumeric(6);
+            String randomPassword = RandomStringUtils.randomAlphanumeric(10);
+            String email = sendCode.getEmail();
+            String code = mailService.sendMail(email, "Moment 인증코드", "인증코드 : " + randomCode);
+            if (Objects.equals(code, "success")) {
+                User user = User.builder()
+                        .email(email)
+                        .password(passwordEncoder.encode(randomPassword))
+                        .role(Role.ROLE_TEMP_USER)
+                        .verificationCode(randomCode)
+                        .build();
+                userService.save(user);
+                String accessToken = jwtTokenUtils.generateAccessToken(provider, iss, user.getId(), Role.ROLE_TEMP_USER);
+                return TokenResponseDTO.GetTempToken.builder()
+                        .grantType("Bearer")
+                        .accessToken(accessToken)
+                        .role(Role.ROLE_TEMP_USER)
+                        .userId(user.getId())
+                        .build();
 
+            }
+            else throw new IllegalArgumentException("인증코드 전송 실패");
         }
-        else throw new IllegalArgumentException("인증코드 전송 실패");
+        else {
+            User user = userRepository.findByEmail(sendCode.getEmail()).orElseThrow(() -> new AlreadyRegisteredEmailException("미 가입된 이메일"));
+            String randomCode = RandomStringUtils.randomAlphanumeric(6);
+            String code = mailService.sendMail(sendCode.getEmail(), "Moment 인증코드", "인증코드 : " + randomCode);
+            if (Objects.equals(code, "success")) {
+                user.setVerificationCode(randomCode);
+                userService.save(user);
+                String accessToken = jwtTokenUtils.generateAccessToken(provider, iss, user.getId(), user.getRole());
+                return TokenResponseDTO.GetTempToken.builder()
+                        .grantType("Bearer")
+                        .accessToken(accessToken)
+                        .role(user.getRole())
+                        .userId(user.getId())
+                        .build();
+            }
+            else throw new IllegalArgumentException("인증코드 전송 실패");
+        }
     }
 
 

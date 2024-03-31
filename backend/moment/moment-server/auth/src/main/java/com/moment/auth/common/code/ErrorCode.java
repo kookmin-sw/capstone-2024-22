@@ -82,6 +82,8 @@ public enum ErrorCode {
 
     ALREADY_BOOKED_DATE(400, "Already booked date"),
 
+    ALREADY_REGISTERED_EMAIL(402, "Already registered email"),
+
     ; // End
 
     /**
