@@ -21,61 +21,127 @@ struct CardView: View {
     
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                VStack {
-                    HStack {
-                        Button(action: {
-                                                   // "뒤로" 버튼의 액션: 현재 뷰를 종료
-                                                   self.presentationMode.wrappedValue.dismiss()
-                        }) {
-                            HStack {
-                                
-                                Text("뒤로")
+        ZStack{
+            NavigationView {
+                
+                ZStack {
+                    
+                    VStack {
+                        HStack {
+                            Button(action: {
+                                // "뒤로" 버튼의 액션: 현재 뷰를 종료
+                                self.presentationMode.wrappedValue.dismiss()
+                            }) {
+                                HStack {
+                                    
+                                    Text("뒤로")
+                                }
                             }
-                        }
-                        Spacer()
-                                                   
-                        if isEditing {
-                            Button("삭제") {
-                                // 선택된 카드들을 삭제하는 로직
-                                cardViewModel.cardItems.removeAll { selectedCardIDs.contains($0.id) }
+                            Spacer()
+                            
+                            if isEditing {
+                                Button("삭제") {
+                                    // 선택된 카드들을 삭제하는 로직
+                                    //cardViewModel.cardItems.removeAll { selectedCardIDs.contains($0.id) }
+                                    self.showConfirmationDialog = true
+                                }
+                            } else {
+                                Button("편집") { // 편집모드인 삭제
+                                    isEditing.toggle()
+                                }
                             }
-                        } else {
-                            Button("삭제") { // 편집모드인 삭제
-                                isEditing.toggle()
-                            }
-                        }
-                       
-                    }
-                    .padding()
-                    
-                    CustomTitleMainDivider()
-                        
-                    
-                    HStack {
-                        Spacer()
-                        Text(item.name)
-                            .font(.headline)
-                            .foregroundColor(.black)
-                    }
-                    .padding(.horizontal, 15)
-                    
-                    CustomTitleMainDivider()
-                        .padding(.bottom,10)
-                    
-                    ScrollView {
-                        // ForEach를 사용하여 cardViewModel의 cardItems 배열을 반복 처리
-                        ForEach(cardViewModel.cardItems) { cardItem in
-                            // 각 cardItem에 대한 AccordionView 인스턴스를 생성
-                            AccordionView(audioRecorderManager: audioRecorderManager, isEditing: $isEditing, selectedCardIDs: $selectedCardIDs, cardViewModel: cardViewModel, cardItem: cardItem)
                             
                         }
+                        .padding()
+                        
+                        CustomTitleMainDivider()
+                        
+                        
+                        HStack {
+                            Spacer()
+                            Text(item.name)
+                                .font(.headline)
+                                .foregroundColor(.black)
+                        }
+                        .padding(.horizontal, 15)
+                        
+                        CustomTitleMainDivider()
+                            .padding(.bottom,10)
+                        
+                        ScrollView {
+                            // ForEach를 사용하여 cardViewModel의 cardItems 배열을 반복 처리
+                            ForEach(cardViewModel.cardItems) { cardItem in
+                                // 각 cardItem에 대한 AccordionView 인스턴스를 생성
+                                AccordionView(audioRecorderManager: audioRecorderManager, isEditing: $isEditing, selectedCardIDs: $selectedCardIDs, cardViewModel: cardViewModel, cardItem: cardItem)
+                                
+                            }
+                        }
+                        //첫번째 주석 넣기
+                        
                     }
-                    //첫번째 주석 넣기
+                    
+                    
+                    
+                }.background(Color.homeBack)
+              
+            }
+            if showConfirmationDialog {
+                CustomConfirmationDialog(
+                    isActive: $showConfirmationDialog,
+                    message: "선택한 카드를 삭제하시겠습니까?",
+                    confirmAction: {
+                        // 삭제 로직
+                        cardViewModel.cardItems.removeAll { selectedCardIDs.contains($0.id) }
+                        selectedCardIDs.removeAll()
+                        isEditing = false
+                        showConfirmationDialog = false
+                    },
+                    cancelAction: {
+                        showConfirmationDialog = false
+                    }
+                )
+            }
+            
+        }
+        .navigationBarBackButtonHidden(true)
+        
+        
+       
+    }
+}
+
+struct CustomConfirmationDialog: View {
+    @Binding var isActive: Bool
+    var message: String
+    var confirmAction: () -> Void
+    var cancelAction: () -> Void
+    
+    var body: some View {
+        ZStack {
+            // 어두운 배경
+            Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
+            
+            VStack(spacing: 20) {
+                Text(message)
+                    .font(.headline)
+                    .foregroundColor(.black)
+                    .padding()
+                
+                HStack(spacing: 20) {
+                    Button("취소", action: cancelAction)
+                        .foregroundColor(.blue)
+                    Button("확인", action: confirmAction)
+                        .foregroundColor(.red)
                 }
             }
-        }.navigationBarBackButtonHidden(true)
+            .padding()
+            .background(Color.white)
+            .cornerRadius(15)
+            .padding(20) // 내부 요소와의 패딩
+        }
+        .onTapGesture {
+            // 배경 탭시 다이얼로그 닫기 (선택적)
+        }
     }
 }
 
@@ -100,11 +166,11 @@ struct AccordionView: View {
                     }
                 }) {
                     Image(systemName: selectedCardIDs.contains(cardItem.id) ? "checkmark.square.fill" : "square")
-                        .foregroundColor(.blue)
+                        .foregroundColor(.homeRed)
                         .padding(.leading, 100) // 왼쪽 패딩 추가로 체크박스 위치 조정
                 }
             }
-
+            
             VStack {
                 DisclosureGroup(isExpanded: $isExpanded) {
                     contentVStack
@@ -112,40 +178,42 @@ struct AccordionView: View {
                     HeaderView(cardItem: cardItem)
                 }
                 .accentColor(.black)
-               
-//                .padding(.horizontal, isEditing ? 15 : 5) // 편집 모드일 때의 패딩 조정
+                
+                //                .padding(.horizontal, isEditing ? 15 : 5) // 편집 모드일 때의 패딩 조정
                 .padding()
-         
+                
+                
                 .background(Color.homeBack)
                 .cornerRadius(10)
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(Color.toastColor, lineWidth: 2)
                 )
-            }.padding(.horizontal,10)
+            }.padding(.horizontal,20)
+                .padding(.vertical,5)
             
         }
-     
+        
         .animation(.default, value: isEditing) // 편집 모드 변화에 따른 애니메이션
     }
     
     
     
     
-
+    
     // 컨텐츠 VStack을 별도의 ViewBuilder로 추출하여 재사용
     @ViewBuilder
     private var contentVStack: some View {
         VStack {
             Spacer().frame(height: 40)
             locationAndTimeInfo
-            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, longText: "긴 텍스트 예시")
+            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, longText: "\(cardItem.exampleText)")
             DynamicGradientImagePicker()
             Spacer().frame(height: 30)
             EmotionView()
         }
     }
-
+    
     // 위치 및 시간 정보를 보여주는 HStack을 별도의 ViewBuilder로 추출
     @ViewBuilder
     private var locationAndTimeInfo: some View {
