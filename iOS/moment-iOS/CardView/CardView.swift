@@ -35,6 +35,7 @@ struct CardView: View {
                                 HStack {
                                     
                                     Text("뒤로")
+                                        .tint(Color.black)
                                 }
                             }
                             Spacer()
@@ -44,11 +45,11 @@ struct CardView: View {
                                     // 선택된 카드들을 삭제하는 로직
                                     //cardViewModel.cardItems.removeAll { selectedCardIDs.contains($0.id) }
                                     self.showConfirmationDialog = true
-                                }
+                                } .tint(Color.black)
                             } else {
                                 Button("편집") { // 편집모드인 삭제
                                     isEditing.toggle()
-                                }
+                                } .tint(Color.black)
                             }
                             
                         }
@@ -562,76 +563,3 @@ struct CustomDialogRecordCard: View {
     }
 }
 
-
-//            }
-//        }
-//        .background(Color.homeBack)
-//        .navigationBarHidden(true)
-//        .alert(isPresented: $showConfirmationDialog) {
-//            Alert(
-//                title: Text("삭제 확인"),
-//                message: Text("정말로 삭제하시겠습니까?"),
-//                primaryButton: .destructive(Text("삭제"), action: {
-//                    // 여기에 삭제 로직 추가
-//                    // 삭제를 확정하는 작업을 수행할 수 있습니다.
-//                    // 예: deleteSelectedItems()
-//                    isDeleteMode = false // 삭제 모드 종료
-//                    isSelected = false // 체크박스 선택 해제
-//                }),
-//                secondaryButton: .cancel(Text("취소"), action: {
-//                    // 취소를 선택한 경우 실행할 작업이 있다면 추가할 수 있습니다.
-//                })
-//            )
-//        }
-//    }
-//
-//    private var backButton: some View {
-//        Button("뒤로") {
-//            presentationMode.wrappedValue.dismiss()
-//        }
-//        .foregroundColor(.black)
-//    }
-//
-//    private var editOrDeleteButton: some View {
-//        Button(isDeleteMode ? "삭제" : "삭제") {
-//            withAnimation {
-//                if isDeleteMode {
-//                    // 삭제 모드에서 삭제 버튼을 누를 때 다이얼로그 표시
-//                    showConfirmationDialog = true
-//                } else {
-//                    // 편집 모드로 전환하면서 체크박스 선택 해제
-//                    isSelected = false
-//                }
-//                isDeleteMode.toggle()
-//            }
-//        }
-//        .foregroundColor(.black)
-//_________________________________________
-
-// 삭제 모드 활성화 시 체크박스와 함께 컨텐츠를 표시하는 로직
-//            if isDeleteMode {
-//                HStack {
-//                    Button(action: { isSelected.toggle() }) {
-//                        Image(systemName: isSelected ? "checkmark.square.fill" : "square")
-//                            .foregroundColor(.blue)
-//                    }
-//                    .transition(.move(edge: .leading))
-//                    .padding(.leading, 20)
-//
-//                    DisclosureGroup(isExpanded: $isExpanded) {
-//                        contentVStack
-//                    } label: {
-//                        HeaderView()
-//                    }
-//                    .accentColor(.black)
-//                    .padding()
-//                    .background(Color.homeBack)
-//                    .cornerRadius(10)
-//                    .overlay(
-//                        RoundedRectangle(cornerRadius: 10)
-//                            .stroke(Color.toastColor, lineWidth: 2)
-//                    )
-//                    .offset(x: 20) // 삭제 모드일 때 오른쪽으로 이동
-//                }
-//            } else {
-// 기본 모드에서는 컨텐츠만 표시

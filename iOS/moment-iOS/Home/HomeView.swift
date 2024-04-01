@@ -351,8 +351,9 @@ struct DateRangeView1: View {
     @ObservedObject var cardViewModel : CardViewModel
     
     var body: some View {
+        ZStack{
         VStack {
-        
+            
             CustomHomeMainDividerthick()
                 .padding(.bottom, -10)
             HStack {
@@ -378,15 +379,18 @@ struct DateRangeView1: View {
                                 DayView(day: day, dayIndex: index, item: item) // 'dayIndex' 인자를 전달합니다.
                             }
                         }
-                                .padding(.vertical, 4)
-                                
-                                
-                                
-                            }
-                            
-                        }
+                        .padding(.vertical, 4)
+                        
+                        
+                        
                     }
+                    
                 }
+            }
+        }
+    }.background(Color.homeBack)
+    
+    
             }
         
     
@@ -410,6 +414,7 @@ struct DateRangeView1: View {
         
         return dates
     }
+    
 }
 
 // 날짜 형식 지정
@@ -426,39 +431,41 @@ struct DayView: View {
     var item: Item
     
     var body: some View {
-        VStack {
-            
-            
-            HStack{
-                VStack{
-                    Text("\(dayIndex + 1) 일차")
-                        .font(.subheadline)
-                        .foregroundColor(.black)
-                        .padding(.bottom, 5)
+        
+            VStack {
+                
+                
+                HStack{
+                    VStack{
+                        Text("\(dayIndex + 1) 일차")
+                            .font(.subheadline)
+                            .foregroundColor(.black)
+                            .padding(.bottom, 5)
+                        
+                        Text("\(day, formatter: monthDayFormatter)")
+                            .font(.caption)
+                            .foregroundColor(.black)
+                            .padding(.bottom, 5)
+                    }
                     
-                    Text("\(day, formatter: monthDayFormatter)")
-                        .font(.caption)
+                    
+                    Rectangle()
+                        .fill(Color.homeRed)
+                        .frame(width: 1, height: 42)
+                        .padding(.leading, 3)
+                        .padding(.trailing, 0)
+                    
+                    
+                    Text("몇개의 파일이 있어요.")
                         .foregroundColor(.black)
-                        .padding(.bottom, 5)
+                        .font(.caption)
+                    
+                    Spacer()
                 }
-                
-                
-                Rectangle()
-                    .fill(Color.homeRed)
-                    .frame(width: 1, height: 42)
-                    .padding(.leading, 3)
-                    .padding(.trailing, 0)
-                
-                
-                Text("몇개의 파일이 있어요.")
-                    .foregroundColor(.black)
-                    .font(.caption)
-                
-                Spacer()
+                .padding()
+                CustomHomeSubDivider()
+                    .padding(.vertical, 4)
             }
-            .padding()
-            CustomHomeSubDivider()
-                .padding(.vertical, 4)
-        }
+        
     }
 }
