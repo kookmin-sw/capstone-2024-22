@@ -16,7 +16,7 @@ struct OnboardingView: View {
     @StateObject private var billListViewModel = BillListViewModel()
     @StateObject var audioRecorderManager = AudioRecorderManager()
     @State private var showingCustomAlert = false
-    
+    @StateObject private var cardviewModel = CardViewModel()
     
     var body: some View {
         
@@ -30,10 +30,11 @@ struct OnboardingView: View {
                     PathType in
                     switch PathType {
                     case .homeBaseView :
-                        HomeBaseView(audioRecorderManager: audioRecorderManager)
+                        HomeBaseView(audioRecorderManager: audioRecorderManager, cardViewModel: cardviewModel)
                             .navigationBarBackButtonHidden()
                             .environmentObject(homeViewModel)// 이렇게. environment 를 달아놧다는것은 해당뷰에서도
                             .environmentObject(billListViewModel)//안에 들어가있는 녀석을 호출햇 ㅓ사용할수있다는 말을 뜻한다
+                            .environmentObject(cardviewModel)
                         
 //                    case.todoView :
 //                        TodoView()

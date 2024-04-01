@@ -29,7 +29,7 @@ struct HomeBaseView: View {
     @State private var wasDeleted = false
     @State private var wasLoad = false
     @State private var showingCustomAlertInHome = false
-   
+    @ObservedObject var cardViewModel : CardViewModel
     
     
     var body: some View {
@@ -42,13 +42,14 @@ struct HomeBaseView: View {
                 ZStack {
                     switch homeBaseViewModel.selectedTab {
                     case .Home:
-                        HomeView(showingCustomAlert: $showingCustomAlertInHome, audioRecorderManager: audioRecorderManager)
+                        HomeView(showingCustomAlert: $showingCustomAlertInHome, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
                     case .Bill:
                         BillListView()
                     case .voiceRecorder:
                         VoiceRecorderView()
                     case .Like:
-                        LikeView()
+                        LikeView(day: Date(), item: Item(name: "선유도", startdate: "0305", enddate: "0315"), audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
+
                     case .setting:
                         SettingView()
                     }

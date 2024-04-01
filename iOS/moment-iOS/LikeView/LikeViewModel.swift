@@ -12,86 +12,24 @@ import Foundation
 import Foundation
 import UIKit
 
+struct CardItem: Identifiable {
+    let id: Int
+    let weatherImageName: String
+    let date: String
+    let dayOfWeek: String
+    let time: String
+    let exampleText: String
+    let Like : Bool
+}
+
+
 class LikeViewModel: ObservableObject {
-  @Published var isDisplaySetTimeView: Bool
-  @Published var time: Time
-  @Published var timer: Timer?
-  @Published var timeRemaining: Int
-  @Published var isPaused: Bool
-  var notificationService: NotificationService
-  
-  init(
-    isDisplaySetTimeView: Bool = true,
-    time: Time = .init(hours: 0, minutes: 0, seconds: 0),
-    timer: Timer? = nil,
-    timeRemaining: Int = 0,
-    isPaused: Bool = false,
-    notificationService: NotificationService = .init()
-  ) {
-    self.isDisplaySetTimeView = isDisplaySetTimeView
-    self.time = time
-    self.timer = timer
-    self.timeRemaining = timeRemaining
-    self.isPaused = isPaused
-    self.notificationService = notificationService
-  }
-}
-
-extension LikeViewModel {
-  func settingBtnTapped() {
-    isDisplaySetTimeView = false
-    timeRemaining = time.convertedSeconds
-    startTimer()
-  }
-  
-  func cancelBtnTapped() {
-    stopTimer()
-    isDisplaySetTimeView = true
-  }
-  
-  func pauseOrRestartBtnTapped() {
-    if isPaused {
-      startTimer()
-    } else {
-      timer?.invalidate()
-      timer = nil
-    }
-    isPaused.toggle()
-  }
-}
-
-private extension LikeViewModel {
-  func startTimer() {
-    guard timer == nil else { return }
-    
-    var backgroundTaskID: UIBackgroundTaskIdentifier?
-    backgroundTaskID = UIApplication.shared.beginBackgroundTask {
-      if let task = backgroundTaskID {
-        UIApplication.shared.endBackgroundTask(task)
-        backgroundTaskID = .invalid
-      }
-    }
-    
-    timer = Timer.scheduledTimer(
-      withTimeInterval: 1,
-      repeats: true
-    ) { _ in
-      if self.timeRemaining > 0 {
-        self.timeRemaining -= 1
-      } else {
-        self.stopTimer()
-        self.notificationService.sendNotification()
-        
-        if let task = backgroundTaskID {
-          UIApplication.shared.endBackgroundTask(task)
-          backgroundTaskID = .invalid
-        }
-      }
-    }
-  }
-  
-  func stopTimer() {
-    timer?.invalidate()
-    timer = nil
-  }
+    @Published var cardItems: [CardItem] = [
+        CardItem(id: 1, weatherImageName: "sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:03", exampleText: "꽤나 즐거운 대화였네요", Like: true),
+        CardItem(id: 2, weatherImageName: "sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:03", exampleText: "꽤나 즐거운 대화였네요", Like: true),
+        CardItem(id: 3, weatherImageName: "sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:03", exampleText: "꽤나 즐거운 대화였네요", Like: true),
+        CardItem(id: 4, weatherImageName: "sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:03", exampleText: "꽤나 즐거운 대화였네요", Like: true),
+        CardItem(id: 5, weatherImageName: "sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:03", exampleText: "꽤나 즐거운 대화였네요", Like: true)
+       
+    ]
 }
