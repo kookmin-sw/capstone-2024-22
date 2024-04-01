@@ -269,6 +269,7 @@ struct BottomSheetView1: View {
                             print("녹음 저장")
                             isPresented = false
                             // ViewModel에서 녹음 중지
+                           
                             recordBtn = false  // 버튼 상태 업데이트
                             timerRunning = false  // 타이머 중지
                             wasDeleted = true

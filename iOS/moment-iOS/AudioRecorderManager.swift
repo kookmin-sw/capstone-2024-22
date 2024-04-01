@@ -43,15 +43,52 @@ extension AudioRecorderManager {
     }
   }
   
-  func stopRecording() {
-    audioRecorder?.stop()
-    self.recordedFiles.append(self.audioRecorder!.url)
-    self.isRecording = false
-  }
+//  func stopRecording() {
+//    audioRecorder?.stop()
+//    self.recordedFiles.append(self.audioRecorder!.url)
+//    self.isRecording = false
+//      
+//  }
+    func stopRecording() {
+        audioRecorder?.stop()
+        if let url = audioRecorder?.url {
+            self.recordedFiles.append(self.audioRecorder!.url)
+            self.isRecording = false
+            
+            // 새로운 폴더 경로 생성
+            let fileManager = FileManager.default
+            let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let recordingsDirectory = documentsDirectory.appendingPathComponent("Recordings")
+            
+            do {
+                // "Recordings" 폴더가 없으면 생성
+                try fileManager.createDirectory(at: recordingsDirectory, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                print("Failed to create directory: \(error)")
+            }
+            
+            // 녹음 파일을 "Recordings" 폴더로 이동
+            let newFileURL = recordingsDirectory.appendingPathComponent(url.lastPathComponent)
+            
+            do {
+                if fileManager.fileExists(atPath: newFileURL.path) {
+                    // 동일한 이름의 파일이 이미 있으면 삭제
+                    try fileManager.removeItem(at: newFileURL)
+                }
+                
+                // 파일 이동
+                try fileManager.moveItem(at: url, to: newFileURL)
+                print("File moved to \(newFileURL.path)")
+            } catch {
+                print("Failed to move file: \(error)")
+            }
+        }
+    }
   
   private func getDocumentsDirectory() -> URL {
     let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
     return paths[0]
+      
   }
 }
 
