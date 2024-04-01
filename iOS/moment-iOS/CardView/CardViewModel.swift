@@ -21,10 +21,10 @@ struct CardItem1: Identifiable {
 class CardViewModel: ObservableObject {
     @Published var cardItems: [CardItem1] = [
         CardItem1(id: 1, weatherImageName: "Weather_Sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:03", exampleText: "꽤나 즐거운 대화였네요", like: true),
-        CardItem1(id: 2, weatherImageName: "Weather_Sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:03", exampleText: "꽤나 즐거운 대화였네요", like: true),
-        CardItem1(id: 3, weatherImageName: "Weather_Sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:03", exampleText: "꽤나 즐거운 대화였네요", like: true),
-        CardItem1(id: 4, weatherImageName: "Weather_Sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:03", exampleText: "꽤나 즐거운 대화였네요", like: true),
-        CardItem1(id: 5, weatherImageName: "Weather_Sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:03", exampleText: "꽤나 즐거운 대화였네요", like: true)
+        CardItem1(id: 2, weatherImageName: "Weather_Sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:10", exampleText: "꽤나 즐거운 대화였네요", like: true),
+        CardItem1(id: 3, weatherImageName: "Weather_Sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:15", exampleText: "꽤나 즐거운 대화였네요", like: true),
+        CardItem1(id: 4, weatherImageName: "Weather_Sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:19", exampleText: "꽤나 즐거운 대화였네요", like: true),
+        CardItem1(id: 5, weatherImageName: "Weather_Sunny", date: "2024.03.05", dayOfWeek: "화요일", time: "15:24", exampleText: "꽤나 즐거운 대화였네요", like: true)
        
     ]
 }
