@@ -48,7 +48,7 @@ def run_model_on_gpu(models:dict, source_file, output):
           
         elif model_name == "emotion2vec":
           # for demos
-          result = {"sad": 75, "happy": 5, "angry": 7, "neutral": 10}
+          result = {"sad": 75.3, "happy": 4.7, "angry": 7.1, "neutral": 12.9}
           output["emotions"] = result
           continue
           
@@ -105,8 +105,8 @@ def run_model_on_cpu(models:dict, source_file, output):
       
       if model_name == "whisper":
         # for demo
-          output["text"] = "안녕하세요."
-          continue
+        output["text"] = "안녕하세요."
+        continue
 
         # for real test
         model = model_config[0]
@@ -116,7 +116,7 @@ def run_model_on_cpu(models:dict, source_file, output):
         
       elif model_name == "emotion2vec":
         # for demos
-        result = {"sad": 75, "happy": 5, "angry": 7, "neutral": 10}
+        result = {"sad": 75.3, "happy": 4.7, "angry": 7.1, "neutral": 12.9}
         output["emotions"] = result
         continue
         
@@ -207,6 +207,7 @@ def main(file_name):
   
   if output["status"] == "success":
       # print("Model ran successfully on GPU.")
+      pass
   
   else:
       # if model failed on GPU, then run on CPU
@@ -214,6 +215,8 @@ def main(file_name):
       run_model_on_cpu(models_dict, source_file, output)
       if output["status"] == "success":
           # print("Model ran successfully on CPU.")
+          pass
+
       else:
           # print("Model could not be run on GPU or CPU. Please check your model or system configuration.")
           output["status"] = "failure"
