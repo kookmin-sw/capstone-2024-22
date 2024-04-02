@@ -34,9 +34,13 @@ def run_model_on_gpu(models:dict, source_file, output):
   if torch.cuda.is_available():
     try:
       for model_name, model_config in models.items():
-        output["log"].append(f"{model_name} running on gpu")
         
         if model_name == "whisper":
+          # for demo
+          output["text"] = "안녕하세요."
+          continue
+
+          # for real test
           model = model_config[0]
           model.to('cuda')
           result = model.transcribe(source_file)
@@ -98,9 +102,13 @@ def run_model_on_gpu(models:dict, source_file, output):
 def run_model_on_cpu(models:dict, source_file, output):
   try:
     for model_name, model_config in models.items():
-      output["log"].append(f"{model_name} running on cpu")
       
       if model_name == "whisper":
+        # for demo
+          output["text"] = "안녕하세요."
+          continue
+
+        # for real test
         model = model_config[0]
         model.to('cpu')
         result = model.transcribe(source_file)
@@ -167,13 +175,11 @@ def main(file_name):
   output["emotions"] = None
   output["status"] = "wait"
   output["error"] = None
-  output["log"] = []
   
   source_file = os.path.join(args.source_path, file_name)
 
   # load model
   # print("\n\nload model ------------------------------------------------------------------------------")
-  output["log"].append("load model")
   stt_model = whisper.load_model(args.whisper_version)
   
   ser_model_dir = "./emotion2vec/upstream"
@@ -194,7 +200,6 @@ def main(file_name):
   
   # run model
   # print("\n\nrun model ------------------------------------------------------------------------------")
-  output["log"].append("run model")
   
   # models in GPU
   # output = run_model_on_gpu(models_dict, source_file, output)
@@ -202,7 +207,6 @@ def main(file_name):
   
   if output["status"] == "success":
       # print("Model ran successfully on GPU.")
-      output["log"].append("Model ran successfully on GPU.")
   
   else:
       # if model failed on GPU, then run on CPU
@@ -210,11 +214,9 @@ def main(file_name):
       run_model_on_cpu(models_dict, source_file, output)
       if output["status"] == "success":
           # print("Model ran successfully on CPU.")
-          output["log"].append("Model ran successfully on CPU.")
       else:
           # print("Model could not be run on GPU or CPU. Please check your model or system configuration.")
           output["status"] = "failure"
-          output["log"].append("Model could not be run on GPU or CPU. Please check your model or system configuration.")
     
 
 
