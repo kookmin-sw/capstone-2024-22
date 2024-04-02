@@ -43,10 +43,12 @@ def run_model_on_gpu(models:dict, source_file, output):
           output["text"] = result["text"]
           
         elif model_name == "emotion2vec":
-          result = {"sad": 75, "happy": 5, "angry": 7, "excited": 3, "neutral": 10}
+          # for demos
+          result = {"sad": 75, "happy": 5, "angry": 7, "neutral": 10}
           output["emotions"] = result
           continue
           
+          # for real test
           model, ser_config, ser_task = model_config
           model.to('cuda')
           model.eval()
@@ -105,10 +107,12 @@ def run_model_on_cpu(models:dict, source_file, output):
         output["text"] = result["text"]
         
       elif model_name == "emotion2vec":
-        result = {"sad": 75, "happy": 5, "angry": 7, "excited": 3, "neutral": 10}
+        # for demos
+        result = {"sad": 75, "happy": 5, "angry": 7, "neutral": 10}
         output["emotions"] = result
         continue
         
+        # for real test
         model, ser_config, ser_task = model_config
         model.to('cpu')
         model.eval()
@@ -174,10 +178,16 @@ def main(file_name):
   
   ser_model_dir = "./emotion2vec/upstream"
   ser_checkpoint_dir = "./emotion2vec/emotion2vec_base/emotion2vec_base.pt"
-  ser_model_path = UserDirModule(ser_model_dir)
-  fairseq.utils.import_user_module(ser_model_path)
-  ser_model, ser_cfg, ser_task = fairseq.checkpoint_utils.load_model_ensemble_and_task([ser_checkpoint_dir])
-  ser_model = ser_model[0]
+  ser_classifer_dir = "./emotion2vec/emotion2vec_base/emotion2vec_classifier.pt"
+
+  # for demos
+  ser_model, ser_cfg, ser_task = None, None, None
+
+  ## for real test
+  # ser_model_path = UserDirModule(ser_model_dir)
+  # fairseq.utils.import_user_module(ser_model_path)
+  # ser_model, ser_cfg, ser_task = fairseq.checkpoint_utils.load_model_ensemble_and_task([ser_checkpoint_dir])
+  # ser_model = ser_model[0]
   
   models_dict = {'whisper' : [stt_model], 'emotion2vec' : [ser_model, ser_cfg, ser_task]}
 
