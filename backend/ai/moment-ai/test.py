@@ -175,6 +175,8 @@ def main(file_name):
   output["emotions"] = None
   output["status"] = "wait"
   output["error"] = None
+  output["filename"] = file_name
+  output["dirname"] = os.path.dirname(os.path.abspath(file_name))
   
   source_file = os.path.join(args.source_path, file_name)
 
