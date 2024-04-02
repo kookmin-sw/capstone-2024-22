@@ -13,7 +13,6 @@ public class AiModelRunResponseDTO {
         private final String status;
         private final EmotionResponseDTO.GetEmotionList emotions;
         private final String text;
-        private final List<String> log;
         private final String error;
     }
 }
