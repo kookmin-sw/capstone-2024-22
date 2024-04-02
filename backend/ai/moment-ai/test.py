@@ -175,6 +175,8 @@ def main(file_name):
   output["emotions"] = None
   output["status"] = "wait"
   output["error"] = None
+  output["file_name"] = os.path.basename(file_name)
+  output["file_path"] = os.path.dirname(os.path.abspath(file_name))
   
   source_file = os.path.join(args.source_path, file_name)
 
@@ -243,7 +245,7 @@ def main(file_name):
   return output
 
 if __name__ == "__main__":
-  file_name = "test.mp4" if args.file_path is None else args.file_path
+  file_name = "../moment_ai/test.mp4" if args.file_path is None else args.file_path
   print(file_name)
   result = main(file_name)
   print(result)
