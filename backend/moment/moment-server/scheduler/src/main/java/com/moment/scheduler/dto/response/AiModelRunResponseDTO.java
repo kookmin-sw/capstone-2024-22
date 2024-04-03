@@ -14,5 +14,7 @@ public class AiModelRunResponseDTO {
         private final EmotionResponseDTO.GetEmotionList emotions;
         private final String text;
         private final String error;
+        private final String file_name;
+        private final String file_path;
     }
 }

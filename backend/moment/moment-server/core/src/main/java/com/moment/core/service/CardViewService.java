@@ -71,7 +71,10 @@ public class CardViewService {
 
         CardView cardView = CardView.builder()
                 .recordedAt(uploadRecord.getRecordedAt())
-                .emotion(null)
+                .happy(null)
+                .angry(null)
+                .sad(null)
+                .neutral(null)
                 .stt(null)
                 .isLoved(false)
                 .question(uploadRecord.getQuestion())
@@ -124,7 +127,7 @@ public class CardViewService {
 
         // update
         if (updateRecord.getLocation() != null)
-            cardView.setEmotion(updateRecord.getLocation());
+            cardView.setLocation(updateRecord.getLocation());
         if (updateRecord.getStt() != null)
             cardView.setStt(updateRecord.getStt());
         if (updateRecord.getQuestion() != null)
