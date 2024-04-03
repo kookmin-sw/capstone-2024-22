@@ -5,6 +5,7 @@ import com.moment.scheduler.dto.request.AiModelRunRequestDTO;
 import com.moment.scheduler.dto.response.AiModelRunResponseDTO;
 import com.moment.scheduler.dto.response.EmotionResponseDTO;
 import lombok.AllArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,4 +22,6 @@ public class AiService {
                         .build()
         );
     }
+
+
 }
