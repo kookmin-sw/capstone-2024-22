@@ -30,6 +30,7 @@ struct HomeBaseView: View {
     @State private var wasLoad = false
     @State private var showingCustomAlertInHome = false
     @ObservedObject var cardViewModel : CardViewModel
+    @State private var showingCustomAlertInSetting = false
     
     
     var body: some View {
@@ -51,7 +52,7 @@ struct HomeBaseView: View {
                         LikeView(day: Date(), item: Item(name: "선유도", startdate: "0305", enddate: "0315"), audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
 
                     case .setting:
-                        SettingView()
+                        SettingView(showDialog : $showingCustomAlertInSetting)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -101,8 +102,13 @@ struct HomeBaseView: View {
             if showPartialSheet {
                 BottomSheetView1(isPresented: $showPartialSheet, audioRecorderManager: audioRecorderManager, wasDeleted: $wasDeleted,wasLoad : $wasLoad)
             }
-        }.background(showingCustomAlertInHome ? Color.black.opacity(0.5) : Color.homeBack)
-            .edgesIgnoringSafeArea(.all)
+        }.background(
+            showingCustomAlertInSetting || showingCustomAlertInHome ? Color.black.opacity(0.5) : Color.homeBack
+        )
+        .edgesIgnoringSafeArea(.all)
+
+            
+        
         
         .onChange(of: homeBaseViewModel.isRecording) { newValue in
             withAnimation {
