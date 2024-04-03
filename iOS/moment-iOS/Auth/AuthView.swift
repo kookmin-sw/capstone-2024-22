@@ -52,7 +52,7 @@ struct AuthView: View {
                 HStack {
                     Text("해당 이메일은 본인인증 수단으로서 활용되며\n비밀번호 분실시 복구코드를 보내드리는 용도로 사용됩니다.")
                         .font(.pretendardMedium11)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.gray600)
                         .padding(.top, 3)
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer()

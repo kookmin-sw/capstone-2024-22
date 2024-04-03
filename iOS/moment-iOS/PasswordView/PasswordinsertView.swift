@@ -20,13 +20,13 @@ struct PasswordinsertView: View {
 //            Button("뒤로 가기") {
 //            self.presentationMode.wrappedValue.dismiss()
 //        }
-            Spacer()
+            Spacer().frame(height: 160)
             
             
             HStack(alignment: .bottom) {
                 Text("새비밀번호")
+                    .font(.pretendardMedium11)
                     .foregroundColor(.gray600)
-                    .font(.caption)
                     .padding(.top, 1)
                     .padding(.horizontal, 10)
                 
@@ -34,6 +34,7 @@ struct PasswordinsertView: View {
             }
             
             TextField("비밀번호를 입력해주세요.", text: $pathword)
+                .font(.pretendardMedium11)
                 .padding()
                 .frame(height: 44)
                 .overlay(Rectangle().frame(height: 1), alignment: .bottom)
@@ -43,7 +44,7 @@ struct PasswordinsertView: View {
             HStack(alignment: .bottom) {
                 Text("새 비밀번호 확인")
                     .foregroundColor(.gray600)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .padding(.top, 1)
                     .padding(.horizontal, 10)
                 
@@ -66,6 +67,7 @@ struct PasswordinsertView: View {
             }, label: {
                 Text("로그인하기")
                     .frame(minWidth: 0, maxWidth: .infinity)
+                    .font(.pretendardSemiBold18)
                     .padding()
                     .background(Color.homeRed)
                     .foregroundColor(.white)

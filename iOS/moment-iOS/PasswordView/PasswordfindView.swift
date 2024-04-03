@@ -33,6 +33,7 @@ struct PasswordfindView: View {
                             .offset(x: -100, y: 20)
                         
                         CustomRectangleShapeLeftdown(text: "입력하신 이메일로 인증번호가 전송되었어요\n메일함을 확인해 주세요")
+                            .font(.pretendardMedium11)
                             .frame(width: 340, height: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/)
                             .padding(.bottom, 72)
                            
@@ -44,8 +45,8 @@ struct PasswordfindView: View {
                 
                 HStack(alignment: .bottom) {
                     Text("인증번호")
+                        .font(.pretendardMedium11)
                         .foregroundColor(.gray600)
-                        .font(.caption)
                         .padding(.top, 1)
                         .padding(.horizontal, 20)
                     
@@ -61,7 +62,7 @@ struct PasswordfindView: View {
             HStack{
                 Text("인터넷 상태에 따라 소요시간이 발생할 수 있습니다.")
                     .foregroundColor(.gray600)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .padding(.top, 1)
                     .padding(.horizontal, 20)
                     Spacer()
@@ -72,7 +73,7 @@ struct PasswordfindView: View {
                     Button("인증번호 재전송") {
                         // 비밀번호 찾기 동작 구현
                     }
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .foregroundColor(.black)
                     .padding(.bottom, 10)
                     .overlay(
@@ -90,6 +91,7 @@ struct PasswordfindView: View {
                             .padding(.leading, 200)
                         
                         CustomRectangleShapeRightup(text: "동일한 이메일로 재전송 되었어요")
+                            .font(.pretendardMedium11)
                     } .frame(width: 270, height: 25)
                 }
             }
@@ -104,11 +106,12 @@ struct PasswordfindView: View {
                     },
                     label: {
                         Text("다음")
+                            .font(.pretendardSemiBold18)
                             .frame(minWidth: 0, maxWidth: .infinity)
                             .padding()
                             .background(Color.homeRed)
                             .foregroundColor(.white)
-                            .cornerRadius(10)
+                            .cornerRadius(3)
                     }
                 )
             }.padding()

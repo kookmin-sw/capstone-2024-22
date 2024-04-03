@@ -12,11 +12,11 @@ struct PasswordView: View {
     @EnvironmentObject private var pathModel: PathModel
     var body: some View {
         VStack{
-            Spacer()
+            Spacer().frame(height: 240)
             HStack(alignment: .bottom) {
-                Text("아이디 ")
+                Text("아이디")
                     .foregroundColor(.gray600)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .padding(.top, 1)
                     .padding(.horizontal, 20)
                 
@@ -32,7 +32,7 @@ struct PasswordView: View {
             // Text and Spacer
             HStack {
                 Text("해당 이메일로 비밀번호 초기화 코드가 발송됩니다.")
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .foregroundColor(.gray600)
                     .padding(.top, 3)
                     .fixedSize(horizontal: false, vertical: true)
@@ -41,13 +41,14 @@ struct PasswordView: View {
             .padding([.bottom, .horizontal], 20)
             
             Spacer()
-            
+            HStack{
             Button(
                 action: {
                     pathModel.paths.append(.PasswordfindView)
                 },
                 label: {
                     Text("다음")
+                        .font(.pretendardSemiBold18)
                         .frame(minWidth: 0, maxWidth: .infinity)
                         .padding()
                         .background(Color.homeRed)
@@ -55,6 +56,9 @@ struct PasswordView: View {
                         .cornerRadius(3)
                 }
             )
+                
+            }.padding()
+            
         }
     }
 }

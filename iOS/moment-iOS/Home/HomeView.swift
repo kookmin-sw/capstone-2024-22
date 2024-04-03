@@ -35,7 +35,7 @@ struct HomeView: View {
                         NavigationLink(destination: SelectDayView(calendarViewModel: calendarViewModel)) {
                             Text("추가")
                                 .padding()
-                                .font(.headline)
+                                .font(.yjObangBold15)
                                 .foregroundColor(.black)
                         }
                     }
@@ -43,9 +43,11 @@ struct HomeView: View {
                     CustomHomeVDivider()
                     TabView(selection: $selectedSlideIndex) {
                         Text("어디로 떠나면 좋을까요?")
+                            .font(.pretendardMedium14)
                             .tag(0)
                         NavigationLink(destination: SelectDayView(calendarViewModel: calendarViewModel)) {
                             Text("일상기록")
+                                .font(.pretendardMedium14)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
                         .tag(1)
@@ -127,12 +129,12 @@ struct ItemViewCell: View {
                         
                         VStack{
                             Text(item.startdate)
-                                .font(.caption)
+                                .font(.pretendardMedium11)
                                 .foregroundColor(.black)
                             
                             
                             Text(item.enddate)
-                                .font(.caption)
+                                .font(.pretendardMedium11)
                                 .foregroundColor(.black)
                         }
                         Rectangle()
@@ -152,7 +154,7 @@ struct ItemViewCell: View {
                         
                         
                         Text(item.name)
-                            .fontWeight(.semibold)
+                            .font(.pretendardExtrabold14)
                             .foregroundColor(.black)
                         Rectangle()
                             .fill(Color.homeRed)
@@ -227,7 +229,7 @@ extension ItemViewCell {
                 }
             } label: {
                 Text("수정")
-                    .font(.caption)
+                    .font(.yjObangBold12)
                     .foregroundColor(.black)
                 
                     .frame(width: 50, height: 50)
@@ -249,7 +251,7 @@ extension ItemViewCell {
                 }
             } label: {
                 Text("삭제")
-                    .font(.caption)
+                    .font(.yjObangBold12)
                     .foregroundColor(.homeRed)
                     .frame(width: 50, height: 50)
                     .background(Color.homeBack) // 삭제 버튼 색상 설정
@@ -359,8 +361,9 @@ struct DateRangeView1: View {
             HStack {
                 Spacer() // 좌측 공간을 만들어줌으로써 Text를 우측으로 밀어냄
                 Text(item.name)
-                    .font(.headline)
-                    .padding()
+                    .font(.pretendardBold22)
+                    .padding(.horizontal,10)
+                   
                 Spacer().frame(width: 20) // 우측에 조금 더 공간을 추가하여 Text를 중앙으로 조금 이동시킴
             }
             
@@ -438,12 +441,12 @@ struct DayView: View {
                 HStack{
                     VStack{
                         Text("\(dayIndex + 1) 일차")
-                            .font(.subheadline)
+                            .font(.pretendardExtrabold14)
                             .foregroundColor(.black)
                             .padding(.bottom, 5)
                         
                         Text("\(day, formatter: monthDayFormatter)")
-                            .font(.caption)
+                            .font(.pretendardMedium11)
                             .foregroundColor(.black)
                             .padding(.bottom, 5)
                     }
@@ -457,8 +460,9 @@ struct DayView: View {
                     
                     
                     Text("몇개의 파일이 있어요.")
-                        .foregroundColor(.black)
-                        .font(.caption)
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.gray600)
+                        
                     
                     Spacer()
                 }

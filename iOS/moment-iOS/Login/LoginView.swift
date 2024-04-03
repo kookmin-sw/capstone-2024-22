@@ -53,7 +53,7 @@ private struct StartHomeBtnView: View {
             HStack(alignment: .bottom) {
                 Text("아이디")
                     .foregroundColor(.gray600)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .padding(.top, 1)
                     .padding(.horizontal, 10)
                 
@@ -69,7 +69,7 @@ private struct StartHomeBtnView: View {
             HStack(alignment: .bottom) {
                 Text("비밀번호")
                     .foregroundColor(.gray600)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .padding(.top, 1)
                     .padding(.horizontal, 10)
                 Spacer()
@@ -96,7 +96,7 @@ private struct StartHomeBtnView: View {
                 Button("비밀번호 찾기") {
                     pathModel.paths.append(.PasswordView)
                 }
-                .font(.caption)
+                .font(.pretendardMedium11)
                 .foregroundColor(.black)
                 .padding(.bottom, 10)
                 .overlay(
@@ -106,7 +106,7 @@ private struct StartHomeBtnView: View {
                 
                 Spacer()
                 Text("자동 로그인")
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                 Button(action: {
                     isAutoLogin.toggle()
                 }) {
@@ -129,6 +129,7 @@ private struct StartHomeBtnView: View {
                 pathModel.paths.append(.homeBaseView)
             }, label: {
                 Text("로그인")
+                    .font(.pretendardSemiBold18)
                     .frame(minWidth: 0, maxWidth: .infinity)
                     .padding()
                     .background(email.isEmpty || password.isEmpty ? Color.gray : Color.homeRed)
@@ -143,6 +144,7 @@ private struct StartHomeBtnView: View {
                 pathModel.paths.append(.AuthView)
             }, label: {
                 Text("가입하기")
+                    .font(.pretendardSemiBold18)
                     .frame(minWidth: 0, maxWidth: .infinity)
                     .padding()
                     .background(Color.homeRed)

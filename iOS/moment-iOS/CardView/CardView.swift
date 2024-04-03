@@ -33,41 +33,58 @@ struct CardView: View {
                                 self.presentationMode.wrappedValue.dismiss()
                             }) {
                                 HStack {
-                                    
+                                    Spacer().frame(width: 10)
                                     Text("뒤로")
+                                        .font(.yjObangBold15)
                                         .tint(Color.black)
                                 }
                             }
                             Spacer()
+                            
+                            
+                            
+                            
+                            
                             
                             if isEditing {
                                 Button("삭제") {
                                     // 선택된 카드들을 삭제하는 로직
                                     //cardViewModel.cardItems.removeAll { selectedCardIDs.contains($0.id) }
                                     self.showConfirmationDialog = true
-                                } .tint(Color.black)
+                                }.font(.yjObangBold15)
+                                .tint(Color.black)
+                                Spacer().frame(width: 10)
                             } else {
                                 Button("편집") { // 편집모드인 삭제
                                     isEditing.toggle()
-                                } .tint(Color.black)
+                                }.font(.yjObangBold15)
+                                .tint(Color.black)
+                                Spacer().frame(width: 10)
                             }
+                            
+                            
+                            
+                            
+                            
+                            
                             
                         }
                         .padding()
                         
                         CustomTitleMainDivider()
+                            .padding(.bottom, -10)
                         
                         
                         HStack {
                             Spacer()
                             Text(item.name)
-                                .font(.headline)
+                                .font(.pretendardBold22)
                                 .foregroundColor(.black)
                         }
-                        .padding(.horizontal, 15)
+                        .padding(.horizontal, 20)
                         
                         CustomTitleMainDivider()
-                            .padding(.bottom,10)
+                            .padding(.top, -7)
                         
                         ScrollView {
                             // ForEach를 사용하여 cardViewModel의 cardItems 배열을 반복 처리
@@ -220,17 +237,19 @@ struct AccordionView: View {
     private var locationAndTimeInfo: some View {
         HStack {
             Image("Location")
-            Text("선유도 공영주차장").font(.caption)
+            Text("선유도 공영주차장")
+                .font(.pretendardMedium11)
             Spacer()
-            Text("해가 쨍쨍한날").font(.caption)
+            Text("해가 쨍쨍한날")
+                .font(.pretendardMedium11)
             Image("Weather_Sunny")
         }
         HStack {
             Image("CardTime")
-            Text(cardItem.date).font(.caption) // 카드 아이템의 date 사용
+            Text(cardItem.date).font(.pretendardMedium11)
             Spacer()
-            Image("bar")
-            Text(cardItem.time).font(.caption) // 카드 아이템의 time 사용
+            CustomCarbarDivider()
+            Text(cardItem.time).font(.pretendardMedium11)
         }
     }
 }
@@ -255,10 +274,11 @@ struct HeaderView: View {
                 }
                 Text("\(cardItem.time)") // 타이틀 예시
                     .foregroundColor(.black)
-                    .fontWeight(.bold)
+                    .font(.pretendardExtrabold14)
                 Spacer()
                 
                 Text("\(cardItem.id)")
+                    .font(.pretendardExtrabold14)
                     .foregroundColor(.black)
             }
             .padding(.horizontal,10)
@@ -268,14 +288,14 @@ struct HeaderView: View {
             
             HStack{
                 Text("꽤나 즐거운 대화였네요")
-                    .font(.caption)
-                    .foregroundColor(.black)
+                    .font(.pretendardMedium11)
+                    .foregroundColor(.gray500)
                     .padding(.horizontal,10)
                     .padding(.top,10)
                 Spacer()
                 Text("해가 쨍쨍한날")
-                    .font(.caption)
-                    .foregroundColor(.black)
+                    .font(.pretendardMedium11)
+                    .foregroundColor(.gray500)
                     .padding(.top,10)
                 
                 Image("Weather_Sunny")

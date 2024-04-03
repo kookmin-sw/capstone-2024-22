@@ -14,12 +14,12 @@ struct AddUser: View {
     @EnvironmentObject private var pathModel: PathModel
     var body: some View {
         VStack{
-            Spacer()
+            Spacer().frame(height: 70)
             
             HStack(alignment: .bottom) {
                 Text("아이디")
                     .foregroundColor(.gray600)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .padding(.top, 1)
                     .padding(.horizontal, 10)
                 
@@ -36,7 +36,7 @@ struct AddUser: View {
             HStack(alignment: .bottom) {
                 Text("비밀번호")
                     .foregroundColor(.gray600)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .padding(.top, 1)
                     .padding(.horizontal, 10)
                 
@@ -53,7 +53,7 @@ struct AddUser: View {
             HStack(alignment: .bottom) {
                 Text("비밀번호 확인")
                     .foregroundColor(.gray600)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .padding(.top, 1)
                     .padding(.horizontal, 10)
                 
@@ -73,12 +73,14 @@ struct AddUser: View {
                 pathModel.paths.append(.AuthComplete)
             }, label: {
                 Text("가입하기")
+                    .font(.pretendardSemiBold18)
                     .frame(minWidth: 0, maxWidth: .infinity)
                     .padding()
                     .background(Color.homeRed)
                     .foregroundColor(.white)
                     .cornerRadius(3)
             })
+            
         }.padding()
     }
 }
