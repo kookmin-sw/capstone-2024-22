@@ -20,6 +20,8 @@ struct CustomToolTip: View {
                 Spacer()
                 
                 Text("Tooltip 안내")
+                    .font(.pretendardMedium11)
+                
                     .padding(.trailing, 16)
             }
             
@@ -101,7 +103,7 @@ struct CustomRectangleShapeRightup: View {
             Spacer()
             
             Text(text)
-                .font(.caption)
+                .font(.pretendardMedium11)
                 .foregroundColor(.white)
                 .padding(.vertical, 3)
                 .padding(.horizontal, 16)
@@ -159,7 +161,7 @@ struct CustomRectangleShapeLeftdown: View {
             Spacer()
             
             Text(text)
-                .font(.caption)
+                .font(.pretendardMedium11)
                 .foregroundColor(.white)
                 .padding(.vertical, 10)
                 .padding(.horizontal, 16)

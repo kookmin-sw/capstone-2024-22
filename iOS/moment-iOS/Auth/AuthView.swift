@@ -31,6 +31,7 @@ struct AuthView: View {
                 Spacer()
                 HStack(alignment: .bottom) {
                     Text("이메일")
+                        .font(.pretendardMedium11)
                         .foregroundColor(.gray600)
                         .font(.caption)
                         .padding(.top, 1)
@@ -40,6 +41,8 @@ struct AuthView: View {
                 }.padding(.bottom,1)
            
                 TextField("인증 가능한 이메일을 입력하세요. ", text: $email)
+                
+                
                     .padding()
                     .frame(height: 44)
                     .overlay(Rectangle().frame(height: 1), alignment: .bottom)
@@ -48,7 +51,7 @@ struct AuthView: View {
                 // Text and Spacer
                 HStack {
                     Text("해당 이메일은 본인인증 수단으로서 활용되며\n비밀번호 분실시 복구코드를 보내드리는 용도로 사용됩니다.")
-                        .font(.caption)
+                        .font(.pretendardMedium11)
                         .foregroundColor(.gray)
                         .padding(.top, 3)
                         .fixedSize(horizontal: false, vertical: true)
@@ -62,23 +65,23 @@ struct AuthView: View {
                     // "이용약관" 버튼
                     Text("이용약관")
                         .foregroundColor(.homeRed)
-                        .font(.caption)
+                        .font(.pretendardMedium11)
                         .padding(.bottom, 10)
                     
                     Text("및")
-                        .font(.caption)
+                        .font(.pretendardMedium11)
                         .foregroundColor(.black)
                         .padding(.bottom, 10)
                     
                     // "개인정보 수집동의서" 버튼
                     Text("개인정보 수집동의서")
                         .foregroundColor(.homeRed)
-                        .font(.caption)
+                        .font(.pretendardMedium11)
                         .padding(.bottom, 10)
                     
                     
                     Text("확인")
-                        .font(.caption)
+                        .font(.pretendardMedium11)
                         .foregroundColor(.black)
                         .padding(.bottom, 10)
                     
@@ -102,6 +105,7 @@ struct AuthView: View {
                         },
                         label: {
                             Text("다음")
+                                .font(.pretendardSemiBold18)
                                 .frame(minWidth: 0, maxWidth: .infinity)
                                 .padding()
                                 .background(Color.homeRed)
@@ -171,7 +175,7 @@ struct BottomSheetView: View {
     
     let termsTitles = ["이용 약관 동의", "개인정보 수집 및 이용 동의", "위치정보 이용 동의"]
       
-      let Important = ["필수","필수","선택"]
+      let Important = ["(필수)","(필수)","(선택)"]
     
     var body: some View {
         VStack(spacing: 20) {
@@ -179,12 +183,12 @@ struct BottomSheetView: View {
             ForEach(0..<3) { index in
                 HStack {
                     Text(Important[index])
-                        .font(.yjObangBold15)
+                        .font(.pretendardMedium11)
                         .foregroundColor(Important[index] == "선택" ? .gray : .homeRed)
                         .foregroundColor(.homeRed)
                     
                     Text(termsTitles[index])
-                        .font(.caption)
+                        .font(.pretendardMedium11)
                         .foregroundColor(.gray)
                     
                     Spacer()
@@ -194,7 +198,7 @@ struct BottomSheetView: View {
                                                showingTermsSheet = true
                     }
                     .foregroundColor(.homeRed)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     
                     Button(action: {
                         switch index {
@@ -236,6 +240,7 @@ struct TermsContentSheetView: View {
         NavigationView {
             ScrollView {
                 Text(content)
+                    .font(.pretendardExtrabold16)
                     .padding()
             }
             .navigationBarTitle("약관 확인", displayMode: .inline)
