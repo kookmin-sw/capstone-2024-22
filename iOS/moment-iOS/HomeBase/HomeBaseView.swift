@@ -31,6 +31,7 @@ struct HomeBaseView: View {
     @State private var showingCustomAlertInHome = false
     @ObservedObject var cardViewModel : CardViewModel
     @State private var showingCustomAlertInSetting = false
+    @State private var showDialogGoodbyeAlert = false
     
     
     var body: some View {
@@ -52,7 +53,7 @@ struct HomeBaseView: View {
                         LikeView(day: Date(), item: Item(name: "선유도", startdate: "0305", enddate: "0315"), audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
 
                     case .setting:
-                        SettingView(showDialog : $showingCustomAlertInSetting)
+                        SettingView(showDialog : $showingCustomAlertInSetting, showDialogGoodbye: $showDialogGoodbyeAlert)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -103,7 +104,7 @@ struct HomeBaseView: View {
                 BottomSheetView1(isPresented: $showPartialSheet, audioRecorderManager: audioRecorderManager, wasDeleted: $wasDeleted,wasLoad : $wasLoad)
             }
         }.background(
-            showingCustomAlertInSetting || showingCustomAlertInHome ? Color.black.opacity(0.5) : Color.homeBack
+            showingCustomAlertInSetting || showingCustomAlertInHome || showDialogGoodbyeAlert ? Color.black.opacity(0.5) : Color.homeBack
         )
         .edgesIgnoringSafeArea(.all)
 
@@ -193,6 +194,7 @@ struct BottomSheetView1: View {
                     
                     
                     CustomRectangleShapeLeftdown(text: "녹음은 한번에 최대 10분까지 가능해요 \n최대시간을 넘어가면 자동 종료 후 저장됩니다")
+                        .font(.pretendardMedium11)
                         .multilineTextAlignment(.center)
                         .frame(width: 340, height: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/)
                     
@@ -210,7 +212,7 @@ struct BottomSheetView1: View {
                 
                 
                 Text(timeString(time: timeElapsed))
-                    .font(.caption)
+                    .font(.pretendardMedium18)
                     .padding()
                     .frame(height: 44)
                     .overlay(Rectangle().frame(height: 1), alignment: .bottom)
@@ -230,6 +232,7 @@ struct BottomSheetView1: View {
                 
                 // 추가 텍스트
                 Text("열심히 듣고 있어요")
+                    .font(.pretendardMedium18)
                     .frame(height: 44)
                     .overlay(Rectangle().frame(height: 1), alignment: .bottom)
                     .padding(.horizontal,20)
@@ -245,7 +248,7 @@ struct BottomSheetView1: View {
                             
                         }) {
                             Text("삭제")
-                                .fontWeight(.bold)
+                                .font(.yjObangBold15)
                                 .tint(.black)
                                 .frame(width: 60, height: 30)
                         }
@@ -291,7 +294,7 @@ struct BottomSheetView1: View {
                             //TODO: - 녹음파일을 보냄과 동시에로다가 오픈 소스에서 받아온 기온과 온도들도 같이 보내야함
                         }) {
                             Text("저장")
-                                .fontWeight(.bold)
+                                .font(.yjObangBold15)
                                 .tint(.homeRed)
                                 .frame(width: 60, height: 30)
                         }
@@ -364,7 +367,7 @@ struct TabButton: View {
                     .foregroundColor(selectedTab == title ? .blue : .gray)
                 
                 Text(title.title)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .fontWeight(.bold)
                     .foregroundColor(selectedTab == title ? .black : .gray)
             }

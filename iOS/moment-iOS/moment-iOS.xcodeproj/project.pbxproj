@@ -30,7 +30,6 @@
 		8E5CAE4E2B970D5D00A483B4 /* Todo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE4D2B970D5D00A483B4 /* Todo.swift */; };
 		8E5CAE502B970D6B00A483B4 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE4F2B970D6A00A483B4 /* HomeViewModel.swift */; };
 		8E5CAE522B970DB600A483B4 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE512B970DB600A483B4 /* HomeView.swift */; };
-		8E5CAE542B970DC600A483B4 /* WriteBtn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE532B970DC600A483B4 /* WriteBtn.swift */; };
 		8E5CAE562B970DD400A483B4 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE552B970DD400A483B4 /* CalendarViewModel.swift */; };
 		8E5CAE582B970DE600A483B4 /* SelectDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE572B970DE600A483B4 /* SelectDayView.swift */; };
 		8E5CAE5A2B970DF600A483B4 /* BillListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE592B970DF600A483B4 /* BillListViewModel.swift */; };
@@ -52,7 +51,6 @@
 		8E7FB8FE2BA1E66200F05045 /* CustomDevider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E7FB8FD2BA1E66200F05045 /* CustomDevider.swift */; };
 		8E8C17452BA8575000BF1E1C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17442BA8575000BF1E1C /* LoginView.swift */; };
 		8E8C17482BA85AE200BF1E1C /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17472BA85AE200BF1E1C /* AuthView.swift */; };
-		8E8C174C2BA86BF200BF1E1C /* ButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C174B2BA86BF200BF1E1C /* ButtonStyle.swift */; };
 		8E8C174F2BA97B4500BF1E1C /* AuthNumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C174E2BA97B4500BF1E1C /* AuthNumView.swift */; };
 		8E8C17522BAAB65700BF1E1C /* CustomToolTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17512BAAB65700BF1E1C /* CustomToolTip.swift */; };
 		8E8C17542BAAC59400BF1E1C /* AddUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17532BAAC59400BF1E1C /* AddUser.swift */; };
@@ -138,7 +136,6 @@
 		8E5CAE4D2B970D5D00A483B4 /* Todo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Todo.swift; sourceTree = "<group>"; };
 		8E5CAE4F2B970D6A00A483B4 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		8E5CAE512B970DB600A483B4 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		8E5CAE532B970DC600A483B4 /* WriteBtn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteBtn.swift; sourceTree = "<group>"; };
 		8E5CAE552B970DD400A483B4 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
 		8E5CAE572B970DE600A483B4 /* SelectDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectDayView.swift; sourceTree = "<group>"; };
 		8E5CAE592B970DF600A483B4 /* BillListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillListViewModel.swift; sourceTree = "<group>"; };
@@ -158,7 +155,6 @@
 		8E7FB8FD2BA1E66200F05045 /* CustomDevider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDevider.swift; sourceTree = "<group>"; };
 		8E8C17442BA8575000BF1E1C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		8E8C17472BA85AE200BF1E1C /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
-		8E8C174B2BA86BF200BF1E1C /* ButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyle.swift; sourceTree = "<group>"; };
 		8E8C174E2BA97B4500BF1E1C /* AuthNumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthNumView.swift; sourceTree = "<group>"; };
 		8E8C17512BAAB65700BF1E1C /* CustomToolTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomToolTip.swift; sourceTree = "<group>"; };
 		8E8C17532BAAC59400BF1E1C /* AddUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddUser.swift; sourceTree = "<group>"; };
@@ -253,7 +249,6 @@
 				8E5CAE5D2B970E1800A483B4 /* Memo.swift */,
 				8E5CAE492B970D3B00A483B4 /* CustomNavigationBar.swift */,
 				8E5CAE4B2B970D4F00A483B4 /* NavigationBtnType.swift */,
-				8E5CAE532B970DC600A483B4 /* WriteBtn.swift */,
 				8E5CAE4D2B970D5D00A483B4 /* Todo.swift */,
 				8E5CAE452B970D1000A483B4 /* Tab.swift */,
 				8E15C8722B6527E3001468C7 /* ContentView.swift */,
@@ -361,7 +356,6 @@
 		8E8C174D2BA86BFD00BF1E1C /* Style */ = {
 			isa = PBXGroup;
 			children = (
-				8E8C174B2BA86BF200BF1E1C /* ButtonStyle.swift */,
 				8E5CAE332B970C2C00A483B4 /* Color+Extensions.swift */,
 				8E5CAE472B970D2700A483B4 /* Date+Extensions.swift */,
 				8ECCFBD52BB93BC100C39125 /* Font+Extensions.swift */,
@@ -675,10 +669,8 @@
 				8E15C8712B6527E3001468C7 /* moment_iOSApp.swift in Sources */,
 				8ECCFA982BAFE3BD00C39125 /* AudioRecorderManager.swift in Sources */,
 				8E5CAE6A2B970E9900A483B4 /* Int-Extensions.swift in Sources */,
-				8E5CAE542B970DC600A483B4 /* WriteBtn.swift in Sources */,
 				8ECCFBD92BB9463700C39125 /* CardViewModel.swift in Sources */,
 				8E5CAE342B970C2C00A483B4 /* Color+Extensions.swift in Sources */,
-				8E8C174C2BA86BF200BF1E1C /* ButtonStyle.swift in Sources */,
 				8E5CAE5A2B970DF600A483B4 /* BillListViewModel.swift in Sources */,
 				8ECCFBA72BB59F0100C39125 /* CardView.swift in Sources */,
 				8E5CAE742B970EF400A483B4 /* SettingView.swift in Sources */,

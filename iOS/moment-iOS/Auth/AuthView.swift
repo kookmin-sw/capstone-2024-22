@@ -179,7 +179,7 @@ struct BottomSheetView: View {
             ForEach(0..<3) { index in
                 HStack {
                     Text(Important[index])
-                        .font(.caption)
+                        .font(.yjObangBold15)
                         .foregroundColor(Important[index] == "선택" ? .gray : .homeRed)
                         .foregroundColor(.homeRed)
                     

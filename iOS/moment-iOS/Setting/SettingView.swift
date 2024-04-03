@@ -10,7 +10,7 @@ import SwiftUI
 
 struct SettingView: View {
     @EnvironmentObject private var homeBaseViewModel: HomeBaseViewModel
-    @State private var selectedButtonTitle: String?
+    @State private var selectedButtonTitle: String? = nil
     @State private var isNotificationToggleShownAlert: Bool = false // 토글 표시 상태를 관리하는 변수
     @State private var isNotificationsEnabledAlert: Bool = false // 토글 상태를 관리하는 변수
     @State private var isNotificationToggleShownData: Bool = false // 토글 표시 상태를 관리하는 변수
@@ -18,28 +18,32 @@ struct SettingView: View {
     @State private var isNotificationsEnabledVersion : Bool = false
     @State private var isShowEmail : Bool = false
     @Binding var showDialog : Bool
-    
+    @Binding var showDialogGoodbye : Bool
+    //@State private var selectedButtonTitle: String? = nil
     
     var body: some View {
         ZStack {
             Color.homeBack.edgesIgnoringSafeArea(.all)
             
-           
+            
             VStack(spacing: 20) { // 각 항목 사이의 간격 조절
                 Spacer().frame(height: 85)
                 CustomTitleMainDivider()
                 Spacer().frame(height: 20)
-               // Spacer().frame(height: 30)
+                // Spacer().frame(height: 30)
                 // "알림설정" 버튼
                 
                 VStack{
-                    SettingButton(title: "알림설정", isSelected: selectedButtonTitle == "알림설정", action: {
-                        selectedButtonTitle = "알림설정" // 버튼 선택 시 해당 버튼의 제목을 저장
-                        isNotificationToggleShownAlert.toggle()
-                    })
+                    SettingButton(title: "알림설정", isSelected: selectedButtonTitle == "알림설정") {
+                                       withAnimation {
+                                           selectedButtonTitle = selectedButtonTitle == "알림설정" ? nil : "알림설정"
+                                       }
+                                   }
+                                  
                     
                     HStack{
-                        if isNotificationToggleShownAlert {
+
+                        if selectedButtonTitle == "알림설정" {
                             CustomToggleAlert(isOn: $isNotificationsEnabledAlert)
                         }
                         Spacer()
@@ -49,66 +53,74 @@ struct SettingView: View {
                 
                 // "데이터 허용" 버튼
                 VStack{
-                    SettingButton(title: "데이터 허용", isSelected: selectedButtonTitle == "데이터 허용", action: {
-                        selectedButtonTitle = "데이터 허용" // 버튼 선택 시 해당 버튼의 제목을 저장
-                        isNotificationToggleShownData.toggle()
-                    })
+                    SettingButton(title: "데이터 허용", isSelected: selectedButtonTitle == "데이터 허용") {
+                                      withAnimation {
+                                          selectedButtonTitle = selectedButtonTitle == "데이터 허용" ? nil : "데이터 허용"
+                                      }
+                                  }
+                                  
                     HStack{
-                        if isNotificationToggleShownData {
+
+                        if selectedButtonTitle == "데이터 허용" {
                             CustomToggleData(isOnData: $isNotificationsEnabledData)
                         }
                         Spacer()
-                    }.padding(.bottom,10)
+                    }
+                    .padding(.bottom,2)
                     HStack{
-                        if isNotificationToggleShownData{
+                        Spacer().frame(width: 27)
+                        if selectedButtonTitle == "데이터 허용" {
                             Text("셀룰러 데이터를 허용하면, 데이터 환경에서도 녹음카드 분석이 가능해요\n허용하지 않으면, WI-FI가 연결된 환경에서만 분석해요")
-                                .font(.caption)
+                                .font(.pretendardMedium11)
                                 .foregroundColor(.natural500)
                             Spacer().frame(width: 25)
                         }
-                      
+                        
                     }
                 }
                 VStack{
                     
-                    SettingButton(title: "버전안내", isSelected: selectedButtonTitle == "버전안내", action: {
-                        selectedButtonTitle = "버전안내" // 버튼 선택 시 해당 버튼의 제목을 저장
-                        isNotificationsEnabledVersion.toggle()
-                    })
-                    HStack{
-                        Spacer().frame(width: 35)
-                        if isNotificationsEnabledVersion{
-                            Text("V 1.1")
-                                
-                            Spacer().frame(width: 30)
-                            Text("가장 최신버전이에요")
-                                .font(.caption)
+                    SettingButton(title: "버전안내", isSelected: selectedButtonTitle == "버전안내") {
+                                           selectedButtonTitle = selectedButtonTitle == "버전안내" ? nil : "버전안내"
+                                           isNotificationsEnabledVersion.toggle()
+                                       }
+                    if selectedButtonTitle == "버전안내" {
+                        HStack{
+                            Spacer().frame(width: 35)
+                            if selectedButtonTitle == "버전안내"{
+                                Text("V 1.1")
+                                    .font(.pretendardMedium14)
+                                Spacer().frame(width: 30)
+                                Text("가장 최신버전이에요")
+                                    .font(.pretendardMedium11)
+                            }
+                            Spacer()
+                                .padding(.horizontal,30)
                         }
-                        Spacer()
-                            .padding(.horizontal,30)
                     }
                 }
                 VStack{
-                    SettingButton(title: "문의하기", isSelected: selectedButtonTitle == "문의하기", action: {
-                        selectedButtonTitle = "문의하기" // 버튼 선택 시 해당 버튼의 제목을 저장
-                        isShowEmail.toggle()
-                    })
-                //    HStack{
-                       
-                    if isShowEmail {
+                    SettingButton(title: "문의하기", isSelected: selectedButtonTitle == "문의하기") {
+                                           selectedButtonTitle = selectedButtonTitle == "문의하기" ? nil : "문의하기"
+                                           isShowEmail.toggle()
+                                       }
+                    //    HStack{
+                    
+                    if selectedButtonTitle == "문의하기"  {
                         VStack(alignment: .leading, spacing: 8) {
                             
                             HStack{
                                 Spacer().frame(width: 12)
                                 Text("kookmin@gmail.com")
-                                    .font(.headline) // 이메일 주소에 대한 폰트 스타일 조정
+                                    .font(.pretendardMedium14)
+                                    .tint(.black)
                                 Spacer()
                                 
                             }
                             HStack{
                                 Spacer().frame(width: 12)
                                 Text("앗! 사용하시면서 불편한 점이 있으시다구요?\n이메일로 보내주시면 친절히 답변해드릴게요")
-                                    .font(.caption) // 설명 텍스트에 대한 폰트 스타일 조정
+                                    .font(.pretendardMedium11)
                                     .foregroundColor(.gray) // 설명 텍스트의 색상 조정
                                     .multilineTextAlignment(.leading) // 텍스트를 왼쪽 정렬
                                 Spacer()
@@ -116,11 +128,11 @@ struct SettingView: View {
                         }
                         .padding(.leading) // 왼쪽 패딩 추가로 내용을 좌측에 정렬
                     }
-                        
-                   // }
+                    
+                    // }
                     
                 }
-
+                
                 Spacer()
                 VStack(spacing: 20) {
                     Button(action: {
@@ -130,20 +142,28 @@ struct SettingView: View {
                     }) {
                         HStack {
                             Text("로그아웃")
-                                .foregroundColor(.blue) // 텍스트 색상을 지정할 수 있습니다.
+                                .font(.pretendardMedium14)
+                                .foregroundColor(.black) // 텍스트 색상을 지정할 수 있습니다.
                                 .padding(.leading, 16) // 왼쪽 패딩을 추가하여 여백을 조정하세요.
                             Spacer() // 나머지 공간을 채워서 텍스트를 왼쪽으로 밀어냅니다.
                         }
                         .frame(maxWidth: .infinity, alignment: .leading) // HStack을 최대 너비로 설정하고 왼쪽 정렬
                     }
-
+                    
                     Button(action: {
                         // 탈퇴하기 로직을 여기에 작성하세요
                         print("탈퇴 처리")
+                        self.showDialogGoodbye = true
+                        for fontFamily in UIFont.familyNames {
+                            for fontName in UIFont.fontNames(forFamilyName: fontFamily) {
+                                print(fontName)
+                            }
+                        }
                     }) {
                         HStack {
                             Text("탈퇴하기")
-                                .foregroundColor(.red) // 텍스트 색상을 지정할 수 있습니다.
+                                .font(.pretendardMedium14)
+                                .foregroundColor(.black) // 텍스트 색상을 지정할 수 있습니다.
                                 .padding(.leading, 16) // 왼쪽 패딩을 추가하여 여백을 조정하세요.
                             Spacer() // 나머지 공간을 채워서 텍스트를 왼쪽으로 밀어냅니다.
                         }
@@ -152,11 +172,11 @@ struct SettingView: View {
                     Spacer().frame(height: 40)
                 }
                 .padding() // VStack에 대한 패딩 추가로 전체적인 여백
-
-               
-                           
-                 
-
+                
+                
+                
+                
+                
             }
             .padding(.horizontal, 1) // 좌우 패딩
             
@@ -167,7 +187,7 @@ struct SettingView: View {
                     title: "로그아웃하시겠습니까?",
                     message: "",
                     yesAction: {
-                       
+                        
                         showDialog = false
                     },
                     noAction: {
@@ -178,8 +198,26 @@ struct SettingView: View {
                 .transition(.opacity) // 다이얼로그 등장과 사라짐에 투명도 변화 적용
                 .zIndex(1) // 다이얼로그가 다른 요소들 위에 오도록 설정
             }
+            
+            else if showDialogGoodbye {
+                GoodbyeDialog(
+                    isActive: $showDialogGoodbye,
+                    title: "로그아웃하시겠습니까?",
+                    message: "",
+                    yesAction: {
+                        
+                        showDialogGoodbye = false
+                    },
+                    noAction: {
+                        showDialogGoodbye = false // 다이얼로그 닫기
+                        
+                    }
+                )
+                .transition(.opacity) // 다이얼로그 등장과 사라짐에 투명도 변화 적용
+                .zIndex(1) // 다이얼로그가 다른 요소들 위에 오도록 설정
+            }
         }
-       
+        
     }
 }
 
@@ -202,7 +240,7 @@ struct LogoutDialog: View {
             
             VStack {
                 Text(title)
-                    .font(.title2)
+                    .font(.pretendardExtrabold16)
                     .bold()
                     .padding()
                 
@@ -219,7 +257,7 @@ struct LogoutDialog: View {
                             RoundedRectangle(cornerRadius: 20)
                                 .foregroundColor(.green)
                             Text("네")
-                                .font(.system(size: 16, weight: .bold))
+                                .font(.yjObangBold15)
                                 .foregroundColor(.white)
                                 .padding()
                         }
@@ -235,7 +273,7 @@ struct LogoutDialog: View {
                             RoundedRectangle(cornerRadius: 20)
                                 .foregroundColor(.gray)
                             Text("아니요")
-                                .font(.system(size: 16, weight: .bold))
+                                .font(.yjObangBold15)
                                 .foregroundColor(.white)
                                 .padding()
                         }
@@ -265,7 +303,7 @@ struct LogoutDialog: View {
 
 
 struct GoodbyeDialog: View {
-    @State private var showDialog = false
+    @State private var showDialogGoodbye = false
     @Binding var isActive: Bool
     
     let title: String
@@ -276,19 +314,19 @@ struct GoodbyeDialog: View {
     var body: some View {
         
         ZStack{
-            Color(showDialog ? .black : .black)
-                .opacity(showDialog ? 1.0 : 0.5)
+            Color(showDialogGoodbye ? .black : .black)
+                .opacity(showDialogGoodbye ? 1.0 : 0.5)
                 .edgesIgnoringSafeArea(.all)
-                .animation(.easeInOut, value: showDialog)
+                .animation(.easeInOut, value: showDialogGoodbye)
             
             VStack {
                 Text(title)
-                    .font(.title2)
+                    .font(.pretendardExtrabold16)
                     .bold()
                     .padding()
                 
                 Text(message)
-                    .font(.body)
+                    .font(.pretendardMedium14)
                     .padding(.bottom)
                 
                 HStack {
@@ -300,7 +338,7 @@ struct GoodbyeDialog: View {
                             RoundedRectangle(cornerRadius: 20)
                                 .foregroundColor(.green)
                             Text("네")
-                                .font(.system(size: 16, weight: .bold))
+                                .font(.yjObangBold15)
                                 .foregroundColor(.white)
                                 .padding()
                         }
@@ -316,7 +354,7 @@ struct GoodbyeDialog: View {
                             RoundedRectangle(cornerRadius: 20)
                                 .foregroundColor(.gray)
                             Text("아니요")
-                                .font(.system(size: 16, weight: .bold))
+                                .font(.yjObangBold15)
                                 .foregroundColor(.white)
                                 .padding()
                         }
@@ -348,35 +386,38 @@ struct SettingButton: View {
     let title: String
     var isSelected: Bool
     let action: () -> Void
-
+    
     var body: some View {
-        Button(action: action) {
-            HStack {
-                Text(title)
-                    .foregroundColor(isSelected ? .homeRed : .primary) // 선택된 버튼의 텍스트 색상을 변경
-                    .padding(.bottom, 4)
-                    .background(GeometryReader { geometry in
-                        // 밑줄 추가
-                        Path { path in
-                            let width = geometry.size.width + 10
-                            let height = geometry.size.height
-                            path.move(to: CGPoint(x: -5, y: height))
-                            path.addLine(to: CGPoint(x: width - 5, y: height))
-                        }
-                        .stroke(style: StrokeStyle(lineWidth: 1))
-                        .foregroundColor(isSelected ? .homeRed : .black) // 선택된 버튼의 밑줄 색상을 변경
-                    })
-                Spacer()
-            }
-        }
-        .padding(.vertical, 10)
-        .padding(.horizontal, 35)
+        Button(action: {
+                  action() // 상위 뷰에서 정의한 액션 실행
+                 // isSelected = true // 현재 버튼을 선택된 상태로 만듬
+              }) {
+                  HStack {
+                      Text(title)
+                          .font(.pretendardMedium16) // .pretendardMedium16 대신 사용한 예시
+                          .foregroundColor(isSelected ? .homeRed : .primary) // .homeRed 대신 사용한 예시
+                          .padding(.bottom, 4)
+                          .background(GeometryReader { geometry in
+                              Path { path in
+                                  let width = geometry.size.width + 10
+                                  let height = geometry.size.height
+                                  path.move(to: CGPoint(x: -5, y: height))
+                                  path.addLine(to: CGPoint(x: width - 5, y: height))
+                              }
+                              .stroke(style: StrokeStyle(lineWidth: 1))
+                              .foregroundColor(isSelected ? .homeRed : .black) // .homeRed 대신 사용한 예시
+                          })
+                      Spacer()
+                  }
+              }
+              .padding(.vertical, 10)
+              .padding(.horizontal, 35)
     }
 }
 
 struct CustomToggleAlert: View {
     @Binding var isOn: Bool
-
+    
     var body: some View {
         HStack(spacing:0) {
             // "켜기" 버튼
@@ -384,21 +425,23 @@ struct CustomToggleAlert: View {
                 self.isOn = true
             }) {
                 Text("켜기")
+                    .font(.pretendardMedium14)
                     .foregroundColor(self.isOn ? .white : .Natural500) // 선택된 상태에 따라 글씨 색 변경
-                                        .frame(width: 60, height: 40)
-                                        .background(self.isOn ? Color.homeRed : Color.Secondary50)
-                                        .cornerRadius(5)
+                    .frame(width: 60, height: 40)
+                    .background(self.isOn ? Color.homeRed : Color.Secondary50)
+                    .cornerRadius(5)
             }
-
+            
             // "끄기" 버튼
             Button(action: {
                 self.isOn = false
             }) {
                 Text("끄기")
+                    .font(.pretendardMedium14)
                     .foregroundColor(!self.isOn ? .Natural500 : .Natural500) // 선택된 상태에 따라 글씨 색 변경
-                                        .frame(width: 60, height: 40)
-                                        .background(!self.isOn ? Color.Natural300 : Color.Secondary50)
-                                        .cornerRadius(5)
+                    .frame(width: 60, height: 40)
+                    .background(!self.isOn ? Color.Natural300 : Color.Secondary50)
+                    .cornerRadius(5)
             }
         }
         .frame(width: 180, height: 30)
@@ -407,7 +450,7 @@ struct CustomToggleAlert: View {
 
 struct CustomToggleData: View {
     @Binding var isOnData: Bool
-
+    
     var body: some View {
         HStack(spacing:0) {
             // "켜기" 버튼
@@ -415,21 +458,23 @@ struct CustomToggleData: View {
                 self.isOnData = true
             }) {
                 Text("켜기")
+                    .font(.pretendardMedium14)
                     .foregroundColor(self.isOnData ? .white : .Natural500) // 선택된 상태에 따라 글씨 색 변경
-                                        .frame(width: 60, height: 40)
-                                        .background(self.isOnData ? Color.homeRed : Color.Secondary50)
-                                        .cornerRadius(5)
+                    .frame(width: 60, height: 40)
+                    .background(self.isOnData ? Color.homeRed : Color.Secondary50)
+                    .cornerRadius(5)
             }
-
+            
             // "끄기" 버튼
             Button(action: {
                 self.isOnData = false
             }) {
                 Text("끄기")
+                    .font(.pretendardMedium14)
                     .foregroundColor(!self.isOnData ? .Natural500 : .Natural500) // 선택된 상태에 따라 글씨 색 변경
-                                        .frame(width: 60, height: 40)
-                                        .background(!self.isOnData ? Color.Natural300 : Color.Secondary50)
-                                        .cornerRadius(5)
+                    .frame(width: 60, height: 40)
+                    .background(!self.isOnData ? Color.Natural300 : Color.Secondary50)
+                    .cornerRadius(5)
             }
         }
         .frame(width: 180, height: 30)
