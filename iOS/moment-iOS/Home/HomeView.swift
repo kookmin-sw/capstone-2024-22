@@ -25,17 +25,19 @@ struct HomeView: View {
     @ObservedObject var cardViewModel : CardViewModel
     
     var body: some View {
-        NavigationView {
+       // NavigationView {
             ZStack {
                 
                 
                 VStack {
+                    Spacer().frame(height: 50)
                     // '추가' 버튼
                     HStack {
                         Spacer()
                         NavigationLink(destination: SelectDayView(calendarViewModel: calendarViewModel)) {
                             Text("추가")
-                                .padding()
+                                .padding(.horizontal,30)
+                                .padding(.bottom,15)
                                 .font(.yjObangBold15)
                                 .foregroundColor(.black)
                         }
@@ -61,9 +63,9 @@ struct HomeView: View {
                     CustomHomeMainDividerthick()
                         .padding()
                     // 항목 리스트
-                    CustomHomeSubDivider()
+                   // CustomHomeSubDivider()
                     ScrollView(.vertical, showsIndicators: false) {
-                        LazyVStack(spacing: 0) {
+                        LazyVStack(spacing: 5) {
                             ForEach(homeviewModel.items) { item in
                                 ItemViewCell(item: $homeviewModel.items[homeviewModel.getIndex(item: item)], deleteAction: {
                                     self.itemToDelete = item // 사용자가 삭제할 항목을 설정합니다.
@@ -100,7 +102,7 @@ struct HomeView: View {
                     .zIndex(1) // 다이얼로그가 다른 요소들 위에 오도록 설정
                 }
             }
-        }
+       // }
     }
 }
 
@@ -116,15 +118,25 @@ struct ItemViewCell: View {
     var body: some View {
         
         ZStack {
-            
+
+            if item.offset != 0 {
+                Rectangle()
+                    .fill(Color.gray2.opacity(0.3)) // 여기서 색상과 투명도를 조정합니다.
+                    .frame(width: 183, height: 80) // 여기서 사각형의 크기를 조정합니다.
+                    .cornerRadius(3) // 필요한 경우 모서리를 둥글게 처리합니다.
+                    .offset(x: item.offset + 86) // 슬라이드된 위치에 따라 사각형의 위치를 조정합니다.
+                    .zIndex(1)
+            }
             
             deleteButton
             
             NavigationLink(destination:  DateRangeView1(item: item, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel), isActive: $isLinkActive) {
                 EmptyView()
             }
+        
             
             HStack(spacing: 15) {
+                
                 
                 VStack(alignment: .leading, spacing: 10) {
                     HStack{
@@ -149,24 +161,29 @@ struct ItemViewCell: View {
                     }
                 }.padding(.bottom,10)
                 
-                VStack{
-                    HStack(spacing: 15) {
-                        
-                        Spacer()
-                        
-                        
-                        
-                        Text(item.name)
-                            .font(.pretendardExtrabold14)
-                            .foregroundColor(.black)
-                        Rectangle()
-                            .fill(Color.homeRed)
-                            .frame(width: 1, height: 42)
-                            .padding(.leading, 3)
-                            .padding(.trailing, 0)
-                        
+               
+                  
+                    VStack{
+                        HStack(spacing: 10) {
+                            
+                            Spacer()
+                            
+                            
+                           
+                                Text(item.name)
+                                    .font(.pretendardExtrabold14)
+                                    .foregroundColor(.black)
+                                    .zIndex(2)
+                            
+                            Rectangle()
+                                .fill(Color.homeRed)
+                                .frame(width: 1, height: 42)
+                                .padding(.leading, 3)
+                                .padding(.trailing, 0)
+                            
+                        }
                     }
-                }
+                
                 
                 
                 
@@ -176,7 +193,9 @@ struct ItemViewCell: View {
             }
             .padding()
             .background(Color.homeBack)
+            //.background(item.offset != 0 ? Color.gray.opacity(0.5) : Color.homeBack)
             .contentShape(Rectangle())
+            
             .offset(x: item.offset)
             .gesture(DragGesture().onChanged(onChanged(value:)).onEnded(onEnd(value:)))
         }
@@ -240,7 +259,7 @@ extension ItemViewCell {
                 
             }
             Rectangle()
-                .fill(Color.homeRed)
+                .fill(Color.gray2)
                 .frame(width: 1, height: 42)
                 .padding(.leading, 5)
                 .padding(.trailing, 0)
@@ -260,6 +279,7 @@ extension ItemViewCell {
                     .background(Color.homeBack) // 삭제 버튼 색상 설정
                 
             }
+            Spacer().frame(width: 50)
         }.background(Color.homeBack)
     }
 }

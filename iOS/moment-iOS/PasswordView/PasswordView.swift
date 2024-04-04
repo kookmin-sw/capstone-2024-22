@@ -12,6 +12,20 @@ struct PasswordView: View {
     @EnvironmentObject private var pathModel: PathModel
     var body: some View {
         VStack{
+            Button(action: {
+                // "뒤로" 버튼의 액션: 현재 뷰를 종료
+                pathModel.paths.append(.LoginView)
+            }) {
+                HStack {
+                    Spacer().frame(width: 20)
+                    Image("arrow1")
+                    Text("로그인")
+                        .padding()
+                        .font(.pretendardSemiBold18)
+                        .tint(Color.black)
+                    Spacer()
+                }
+            }
             Spacer().frame(height: 240)
             HStack(alignment: .bottom) {
                 Text("아이디")
@@ -59,7 +73,7 @@ struct PasswordView: View {
                 
             }.padding()
             
-        }
+        }.navigationBarBackButtonHidden(true)
     }
 }
 
