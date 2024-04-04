@@ -235,7 +235,7 @@ struct AccordionView: View {
                 DisclosureGroup(isExpanded: $isExpanded) {
                     contentVStack
                 } label: {
-                    HeaderView(cardItem: cardItem)
+                    HeaderView(isExpanded: $isExpanded, cardItem: cardItem)
                 }
                 .accentColor(.black)
                 
@@ -251,6 +251,7 @@ struct AccordionView: View {
                 )
             }.padding(.horizontal,20)
                 .padding(.vertical,5)
+                
             
         }
         
@@ -301,7 +302,7 @@ struct AccordionView: View {
 
 
 struct HeaderView: View {
-    
+    @Binding var isExpanded: Bool
     @State private var isHeartFilled = false // 하트가 채워졌는지 여부
     var cardItem: CardItem1
     var body: some View {
@@ -327,22 +328,23 @@ struct HeaderView: View {
             .background(Color.homeBack) // 헤더 배경색
             .cornerRadius(10)
             CustomHomeVDividerCard()
-            
-            HStack{
-                Text("꽤나 즐거운 대화였네요")
-                    .font(.pretendardMedium11)
-                    .foregroundColor(.gray500)
-                    .padding(.horizontal,10)
-                    .padding(.top,10)
-                Spacer()
-                Text("해가 쨍쨍한날")
-                    .font(.pretendardMedium11)
-                    .foregroundColor(.gray500)
-                    .padding(.top,10)
-                
-                Image("Weather_Sunny")
-                
-                    .padding(.top,10)
+            if !isExpanded {
+                HStack{
+                    Text("꽤나 즐거운 대화였네요")
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.gray500)
+                        .padding(.horizontal,10)
+                        .padding(.top,10)
+                    Spacer()
+                    Text("해가 쨍쨍한날")
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.gray500)
+                        .padding(.top,10)
+                    
+                    Image("Weather_Sunny")
+                    
+                        .padding(.top,10)
+                }
             }
         }
     }
@@ -455,73 +457,75 @@ struct DynamicGradientImagePicker: View {
         }
     }
 }
+//CustomEmotionViewDivider()
 
-
-struct EmotionView : View {
+struct EmotionView: View {
     var body: some View {
-        VStack{
+        VStack {
             HStack{
-                Text("꽤나 즐거운 대화였어요")
-                    .font(.pretendardMedium11)
-                Spacer()
-                Text("감정분석")
-                    .font(.pretendardMedium11)
+                         Text("꽤나 즐거운 대화였어요")
+                             .font(.pretendardMedium11)
+                             .padding(.horizontal,20)
+                         Spacer()
+                         Text("감정분석")
+                             .font(.pretendardMedium11)
+                             .padding(.horizontal,10)
+                         
+                     }
+                     CustomEmotionViewDivider()
+                     
+            emotionRow(imageName: "netral", emotionText: "평범해요", progressValue: 0.6, percentage: "60%")
+            emotionRow(imageName: "fun", emotionText: "즐거워요", progressValue: 0.2, percentage: "20%")
+            emotionRow(imageName: "angry", emotionText: "화나요", progressValue: 0.15, percentage: "15%")
+            emotionRow(imageName: "sad", emotionText: "슬퍼요", progressValue: 0.05, percentage: "5%")
+        }
+        .padding(.horizontal, 1) // HStack에 패딩을 적용하여 내용이 화면 가장자리에 붙지 않도록 합니다.
+    }
+
+    @ViewBuilder
+    private func emotionRow(imageName: String, emotionText: String, progressValue: Double, percentage: String) -> some View {
+        HStack {
+           
+                Image(imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 12, height: 12) // 이미지의 크기를 설정합니다.
                 
-                
-            }
-            CustomEmotionViewDivider()
+                Text(emotionText)
+                    .font(.pretendardMedium11)
+                    .frame(width: 50, alignment: .leading) // 텍스트의 너비와 정렬을 설정합니다.
             
-            HStack{
-                Text("즐거워요")
-                    .font(.pretendardMedium11)
-                    .padding(.horizontal,10)
-                //물차는 뷰
-                ProgressView(value: 0.6, total: 1.0)
-                    .progressViewStyle(LinearProgressViewStyle(tint: .homeRed)) // 빨간색으로 진행률 표시
-                    .frame(width: 200) // 크기 조절
-                    .padding(.horizontal,10)
-                Text("60 %")
-                    .font(.pretendardMedium11)
-            }
-            HStack{
-                Text("걱정돼요")
-                    .font(.pretendardMedium11)
-                    .padding(.horizontal,10)
-                //물차는 뷰
-                ProgressView(value: 0.2, total: 1.0)
-                    .progressViewStyle(LinearProgressViewStyle(tint: .black)) // 빨간색으로 진행률 표시
-                    .frame(width: 200) // 크기 조절
-                    .padding(.horizontal,10)
-                Text("20 %")
-                    .font(.pretendardMedium11)
-            }
-            HStack{
-                Text("낮설어요")
-                    .font(.pretendardMedium11)
-                    .padding(.horizontal,10)
-                //물차는 뷰
-                ProgressView(value: 0.15, total: 1.0)
-                    .progressViewStyle(LinearProgressViewStyle(tint: .StrangeColor)) // 빨간색으로 진행률 표시
-                    .frame(width: 200) // 크기 조절
-                    .padding(.horizontal,10)
-                Text("15 %")
-                    .font(.pretendardMedium11)
-            }
-            HStack{
-                Text("불안해요")
-                    .font(.pretendardMedium11)
-                    .padding(.horizontal,10)
-                //물차는 뷰
-                ProgressView(value: 0.05, total: 1.0)
-                    .progressViewStyle(LinearProgressViewStyle(tint: .unsafeColor)) // 빨간색으로 진행률 표시
-                    .frame(width: 200) // 크기 조절
-                    .padding(.horizontal,10)
-                Text("5 %")
-                    .font(.pretendardMedium11)
-            }
+                
+            Spacer().frame(width:35)
+          
+            ProgressView(value: progressValue, total: 1.0)
+               
+                .progressViewStyle(LinearProgressViewStyle(tint: getColorForEmotion(emotionText: emotionText))) // 감정에 따른 색상
+                .frame(width: 136) // 진행률 표시기의 너비를 설정합니다.
+            Spacer().frame(width:35)
+            Text(percentage)
+                .font(.pretendardMedium11)
+                .frame(width: 27, alignment: .trailing) // 퍼센트 텍스트의 너비와 정렬을 설정합니다.
+            
+           // Spacer() // 오른쪽에 Spacer를 추가하여 모든 요소를 왼쪽으로 정렬합니다.
         }
     }
+    private func getColorForEmotion(emotionText: String) -> Color {
+            switch emotionText {
+            case "평범해요":
+                return .homeRed
+            case "즐거워요":
+                return .black
+            case "화나요":
+                return .StrangeColor
+            case "슬퍼요":
+                return .unsafeColor
+            default:
+                return .gray
+            }
+        }
 }
+
 
 struct AudioPlayerControls: View {
     @ObservedObject var audioRecorderManager: AudioRecorderManager
