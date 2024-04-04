@@ -202,8 +202,8 @@ struct SettingView: View {
             else if showDialogGoodbye {
                 GoodbyeDialog(
                     isActive: $showDialogGoodbye,
-                    title: "로그아웃하시겠습니까?",
-                    message: "",
+                    title: "정말 탈퇴 하시나요..?",
+                    message: "새로운 계정으로 만나는건 가능하지만\n지금까지의 우리 추억은 모두 사라져요",
                     yesAction: {
                         
                         showDialogGoodbye = false
@@ -320,54 +320,62 @@ struct GoodbyeDialog: View {
                 .animation(.easeInOut, value: showDialogGoodbye)
             
             VStack {
-                Text(title)
+                Spacer()
+                
+                HStack{
+                    Text("정말")
+                    Text("탈퇴")
+                        .foregroundColor(.homeRed)
+                    Text("하시나요..?")
+                }
                     .font(.pretendardExtrabold16)
-                    .bold()
+                    
                     .padding()
                 
                 Text(message)
                     .font(.pretendardMedium14)
+                    .foregroundColor(.gray500)
                     .padding(.bottom)
                 
-                HStack {
+                HStack { // 버튼 사이 간격을 0으로 조정
                     Button {
                         yesAction()
                         close()
                     } label: {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 20)
-                                .foregroundColor(.green)
+                            
                             Text("네")
                                 .font(.yjObangBold15)
-                                .foregroundColor(.white)
-                                .padding()
+                                .foregroundColor(Color.black)
+                            
                         }
-                        .frame(width: 120, height: 44) // 버튼의 크기 조절
+                        .frame(width: 116, height: 38) // 버튼의 크기 조절
                     }
-                    .padding()
+                    
+                    Rectangle() // 빨간색 세로줄 추가
+                        .fill(Color.gray500)
+                        .frame(width: 2, height: 20)
                     
                     Button {
                         noAction()
                         close()
                     } label: {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 20)
-                                .foregroundColor(.gray)
+                            
                             Text("아니요")
                                 .font(.yjObangBold15)
-                                .foregroundColor(.white)
-                                .padding()
+                                .foregroundColor(Color.black)
+                            
                         }
-                        .frame(width: 120, height: 44) // 버튼의 크기 조절
+                        .frame(width: 116, height: 38) // 버튼의 크기 조절
                     }
-                    .padding()
-                }
-                
+                }.padding(.bottom,10)
+                // Spacer()
             }
-            .fixedSize(horizontal: false, vertical: true)
-            .padding()
+            .frame(width: 280, height: 178) // 다이얼로그의 크기 조절
+            
             .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .clipShape(RoundedRectangle(cornerRadius: 0))
             
         }
         

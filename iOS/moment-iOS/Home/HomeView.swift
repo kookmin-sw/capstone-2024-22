@@ -19,6 +19,7 @@ struct HomeView: View {
     //@State private var showingCustomAlert = false
     @Binding var showingCustomAlert: Bool
     @State private var itemToDelete: Item? // 삭제할 아이템을 저장하기 위한 상태변수
+    @State private var selectedItemName: String?
     @ObservedObject var audioRecorderManager: AudioRecorderManager
  
     @ObservedObject var cardViewModel : CardViewModel
@@ -66,6 +67,7 @@ struct HomeView: View {
                             ForEach(homeviewModel.items) { item in
                                 ItemViewCell(item: $homeviewModel.items[homeviewModel.getIndex(item: item)], deleteAction: {
                                     self.itemToDelete = item // 사용자가 삭제할 항목을 설정합니다.
+                                    self.selectedItemName = item.name
                                     self.showingCustomAlert = true // 삭제 확인 다이얼로그를 표시합니다.
                                 }, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
                                 CustomHomeSubDivider()
@@ -79,12 +81,13 @@ struct HomeView: View {
                     
                     CustomDialog(
                         isActive: $showingCustomAlert,
-                        title: "여행을 삭제하시겠습니까?",
-                        message: "해당 파일에 기록된 정보는 모두 사라집니다.",
+                        title: "\(selectedItemName ?? "이 여행")\n 정말 삭제하시겠습니까?",
+                        message: "해당 파일에 기록되어있는 녹음카드는\n '일상 기록'으로 이동합니다",
                         yesAction: {
                             if let item = itemToDelete {
                                 homeviewModel.deleteItem(myItem: item) // 항목 삭제 실행
                                 itemToDelete = nil // 삭제할 아이템 초기화
+                                selectedItemName = nil // 선택한 아이템 이름 초기화
                             }
                             showingCustomAlert = false
                         },
@@ -284,54 +287,57 @@ struct CustomDialog: View {
             
             VStack {
                 Text(title)
-                    .font(.title2)
-                    .bold()
+                    .font(.pretendardExtrabold16)
+                    .multilineTextAlignment(.center)
                     .padding()
                 
                 Text(message)
-                    .font(.body)
+                    
+                    .font(.pretendardMedium14)
+                    .multilineTextAlignment(.center) 
+                    .foregroundColor(.gray500)
                     .padding(.bottom)
                 
-                HStack {
+                HStack { // 버튼 사이 간격을 0으로 조정
                     Button {
                         yesAction()
                         close()
                     } label: {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 20)
-                                .foregroundColor(.green)
+                            
                             Text("네")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding()
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
                         }
-                        .frame(width: 120, height: 44) // 버튼의 크기 조절
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
                     }
-                    .padding()
+                    
+                    Rectangle() // 빨간색 세로줄 추가
+                        .fill(Color.gray500)
+                        .frame(width: 2, height: 20)
                     
                     Button {
                         noAction()
                         close()
                     } label: {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 20)
-                                .foregroundColor(.gray)
+                            
                             Text("아니요")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding()
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
                         }
-                        .frame(width: 120, height: 44) // 버튼의 크기 조절
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
                     }
-                    .padding()
-                }
+                }.padding(.bottom,10)
                 
             }
-            .fixedSize(horizontal: false, vertical: true)
-            .padding()
-            .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
             
+            .frame(width: 280, height: 196) // 다이얼로그의 크기 조절
+            
+            .background(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 0))
         }
         
         // .ignoresSafeArea()

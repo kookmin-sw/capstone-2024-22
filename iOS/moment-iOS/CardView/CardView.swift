@@ -106,15 +106,16 @@ struct CardView: View {
             if showConfirmationDialog {
                 CustomConfirmationDialog(
                     isActive: $showConfirmationDialog,
-                    message: "선택한 카드를 삭제하시겠습니까?",
-                    confirmAction: {
+                    title: "\(selectedCardIDs.count)개의 녹음 카드를 정말 삭제할까요?",
+                    message: "삭제된 녹음 카드는 복구할 수 없어요",
+                    yesAction: {
                         // 삭제 로직
                         cardViewModel.cardItems.removeAll { selectedCardIDs.contains($0.id) }
                         selectedCardIDs.removeAll()
                         isEditing = false
                         showConfirmationDialog = false
                     },
-                    cancelAction: {
+                    noAction: {
                         showConfirmationDialog = false
                     }
                 )
@@ -130,35 +131,76 @@ struct CardView: View {
 
 struct CustomConfirmationDialog: View {
     @Binding var isActive: Bool
+    var title: String
     var message: String
-    var confirmAction: () -> Void
-    var cancelAction: () -> Void
+    var yesAction: () -> Void
+    var noAction: () -> Void
+    @State private var offset: CGFloat = 1000
     
     var body: some View {
         ZStack {
             // 어두운 배경
             Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
             
-            VStack(spacing: 20) {
-                Text(message)
-                    .font(.pretendardMedium13)
-                    .foregroundColor(.black)
+            VStack {
+                Text(title)
+                    .font(.pretendardExtrabold16)
+                    
                     .padding()
                 
-                HStack(spacing: 20) {
-                    Button("취소", action: cancelAction)
-                        .foregroundColor(.blue)
-                    Button("확인", action: confirmAction)
-                        .foregroundColor(.red)
-                }
+                Text(message)
+                    .font(.pretendardMedium14)
+                    .foregroundColor(Color.gray500)
+                    .padding(.bottom)
+                
+                HStack { // 버튼 사이 간격을 0으로 조정
+                    Button {
+                        yesAction()
+                        close()
+                    } label: {
+                        ZStack {
+                            
+                            Text("네")
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
+                        }
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
+                    }
+                    
+                    Rectangle() // 빨간색 세로줄 추가
+                        .fill(Color.gray500)
+                        .frame(width: 2, height: 20)
+                    
+                    Button {
+                        noAction()
+                        close()
+                    } label: {
+                        ZStack {
+                            
+                            Text("아니요")
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
+                        }
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
+                    }
+                }.padding(.bottom,10)
+                
             }
-            .padding()
-            .background(Color.white)
-            .cornerRadius(15)
-            .padding(20) // 내부 요소와의 패딩
+            .frame(width: 280, height: 158) // 다이얼로그의 크기 조절
+            
+            .background(.homeBack)
+            .clipShape(RoundedRectangle(cornerRadius: 0))
         }
         .onTapGesture {
             // 배경 탭시 다이얼로그 닫기 (선택적)
+        }
+    }
+    func close() {
+        withAnimation(.spring()) {
+            offset = 1000
+            isActive = false
         }
     }
 }
@@ -530,53 +572,54 @@ struct CustomDialogRecordCard: View {
             
             VStack {
                 Text(title)
-                    .font(.title2)
-                    .bold()
+                    .font(.pretendardExtrabold16)
+                    
                     .padding()
                 
                 Text(message)
-                    .font(.body)
+                    .font(.pretendardMedium14)
+                    .foregroundColor(Color.gray500)
                     .padding(.bottom)
                 
-                HStack {
+                HStack { // 버튼 사이 간격을 0으로 조정
                     Button {
                         yesAction()
                         close()
                     } label: {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 20)
-                                .foregroundColor(.green)
+                            
                             Text("네")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding()
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
                         }
-                        .frame(width: 120, height: 44) // 버튼의 크기 조절
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
                     }
-                    .padding()
+                    
+                    Rectangle() // 빨간색 세로줄 추가
+                        .fill(Color.gray500)
+                        .frame(width: 2, height: 20)
                     
                     Button {
                         noAction()
                         close()
                     } label: {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 20)
-                                .foregroundColor(.gray)
+                            
                             Text("아니요")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding()
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
                         }
-                        .frame(width: 120, height: 44) // 버튼의 크기 조절
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
                     }
-                    .padding()
-                }
+                }.padding(.bottom,10)
                 
             }
-            .fixedSize(horizontal: false, vertical: true)
-            .padding()
-            .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .frame(width: 280, height: 158) // 다이얼로그의 크기 조절
+            
+            .background(.homeBack)
+            .clipShape(RoundedRectangle(cornerRadius: 0))
             
         }
         
