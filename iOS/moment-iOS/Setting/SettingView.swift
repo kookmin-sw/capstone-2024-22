@@ -35,14 +35,14 @@ struct SettingView: View {
                 
                 VStack{
                     SettingButton(title: "알림설정", isSelected: selectedButtonTitle == "알림설정") {
-                                       withAnimation {
-                                           selectedButtonTitle = selectedButtonTitle == "알림설정" ? nil : "알림설정"
-                                       }
-                                   }
-                                  
+                        withAnimation {
+                            selectedButtonTitle = selectedButtonTitle == "알림설정" ? nil : "알림설정"
+                        }
+                    }
+                    
                     
                     HStack{
-
+                        
                         if selectedButtonTitle == "알림설정" {
                             CustomToggleAlert(isOn: $isNotificationsEnabledAlert)
                         }
@@ -54,13 +54,13 @@ struct SettingView: View {
                 // "데이터 허용" 버튼
                 VStack{
                     SettingButton(title: "데이터 허용", isSelected: selectedButtonTitle == "데이터 허용") {
-                                      withAnimation {
-                                          selectedButtonTitle = selectedButtonTitle == "데이터 허용" ? nil : "데이터 허용"
-                                      }
-                                  }
-                                  
+                        withAnimation {
+                            selectedButtonTitle = selectedButtonTitle == "데이터 허용" ? nil : "데이터 허용"
+                        }
+                    }
+                    
                     HStack{
-
+                        
                         if selectedButtonTitle == "데이터 허용" {
                             CustomToggleData(isOnData: $isNotificationsEnabledData)
                         }
@@ -81,9 +81,9 @@ struct SettingView: View {
                 VStack{
                     
                     SettingButton(title: "버전안내", isSelected: selectedButtonTitle == "버전안내") {
-                                           selectedButtonTitle = selectedButtonTitle == "버전안내" ? nil : "버전안내"
-                                           isNotificationsEnabledVersion.toggle()
-                                       }
+                        selectedButtonTitle = selectedButtonTitle == "버전안내" ? nil : "버전안내"
+                        isNotificationsEnabledVersion.toggle()
+                    }
                     if selectedButtonTitle == "버전안내" {
                         HStack{
                             Spacer().frame(width: 35)
@@ -101,9 +101,9 @@ struct SettingView: View {
                 }
                 VStack{
                     SettingButton(title: "문의하기", isSelected: selectedButtonTitle == "문의하기") {
-                                           selectedButtonTitle = selectedButtonTitle == "문의하기" ? nil : "문의하기"
-                                           isShowEmail.toggle()
-                                       }
+                        selectedButtonTitle = selectedButtonTitle == "문의하기" ? nil : "문의하기"
+                        isShowEmail.toggle()
+                    }
                     //    HStack{
                     
                     if selectedButtonTitle == "문의하기"  {
@@ -184,7 +184,7 @@ struct SettingView: View {
                 
                 LogoutDialog(
                     isActive: $showDialog,
-                    title: "로그아웃하시겠습니까?",
+                    title: "정말 로그아웃 하시나요?",
                     message: "",
                     yesAction: {
                         
@@ -229,77 +229,77 @@ struct LogoutDialog: View {
     let message: String
     let yesAction: () -> Void
     let noAction: () -> Void
-    @State private var offset: CGFloat = 1000
+    
     var body: some View {
-        
         ZStack{
             Color(showDialog ? .black : .black)
-                .opacity(showDialog ? 1.0 : 0.5)
+                .opacity(showDialog ? 0.5 : 0.5) // 배경색 투명도 조정
                 .edgesIgnoringSafeArea(.all)
                 .animation(.easeInOut, value: showDialog)
             
             VStack {
-                Text(title)
-                    .font(.pretendardExtrabold16)
-                    .bold()
-                    .padding()
-                
-                Text(message)
-                    .font(.body)
-                    .padding(.bottom)
-                
+                Spacer()
                 HStack {
+                    Text("정말")
+                    Text("로그아웃")
+                        .foregroundColor(.homeRed)
+                    Text("하시나요?")
+                }
+                .font(.pretendardExtrabold16)
+       
+                .padding()
+                
+                
+                
+                HStack { // 버튼 사이 간격을 0으로 조정
                     Button {
                         yesAction()
                         close()
                     } label: {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 20)
-                                .foregroundColor(.green)
+                            
                             Text("네")
                                 .font(.yjObangBold15)
-                                .foregroundColor(.white)
-                                .padding()
+                                .foregroundColor(Color.black)
+                            
                         }
-                        .frame(width: 120, height: 44) // 버튼의 크기 조절
+                        .frame(width: 116, height: 38) // 버튼의 크기 조절
                     }
-                    .padding()
+                    
+                    Rectangle() // 빨간색 세로줄 추가
+                        .fill(Color.gray500)
+                        .frame(width: 2, height: 20)
                     
                     Button {
                         noAction()
                         close()
                     } label: {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 20)
-                                .foregroundColor(.gray)
+                            
                             Text("아니요")
                                 .font(.yjObangBold15)
-                                .foregroundColor(.white)
-                                .padding()
+                                .foregroundColor(Color.black)
+                            
                         }
-                        .frame(width: 120, height: 44) // 버튼의 크기 조절
+                        .frame(width: 116, height: 38) // 버튼의 크기 조절
                     }
-                    .padding()
-                }
+                }.padding(.bottom,10)
                 
+                Spacer()
             }
-            .fixedSize(horizontal: false, vertical: true)
-            .padding()
+            .frame(width: 280, height: 114) // 다이얼로그의 크기 조절
             .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            
+            .clipShape(RoundedRectangle(cornerRadius: 0))
         }
-        
-        // .ignoresSafeArea()
     }
     
     func close() {
         withAnimation(.spring()) {
-            offset = 1000
             isActive = false
         }
     }
 }
+
 
 
 struct GoodbyeDialog: View {
@@ -389,29 +389,29 @@ struct SettingButton: View {
     
     var body: some View {
         Button(action: {
-                  action() // 상위 뷰에서 정의한 액션 실행
-                 // isSelected = true // 현재 버튼을 선택된 상태로 만듬
-              }) {
-                  HStack {
-                      Text(title)
-                          .font(.pretendardMedium16) // .pretendardMedium16 대신 사용한 예시
-                          .foregroundColor(isSelected ? .homeRed : .primary) // .homeRed 대신 사용한 예시
-                          .padding(.bottom, 4)
-                          .background(GeometryReader { geometry in
-                              Path { path in
-                                  let width = geometry.size.width + 10
-                                  let height = geometry.size.height
-                                  path.move(to: CGPoint(x: -5, y: height))
-                                  path.addLine(to: CGPoint(x: width - 5, y: height))
-                              }
-                              .stroke(style: StrokeStyle(lineWidth: 1))
-                              .foregroundColor(isSelected ? .homeRed : .black) // .homeRed 대신 사용한 예시
-                          })
-                      Spacer()
-                  }
-              }
-              .padding(.vertical, 10)
-              .padding(.horizontal, 35)
+            action() // 상위 뷰에서 정의한 액션 실행
+            // isSelected = true // 현재 버튼을 선택된 상태로 만듬
+        }) {
+            HStack {
+                Text(title)
+                    .font(.pretendardMedium16) // .pretendardMedium16 대신 사용한 예시
+                    .foregroundColor(isSelected ? .homeRed : .primary) // .homeRed 대신 사용한 예시
+                    .padding(.bottom, 4)
+                    .background(GeometryReader { geometry in
+                        Path { path in
+                            let width = geometry.size.width + 10
+                            let height = geometry.size.height
+                            path.move(to: CGPoint(x: -5, y: height))
+                            path.addLine(to: CGPoint(x: width - 5, y: height))
+                        }
+                        .stroke(style: StrokeStyle(lineWidth: 1))
+                        .foregroundColor(isSelected ? .homeRed : .black) // .homeRed 대신 사용한 예시
+                    })
+                Spacer()
+            }
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 35)
     }
 }
 

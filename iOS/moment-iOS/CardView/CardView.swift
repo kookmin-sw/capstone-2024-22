@@ -141,7 +141,7 @@ struct CustomConfirmationDialog: View {
             
             VStack(spacing: 20) {
                 Text(message)
-                    .font(.headline)
+                    .font(.pretendardMedium13)
                     .foregroundColor(.black)
                     .padding()
                 
@@ -317,6 +317,7 @@ struct DynamicGradientRectangleView: View {
                 .padding()
             
             Text(longText)
+                .font(.pretendardMedium13)
                 .padding()
         }
         .background(
@@ -347,7 +348,8 @@ struct DynamicGradientImagePicker: View {
                             selectedImages.append(nil) // 추가 버튼에 해당하는 nil 추가
                         }) {
                             HStack {
-                                Text("이미지 추가하기")
+                                Text("사진 추가")
+                                    .font(.pretendardMedium11)
                                     .foregroundColor(.black)
                                 Image("Imageadd")
                                     .foregroundColor(.white)
@@ -418,8 +420,10 @@ struct EmotionView : View {
         VStack{
             HStack{
                 Text("꽤나 즐거운 대화였어요")
+                    .font(.pretendardMedium11)
                 Spacer()
                 Text("감정분석")
+                    .font(.pretendardMedium11)
                 
                 
             }
@@ -427,47 +431,51 @@ struct EmotionView : View {
             
             HStack{
                 Text("즐거워요")
-                    .font(.caption)
+                    .font(.pretendardMedium11)
+                    .padding(.horizontal,10)
                 //물차는 뷰
                 ProgressView(value: 0.6, total: 1.0)
                     .progressViewStyle(LinearProgressViewStyle(tint: .homeRed)) // 빨간색으로 진행률 표시
-                    .frame(width: 200, height: 20) // 크기 조절
-                    .padding()
+                    .frame(width: 200) // 크기 조절
+                    .padding(.horizontal,10)
                 Text("60 %")
-                    .font(.caption)
+                    .font(.pretendardMedium11)
             }
             HStack{
                 Text("걱정돼요")
-                    .font(.caption)
+                    .font(.pretendardMedium11)
+                    .padding(.horizontal,10)
                 //물차는 뷰
                 ProgressView(value: 0.2, total: 1.0)
                     .progressViewStyle(LinearProgressViewStyle(tint: .black)) // 빨간색으로 진행률 표시
-                    .frame(width: 200, height: 20) // 크기 조절
-                    .padding()
+                    .frame(width: 200) // 크기 조절
+                    .padding(.horizontal,10)
                 Text("20 %")
-                    .font(.caption)
+                    .font(.pretendardMedium11)
             }
             HStack{
                 Text("낮설어요")
-                    .font(.caption)
+                    .font(.pretendardMedium11)
+                    .padding(.horizontal,10)
                 //물차는 뷰
                 ProgressView(value: 0.15, total: 1.0)
                     .progressViewStyle(LinearProgressViewStyle(tint: .StrangeColor)) // 빨간색으로 진행률 표시
-                    .frame(width: 200, height: 20) // 크기 조절
-                    .padding()
+                    .frame(width: 200) // 크기 조절
+                    .padding(.horizontal,10)
                 Text("15 %")
-                    .font(.caption)
+                    .font(.pretendardMedium11)
             }
             HStack{
                 Text("불안해요")
-                    .font(.caption)
+                    .font(.pretendardMedium11)
+                    .padding(.horizontal,10)
                 //물차는 뷰
                 ProgressView(value: 0.05, total: 1.0)
                     .progressViewStyle(LinearProgressViewStyle(tint: .unsafeColor)) // 빨간색으로 진행률 표시
-                    .frame(width: 200, height: 20) // 크기 조절
-                    .padding()
+                    .frame(width: 200) // 크기 조절
+                    .padding(.horizontal,10)
                 Text("5 %")
-                    .font(.caption)
+                    .font(.pretendardMedium11)
             }
         }
     }
