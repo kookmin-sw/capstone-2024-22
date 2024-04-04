@@ -35,20 +35,76 @@ struct OnboardingView: View {
                                       .scaledToFit()
                                       
                                 
-                              }
-                              .tag(index)
+                              }.tag(index)
+                            
                           }
-                      }
-                   
-                      
+                      } .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 
                       
-                HStack{
-                  Spacer()
-                    StartBtnView()
-                        .padding()
+                if currentPage == onboardingViewModel.onboardingContents.count - 1 {
+                               // 마지막 인덱스에 도달했을 때 보여줄 버튼
+                    Spacer().frame(height: 10)
+                    
+                    Button(
+                        action: {
+                            pathModel.paths.append(.LoginView)
+                        },
+                        label: {
+                            Text("시작하기")
+                                .font(.pretendardSemiBold18)
+                                .frame(width: 335,height: 32)
+                                .padding()
+                                .background(Color.homeRed)
+                                .foregroundColor(.white)
+                                .cornerRadius(3)
+                        }
+                    )
+                      
+                    Spacer().frame(height: 40)
+                } else {
+                    // 그 외의 페이지에서 보여줄 버튼
+                    Button(action: {
+                        // 현재 인덱스가 마지막이 아닐 때의 버튼 액션
+                        if currentPage < onboardingViewModel.onboardingContents.count - 1 {
+                           
+                            pathModel.paths.append(.LoginView)
+                        }
+                    }) {
+                        HStack {
+                            Spacer()
+                            Text("바로 시작하기") .font(.pretendardMedium14)
+                                                       .foregroundColor(.black)
+                            Image("arrowST")
+                        }
+                        .padding(.bottom , 50)
+                                          .padding()
+                    }
                 }
+                      
+//                HStack{
+//                  Spacer()
+//                    Button(
+//                        action : {
+//                            pathModel.paths.append(.LoginView)
+//                        },
+//                        label :{
+//                            HStack{
+//                                Text("바로 시작하기")
+//                                    .font(.pretendardMedium14)
+//                                    .foregroundColor(.black)
+//                                
+//                                Image("arrowST")
+//                                    
+//                                
+//                            }
+//                        }
+//                    )
+//                    .padding(.bottom , 50)
+//                    .padding()
+//                      
+//                }
                 Spacer()
+                    .frame(height: 30)
                 
                   }
           
@@ -128,7 +184,7 @@ private struct StartBtnView : View{
             },
             label :{
                 HStack{
-                    Text("시작하기")
+                    Text("바로 시작하기")
                         .font(.pretendardMedium14)
                         .foregroundColor(.black)
                     
