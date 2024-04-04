@@ -14,7 +14,24 @@ struct AddUser: View {
     @EnvironmentObject private var pathModel: PathModel
     var body: some View {
         VStack{
-            Spacer().frame(height: 70)
+            Button(action: {
+            // "뒤로" 버튼의 액션: 현재 뷰를 종료
+            pathModel.paths.append(.AuthView)
+        }) {
+            HStack {
+                
+                   
+                Image("arrow1")
+                    .padding(.horizontal,10)
+                Text("로그인")
+                    
+                    .font(.pretendardSemiBold18)
+                    .tint(Color.black)
+                Spacer()
+            }
+        }
+            
+            Spacer().frame(height: 90)
             
             HStack(alignment: .bottom) {
                 Text("아이디")
@@ -82,6 +99,7 @@ struct AddUser: View {
             })
             
         }.padding()
+            .navigationBarBackButtonHidden(true)
     }
 }
 

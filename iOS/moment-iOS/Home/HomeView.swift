@@ -357,10 +357,23 @@ struct DateRangeView1: View {
     var item: Item
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @ObservedObject var cardViewModel : CardViewModel
-    
+    @Environment(\.presentationMode) var presentationMode
     var body: some View {
         ZStack{
         VStack {
+            Button(action: {
+                // "뒤로" 버튼의 액션: 현재 뷰를 종료
+                self.presentationMode.wrappedValue.dismiss()
+            }) {
+                HStack {
+                    Spacer().frame(width: 20)
+                    Text("뒤로")
+                        .padding()
+                        .font(.yjObangBold15)
+                        .tint(Color.black)
+                    Spacer()
+                }
+            }
             
             CustomHomeMainDividerthick()
                 .padding(.bottom, -10)
@@ -398,6 +411,7 @@ struct DateRangeView1: View {
             }
         }
     }.background(Color.homeBack)
+            .navigationBarBackButtonHidden(true)
     
     
             }

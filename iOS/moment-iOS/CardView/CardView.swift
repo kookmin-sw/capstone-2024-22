@@ -52,13 +52,13 @@ struct CardView: View {
                                     //cardViewModel.cardItems.removeAll { selectedCardIDs.contains($0.id) }
                                     self.showConfirmationDialog = true
                                 }.font(.yjObangBold15)
-                                .tint(Color.black)
+                                    .tint(Color.black)
                                 Spacer().frame(width: 10)
                             } else {
                                 Button("편집") { // 편집모드인 삭제
                                     isEditing.toggle()
                                 }.font(.yjObangBold15)
-                                .tint(Color.black)
+                                    .tint(Color.black)
                                 Spacer().frame(width: 10)
                             }
                             
@@ -101,7 +101,7 @@ struct CardView: View {
                     
                     
                 }.background(Color.homeBack)
-              
+                
             }
             if showConfirmationDialog {
                 CustomConfirmationDialog(
@@ -125,7 +125,7 @@ struct CardView: View {
         .navigationBarBackButtonHidden(true)
         
         
-       
+        
     }
 }
 
@@ -145,7 +145,7 @@ struct CustomConfirmationDialog: View {
             VStack {
                 Text(title)
                     .font(.pretendardExtrabold16)
-                    
+                
                     .padding()
                 
                 Text(message)
@@ -251,7 +251,7 @@ struct AccordionView: View {
                 )
             }.padding(.horizontal,20)
                 .padding(.vertical,5)
-                
+            
             
         }
         
@@ -463,17 +463,17 @@ struct EmotionView: View {
     var body: some View {
         VStack {
             HStack{
-                         Text("꽤나 즐거운 대화였어요")
-                             .font(.pretendardMedium11)
-                             .padding(.horizontal,20)
-                         Spacer()
-                         Text("감정분석")
-                             .font(.pretendardMedium11)
-                             .padding(.horizontal,10)
-                         
-                     }
-                     CustomEmotionViewDivider()
-                     
+                Text("꽤나 즐거운 대화였어요")
+                    .font(.pretendardMedium11)
+                    .padding(.horizontal,20)
+                Spacer()
+                Text("감정분석")
+                    .font(.pretendardMedium11)
+                    .padding(.horizontal,10)
+                
+            }
+            CustomEmotionViewDivider()
+            
             emotionRow(imageName: "netral", emotionText: "평범해요", progressValue: 0.6, percentage: "60%")
             emotionRow(imageName: "fun", emotionText: "즐거워요", progressValue: 0.2, percentage: "20%")
             emotionRow(imageName: "angry", emotionText: "화나요", progressValue: 0.15, percentage: "15%")
@@ -481,25 +481,25 @@ struct EmotionView: View {
         }
         .padding(.horizontal, 1) // HStack에 패딩을 적용하여 내용이 화면 가장자리에 붙지 않도록 합니다.
     }
-
+    
     @ViewBuilder
     private func emotionRow(imageName: String, emotionText: String, progressValue: Double, percentage: String) -> some View {
         HStack {
-           
-                Image(imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 12, height: 12) // 이미지의 크기를 설정합니다.
-                
-                Text(emotionText)
-                    .font(.pretendardMedium11)
-                    .frame(width: 50, alignment: .leading) // 텍스트의 너비와 정렬을 설정합니다.
             
-                
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 12, height: 12) // 이미지의 크기를 설정합니다.
+            
+            Text(emotionText)
+                .font(.pretendardMedium11)
+                .frame(width: 50, alignment: .leading) // 텍스트의 너비와 정렬을 설정합니다.
+            
+            
             Spacer().frame(width:35)
-          
+            
             ProgressView(value: progressValue, total: 1.0)
-               
+            
                 .progressViewStyle(LinearProgressViewStyle(tint: getColorForEmotion(emotionText: emotionText))) // 감정에 따른 색상
                 .frame(width: 136) // 진행률 표시기의 너비를 설정합니다.
             Spacer().frame(width:35)
@@ -507,23 +507,23 @@ struct EmotionView: View {
                 .font(.pretendardMedium11)
                 .frame(width: 27, alignment: .trailing) // 퍼센트 텍스트의 너비와 정렬을 설정합니다.
             
-           // Spacer() // 오른쪽에 Spacer를 추가하여 모든 요소를 왼쪽으로 정렬합니다.
+            // Spacer() // 오른쪽에 Spacer를 추가하여 모든 요소를 왼쪽으로 정렬합니다.
         }
     }
     private func getColorForEmotion(emotionText: String) -> Color {
-            switch emotionText {
-            case "평범해요":
-                return .homeRed
-            case "즐거워요":
-                return .black
-            case "화나요":
-                return .StrangeColor
-            case "슬퍼요":
-                return .unsafeColor
-            default:
-                return .gray
-            }
+        switch emotionText {
+        case "평범해요":
+            return .homeRed
+        case "즐거워요":
+            return .black
+        case "화나요":
+            return .StrangeColor
+        case "슬퍼요":
+            return .unsafeColor
+        default:
+            return .gray
         }
+    }
 }
 
 
@@ -577,7 +577,7 @@ struct CustomDialogRecordCard: View {
             VStack {
                 Text(title)
                     .font(.pretendardExtrabold16)
-                    
+                
                     .padding()
                 
                 Text(message)

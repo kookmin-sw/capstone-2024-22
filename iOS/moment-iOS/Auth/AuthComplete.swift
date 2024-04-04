@@ -15,6 +15,7 @@ struct AuthComplete: View {
             Spacer()
             
             Text("회원가입이 완료되었어요\n만나서 반가워요 !")
+                .multilineTextAlignment(.center)
                 .font(.pretendardBold30)
             Spacer()
             Button(action: {
@@ -22,6 +23,7 @@ struct AuthComplete: View {
                 pathModel.paths.append(.LoginView)
             }, label: {
                 Text("로그인하기")
+                    .multilineTextAlignment(.center)
                     .font(.pretendardSemiBold18)
                     .frame(minWidth: 0, maxWidth: .infinity)
                     .padding()
@@ -31,6 +33,7 @@ struct AuthComplete: View {
             })
             
         }.padding()
+            .navigationBarBackButtonHidden(true)
     }
 }
 
