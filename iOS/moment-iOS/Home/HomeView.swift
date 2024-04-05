@@ -19,23 +19,26 @@ struct HomeView: View {
     //@State private var showingCustomAlert = false
     @Binding var showingCustomAlert: Bool
     @State private var itemToDelete: Item? // 삭제할 아이템을 저장하기 위한 상태변수
+    @State private var selectedItemName: String?
     @ObservedObject var audioRecorderManager: AudioRecorderManager
  
-    
+    @ObservedObject var cardViewModel : CardViewModel
     
     var body: some View {
-        NavigationView {
+       // NavigationView {
             ZStack {
                 
                 
                 VStack {
+                    Spacer().frame(height: 50)
                     // '추가' 버튼
                     HStack {
                         Spacer()
                         NavigationLink(destination: SelectDayView(calendarViewModel: calendarViewModel)) {
                             Text("추가")
-                                .padding()
-                                .font(.headline)
+                                .padding(.horizontal,30)
+                                .padding(.bottom,15)
+                                .font(.yjObangBold15)
                                 .foregroundColor(.black)
                         }
                     }
@@ -43,9 +46,11 @@ struct HomeView: View {
                     CustomHomeVDivider()
                     TabView(selection: $selectedSlideIndex) {
                         Text("어디로 떠나면 좋을까요?")
+                            .font(.pretendardMedium14)
                             .tag(0)
                         NavigationLink(destination: SelectDayView(calendarViewModel: calendarViewModel)) {
                             Text("일상기록")
+                                .font(.pretendardMedium14)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
                         .tag(1)
@@ -58,14 +63,15 @@ struct HomeView: View {
                     CustomHomeMainDividerthick()
                         .padding()
                     // 항목 리스트
-                    CustomHomeSubDivider()
+                   // CustomHomeSubDivider()
                     ScrollView(.vertical, showsIndicators: false) {
-                        LazyVStack(spacing: 0) {
+                        LazyVStack(spacing: 5) {
                             ForEach(homeviewModel.items) { item in
                                 ItemViewCell(item: $homeviewModel.items[homeviewModel.getIndex(item: item)], deleteAction: {
                                     self.itemToDelete = item // 사용자가 삭제할 항목을 설정합니다.
+                                    self.selectedItemName = item.name
                                     self.showingCustomAlert = true // 삭제 확인 다이얼로그를 표시합니다.
-                                }, audioRecorderManager: audioRecorderManager)
+                                }, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
                                 CustomHomeSubDivider()
                             }
                         }
@@ -77,12 +83,13 @@ struct HomeView: View {
                     
                     CustomDialog(
                         isActive: $showingCustomAlert,
-                        title: "여행을 삭제하시겠습니까?",
-                        message: "해당 파일에 기록된 정보는 모두 사라집니다.",
+                        title: "\(selectedItemName ?? "이 여행")\n 정말 삭제하시겠습니까?",
+                        message: "해당 파일에 기록되어있는 녹음카드는\n '일상 기록'으로 이동합니다",
                         yesAction: {
                             if let item = itemToDelete {
                                 homeviewModel.deleteItem(myItem: item) // 항목 삭제 실행
                                 itemToDelete = nil // 삭제할 아이템 초기화
+                                selectedItemName = nil // 선택한 아이템 이름 초기화
                             }
                             showingCustomAlert = false
                         },
@@ -95,7 +102,7 @@ struct HomeView: View {
                     .zIndex(1) // 다이얼로그가 다른 요소들 위에 오도록 설정
                 }
             }
-        }
+       // }
     }
 }
 
@@ -107,19 +114,29 @@ struct ItemViewCell: View {
     var deleteAction: () -> Void
     @State private var isLinkActive = false
     @ObservedObject var audioRecorderManager: AudioRecorderManager
-  
+    @ObservedObject var cardViewModel : CardViewModel
     var body: some View {
         
         ZStack {
-            
+
+            if item.offset != 0 {
+                Rectangle()
+                    .fill(Color.gray2.opacity(0.3)) // 여기서 색상과 투명도를 조정합니다.
+                    .frame(width: 183, height: 80) // 여기서 사각형의 크기를 조정합니다.
+                    .cornerRadius(3) // 필요한 경우 모서리를 둥글게 처리합니다.
+                    .offset(x: item.offset + 86) // 슬라이드된 위치에 따라 사각형의 위치를 조정합니다.
+                    .zIndex(1)
+            }
             
             deleteButton
             
-            NavigationLink(destination:  DateRangeView1(item: item, audioRecorderManager: audioRecorderManager), isActive: $isLinkActive) {
+            NavigationLink(destination:  DateRangeView1(item: item, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel), isActive: $isLinkActive) {
                 EmptyView()
             }
+        
             
             HStack(spacing: 15) {
+                
                 
                 VStack(alignment: .leading, spacing: 10) {
                     HStack{
@@ -127,12 +144,12 @@ struct ItemViewCell: View {
                         
                         VStack{
                             Text(item.startdate)
-                                .font(.caption)
+                                .font(.pretendardMedium11)
                                 .foregroundColor(.black)
                             
                             
                             Text(item.enddate)
-                                .font(.caption)
+                                .font(.pretendardMedium11)
                                 .foregroundColor(.black)
                         }
                         Rectangle()
@@ -144,24 +161,29 @@ struct ItemViewCell: View {
                     }
                 }.padding(.bottom,10)
                 
-                VStack{
-                    HStack(spacing: 15) {
-                        
-                        Spacer()
-                        
-                        
-                        
-                        Text(item.name)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.black)
-                        Rectangle()
-                            .fill(Color.homeRed)
-                            .frame(width: 1, height: 42)
-                            .padding(.leading, 3)
-                            .padding(.trailing, 0)
-                        
+               
+                  
+                    VStack{
+                        HStack(spacing: 10) {
+                            
+                            Spacer()
+                            
+                            
+                           
+                                Text(item.name)
+                                    .font(.pretendardExtrabold14)
+                                    .foregroundColor(.black)
+                                    .zIndex(2)
+                            
+                            Rectangle()
+                                .fill(Color.homeRed)
+                                .frame(width: 1, height: 42)
+                                .padding(.leading, 3)
+                                .padding(.trailing, 0)
+                            
+                        }
                     }
-                }
+                
                 
                 
                 
@@ -171,7 +193,9 @@ struct ItemViewCell: View {
             }
             .padding()
             .background(Color.homeBack)
+            //.background(item.offset != 0 ? Color.gray.opacity(0.5) : Color.homeBack)
             .contentShape(Rectangle())
+            
             .offset(x: item.offset)
             .gesture(DragGesture().onChanged(onChanged(value:)).onEnded(onEnd(value:)))
         }
@@ -227,7 +251,7 @@ extension ItemViewCell {
                 }
             } label: {
                 Text("수정")
-                    .font(.caption)
+                    .font(.yjObangBold12)
                     .foregroundColor(.black)
                 
                     .frame(width: 50, height: 50)
@@ -235,7 +259,7 @@ extension ItemViewCell {
                 
             }
             Rectangle()
-                .fill(Color.homeRed)
+                .fill(Color.gray2)
                 .frame(width: 1, height: 42)
                 .padding(.leading, 5)
                 .padding(.trailing, 0)
@@ -249,12 +273,13 @@ extension ItemViewCell {
                 }
             } label: {
                 Text("삭제")
-                    .font(.caption)
+                    .font(.yjObangBold12)
                     .foregroundColor(.homeRed)
                     .frame(width: 50, height: 50)
                     .background(Color.homeBack) // 삭제 버튼 색상 설정
                 
             }
+            Spacer().frame(width: 50)
         }.background(Color.homeBack)
     }
 }
@@ -282,54 +307,57 @@ struct CustomDialog: View {
             
             VStack {
                 Text(title)
-                    .font(.title2)
-                    .bold()
+                    .font(.pretendardExtrabold16)
+                    .multilineTextAlignment(.center)
                     .padding()
                 
                 Text(message)
-                    .font(.body)
+                    
+                    .font(.pretendardMedium14)
+                    .multilineTextAlignment(.center) 
+                    .foregroundColor(.gray500)
                     .padding(.bottom)
                 
-                HStack {
+                HStack { // 버튼 사이 간격을 0으로 조정
                     Button {
                         yesAction()
                         close()
                     } label: {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 20)
-                                .foregroundColor(.green)
+                            
                             Text("네")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding()
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
                         }
-                        .frame(width: 120, height: 44) // 버튼의 크기 조절
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
                     }
-                    .padding()
+                    
+                    Rectangle() // 빨간색 세로줄 추가
+                        .fill(Color.gray500)
+                        .frame(width: 2, height: 20)
                     
                     Button {
                         noAction()
                         close()
                     } label: {
                         ZStack {
-                            RoundedRectangle(cornerRadius: 20)
-                                .foregroundColor(.gray)
+                            
                             Text("아니요")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding()
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
                         }
-                        .frame(width: 120, height: 44) // 버튼의 크기 조절
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
                     }
-                    .padding()
-                }
+                }.padding(.bottom,10)
                 
             }
-            .fixedSize(horizontal: false, vertical: true)
-            .padding()
-            .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
             
+            .frame(width: 280, height: 196) // 다이얼로그의 크기 조절
+            
+            .background(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 0))
         }
         
         // .ignoresSafeArea()
@@ -348,18 +376,33 @@ struct CustomDialog: View {
 struct DateRangeView1: View {
     var item: Item
     @ObservedObject var audioRecorderManager: AudioRecorderManager
-   
-    
+    @ObservedObject var cardViewModel : CardViewModel
+    @Environment(\.presentationMode) var presentationMode
     var body: some View {
+        ZStack{
         VStack {
-        
+            Button(action: {
+                // "뒤로" 버튼의 액션: 현재 뷰를 종료
+                self.presentationMode.wrappedValue.dismiss()
+            }) {
+                HStack {
+                    Spacer().frame(width: 20)
+                    Text("뒤로")
+                        .padding()
+                        .font(.yjObangBold15)
+                        .tint(Color.black)
+                    Spacer()
+                }
+            }
+            
             CustomHomeMainDividerthick()
                 .padding(.bottom, -10)
             HStack {
                 Spacer() // 좌측 공간을 만들어줌으로써 Text를 우측으로 밀어냄
                 Text(item.name)
-                    .font(.headline)
-                    .padding()
+                    .font(.pretendardBold22)
+                    .padding(.horizontal,10)
+                   
                 Spacer().frame(width: 20) // 우측에 조금 더 공간을 추가하여 Text를 중앙으로 조금 이동시킴
             }
             
@@ -374,19 +417,23 @@ struct DateRangeView1: View {
                         let days = generateDateRange(from: startDate, to: endDate)
                         
                         ForEach(Array(days.enumerated()), id: \.element) { index, day in
-                            NavigationLink(destination: CardView(day: day, item: item, audioRecorderManager: audioRecorderManager)) {
+                            NavigationLink(destination: CardView(day: day, item: item, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) {
                                 DayView(day: day, dayIndex: index, item: item) // 'dayIndex' 인자를 전달합니다.
                             }
                         }
-                                .padding(.vertical, 4)
-                                
-                                
-                                
-                            }
-                            
-                        }
+                        .padding(.vertical, 4)
+                        
+                        
+                        
                     }
+                    
                 }
+            }
+        }
+    }.background(Color.homeBack)
+            .navigationBarBackButtonHidden(true)
+    
+    
             }
         
     
@@ -410,6 +457,7 @@ struct DateRangeView1: View {
         
         return dates
     }
+    
 }
 
 // 날짜 형식 지정
@@ -426,39 +474,42 @@ struct DayView: View {
     var item: Item
     
     var body: some View {
-        VStack {
-            
-            
-            HStack{
-                VStack{
-                    Text("\(dayIndex + 1) 일차")
-                        .font(.subheadline)
-                        .foregroundColor(.black)
-                        .padding(.bottom, 5)
+        
+            VStack {
+                
+                
+                HStack{
+                    VStack{
+                        Text("\(dayIndex + 1) 일차")
+                            .font(.pretendardExtrabold14)
+                            .foregroundColor(.black)
+                            .padding(.bottom, 5)
+                        
+                        Text("\(day, formatter: monthDayFormatter)")
+                            .font(.pretendardMedium11)
+                            .foregroundColor(.black)
+                            .padding(.bottom, 5)
+                    }
                     
-                    Text("\(day, formatter: monthDayFormatter)")
-                        .font(.caption)
-                        .foregroundColor(.black)
-                        .padding(.bottom, 5)
+                    
+                    Rectangle()
+                        .fill(Color.homeRed)
+                        .frame(width: 1, height: 42)
+                        .padding(.leading, 3)
+                        .padding(.trailing, 0)
+                    
+                    
+                    Text("몇개의 파일이 있어요.")
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.gray600)
+                        
+                    
+                    Spacer()
                 }
-                
-                
-                Rectangle()
-                    .fill(Color.homeRed)
-                    .frame(width: 1, height: 42)
-                    .padding(.leading, 3)
-                    .padding(.trailing, 0)
-                
-                
-                Text("몇개의 파일이 있어요.")
-                    .foregroundColor(.black)
-                    .font(.caption)
-                
-                Spacer()
+                .padding()
+                CustomHomeSubDivider()
+                    .padding(.vertical, 4)
             }
-            .padding()
-            CustomHomeSubDivider()
-                .padding(.vertical, 4)
-        }
+        
     }
 }

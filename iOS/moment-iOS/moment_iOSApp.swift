@@ -18,7 +18,9 @@ struct moment_iOSApp: App {
     var body: some Scene {
         WindowGroup {// 여기서 앱메인 뷰를 그리고
             OnboardingView() // 이게 어떤 뷰부터 시작할지를 정해주는거구만 ..
+            
         }
+        
         
     }
 }

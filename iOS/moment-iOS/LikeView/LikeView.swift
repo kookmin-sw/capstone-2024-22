@@ -12,20 +12,23 @@ import SwiftUI
 
 
 struct LikeView: View {
-    @StateObject var likeViewModel = LikeViewModel()
-   
-    
+    @ObservedObject var viewModel = LikeViewModel()
+    var day: Date
+    var item: Item
+    @Environment(\.presentationMode) var presentationMode
+    @ObservedObject var audioRecorderManager: AudioRecorderManager
+    @State private var isDeleteMode = false // 삭제 모드 상태
+    @State private var isSelected = false // 체크박스 선택 여부
+    @State private var showConfirmationDialog = false // 커스텀 다이얼로그 표시 여부
+    @ObservedObject var cardViewModel : CardViewModel
+
     var body: some View {
-        VStack{
-       
-           // AccordionView()
+        ScrollView {
+            VStack {
+                
+          Text("")
+          Text("f")
+            }
         }
-        
     }
 }
-
-
-
-
-
-

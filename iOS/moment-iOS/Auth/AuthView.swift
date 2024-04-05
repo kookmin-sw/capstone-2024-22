@@ -16,6 +16,7 @@ struct AuthView: View {
     @State private var isAgreeRequired1: Bool = false
     @State private var isAgreeRequired2: Bool = false
     @State private var isAgreeRequired3: Bool = false
+    @Environment(\.presentationMode) var presentationMode
     
     var heightFactor: CGFloat {
         UIScreen.main.bounds.height > 800 ? 3.6 : 3
@@ -26,129 +27,150 @@ struct AuthView: View {
     }
     
     var body: some View {
-        ZStack {
-            VStack {
-                Spacer()
-                HStack(alignment: .bottom) {
-                    Text("이메일")
-                        .foregroundColor(.gray600)
-                        .font(.caption)
-                        .padding(.top, 1)
-                        .padding(.horizontal, 20)
-                    
-                    Spacer()
-                }.padding(.bottom,1)
-           
-                TextField("인증 가능한 이메일을 입력하세요. ", text: $email)
-                    .padding()
-                    .frame(height: 44)
-                    .overlay(Rectangle().frame(height: 1), alignment: .bottom)
-                    .padding(.horizontal,20)
-                
-                // Text and Spacer
-                HStack {
-                    Text("해당 이메일은 본인인증 수단으로서 활용되며\n비밀번호 분실시 복구코드를 보내드리는 용도로 사용됩니다.")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                        .padding(.top, 3)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Spacer()
-                }
-                .padding([.bottom, .horizontal], 20)
-                
-                // Checkbox and Button
-                HStack {
-                    Spacer()
-                    // "이용약관" 버튼
-                    Text("이용약관")
-                        .foregroundColor(.homeRed)
-                        .font(.caption)
-                        .padding(.bottom, 10)
-                    
-                    Text("및")
-                        .font(.caption)
-                        .foregroundColor(.black)
-                        .padding(.bottom, 10)
-                    
-                    // "개인정보 수집동의서" 버튼
-                    Text("개인정보 수집동의서")
-                        .foregroundColor(.homeRed)
-                        .font(.caption)
-                        .padding(.bottom, 10)
-                    
-                    
-                    Text("확인")
-                        .font(.caption)
-                        .foregroundColor(.black)
-                        .padding(.bottom, 10)
-                    
+        NavigationView {
+            ZStack {
+                VStack {
                     Button(action: {
-                        isShowingBottom = true
+                        // "뒤로" 버튼의 액션: 현재 뷰를 종료
+                        pathModel.paths.append(.LoginView)
                     }) {
-                        Image(systemName: isAutoLogin ? "checkmark.square.fill" : "square")
-                            .foregroundColor(isAutoLogin ? .homeRed : .gray)
+                        HStack {
+                            Spacer().frame(width: 20)
+                            Image("arrow1")
+                            Text("로그인")
+                                .padding()
+                                .font(.pretendardSemiBold18)
+                                .tint(Color.black)
+                            Spacer()
+                        }
+                    }
+                    
+                    Spacer()
+                    HStack(alignment: .bottom) {
+                        Text("이메일")
+                            .font(.pretendardMedium11)
+                            .foregroundColor(.gray600)
+                            .font(.caption)
+                            .padding(.top, 1)
+                            .padding(.horizontal, 20)
+                        
+                        Spacer()
+                    }.padding(.bottom,1)
+                    
+                    TextField("인증 가능한 이메일을 입력하세요. ", text: $email)
+                    
+                    
+                        .padding()
+                        .frame(height: 44)
+                        .overlay(Rectangle().frame(height: 1), alignment: .bottom)
+                        .padding(.horizontal,20)
+                    
+                    // Text and Spacer
+                    HStack {
+                        Text("해당 이메일은 본인인증 수단으로서 활용되며\n비밀번호 분실시 복구코드를 보내드리는 용도로 사용됩니다.")
+                            .font(.pretendardMedium11)
+                            .foregroundColor(.gray600)
+                            .padding(.top, 3)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer()
+                    }
+                    .padding([.bottom, .horizontal], 20)
+                    
+                    // Checkbox and Button
+                    HStack {
+                        Spacer()
+                        // "이용약관" 버튼
+                        Text("이용약관")
+                            .foregroundColor(.homeRed)
+                            .font(.pretendardMedium11)
+                            .padding(.bottom, 10)
+                        
+                        Text("및")
+                            .font(.pretendardMedium11)
                             .foregroundColor(.black)
                             .padding(.bottom, 10)
-                    }
-                }.padding(.horizontal,20)
-                
-                Spacer()
-                
-                // Next Button
-                VStack {
-                    Button(
-                        action: {
-                            pathModel.paths.append(.AuthNumView)
-                        },
-                        label: {
-                            Text("다음")
-                                .frame(minWidth: 0, maxWidth: .infinity)
-                                .padding()
-                                .background(Color.homeRed)
-                                .foregroundColor(.white)
-                                .cornerRadius(3)
+                        
+                        // "개인정보 수집동의서" 버튼
+                        Text("개인정보 수집동의서")
+                            .foregroundColor(.homeRed)
+                            .font(.pretendardMedium11)
+                            .padding(.bottom, 10)
+                        
+                        
+                        Text("확인")
+                            .font(.pretendardMedium11)
+                            .foregroundColor(.black)
+                            .padding(.bottom, 10)
+                        
+                        Button(action: {
+                            isShowingBottom = true
+                        }) {
+                            Image(systemName: isAutoLogin ? "checkmark.square.fill" : "square")
+                                .foregroundColor(isAutoLogin ? .homeRed : .gray)
+                                .foregroundColor(.black)
+                                .padding(.bottom, 10)
                         }
-                    )
-                }.padding()
-            }
-            
-            // Dark Overlay
-            if isShowingBottom {
-                Color.black.opacity(0.5)
-                    .edgesIgnoringSafeArea(.all)
-                    .transition(.opacity)
-                    .onTapGesture {
-                        withAnimation {
-                            isShowingBottom = false
-                        }
-                    }
-            }
-            
-            // Bottom Sheet
-            if isShowingBottom {
-                GeometryReader { proxy in
+                    }.padding(.horizontal,20)
+                    
+                    Spacer()
+                    
+                    // Next Button
                     VStack {
-                        Spacer()
-                        BottomSheetView(isAgree1: $isAgreeRequired1, isAgree2: $isAgreeRequired2, isAgree3: $isAgreeRequired3, showingSheet: $isShowingBottom)
-                            .frame(
-                                width: proxy.size.width,
-                                height: proxy.size.height / heightFactor,
-                                alignment: .center
-                            )
-                            .offset(y: offset)
-                            .animation(.easeInOut(duration: 0.49))
-                    }
+                        Button(
+                            action: {
+                                pathModel.paths.append(.AuthNumView)
+                            },
+                            label: {
+                                Text("다음")
+                                    .font(.pretendardSemiBold18)
+                                    .frame(minWidth: 0, maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.homeRed)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(3)
+                            }
+                        )
+                    }.padding()
                 }
-                .edgesIgnoringSafeArea(.bottom)
-                .transition(.move(edge: .bottom))
+                
+                // Dark Overlay
+                if isShowingBottom {
+                    Color.black.opacity(0.5)
+                        .edgesIgnoringSafeArea(.all)
+                        .transition(.opacity)
+                        .onTapGesture {
+                            withAnimation {
+                                isShowingBottom = false
+                            }
+                        }
+                }
+                
+                // Bottom Sheet
+                if isShowingBottom {
+                    GeometryReader { proxy in
+                        VStack {
+                            Spacer()
+                            BottomSheetView(isAgree1: $isAgreeRequired1, isAgree2: $isAgreeRequired2, isAgree3: $isAgreeRequired3, showingSheet: $isShowingBottom)
+                                .frame(
+                                    width: proxy.size.width,
+                                    height: proxy.size.height / heightFactor,
+                                    alignment: .center
+                                )
+                                .offset(y: offset)
+                                .animation(.easeInOut(duration: 0.49))
+                        }
+                    }
+                    .edgesIgnoringSafeArea(.bottom)
+                    .transition(.move(edge: .bottom))
+                }
             }
-        }
-        .onChange(of: isAgreeRequired1) { _ in
-            updateAutoLoginStatus()
-        }
-        .onChange(of: isAgreeRequired2) { _ in
-            updateAutoLoginStatus()
-        }
+            .onChange(of: isAgreeRequired1) { _ in
+                updateAutoLoginStatus()
+            }
+            .onChange(of: isAgreeRequired2) { _ in
+                updateAutoLoginStatus()
+            }
+        }.navigationBarBackButtonHidden(true)
     }
     
     func updateAutoLoginStatus() {
@@ -171,7 +193,7 @@ struct BottomSheetView: View {
     
     let termsTitles = ["이용 약관 동의", "개인정보 수집 및 이용 동의", "위치정보 이용 동의"]
       
-      let Important = ["필수","필수","선택"]
+      let Important = ["(필수)","(필수)","(선택)"]
     
     var body: some View {
         VStack(spacing: 20) {
@@ -179,12 +201,12 @@ struct BottomSheetView: View {
             ForEach(0..<3) { index in
                 HStack {
                     Text(Important[index])
-                        .font(.caption)
+                        .font(.pretendardMedium11)
                         .foregroundColor(Important[index] == "선택" ? .gray : .homeRed)
                         .foregroundColor(.homeRed)
                     
                     Text(termsTitles[index])
-                        .font(.caption)
+                        .font(.pretendardMedium11)
                         .foregroundColor(.gray)
                     
                     Spacer()
@@ -194,7 +216,7 @@ struct BottomSheetView: View {
                                                showingTermsSheet = true
                     }
                     .foregroundColor(.homeRed)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     
                     Button(action: {
                         switch index {
@@ -236,6 +258,7 @@ struct TermsContentSheetView: View {
         NavigationView {
             ScrollView {
                 Text(content)
+                    .font(.pretendardExtrabold16)
                     .padding()
             }
             .navigationBarTitle("약관 확인", displayMode: .inline)

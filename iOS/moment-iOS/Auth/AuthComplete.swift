@@ -15,13 +15,16 @@ struct AuthComplete: View {
             Spacer()
             
             Text("회원가입이 완료되었어요\n만나서 반가워요 !")
-                .font(.headline)
+                .multilineTextAlignment(.center)
+                .font(.pretendardBold30)
             Spacer()
             Button(action: {
                 // 가입하기 버튼 동작 구현
                 pathModel.paths.append(.LoginView)
             }, label: {
-                Text("가입하기")
+                Text("로그인하기")
+                    .multilineTextAlignment(.center)
+                    .font(.pretendardSemiBold18)
                     .frame(minWidth: 0, maxWidth: .infinity)
                     .padding()
                     .background(Color.homeRed)
@@ -30,6 +33,7 @@ struct AuthComplete: View {
             })
             
         }.padding()
+            .navigationBarBackButtonHidden(true)
     }
 }
 

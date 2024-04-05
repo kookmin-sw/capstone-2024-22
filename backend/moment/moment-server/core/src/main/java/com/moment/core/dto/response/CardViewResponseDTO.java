@@ -48,8 +48,17 @@ public class CardViewResponseDTO {
         @Schema(description = "STT")
         private final String stt;
 
-        @Schema(description = "emotion")
-        private final String emotion;
+        @Schema(description = "기쁨")
+        private final float happy;
+
+        @Schema(description = "슬픔")
+        private final float sad;
+
+        @Schema(description = "화남")
+        private final float angry;
+
+        @Schema(description = "중립")
+        private final float neutral;
 
         @Schema(description = "질문")
         private final String question;
@@ -74,7 +83,10 @@ public class CardViewResponseDTO {
                     .weather(cardView.getWeather())
                     .temperature(cardView.getTemperature())
                     .stt(cardView.getStt())
-                    .emotion(cardView.getEmotion())
+                    .happy(cardView.getHappy())
+                    .sad(cardView.getSad())
+                    .angry(cardView.getAngry())
+                    .neutral(cardView.getNeutral())
                     .question(cardView.getQuestion())
                     .isLoved(cardView.getIsLoved())
                     .recordFileStatus(cardView.getRecordFileStatus())

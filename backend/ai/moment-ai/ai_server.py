@@ -19,7 +19,8 @@ def ai_server_health():
 
 @app.route('/ai/run', methods=['POST'])
 def ai_server_run():
-    file_name = request.args.get('file_name')
+    file_name = request.json.get('file_name')  # 요청의 JSON 본문에서 'file_name' 가져오기
+    file_path = request.json.get('file_path')  # 요청의 JSON 본문에서 'file_path' 가져오기
     if file_name is None:
         return jsonify({"error": "'file_name' parameter is missing."}), 400
 

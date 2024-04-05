@@ -2,7 +2,6 @@ package com.moment.core.domain.cardView;
 
 import com.moment.core.domain.BaseEntity;
 import com.moment.core.domain.tripFile.TripFile;
-import com.moment.core.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -63,9 +62,21 @@ public class CardView extends BaseEntity {
     @Column(name = "stt")
     private String stt;
 
-    // 감정
-    @Column(name = "emotion")
-    private String emotion;
+    // happy
+    @Column(name = "happy")
+    private Float happy;
+
+    // sad
+    @Column(name = "sad")
+    private Float sad;
+
+    // angry
+    @Column(name = "angry")
+    private Float angry;
+
+    // neutral
+    @Column(name = "neutral")
+    private Float neutral;
 
     // 질문
     @Column(name = "question", nullable = false)

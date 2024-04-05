@@ -34,19 +34,25 @@ def run_model_on_gpu(models:dict, source_file, output):
   if torch.cuda.is_available():
     try:
       for model_name, model_config in models.items():
-        output["log"].append(f"{model_name} running on gpu")
         
         if model_name == "whisper":
+          # for demo
+          output["text"] = "안녕하세요."
+          continue
+
+          # for real test
           model = model_config[0]
           model.to('cuda')
           result = model.transcribe(source_file)
           output["text"] = result["text"]
           
         elif model_name == "emotion2vec":
-          result = {"sad": 75, "happy": 5, "angry": 7, "excited": 3, "neutral": 10}
+          # for demos
+          result = {"sad": 75.3, "happy": 4.7, "angry": 7.1, "neutral": 12.9}
           output["emotions"] = result
           continue
           
+          # for real test
           model, ser_config, ser_task = model_config
           model.to('cuda')
           model.eval()
@@ -96,19 +102,25 @@ def run_model_on_gpu(models:dict, source_file, output):
 def run_model_on_cpu(models:dict, source_file, output):
   try:
     for model_name, model_config in models.items():
-      output["log"].append(f"{model_name} running on cpu")
       
       if model_name == "whisper":
+        # for demo
+        output["text"] = "안녕하세요."
+        continue
+
+        # for real test
         model = model_config[0]
         model.to('cpu')
         result = model.transcribe(source_file)
         output["text"] = result["text"]
         
       elif model_name == "emotion2vec":
-        result = {"sad": 75, "happy": 5, "angry": 7, "excited": 3, "neutral": 10}
+        # for demos
+        result = {"sad": 75.3, "happy": 4.7, "angry": 7.1, "neutral": 12.9}
         output["emotions"] = result
         continue
         
+        # for real test
         model, ser_config, ser_task = model_config
         model.to('cpu')
         model.eval()
@@ -163,28 +175,33 @@ def main(file_name):
   output["emotions"] = None
   output["status"] = "wait"
   output["error"] = None
-  output["log"] = []
+  output["file_name"] = os.path.basename(file_name)
+  output["file_path"] = os.path.dirname(os.path.abspath(file_name))
   
   source_file = os.path.join(args.source_path, file_name)
 
   # load model
   # print("\n\nload model ------------------------------------------------------------------------------")
-  output["log"].append("load model")
   stt_model = whisper.load_model(args.whisper_version)
   
   ser_model_dir = "./emotion2vec/upstream"
   ser_checkpoint_dir = "./emotion2vec/emotion2vec_base/emotion2vec_base.pt"
-  ser_model_path = UserDirModule(ser_model_dir)
-  fairseq.utils.import_user_module(ser_model_path)
-  ser_model, ser_cfg, ser_task = fairseq.checkpoint_utils.load_model_ensemble_and_task([ser_checkpoint_dir])
-  ser_model = ser_model[0]
+  ser_classifer_dir = "./emotion2vec/emotion2vec_base/emotion2vec_classifier.pt"
+
+  # for demos
+  ser_model, ser_cfg, ser_task = None, None, None
+
+  ## for real test
+  # ser_model_path = UserDirModule(ser_model_dir)
+  # fairseq.utils.import_user_module(ser_model_path)
+  # ser_model, ser_cfg, ser_task = fairseq.checkpoint_utils.load_model_ensemble_and_task([ser_checkpoint_dir])
+  # ser_model = ser_model[0]
   
   models_dict = {'whisper' : [stt_model], 'emotion2vec' : [ser_model, ser_cfg, ser_task]}
 
   
   # run model
   # print("\n\nrun model ------------------------------------------------------------------------------")
-  output["log"].append("run model")
   
   # models in GPU
   # output = run_model_on_gpu(models_dict, source_file, output)
@@ -192,7 +209,7 @@ def main(file_name):
   
   if output["status"] == "success":
       # print("Model ran successfully on GPU.")
-      output["log"].append("Model ran successfully on GPU.")
+      pass
   
   else:
       # if model failed on GPU, then run on CPU
@@ -200,11 +217,11 @@ def main(file_name):
       run_model_on_cpu(models_dict, source_file, output)
       if output["status"] == "success":
           # print("Model ran successfully on CPU.")
-          output["log"].append("Model ran successfully on CPU.")
+          pass
+
       else:
           # print("Model could not be run on GPU or CPU. Please check your model or system configuration.")
           output["status"] = "failure"
-          output["log"].append("Model could not be run on GPU or CPU. Please check your model or system configuration.")
     
 
 
@@ -228,7 +245,7 @@ def main(file_name):
   return output
 
 if __name__ == "__main__":
-  file_name = "test.mp4" if args.file_path is None else args.file_path
+  file_name = "../moment_ai/test.mp4" if args.file_path is None else args.file_path
   print(file_name)
   result = main(file_name)
   print(result)

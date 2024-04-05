@@ -3,8 +3,10 @@ package com.capstone.android.application.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,7 +15,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,33 +27,35 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRowDefaults
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material.TabRow
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.toColorInt
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -60,9 +63,11 @@ import androidx.navigation.compose.rememberNavController
 import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
 import com.capstone.android.application.app.composable.MomentTextField
+import com.capstone.android.application.presentation.CountViewModel
 import com.capstone.android.application.ui.theme.BackButton_Onboarding
 import com.capstone.android.application.ui.theme.BigButton
 import com.capstone.android.application.ui.theme.CheckButton
+import com.capstone.android.application.ui.theme.CountText
 import com.capstone.android.application.ui.theme.P_Bold30
 import com.capstone.android.application.ui.theme.P_ExtraBold16
 import com.capstone.android.application.ui.theme.P_Medium11
@@ -76,11 +81,10 @@ import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.primary_500
 import com.capstone.android.application.ui.theme.tertiary_500
 import com.capstone.android.application.ui.theme.white
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 enum class OnboardingScreen(){
     Login,
@@ -102,6 +106,7 @@ class OnboardingActivity:ComponentActivity() {
 
         setContent{
             navController = rememberNavController()
+
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
@@ -114,7 +119,7 @@ class OnboardingActivity:ComponentActivity() {
                 ){
                     composable(route=OnboardingScreen.Login.name){ Login() }
                     composable(route=OnboardingScreen.LoginComplete.name){ LoginComplete()}
-                        composable(route=OnboardingScreen.Signup_email.name){ Signup_email() }
+                    composable(route=OnboardingScreen.Signup_email.name){ Signup_email() }
                     composable(route=OnboardingScreen.Signup_number.name){ Signup_number() }
                     composable(route=OnboardingScreen.Signup.name){ Signup() }
                     composable(route=OnboardingScreen.FindPassword.name){ FindPassword() }
@@ -531,20 +536,24 @@ class OnboardingActivity:ComponentActivity() {
 
 
     @Composable
-    fun Signup_number(){
-        val number = remember{
-            mutableStateOf("")
-        }
+    fun Signup_number(countViewModel: CountViewModel = viewModel()){
 
-        var signnumState = remember {
-            mutableStateOf(true)
-        }
+        val timeLeft by countViewModel.timeLeft.collectAsState()
+        val number = remember{mutableStateOf("")}
+        var signnumState = remember {mutableStateOf(true)}
         val focusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
 
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
         }
+        DisposableEffect(Unit) {
+            countViewModel.startCountdown() // 카운트다운 시작
+            onDispose {
+                // DisposableEffect가 해제될 때 카운트다운을 중지하거나 정리할 필요 없음
+            }
+        }
+
         Box(modifier = Modifier
             .fillMaxSize()
             .background(color = tertiary_500)
@@ -587,13 +596,13 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(top = 344.dp)
             ) {
                 Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .padding(horizontal = 8.dp),
-                    horizontalArrangement = Arrangement.Absolute.SpaceBetween
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
                 ) {
-                    Column {
-                        P_Medium11("인증번호", if(signnumState.value) black else negative_600)
-                    }
+                    P_Medium11("인증번호", if(signnumState.value) black else negative_600)
+                    CountText(timeLeft)
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 MomentTextField(
@@ -631,7 +640,7 @@ class OnboardingActivity:ComponentActivity() {
                 Row(modifier = Modifier
                     .width(86.dp)
                     .align(Alignment.End)
-                    .clickable { /*인증번호 재전송 기능*/ }) {
+                    .clickable { countViewModel.restartCountdown() }) {
                     Column {
                         Column(modifier = Modifier
                             .padding(horizontal = 8.dp)) {
@@ -1229,6 +1238,6 @@ class OnboardingActivity:ComponentActivity() {
     @Preview
     @Composable
     fun OnboardingPreView(){
-        LoginComplete()
+        Signup_number()
     }
 }
