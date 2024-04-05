@@ -14,7 +14,7 @@ import PopupView
              HStack {
                  Spacer()
                  Text("녹음이 삭제되었습니다.")
-                     .font(.caption)
+                     .font(.pretendardMedium11)
                      .padding(.vertical, 10)
                  Spacer()
              }
@@ -32,7 +32,7 @@ struct FloatingToastLoadView: View {
             HStack {
                 Spacer()
                 Text("녹음이 저장되었습니다.")
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .padding(.vertical, 10)
                 Spacer()
             }

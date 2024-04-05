@@ -27,6 +27,12 @@ extension Color { // 왜 extension 을 썼지? : extension 은 원래있던 클�
     static let customWhite = Color("White")
     static let homeRed = Color("homeRed1")
     static let toastColor = Color("ToastColor")
-    
+    static let unsafeColor = Color("unsafeColor")
+    static let StrangeColor = Color("StrangeColor")
+    static let LikeColor = Color("LikeColor")
+    static let Secondary50 = Color("Secondary50")
+    static let Natural500 = Color("Natural500")
+    static let Natural50 = Color("Natural50")
+    static let Natural300 = Color("Natural300")
     
 }

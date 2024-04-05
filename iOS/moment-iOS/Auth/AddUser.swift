@@ -14,12 +14,29 @@ struct AddUser: View {
     @EnvironmentObject private var pathModel: PathModel
     var body: some View {
         VStack{
-            Spacer()
+            Button(action: {
+            // "뒤로" 버튼의 액션: 현재 뷰를 종료
+            pathModel.paths.append(.AuthView)
+        }) {
+            HStack {
+                
+                   
+                Image("arrow1")
+                    .padding(.horizontal,10)
+                Text("로그인")
+                    
+                    .font(.pretendardSemiBold18)
+                    .tint(Color.black)
+                Spacer()
+            }
+        }
+            
+            Spacer().frame(height: 90)
             
             HStack(alignment: .bottom) {
                 Text("아이디")
                     .foregroundColor(.gray600)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .padding(.top, 1)
                     .padding(.horizontal, 10)
                 
@@ -36,7 +53,7 @@ struct AddUser: View {
             HStack(alignment: .bottom) {
                 Text("비밀번호")
                     .foregroundColor(.gray600)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .padding(.top, 1)
                     .padding(.horizontal, 10)
                 
@@ -53,7 +70,7 @@ struct AddUser: View {
             HStack(alignment: .bottom) {
                 Text("비밀번호 확인")
                     .foregroundColor(.gray600)
-                    .font(.caption)
+                    .font(.pretendardMedium11)
                     .padding(.top, 1)
                     .padding(.horizontal, 10)
                 
@@ -73,13 +90,16 @@ struct AddUser: View {
                 pathModel.paths.append(.AuthComplete)
             }, label: {
                 Text("가입하기")
+                    .font(.pretendardSemiBold18)
                     .frame(minWidth: 0, maxWidth: .infinity)
                     .padding()
                     .background(Color.homeRed)
                     .foregroundColor(.white)
                     .cornerRadius(3)
             })
+            
         }.padding()
+            .navigationBarBackButtonHidden(true)
     }
 }
 
