@@ -12,6 +12,7 @@ public class AiModelRunRequestDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RunModel {
-        private String fileName;
+        private String file_name;
+        private String file_path;
     }
 }

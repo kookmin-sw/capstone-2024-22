@@ -1,7 +1,8 @@
-package com.moment.core.domain.cardView;
+package com.moment.scheduler.domain.cardView;
 
-import com.moment.core.domain.BaseEntity;
-import com.moment.core.domain.tripFile.TripFile;
+
+import com.moment.scheduler.domain.BaseEntity;
+import com.moment.scheduler.domain.tripFile.TripFile;
 import jakarta.persistence.*;
 import lombok.*;
 
