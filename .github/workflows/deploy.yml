@@ -56,6 +56,7 @@ jobs:
 
       - run: |
           docker-compose up --build
+        working-directory: ${{ env.working-directory }}
 
           # 서버에 애플리케이션 배포 스크립트 실행
         # 예: scp, SSH, Docker, Kubernetes 등을 사용하여 배포
