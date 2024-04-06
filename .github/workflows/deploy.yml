@@ -73,6 +73,7 @@ jobs:
           touch key.txt
           echo "${{ secrets.SERVER_KEY }}" > key.txt
           chmod 600 key.txt
+        working-directory: ${{ env.working-directory }}
       - name: Deploy the application
         env:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
@@ -82,3 +83,4 @@ jobs:
           chmod 755 ./deploy.sh
           set -e
           ./deploy.sh
+        working-directory: ${{ env.working-directory }}
