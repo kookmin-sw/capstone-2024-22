@@ -43,16 +43,16 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build -x test
-          build-root-directory: ./backend/moment/moment-server
-          gradle-version: 7.5
-
-      - name: Deploy to Server
-        uses: actions/checkout@v3
+#
+#      - name: Build with Gradle
+#        uses: gradle/gradle-build-action@v2
+#        with:
+#          arguments: build -x test
+#          build-root-directory: ./backend/moment/moment-server
+#          gradle-version: 7.5
+#
+#      - name: Deploy to Server
+#        uses: actions/checkout@v3
 
 #      - run: |
 #          docker-compose up --build
@@ -82,4 +82,3 @@ jobs:
           chmod 755 ./deploy.sh
           set -e
           ./deploy.sh
-        working-directory: ${{ env.working-directory }}
