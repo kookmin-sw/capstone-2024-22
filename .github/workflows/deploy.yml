@@ -24,17 +24,17 @@ jobs:
 
       - uses: actions/checkout@v3
 
-      - run: touch ./auth/src/main/resources/application.properties
-      - run: echo "${{ secrets.AUTH_PROPERTIES }}" > ./auth/src/main/resources/application.properties
+      - run: touch ./backend/moment/moment-server/auth/src/main/resources/application.properties
+      - run: echo "${{ secrets.AUTH_PROPERTIES }}" > ./backend/moment/moment-server/auth/src/main/resources/application.properties
 
-      - run: touch ./core/src/main/resources/application.properties
-      - run: echo "${{ secrets.CORE_PROPERTIES }}" > ./core/src/main/resources/application.properties
+      - run: touch ./backend/moment/moment-server/core/src/main/resources/application.properties
+      - run: echo "${{ secrets.CORE_PROPERTIES }}" > ./backend/moment/moment-server/core/src/main/resources/application.properties
 
-      - run: touch ./mail/src/main/resources/application.properties
-      - run: echo "${{ secrets.MAIL_PROPERTIES }}" > ./mail/src/main/resources/application.properties
+      - run: touch ./backend/moment/moment-server/mail/src/main/resources/application.properties
+      - run: echo "${{ secrets.MAIL_PROPERTIES }}" > ./backend/moment/moment-server/mail/src/main/resources/application.properties
 
-      - run: touch ./scheduler/src/main/resources/application.properties
-      - run: echo "${{ secrets.SCHEDULER_PROPERTIES }}" > ./scheduler/src/main/resources/application.properties
+      - run: touch ./backend/moment/moment-server/scheduler/src/main/resources/application.properties
+      - run: echo "${{ secrets.SCHEDULER_PROPERTIES }}" > ./backend/moment/moment-server/scheduler/src/main/resources/application.properties
 
 
 #      - run: cat ./src/main/resources/application.properties
