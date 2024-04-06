@@ -38,6 +38,7 @@ public class AuthService {
 
     @Transactional
     public TokenResponseDTO.GetTempToken sendCode(AuthRequest.SendCode sendCode) {
+        log.info("sendCode.isSignUp : {}", sendCode.isSignUp());
         if (sendCode.isSignUp()) {
             if(userRepository.existsByEmail(sendCode.getEmail())){
                 throw new AlreadyRegisteredEmailException("이미 가입된 이메일");
