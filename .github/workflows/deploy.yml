@@ -36,6 +36,12 @@ jobs:
 
 #      - run: cat ./src/main/resources/application.properties
 
+      - name: Set up Gradle
+        uses: eskatos/setup-gradle@v1
+        with:
+          gradle-version: <desired_gradle_version>
+
+
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
@@ -44,7 +50,9 @@ jobs:
       - name: Deploy to Server
         uses: actions/checkout@v3
 
-      - run: docker-compose up --build
+      - run: |
+          cd ./backend/moment/moment-server
+          docker-compose up --build
 
           # 서버에 애플리케이션 배포 스크립트 실행
         # 예: scp, SSH, Docker, Kubernetes 등을 사용하여 배포
