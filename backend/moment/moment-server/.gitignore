@@ -26,7 +26,7 @@
 hs_err_pid*
 replay_pid*
 
-*.properties
+
 /.gradle/8.5/fileHashes/fileHashes.bin
 /.gradle/buildOutputCleanup/buildOutputCleanup.lock
 /.gradle/8.5/checksums/checksums.lock

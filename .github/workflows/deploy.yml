@@ -54,9 +54,9 @@ jobs:
       - name: Deploy to Server
         uses: actions/checkout@v3
 
-      - run: |
-          docker-compose up --build
-        working-directory: ${{ env.working-directory }}
+#      - run: |
+#          docker-compose up --build
+#        working-directory: ${{ env.working-directory }}
 
           # 서버에 애플리케이션 배포 스크립트 실행
         # 예: scp, SSH, Docker, Kubernetes 등을 사용하여 배포
