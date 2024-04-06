@@ -15,14 +15,17 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v2
+        working-directory: ${{ env.working-directory }}
 
       - name: Set up Java
         uses: actions/setup-java@v2
         with:
           java-version: 17  # 원하는 Java 버전으로 변경
           distribution: 'temurin'
+        working-directory: ${{ env.working-directory }}
 
       - uses: actions/checkout@v3
+        working-directory: ${{ env.working-directory }}
 
       - run: touch ./backend/moment/moment-server/auth/src/main/resources/application.properties
       - run: echo "${{ secrets.AUTH_PROPERTIES }}" > ./backend/moment/moment-server/auth/src/main/resources/application.properties
@@ -41,23 +44,28 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+        working-directory: ${{ env.working-directory }}
 
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build
+          build-root-directory: ${{ env.working-directory }}
 
       - name: Deploy to Server
         uses: actions/checkout@v3
+        working-directory: ${{ env.working-directory }}
 
       - run: |
           docker-compose up --build
+        working-directory: ${{ env.working-directory }}
 
           # 서버에 애플리케이션 배포 스크립트 실행
         # 예: scp, SSH, Docker, Kubernetes 등을 사용하여 배포
   deploy:
-
+    env:
+      working-directory: ./backend/moment/moment-server
     runs-on: ubuntu-latest
     needs:
       - build
