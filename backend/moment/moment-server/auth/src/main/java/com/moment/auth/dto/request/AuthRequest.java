@@ -25,7 +25,7 @@ public class AuthRequest {
     @Setter
     public static class SendCode {
         private String email;
-        private boolean isSignUp;
+        private String isSignUp;
     }
 
     @Getter
