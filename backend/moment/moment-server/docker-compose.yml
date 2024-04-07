@@ -76,7 +76,7 @@ services:
       ports:
         - "8081:8081"  # 호스트 머신의 8081 포트와 컨테이너 내부의 8081 포트를 매핑
       environment:
-        SPRING_DATASOURCE_URL: jdbc:mysql://db-core:3306/moment-core?createDatabaseIfNotExist=TRUE&useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
+        SPRING_DATASOURCE_URL: jdbc:mysql://db-core:3306/moment_core?createDatabaseIfNotExist=TRUE&useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
         SPRING_DATASOURCE_USERNAME: root
         SPRING_DATASOURCE_PASSWORD: root1234
       depends_on:
@@ -108,7 +108,7 @@ services:
     ports:
         - "8083:8083"  # 호스트 머신의 8083 포트와 컨테이너 내부의 8083 포트를 매핑
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db-auth:3306/moment-auth?createDatabaseIfNotExist=TRUE&useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-auth:3306/moment_auth?createDatabaseIfNotExist=TRUE&useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root1234
     logging:
