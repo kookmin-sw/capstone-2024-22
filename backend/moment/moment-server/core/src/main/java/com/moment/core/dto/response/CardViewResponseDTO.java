@@ -49,16 +49,16 @@ public class CardViewResponseDTO {
         private final String stt;
 
         @Schema(description = "기쁨")
-        private final float happy;
+        private final Float happy;
 
         @Schema(description = "슬픔")
-        private final float sad;
+        private final Float sad;
 
         @Schema(description = "화남")
-        private final float angry;
+        private final Float angry;
 
         @Schema(description = "중립")
-        private final float neutral;
+        private final Float neutral;
 
         @Schema(description = "질문")
         private final String question;
