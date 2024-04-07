@@ -64,8 +64,8 @@ services:
         max-file: "10"
     networks:
       - moment-net
-  #    volumes:
-  #      - /c/Users/jykim/TheWayHome_Server/src/main/resources/static/images:/app/src/main/resources/static/images
+    volumes:
+      - /root/files/record:/files/record
 
   # 스케줄러 서버
   scheduler:
@@ -181,7 +181,6 @@ services:
 
 volumes:
     moment_core_data:
-#    moment_scheduler_data:
     moment_auth_data:
 
 
