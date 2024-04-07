@@ -67,7 +67,7 @@ public class CardViewService {
 
         // 파일 이름 생성
         String fileName = createFileName(recordFile.getOriginalFilename());
-        log.info("filepath+filename : " + getFullPath(fileName));
+
         // 로컬 저장소에 파일 저장
         recordFile.transferTo(new File(getFullPath(fileName)));
 
