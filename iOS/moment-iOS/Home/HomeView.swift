@@ -49,7 +49,7 @@ struct HomeView: View {
                         Text("어디로 떠나면 좋을까요?")
                             .font(.pretendardMedium14)
                             .tag(0)
-                        NavigationLink(destination: SelectDayView(calendarViewModel: calendarViewModel)) {
+                        NavigationLink(destination: DailyView()) {
                             Text("일상기록")
                                 .font(.pretendardMedium14)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -17,15 +17,15 @@ struct SelectDayView: View {
     @State private var selectedTab: Int = 0
     @State private var tripName: String = "" // 여행 이름을 위한 상태
     @EnvironmentObject var homeViewModel: HomeViewModel
-    //@Binding var showSlideOverCard: Bool
+    @State private var isCalendarVisible: Bool = false
     @Environment(\.presentationMode) var presentationMode
     
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
+        formatter.dateFormat = "yyyy.MM.dd" // 직접 날짜 형식을 지정
         return formatter
     }
+
     
     var body: some View {
         ZStack{
@@ -68,24 +68,29 @@ struct SelectDayView: View {
                     .padding(.top, 20)
                 
                 HStack(spacing:20) {
-                    CustomTabField(selectedTab: $selectedTab, date: calendarViewModel.startTime, dateFormatter: dateFormatter, title: "출발 날짜", tag: 0)
-                    
-                    CustomTabField(selectedTab: $selectedTab, date: calendarViewModel.endTime, dateFormatter: dateFormatter, title: "도착 날짜", tag: 1)
-                }
+                                   CustomTabField(selectedTab: $selectedTab, date: calendarViewModel.startTime, dateFormatter: dateFormatter, title: "출발 날짜", tag: 0, isCalendarVisible: $isCalendarVisible)
+                                   
+                                   CustomTabField(selectedTab: $selectedTab, date: calendarViewModel.endTime, dateFormatter: dateFormatter, title: "도착 날짜", tag: 1, isCalendarVisible: .constant(false)) // 도착 날짜 태그에는 isCalendarVisible을 변경하지 않음
+                               }
                 .padding(.horizontal)
-                
-                SwiftUIFSCalendarWrapper(startDate: $calendarViewModel.startTime, endDate: $calendarViewModel.endTime, tab: selectedTab)
-                    .padding(.top, -10) // 달력 상단의 패딩을 줄임
-                    .frame(width:340,height: 345) // 달력의 크기 조정
-                    .onChange(of: calendarViewModel.startTime) { newStartDate in
-                        calendarViewModel.addSelectedDay(newStartDate ?? Date())
-                    }
-                    .onChange(of: calendarViewModel.endTime) { newEndDate in
-                        calendarViewModel.addSelectedDay(newEndDate ?? Date())
-                    }
-                Spacer()
-                    .frame(height: 110)
-            }
+                if isCalendarVisible {
+                    SwiftUIFSCalendarWrapper(startDate: $calendarViewModel.startTime, endDate: $calendarViewModel.endTime, tab: selectedTab)
+                        .padding(.top, -10) // 달력 상단의 패딩을 줄임
+                        .frame(width:340,height: 345) // 달력의 크기 조정
+                        .onChange(of: calendarViewModel.startTime) { newStartDate in
+                            calendarViewModel.addSelectedDay(newStartDate ?? Date())
+                        }
+                        .onChange(of: calendarViewModel.endTime) { newEndDate in
+                            calendarViewModel.addSelectedDay(newEndDate ?? Date())
+                        }
+                    
+                    Spacer()
+                        .frame(height: 110)
+                }else {
+                    // 달력이 숨겨져 있을 때 공간을 차지할 빈 뷰
+                    Color.clear.frame(width: 340, height: 460)
+                }
+            } .animation(.easeInOut, value: isCalendarVisible) // 선택적: 달력 표시/숨김에 애니메이션 적용
             .navigationBarBackButtonHidden(true)
             .padding()
             
@@ -102,6 +107,7 @@ struct CustomTabField: View {
     var dateFormatter: DateFormatter // 날짜 형식 지정
     let title: String // 필드의 기본 텍스트
     let tag: Int // 이 필드의 태그
+    @Binding var isCalendarVisible: Bool
     
     var body: some View {
         Text(date != nil ? dateFormatter.string(from: date!) : title)
@@ -112,12 +118,16 @@ struct CustomTabField: View {
             .foregroundColor(.black) // 글자색을 검정색으로 설정
             .cornerRadius(5) // 배경색이 있을 때 모서리를 약간 둥글게
             .onTapGesture {
-                self.selectedTab = self.tag // 탭을 선택했을 때 해당 탭으로 변경
-            }
+                        self.selectedTab = self.tag
+                        if self.tag == 0 { // 출발 날짜 태그가 선택된 경우
+                            self.isCalendarVisible = true
+                        }
+                    }
             .overlay(
                 Rectangle()
                     .frame(height: self.selectedTab == self.tag ? 0 : 1) // 선택된 탭에만 밑줄 표시
                     .foregroundColor(.black), alignment: .bottom)
+        
     }
 }
 
