@@ -23,6 +23,7 @@ struct HomeView: View {
     @ObservedObject var audioRecorderManager: AudioRecorderManager
  
     @ObservedObject var cardViewModel : CardViewModel
+    @State private var showSlideOverCard = false
     
     var body: some View {
        // NavigationView {
