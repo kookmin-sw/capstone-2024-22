@@ -418,7 +418,8 @@ struct DateRangeView1: View {
                         let days = generateDateRange(from: startDate, to: endDate)
                         
                         ForEach(Array(days.enumerated()), id: \.element) { index, day in
-                            NavigationLink(destination: CardView(day: day, item: item, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) {
+                            NavigationLink(destination: CardView(day: day, item: item, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) 
+                            {
                                 DayView(day: day, dayIndex: index, item: item) // 'dayIndex' 인자를 전달합니다.
                             }
                         }

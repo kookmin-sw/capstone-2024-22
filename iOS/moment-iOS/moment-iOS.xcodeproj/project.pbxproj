@@ -60,6 +60,7 @@
 		8E970E172BC3E070003476C4 /* DailyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E162BC3E070003476C4 /* DailyView.swift */; };
 		8E970E192BC3E079003476C4 /* DailyViewmodel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E182BC3E079003476C4 /* DailyViewmodel.swift */; };
 		8E970E1B2BC3E865003476C4 /* DailyCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E1A2BC3E865003476C4 /* DailyCardViewModel.swift */; };
+		8E970E1D2BC405C7003476C4 /* DailyCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E1C2BC405C7003476C4 /* DailyCardView.swift */; };
 		8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA922BAD6B3200C39125 /* PasswordView.swift */; };
 		8ECCFA982BAFE3BD00C39125 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */; };
 		8ECCFADF2BB066D600C39125 /* FloatingToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */; };
@@ -167,6 +168,7 @@
 		8E970E162BC3E070003476C4 /* DailyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyView.swift; sourceTree = "<group>"; };
 		8E970E182BC3E079003476C4 /* DailyViewmodel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyViewmodel.swift; sourceTree = "<group>"; };
 		8E970E1A2BC3E865003476C4 /* DailyCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCardViewModel.swift; sourceTree = "<group>"; };
+		8E970E1C2BC405C7003476C4 /* DailyCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCardView.swift; sourceTree = "<group>"; };
 		8ECCFA922BAD6B3200C39125 /* PasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordView.swift; sourceTree = "<group>"; };
 		8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
 		8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingToastView.swift; sourceTree = "<group>"; };
@@ -384,6 +386,7 @@
 				8E970E162BC3E070003476C4 /* DailyView.swift */,
 				8E970E182BC3E079003476C4 /* DailyViewmodel.swift */,
 				8E970E1A2BC3E865003476C4 /* DailyCardViewModel.swift */,
+				8E970E1C2BC405C7003476C4 /* DailyCardView.swift */,
 			);
 			path = DailyView;
 			sourceTree = "<group>";
@@ -697,6 +700,7 @@
 				8ECCFB632BB29FC000C39125 /* PasswordinsertView.swift in Sources */,
 				8E5CAE6C2B970EAE00A483B4 /* LikeViewModel.swift in Sources */,
 				8E5CAE722B970EE700A483B4 /* AppDelegate.swift in Sources */,
+				8E970E1D2BC405C7003476C4 /* DailyCardView.swift in Sources */,
 				8ECCFBB22BB804B900C39125 /* ImagePicker.swift in Sources */,
 				8E5CAE3C2B970CB300A483B4 /* OnboardingView.swift in Sources */,
 			);

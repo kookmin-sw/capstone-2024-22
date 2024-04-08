@@ -55,12 +55,13 @@ struct DailyView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 10) {
                         ForEach(viewModel.dailyItems) { item in
-                            NavigationLink(destination: Text("\(item.name) 상세 페이지")) {
-                                DailyItemViewCell(item: item) // ItemViewCell을 DailyItem에 맞게 수정
-                            }
+                                                   NavigationLink(destination: Text("\(item.name) 상세 페이지")) {
+                                                       DailyItemViewCell(item: item) // ItemViewCell을 DailyItem에 맞게 수정
+                                                   }
                             CustomHomeSubDivider()
-                        }.padding(.vertical,10)
+                        }
                     }
+                    
                 }
             }
         }.navigationBarBackButtonHidden()
@@ -90,6 +91,7 @@ struct DailyItemViewCell: View {
             
             Spacer()
         }
-        .padding(.horizontal,40)
+        .padding(.horizontal,20)
+        .padding()
     }
 }
