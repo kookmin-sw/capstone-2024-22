@@ -109,4 +109,13 @@ dependencies {
 
     // swipe 구현을 위한 라이
     implementation("androidx.compose.foundation:foundation:1.6.0-alpha04")
+
+    // coroutine 의존성
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+
+    // enable constraintlayout
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+
+    // AsyncImage
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }
