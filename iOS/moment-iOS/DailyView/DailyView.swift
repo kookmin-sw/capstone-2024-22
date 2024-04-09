@@ -9,8 +9,7 @@ import Foundation
 
 import SwiftUI
 import Foundation
-import SwiftUI
-import SwiftUI
+
 struct DailyView: View {
     @ObservedObject var viewModel = DailyItemViewModel() // 뷰 모델 인스턴스화
     @Environment(\.presentationMode) var presentationMode
