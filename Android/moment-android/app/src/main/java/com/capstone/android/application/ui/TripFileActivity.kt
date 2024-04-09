@@ -1,5 +1,6 @@
 package com.capstone.android.application.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -91,7 +92,7 @@ class TripFileActivity:ComponentActivity() {
             }
         }
     }
-    
+
     @Composable
     fun Main(){
         Column(
@@ -134,6 +135,7 @@ class TripFileActivity:ComponentActivity() {
                     itemContent = {index->
                         Column(
                             modifier = Modifier.clickable {
+                                startActivity(Intent(this@TripFileActivity,CardActivity::class.java))
                             } ,
                         ) {
                             Box(
@@ -207,7 +209,7 @@ class TripFileActivity:ComponentActivity() {
                 )
             }
         }
-        
+
     }
     
     @Preview
