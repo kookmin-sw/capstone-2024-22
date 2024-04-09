@@ -2,24 +2,36 @@ package com.capstone.android.application.ui.theme
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -81,29 +93,21 @@ fun BackButton_Onboarding(onClick : () -> Unit){
 }
 
 @Composable
-fun CheckButton(){
+fun CheckButton( isChecked : MutableState<Boolean>){
 
-    val isChecked = remember { mutableStateOf(false) }
 
-    Checkbox(
-        modifier = Modifier
-            .height(4.dp)
-            .width(4.dp),
-        checked = isChecked.value,
-        onCheckedChange = {
-            isChecked.value = it
-        },
-        colors = CheckboxDefaults.colors(
-            checkedColor = primary_500,
-            uncheckedColor = black
-        )
-    )
+
+    Column(modifier = Modifier.size(16.dp).clickable { isChecked.value = !isChecked.value }) {
+        Image(modifier = Modifier.fillMaxSize(),
+            painter = if(isChecked.value) painterResource(R.drawable.ic_checkbox_true)
+            else painterResource(id = R.drawable.ic_checkbox_false),
+            contentDescription = "check button")
+    }
 }
 
 @Preview(apiLevel = 33)
 @Composable
 fun btnPreview() {
     ApplicationTheme {
-        CheckButton()
     }
 }

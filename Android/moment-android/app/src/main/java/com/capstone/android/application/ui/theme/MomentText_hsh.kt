@@ -1,5 +1,6 @@
 package com.capstone.android.application.ui.theme
 
+
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -36,6 +37,43 @@ fun P_Medium11(content: String, color: Color){
 }
 
 @Composable
+fun P_Medium14(content: String, color: Color){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp)
+    )
+}
+
+@Composable
+fun P_Medium18(content: String, color: Color){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 18.sp)
+    )
+}
+
+@Composable
+fun P_ExtraBold16(content: String, color: Color){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 16.sp)
+    )
+}
+
+
+@Composable
 fun P_Bold30(content: String, color: Color, textAlign: TextAlign){
     Text(
         text = content,
@@ -45,6 +83,17 @@ fun P_Bold30(content: String, color: Color, textAlign: TextAlign){
             fontFamily = PretendardFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 30.sp)
+    )
+}
+@Composable
+fun YJ_Bold15(content: String, color: Color){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = FontMoment.obangFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = 15.sp)
     )
 }
 
@@ -58,6 +107,22 @@ fun HintText(content : String){
             fontFamily = PretendardFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 18.sp)
+    )
+}
+
+@Composable
+fun CountText(timeLeft: Long){
+
+    val min = (timeLeft / 1000) / 60
+    val sec = (timeLeft / 1000) % 60
+
+    Text(
+        text = String.format("%02d:%02d", min, sec),
+        style = TextStyle(
+            color = neutral_600,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 11.sp)
     )
 }
 
