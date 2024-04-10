@@ -5,15 +5,19 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +33,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,11 +40,10 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -50,6 +52,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,8 +61,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -75,22 +80,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.screen.BottomNavItem
 import com.capstone.android.application.ui.CardActivity
-import com.capstone.android.application.ui.OnboardingScreen
 import com.capstone.android.application.ui.PostTripActivity
 import com.capstone.android.application.ui.TripFileActivity
 import com.capstone.android.application.ui.theme.ApplicationTheme
-import com.capstone.android.application.ui.theme.CheckButton
 import com.capstone.android.application.ui.theme.FontMoment
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
 import com.capstone.android.application.ui.theme.P_Medium18
-import com.capstone.android.application.ui.theme.PretendardFamily
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
-import com.capstone.android.application.ui.theme.negative_600
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.primary_500
@@ -101,6 +105,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
+import java.io.File
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1052,8 +1057,448 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun Favorite(){
-        Box(contentAlignment = Alignment.Center) {
-            Text(text = "즐겨찾기")
+        var expanded = remember { mutableStateOf(true) }
+
+        val imageList = mutableStateListOf<File>()
+        val cardItems = mutableStateListOf<CardActivity.Card>()
+        val emotionList = mutableStateListOf<CardActivity.Emotion>()
+
+        cardItems.add(CardActivity.Card())
+        cardItems.add(CardActivity.Card())
+        cardItems.add(CardActivity.Card())
+
+        emotionList.add(
+            CardActivity.Emotion(
+                icon = R.drawable.ic_emotion_common,
+                text = "평범해요",
+                persent = "60%"
+            )
+        )
+        emotionList.add(
+            CardActivity.Emotion(
+                icon = R.drawable.ic_emotion_happy,
+                text = "즐거워요",
+                persent = "20%"
+            )
+        )
+        emotionList.add(
+            CardActivity.Emotion(
+                icon = R.drawable.ic_emotion_angry,
+                text = "화가나요",
+                persent = "15%"
+            )
+        )
+        emotionList.add(
+            CardActivity.Emotion(
+                icon = R.drawable.ic_emotion_sad,
+                text = "슬퍼요 ",
+                persent = "5%"
+            )
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable {
+                }
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+            ) {
+                Divider(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color("#706969".toColorInt()),
+                    thickness = 2.dp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 16.dp),
+                    text = "전라도의 선유도",
+                    textAlign = TextAlign.End,
+                    fontSize = 22.sp,
+                    fontFamily = FontMoment.preStandardFont,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Divider(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Color("#706969".toColorInt()),
+                    thickness = 2.dp
+                )
+            }
+
+
+
+            LazyColumn(
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+            ) {
+                items(cardItems.size) { index ->
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.Top,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .border(
+                                    border = BorderStroke(
+                                        width = 1.dp,
+                                        color = Color("#C3C8BC".toColorInt())
+                                    ), shape = RoundedCornerShape(4.dp)
+                                )
+                                .animateContentSize()
+                                .fillMaxWidth()
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) {
+                                    cardItems[index].isExpand.value = !cardItems[index].isExpand.value
+                                }
+
+                        ) {
+                            Spacer(modifier = Modifier.height(22.dp))
+                            Column() {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 24.dp)
+                                ) {
+                                    Image(
+                                        modifier = Modifier
+                                            .size(26.dp)
+                                            .clickable {
+                                                cardItems[index].isFavorite.value = !cardItems[index].isFavorite.value
+                                            }
+                                        ,
+                                        painter = painterResource(id = if(cardItems[index].isFavorite.value) R.drawable.ic_heart_red else R.drawable.ic_heart_white),
+                                        contentDescription = ""
+                                    )
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Text(
+                                        text = "ss",
+                                        fontFamily = FontMoment.preStandardFont,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 14.sp
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Row {
+                                        Text(
+                                            text = "_00${index + 1}",
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            fontSize = 14.sp
+                                        )
+                                        Spacer(modifier = Modifier.width(16.dp))
+                                        Image(
+                                            modifier = Modifier
+                                                .size(18.dp)
+                                                .padding(top = 6.dp),
+                                            painter = painterResource(id = R.drawable.ic_down),
+                                            contentDescription = ""
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(6.dp))
+
+                                Divider(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 12.dp)
+                                        .height(2.dp)
+                                        .background(color = Color("#706969".toColorInt()))
+                                )
+                            }
+
+
+                            if (cardItems[index].isExpand.value) {
+                                Spacer(modifier = Modifier.height(40.dp))
+                                Column {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 22.dp)
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_location_grey),
+                                            contentDescription = ""
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "wegwae",
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_weather_black),
+                                            contentDescription = ""
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "wegwae",
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 22.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_clock_grey),
+                                            contentDescription = ""
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "wegwae",
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Divider(
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .height(1.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "wegwae",
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(30.dp))
+
+//                                LinearDeterminateIndicator()
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 12.dp)
+                                            .background(
+                                                brush = Brush.verticalGradient(
+                                                    listOf(
+                                                        Color("#FBFAF7".toColorInt()),
+                                                        Color("#C3C8BC".toColorInt())
+                                                    )
+                                                ),
+                                                shape = RoundedCornerShape(4.dp)
+                                            )
+                                    ) {
+                                        FancyProgressBar(
+                                            Modifier
+                                                .height(12.dp)
+                                                .fillMaxWidth(),
+                                            onDragEnd = { finalProgress ->
+                                                Log.e(
+                                                    "finalProgress: ",
+                                                    "${
+                                                        String.format(
+                                                            "%.0f",
+                                                            (1 - finalProgress) * 100
+                                                        )
+                                                    }%"
+                                                )
+
+
+                                            }, onDrag = { progress ->
+                                                Log.d(
+                                                    "progress: ",
+                                                    "${
+                                                        String.format(
+                                                            "%.0f",
+                                                            (1 - progress) * 100
+                                                        )
+                                                    }%"
+                                                )
+                                            })
+                                        Spacer(modifier = Modifier.height(10.dp))
+                                        Column(
+                                            modifier = Modifier.padding(horizontal = 8.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.ic_record_start),
+                                                contentDescription = "seg"
+                                            )
+                                            Spacer(modifier = Modifier.height(10.dp))
+                                            Text(
+                                                text = "질문리스트가 있다면 여기에 먼저 띄워질거에요",
+                                                fontFamily = FontMoment.preStandardFont,
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 11.sp,
+                                                color = Color("#99342E".toColorInt())
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Text(
+                                                text = "분석된 글이 쓰여지는 공간입니다. 칸의 가로 넓이는 고정되어있습니다. 칸의 사이즈별 마진은 동일합니다. 즉 모바일 사이즈 마진에 맞춰 칸이 늘어나거나 줄어들며 글자 쓰는 공간도 칸에 따라 유동적으로 변경됩니다. 칸 안의 글자 양 옆 마진은 8이며 칸의 모바일 사이즈 마진은 큰 카드가 왼 20px, 오 20px이며 / 글이 쓰여지는 공간의 마진은 카드마진 기준으로 왼 24px, 오23px입니다. 좌우가 다른이유는 아이폰 미니의 화면비율이 홀수라서 그렇습니다. 은근히 신경쓰이네요 또, 가로글자수 제한은 있지만 세로로는 제한이없습니다. 카드의 길이가 무한정 길어질 수도 있다는 말이지요. 세로에도 제한을 두는 것이 좋을까요?",
+                                                fontFamily = FontMoment.preStandardFont,
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 12.sp
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Image(
+                                                painter = painterResource(id = R.drawable.ic_pencil),
+                                                contentDescription = "edit"
+                                            )
+                                            Spacer(modifier = Modifier.height(18.dp))
+                                        }
+
+                                    }
+                                    if (imageList.isNotEmpty()) {
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Divider(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 23.dp),
+                                            color = Color("#C3C1C1".toColorInt())
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                        LazyRow(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 30.dp),
+                                            horizontalArrangement = Arrangement.Start,
+                                            content = {
+                                                items(imageList.size) { index ->
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .size(72.dp)
+                                                            .padding(end = 8.dp)
+                                                    ) {
+                                                        AsyncImage(
+                                                            contentScale = ContentScale.Crop,
+                                                            modifier = Modifier
+                                                                .height(70.dp)
+                                                                .width(66.dp)
+                                                                .clip(RoundedCornerShape(6.dp)),
+                                                            model = ImageRequest.Builder(this@MainActivity)
+                                                                .data(imageList[index])
+                                                                .build(),
+                                                            contentDescription = "image"
+                                                        )
+
+                                                    }
+                                                }
+                                            })
+                                    }
+
+                                    Spacer(modifier = Modifier.height(30.dp))
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 24.dp)
+                                    ) {
+                                        Text(
+                                            text = "꽤나 즐거운 대화였네요",
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 11.sp
+                                        )
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        Text(
+                                            text = "꽤나 즐거운 대화였네요",
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Divider(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 11.dp),
+                                        color = Color("#706969".toColorInt())
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 24.dp)
+                                    ) {
+                                        emotionList.forEach { item ->
+                                            Row(
+                                                modifier = Modifier.height(20.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Image(
+                                                    modifier = Modifier.size(12.dp),
+                                                    painter = painterResource(id = item.icon),
+                                                    contentDescription = ""
+                                                )
+
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(
+                                                    text = item.text,
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontWeight = FontWeight.Medium,
+                                                    fontSize = 11.sp
+                                                )
+                                                Spacer(modifier = Modifier.width(26.dp))
+
+                                                LinearProgressIndicator(
+                                                    progress = { 0.4f }
+                                                )
+                                                Spacer(modifier = Modifier.width(36.dp))
+                                                Text(
+                                                    text = item.text,
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontWeight = FontWeight.Medium,
+                                                    fontSize = 11.sp
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                }
+                            } else {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 24.dp),
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    Text(
+                                        text = "꽤나 즐거운 대화였네요.",
+                                        fontSize = 12.sp,
+                                        color = Color("#938F8F".toColorInt()),
+                                        fontFamily = FontMoment.preStandardFont,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Spacer(modifier = Modifier.width(64.dp))
+                                    Text(
+                                        text = "해가 쨍쨍한 날",
+                                        fontSize = 12.sp,
+                                        color = Color("#938F8F".toColorInt()),
+                                        fontFamily = FontMoment.preStandardFont,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Image(
+                                        modifier = Modifier.size(18.dp),
+                                        painter = painterResource(id = R.drawable.ic_weather_grey),
+                                        contentDescription = ""
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
+
         }
     }
 
@@ -1247,7 +1692,8 @@ class MainActivity : ComponentActivity() {
 //            Home()
 //            ItemTrip()
 //            RecordDaily()
-            Setting()
+//            Setting()
+            Favorite()
         }
     }
 
