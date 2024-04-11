@@ -1,0 +1,12 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/core/trip/register' -i -X POST \
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    -H 'userId: 1' \
+    -H 'Accept: application/json' \
+    -d '{
+  "startDate" : "2024-04-11",
+  "endDate" : "2024-04-12",
+  "tripName" : "test"
+}'
+----

@@ -1,0 +1,8 @@
+[source,bash]
+----
+$ echo '{
+  "email" : "alexj99@naver.com",
+  "isSignUp" : "true"
+}' | http POST 'http://localhost:8080/auth/code' \
+    'Content-Type:application/json;charset=UTF-8'
+----

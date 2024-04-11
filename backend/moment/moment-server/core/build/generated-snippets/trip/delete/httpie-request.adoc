@@ -1,0 +1,7 @@
+[source,bash]
+----
+$ http DELETE 'http://localhost:8080/core/trip/1' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'userId:1' \
+    'Accept:application/json'
+----

@@ -1,0 +1,15 @@
+[source,http,options="nowrap"]
+----
+POST /core/trip/register HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+userId: 1
+Accept: application/json
+Content-Length: 83
+Host: localhost:8080
+
+{
+  "startDate" : "2024-04-11",
+  "endDate" : "2024-04-12",
+  "tripName" : "test"
+}
+----

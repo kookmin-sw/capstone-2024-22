@@ -1,0 +1,13 @@
+[source,http,options="nowrap"]
+----
+PATCH /auth/password HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+userId: 1
+Content-Length: 48
+Host: localhost:8080
+
+{
+  "code" : "1234",
+  "newPassword" : "12345"
+}
+----

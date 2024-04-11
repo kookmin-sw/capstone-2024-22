@@ -1,0 +1,8 @@
+.+/core/cardView/like/{cardViewId}+
+|===
+|Parameter|Description
+
+|`+cardViewId+`
+|카드뷰 ID
+
+|===

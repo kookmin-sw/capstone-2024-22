@@ -1,0 +1,28 @@
+[source,json,options="nowrap"]
+----
+{
+  "status" : 201,
+  "code" : "201",
+  "msg" : "INSERT SUCCESS",
+  "detailMsg" : "",
+  "data" : {
+    "tripFileId" : 1,
+    "recordedAt" : "2024-02-08T14:30:00",
+    "recordFileName" : "test.mp3",
+    "recordFileUrl" : "http://localhost:8080/",
+    "location" : "서울",
+    "recordFileLength" : 100,
+    "weather" : "맑음",
+    "temperature" : "20",
+    "stt" : "test",
+    "happy" : 0.1,
+    "sad" : 0.1,
+    "angry" : 0.1,
+    "neutral" : 0.1,
+    "question" : "질문",
+    "recordFileStatus" : "WAIT",
+    "id" : 1,
+    "loved" : true
+  }
+}
+----
