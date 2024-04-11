@@ -1,0 +1,8 @@
+.+/core/cardView/all/{tripFileId}+
+|===
+|Parameter|Description
+
+|`+tripFileId+`
+|여행 파일 ID
+
+|===

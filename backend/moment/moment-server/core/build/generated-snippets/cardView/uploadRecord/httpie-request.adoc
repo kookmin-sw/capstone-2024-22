@@ -1,0 +1,13 @@
+[source,bash]
+----
+$ http --multipart POST 'http://localhost:8080/core/cardView/upload' \
+    'userId:1' \
+    'recordFile'@'test.mp3' \
+    'uploadRecord'='{
+  "location": "서울",
+  "recordedAt": "2024-02-08T14:30:00",
+  "temperature": "20",
+  "weather": "맑음",
+  "question": "질문"
+}'
+----

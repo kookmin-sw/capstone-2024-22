@@ -1,0 +1,40 @@
+|===
+|Path|Type|Description
+
+|`+status+`
+|`+Number+`
+|응답 상태 코드
+
+|`+code+`
+|`+String+`
+|응답 코드
+
+|`+msg+`
+|`+String+`
+|응답 메시지
+
+|`+detailMsg+`
+|`+String+`
+|상세 메시지
+
+|`+data.tripFiles[].id+`
+|`+Number+`
+|파일 ID
+
+|`+data.tripFiles[].tripId+`
+|`+Number+`
+|여행 ID
+
+|`+data.tripFiles[].email+`
+|`+String+`
+|유저 email
+
+|`+data.tripFiles[].yearDate+`
+|`+String+`
+|연월일
+
+|`+data.tripFiles[].analyzingCount+`
+|`+Number+`
+|분석 중 파일 개수
+
+|===

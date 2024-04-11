@@ -1,0 +1,8 @@
+.+/core/tripfile/{tripId}+
+|===
+|Parameter|Description
+
+|`+tripId+`
+|여행 ID
+
+|===

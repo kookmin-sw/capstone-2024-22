@@ -1,0 +1,10 @@
+[source,json,options="nowrap"]
+----
+{
+  "status" : 201,
+  "code" : "201",
+  "msg" : "INSERT SUCCESS",
+  "detailMsg" : "",
+  "data" : { }
+}
+----

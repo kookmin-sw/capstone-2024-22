@@ -1,0 +1,6 @@
+[source,bash]
+----
+$ http PUT 'http://localhost:8080/core/cardView/like/1' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'userId:1'
+----

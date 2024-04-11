@@ -1,0 +1,19 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 229
+
+{
+  "status" : 200,
+  "code" : "200",
+  "msg" : "SELECT SUCCESS",
+  "detailMsg" : "",
+  "data" : {
+    "grantType" : "Bearer",
+    "accessToken" : "accessToken",
+    "refreshToken" : "refresh",
+    "role" : "ROLE_AUTH_USER"
+  }
+}
+----

@@ -1,0 +1,6 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/core/cardView/like/1' -i -X PUT \
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    -H 'userId: 1'
+----

@@ -1,0 +1,8 @@
+[source,json,options="nowrap"]
+----
+{
+  "startDate" : "2024-04-11",
+  "endDate" : "2024-04-12",
+  "tripName" : "test"
+}
+----

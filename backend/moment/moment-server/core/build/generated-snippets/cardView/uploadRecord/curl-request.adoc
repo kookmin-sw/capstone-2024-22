@@ -1,0 +1,14 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/core/cardView/upload' -i -X POST \
+    -H 'Content-Type: multipart/form-data;charset=UTF-8' \
+    -H 'userId: 1' \
+    -F 'recordFile=@test.mp3;type=audio/mp3' \
+    -F 'uploadRecord={
+  "location": "서울",
+  "recordedAt": "2024-02-08T14:30:00",
+  "temperature": "20",
+  "weather": "맑음",
+  "question": "질문"
+};type=application/json'
+----

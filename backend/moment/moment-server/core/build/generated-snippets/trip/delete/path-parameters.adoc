@@ -1,0 +1,8 @@
+.+/core/trip/{tripId}+
+|===
+|Parameter|Description
+
+|`+tripId+`
+|삭제할 여행 ID
+
+|===
