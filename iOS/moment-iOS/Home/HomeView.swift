@@ -25,6 +25,7 @@ struct HomeView: View {
     @ObservedObject var cardViewModel : CardViewModel
     @State private var showSlideOverCard = false
     
+    
     var body: some View {
        // NavigationView {
             ZStack {
@@ -46,9 +47,14 @@ struct HomeView: View {
                     
                     CustomHomeVDivider()
                     TabView(selection: $selectedSlideIndex) {
-                        Text("어디로 떠나면 좋을까요?")
-                            .font(.pretendardMedium14)
-                            .tag(0)
+                        
+                                   // "여행 종료"의 경우
+                                   Text("어디로 떠나면 좋을까요")
+                                       .font(.pretendardMedium14)
+                                       .foregroundColor(.gray600)
+                                       .tag(0)
+                               
+                           
                         NavigationLink(destination: DailyView()) {
                             Text("일상기록")
                                 .font(.pretendardMedium14)
@@ -118,6 +124,8 @@ struct ItemViewCell: View {
     @ObservedObject var cardViewModel : CardViewModel
     var body: some View {
         
+        
+        
         ZStack {
 
             if item.offset != 0 {
@@ -144,6 +152,7 @@ struct ItemViewCell: View {
                         
                         
                         VStack{
+                            
                             Text(item.startdate)
                                 .font(.pretendardMedium11)
                                 .foregroundColor(.black)

@@ -110,24 +110,29 @@ struct CustomTabField: View {
     @Binding var isCalendarVisible: Bool
     
     var body: some View {
-        Text(date != nil ? dateFormatter.string(from: date!) : title)
-            .font(.pretendardMedium16)
-            .padding(.vertical, 20) // 세로 방향으로 패딩 추가
-            .frame(width: 160) // 최대 너비 설정
-            .background(self.selectedTab == self.tag ? Color.white : Color.clear) // 탭이 선택되면 배경색을 흰색으로 변경
-            .foregroundColor(.black) // 글자색을 검정색으로 설정
-            .cornerRadius(5) // 배경색이 있을 때 모서리를 약간 둥글게
-            .onTapGesture {
-                        self.selectedTab = self.tag
-                        if self.tag == 0 { // 출발 날짜 태그가 선택된 경우
-                            self.isCalendarVisible = true
-                        }
+        Button(action: {
+                  self.selectedTab = self.tag
+                  self.isCalendarVisible.toggle()
+        }) {
+            Text(date != nil ? dateFormatter.string(from: date!) : title)
+                .font(.pretendardMedium16)
+                .padding(.vertical, 20) // 세로 방향으로 패딩 추가
+                .frame(width: 160) // 최대 너비 설정
+                .background(self.selectedTab == self.tag ? Color.white : Color.homeBack) // 탭이 선택되면 배경색을 흰색으로 변경
+                .foregroundColor(.black) // 글자색을 검정색으로 설정
+                .cornerRadius(5) // 배경색이 있을 때 모서리를 약간 둥글게
+                .onTapGesture {
+                    self.selectedTab = self.tag
+                    if self.tag == 0 { // 출발 날짜 태그가 선택된 경우
+                        self.isCalendarVisible = true
                     }
-            .overlay(
-                Rectangle()
-                    .frame(height: self.selectedTab == self.tag ? 0 : 1) // 선택된 탭에만 밑줄 표시
-                    .foregroundColor(.black), alignment: .bottom)
-        
+                }
+                .overlay(
+                    Rectangle().frame(height: 1)
+                        .foregroundColor(.black), // 항상 검은색 밑줄 표시
+                    alignment: .bottom
+                )
+        } .background(self.selectedTab == self.tag ? Color.white : Color.clear)
     }
 }
 

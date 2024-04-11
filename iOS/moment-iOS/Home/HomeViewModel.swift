@@ -21,14 +21,25 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
     @Published var showingDeleteAlert: Bool = false
     @Published var indexToDelete: Int? = nil
     
-    @Published var items = [
-        Item(name: "선유도여행", startdate: "2024. 03. 05", enddate: "2024. 03. 13"),
-        Item(name: "일본여행", startdate: "2024. 03. 07", enddate: "2024. 03. 19"),
-        Item(name: "뭐하기 여행", startdate: "2024. 03. 05", enddate: "2024. 03. 13"),
-        Item(name: "좋은여행", startdate: "2024. 03. 05", enddate: "2024. 03. 13")
+    @Published var items: [Item] = []
         
-        
-    ]
+        init() {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy. MM. dd"
+            
+            items = [
+                       Item(name: "선유도여행", startdate: "2024. 04. 11", enddate: "2024. 04. 13"),
+                       Item(name: "일본여행", startdate: "2024. 05. 15", enddate: "2024. 05. 19"),
+                       Item(name: "뭐하기 여행", startdate: "2024. 06. 05", enddate: "2024. 06. 13"),
+                       Item(name: "좋은여행", startdate: "2024. 07. 05", enddate: "2024. 10. 13")
+                   ]
+            self.todos = []
+            self.isEditTodoMode = false
+            self.removeTodos = []
+            self.isDisplayRemoveTodoAlert = false
+            self.tripName = ""
+            
+        }
     
     
     func getIndex(item: Item) -> Int {
@@ -81,55 +92,29 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
             showingDeleteAlert = false
         }
     }
-    
-    
 }
 
-extension HomeViewModel { //TodoListViewModel의 새로운 기능을 추가하는용도의 소스코드
-    
-    func selectedBoxTapped(_ todo: Todo) {
-        if let index = todos.firstIndex(where: { $0 == todo }) {
-            todos[index].selected.toggle()
-        }
-    }// 모르겠다 시발 ㅋㅋ
-    
-    func addTodo(_ todo: Todo) {
-        todos.append(todo)
-    } // todo 리스트에 투두를 하나 추가하는 함수인거임 append 를 사용한게 그 이유임 뷰에서 보여줄때는 어떠한 장치를 써야할듯 함
-    
-    func navigationRightBtnTapped() {
-        if isEditTodoMode {
-            if removeTodos.isEmpty { // isEmpty 들어가보니까 스트링타입이 같은지를 파악해서 없으면 반환하는 거네
-                isEditTodoMode = false // 제거할게없으면 편집모드가 불가능하니까 false 로 두고 그게아니면
+extension HomeViewModel {
+    // 가장 가까운 여행의 상태와 이름을 반환하는 함수
+    func tripStatusAndNameForToday() -> (status: String, name: String?) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy. MM. dd"
+        
+        let today = Date()
+        if let closestTrip = items.min(by: { abs(dateFormatter.date(from: $0.startdate)!.distance(to: today)) < abs(dateFormatter.date(from: $1.startdate)!.distance(to: today)) }) {
+            if let startdate = dateFormatter.date(from: closestTrip.startdate), let enddate = dateFormatter.date(from: closestTrip.enddate) {
+                if startdate > today {
+                    let daysRemaining = Calendar.current.dateComponents([.day], from: today, to: startdate).day ?? 0
+                    return ("\(daysRemaining)일 남음", closestTrip.name)
+                } else if enddate > today {
+                    let dayNumber = Calendar.current.dateComponents([.day], from: startdate, to: today).day ?? 0
+                    return ("여행 \(dayNumber)일차", closestTrip.name)
+                } else {
+                    return ("여행 종료", closestTrip.name)
+                }
             }
-            else {
-                setIsDisplayRemoveTodoAlert(true) // 그때는 보여주는 역할을 하네 그게 1
-            }
-        }else {
-            isEditTodoMode = true//3 그게또 아닐경우엔 무조건 투두를 만들어야하니까 이렇게 조건을 준듯
         }
+        return ("어디로 떠나면 좋을까요?", nil)
     }
-    
-    
-    func setIsDisplayRemoveTodoAlert(_ isDisplay: Bool) { // 여기에서 set 을 ㅗ보여주는 역할을 하고 2
-        isDisplayRemoveTodoAlert = isDisplay
-    }
-    
-    func todoRemoveSelectedBoxTapped(_ todo: Todo) {
-        if let index = removeTodos.firstIndex(of: todo) { // todo의 첫번째 요소를 찾아서 그인덱스를 추출해서 index에 넣고 그러면 여기서 문제가 생기는데 where 와 of 의 차이점을 알아보면 where 는 클로저가 존재하는가 를 일단 따지고 나서 그요소와 처음으로 같은인덱스를 가져오는거고 of 는 배열내에서 특정한 값과 동일한 요소를 찾을 때 사용하는거임
-            removeTodos.remove(at: index)}//at으로 특정index 에 접근해서 제거하는 루트로 가는거같다
-        else {
-            removeTodos.append(todo)// 그게 아니라면 즉, 인덱스를 찾지못했을때는 todo를 만들어버리는개념임
-        }
-    }
-    
-    func removeBtnTapped() {
-        todos.removeAll {
-            todo in
-            removeTodos.contains(todo)
-        }
-        removeTodos.removeAll()
-        isEditTodoMode = false
-    }
-    
 }
+
