@@ -386,7 +386,7 @@ struct ReceiptDetailView: View {
             // 나머지 카드 부분
             Rectangle()
                 .fill(Color.Secondary50)
-                .frame(height: 450)
+                .frame(height: 603)
                 .overlay(
                     VStack{
                         Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이 ")
@@ -431,10 +431,12 @@ struct ReceiptDetailView: View {
                         
                         Image("cut")
                         
+                        StatsView()
+                        Spacer()
                     }
                 )
         }
-        .frame(width: 340, height: 500)
+        .frame(width: 335, height: 653)
         
         .cornerRadius(5) // 모서리를 둥글게 처리합니다.
         .overlay(
@@ -445,5 +447,59 @@ struct ReceiptDetailView: View {
 }
 
 
-
-
+struct StatsView: View {
+    var body: some View {
+      
+        HStack(spacing:20) {
+                VStack(spacing: 10) {
+                    Text("여행 카드")
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.gray500)
+                        .multilineTextAlignment(.center)
+                    Text("27")
+                        .font(.pretendardExtrabold14)
+                        .foregroundColor(.homeRed)
+                        .multilineTextAlignment(.center)
+                    
+                    Text("여행 날짜")
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.gray500)
+                        .multilineTextAlignment(.center)
+                    Text("2024. 03. 05")
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.homeRed)
+                        .multilineTextAlignment(.center)
+                    Text("2024. 03. 13")
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.homeRed)
+                        .multilineTextAlignment(.center)
+                }
+               
+                VStack(alignment: .leading) {
+                    Text("여행 감정")
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.gray500)
+                        .padding(.vertical,10)
+                        
+                    ProgressView(value: 0.6).frame(width: 109,height: 15)
+                        .cornerRadius(3)
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                    ProgressView(value: 0.6).frame(width: 109,height: 15)
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                    
+                    ProgressView(value: 0.6).frame(width: 109,height: 15)
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .cornerRadius(3)
+                    ProgressView(value: 0.6).frame(width: 109,height: 15)
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .cornerRadius(3)
+                }
+                
+            }
+            
+          
+        
+     
+      
+    }
+}
