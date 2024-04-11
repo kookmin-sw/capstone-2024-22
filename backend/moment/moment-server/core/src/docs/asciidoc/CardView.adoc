@@ -1,0 +1,24 @@
+== CardView
+:doctype: book
+:source-highlighter: highlightjs
+:sectlinks:
+:toc: left
+:toclevels: 3
+=== 녹음본 업로드
+operation::cardView/uploadRecord[snippets="http-request,request-headers,request-part-uploadRecord-fields,http-response,response-fields"]
+
+=== 카드뷰 삭제
+operation::cardView/deleteRecord[snippets="http-request,request-headers,path-parameters,http-response,response-fields"]
+
+=== 여행파일ID로 카드뷰 전체 조회
+operation::cardView/getAllCardView[snippets="http-request,request-headers,http-response,response-fields"]
+
+=== 카드뷰 수정
+operation::cardView/updateRecord[snippets="http-request,request-headers,path-parameters,request-body,request-fields,http-response,response-fields"]
+
+=== 카드뷰 좋아요 누르기
+operation::cardView/likeCardView[snippets="http-request,request-headers,path-parameters,http-response,response-fields"]
+
+=== 좋아요 상태의 카드뷰 조회
+operation::cardView/getLikeCardView[snippets="http-request,request-headers,http-response,response-fields"]
+
