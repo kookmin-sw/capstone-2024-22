@@ -34,9 +34,6 @@
 		8E5CAE582B970DE600A483B4 /* SelectDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE572B970DE600A483B4 /* SelectDayView.swift */; };
 		8E5CAE5A2B970DF600A483B4 /* BillListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE592B970DF600A483B4 /* BillListViewModel.swift */; };
 		8E5CAE5C2B970E0400A483B4 /* BillListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE5B2B970E0400A483B4 /* BillListView.swift */; };
-		8E5CAE5E2B970E1800A483B4 /* Memo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE5D2B970E1800A483B4 /* Memo.swift */; };
-		8E5CAE602B970E2800A483B4 /* MemoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE5F2B970E2800A483B4 /* MemoViewModel.swift */; };
-		8E5CAE622B970E4300A483B4 /* MemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE612B970E4300A483B4 /* MemoView.swift */; };
 		8E5CAE642B970E5B00A483B4 /* Double+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE632B970E5B00A483B4 /* Double+Extensions.swift */; };
 		8E5CAE662B970E6B00A483B4 /* VoiceRecorderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE652B970E6B00A483B4 /* VoiceRecorderViewModel.swift */; };
 		8E5CAE682B970E8700A483B4 /* VoiceRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE672B970E8700A483B4 /* VoiceRecorderView.swift */; };
@@ -144,9 +141,6 @@
 		8E5CAE572B970DE600A483B4 /* SelectDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectDayView.swift; sourceTree = "<group>"; };
 		8E5CAE592B970DF600A483B4 /* BillListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillListViewModel.swift; sourceTree = "<group>"; };
 		8E5CAE5B2B970E0400A483B4 /* BillListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillListView.swift; sourceTree = "<group>"; };
-		8E5CAE5D2B970E1800A483B4 /* Memo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Memo.swift; sourceTree = "<group>"; };
-		8E5CAE5F2B970E2800A483B4 /* MemoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoViewModel.swift; sourceTree = "<group>"; };
-		8E5CAE612B970E4300A483B4 /* MemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoView.swift; sourceTree = "<group>"; };
 		8E5CAE632B970E5B00A483B4 /* Double+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Extensions.swift"; sourceTree = "<group>"; };
 		8E5CAE652B970E6B00A483B4 /* VoiceRecorderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceRecorderViewModel.swift; sourceTree = "<group>"; };
 		8E5CAE672B970E8700A483B4 /* VoiceRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceRecorderView.swift; sourceTree = "<group>"; };
@@ -253,9 +247,6 @@
 				8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */,
 				8E5CAE632B970E5B00A483B4 /* Double+Extensions.swift */,
 				8E5CAE692B970E9900A483B4 /* Int-Extensions.swift */,
-				8E5CAE5F2B970E2800A483B4 /* MemoViewModel.swift */,
-				8E5CAE612B970E4300A483B4 /* MemoView.swift */,
-				8E5CAE5D2B970E1800A483B4 /* Memo.swift */,
 				8E5CAE492B970D3B00A483B4 /* CustomNavigationBar.swift */,
 				8E5CAE4B2B970D4F00A483B4 /* NavigationBtnType.swift */,
 				8E5CAE4D2B970D5D00A483B4 /* Todo.swift */,
@@ -653,13 +644,10 @@
 				8E8C174F2BA97B4500BF1E1C /* AuthNumView.swift in Sources */,
 				8E5CAE702B970ED700A483B4 /* NotificationService.swift in Sources */,
 				8E5CAE442B970CFF00A483B4 /* HomeBaseViewModel.swift in Sources */,
-				8E5CAE602B970E2800A483B4 /* MemoViewModel.swift in Sources */,
 				8E5CAE642B970E5B00A483B4 /* Double+Extensions.swift in Sources */,
 				8E2D273B2BA57DE7006248EA /* FSCalendarWrapper.swift in Sources */,
 				8E5CAE402B970CD800A483B4 /* PathModel.swift in Sources */,
-				8E5CAE622B970E4300A483B4 /* MemoView.swift in Sources */,
 				8E5CAE6E2B970EC600A483B4 /* LikeView.swift in Sources */,
-				8E5CAE5E2B970E1800A483B4 /* Memo.swift in Sources */,
 				8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */,
 				8E5CAE502B970D6B00A483B4 /* HomeViewModel.swift in Sources */,
 				8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */,

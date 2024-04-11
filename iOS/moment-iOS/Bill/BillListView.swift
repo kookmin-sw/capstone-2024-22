@@ -13,6 +13,7 @@ struct BillListView: View {
     @EnvironmentObject private var pathModel: PathModel
     @EnvironmentObject private var billListViewModel : BillListViewModel
     @EnvironmentObject private var homeBaseViewModel : HomeBaseViewModel
+    @EnvironmentObject var homeViewModel: HomeViewModel
     
     
     var body: some View {
@@ -249,46 +250,72 @@ struct StatsCardView: View {
     }
 }
 
-
 struct ReceiptsView: View {
+    @EnvironmentObject var homeViewModel: HomeViewModel // HomeViewModel 인스턴스
+    
     var body: some View {
         NavigationView {
-            VStack {
-                // 테두리만 있는 사각형 안의 텍스트
-                NavigationLink(destination: ReceiptDetailView()) {
-                    Text("여행1")
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 2))
-                        .foregroundColor(.black)
+            List {
+                ForEach(homeViewModel.items) { item in
+                    NavigationLink(destination: ReceiptDetailView(item: item)) {
+                        ReceiptCell(item: item)
+                    }
+                    .padding(.vertical, 5)
                 }
-                .padding() // 네비게이션 링크에 패딩을 적용
+               
             }
             .navigationBarTitle("영수증", displayMode: .inline)
         }
     }
 }
 
-struct ReceiptDetailView: View {
+struct ReceiptCell: View {
+    let item: Item
+
     var body: some View {
-        Rectangle()
-            .fill(Color.gray)
-            .frame(height: 500)
-            .overlay(
-                Image(systemName: "pencil.tip")
-                    .font(.largeTitle)
-                    .foregroundColor(.customGray2)
-            )
-            .cornerRadius(10)
-            .navigationBarTitle("영수증 상세", displayMode: .inline)
+        HStack {
+            VStack(alignment: .leading) {
+                Text(item.name)
+                    .font(.headline)
+                Text("시작: \(item.startdate)")
+                    .font(.subheadline)
+                Text("종료: \(item.enddate)")
+                    .font(.subheadline)
+            }
+            Spacer()
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(RoundedRectangle(cornerRadius: 10).stroke(Color.blue, lineWidth: 2))
+        .foregroundColor(.black)
     }
 }
 
+// ReceiptDetailView 정의
+struct ReceiptDetailView: View {
+    let item: Item
 
-
-
-#Preview {
-    BillListView()
-        .environmentObject(PathModel())
-        .environmentObject(BillListViewModel())
+    var body: some View {
+        Text("상세 정보: \(item.name)")
+            .navigationBarTitle(Text(item.name), displayMode: .inline)
+    }
 }
+
+//
+//struct ReceiptDetailView: View {
+//    var body: some View {
+//        Rectangle()
+//            .fill(Color.gray)
+//            .frame(height: 500)
+//            .overlay(
+//                Image(systemName: "pencil.tip")
+//                    .font(.largeTitle)
+//                    .foregroundColor(.customGray2)
+//            )
+//            .cornerRadius(10)
+//            .navigationBarTitle("영수증 상세", displayMode: .inline)
+//    }
+//}
+
+
+

@@ -32,6 +32,7 @@ struct HomeBaseView: View {
     @ObservedObject var cardViewModel : CardViewModel
     @State private var showingCustomAlertInSetting = false
     @State private var showDialogGoodbyeAlert = false
+    @StateObject private var homeViewModel = HomeViewModel()
     
     
     var body: some View {
@@ -47,6 +48,7 @@ struct HomeBaseView: View {
                         HomeView(showingCustomAlert: $showingCustomAlertInHome, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
                     case .Bill:
                         BillListView()
+                            .environmentObject(homeViewModel)
                     case .voiceRecorder:
                         VoiceRecorderView()
                     case .Like:
