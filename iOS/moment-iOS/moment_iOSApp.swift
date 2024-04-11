@@ -17,7 +17,7 @@ struct moment_iOSApp: App {
    // AppDelegate 클래스의 인스턴스를 appDelegate 라는 이름으로 만들어 SwiftUI 생명주기와 함께 동작하도록 하는거구만여
     var body: some Scene {
         WindowGroup {// 여기서 앱메인 뷰를 그리고
-            OnboardingView() // 이게 어떤 뷰부터 시작할지를 정해주는거구만 ..
+            OnboardingView() // 이게 어떤 뷰부터 시작할지를 정해주는거구만
                 .environmentObject(homeViewModel)
             
         }
