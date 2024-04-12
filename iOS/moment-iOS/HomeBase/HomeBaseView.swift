@@ -32,6 +32,7 @@ struct HomeBaseView: View {
     @ObservedObject var cardViewModel : CardViewModel
     @State private var showingCustomAlertInSetting = false
     @State private var showDialogGoodbyeAlert = false
+    @StateObject private var homeViewModel = HomeViewModel()
     
     
     var body: some View {
@@ -47,6 +48,7 @@ struct HomeBaseView: View {
                         HomeView(showingCustomAlert: $showingCustomAlertInHome, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
                     case .Bill:
                         BillListView()
+                            .environmentObject(homeViewModel)
                     case .voiceRecorder:
                         VoiceRecorderView()
                     case .Like:
@@ -224,10 +226,14 @@ struct BottomSheetView1: View {
                     }
                     .onAppear {
                         timerRunning = true
+                        audioRecorderManager.startRecording()
+                        timeElapsed = 0
                     }
                     .onDisappear {
+                        audioRecorderManager.stopRecording()
                         timerRunning = false
                         timeElapsed = 0
+                        
                     }
                 
                 // 추가 텍스트
@@ -262,10 +268,11 @@ struct BottomSheetView1: View {
                         audioRecorderManager.isRecording
                         ? audioRecorderManager.stopRecording()
                         : audioRecorderManager.startRecording()
+                        timeElapsed = 0
                         
                         
                     }) {
-                        Image(systemName: audioRecorderManager.isRecording ? "stop.fill" : "record.circle")
+                        Image(systemName: audioRecorderManager.isRecording ? "record.circle" : "stop.fill")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 50, height: 50)
@@ -301,7 +308,7 @@ struct BottomSheetView1: View {
                         .padding(.leading, 20)
                     }
                 }
-                .padding()
+                .padding(.bottom,100)
                 
                 //TODO: - 저장파일 확인용
                 

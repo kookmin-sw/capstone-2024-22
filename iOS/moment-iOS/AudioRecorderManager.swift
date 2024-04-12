@@ -25,6 +25,7 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
 
 // MARK: - 음성메모 녹음 관련 메서드
 extension AudioRecorderManager {
+    
   func startRecording() {
     let fileURL = getDocumentsDirectory().appendingPathComponent("recording-\(Date().timeIntervalSince1970).m4a")
     let settings = [

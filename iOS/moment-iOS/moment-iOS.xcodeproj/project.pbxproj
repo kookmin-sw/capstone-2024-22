@@ -34,9 +34,6 @@
 		8E5CAE582B970DE600A483B4 /* SelectDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE572B970DE600A483B4 /* SelectDayView.swift */; };
 		8E5CAE5A2B970DF600A483B4 /* BillListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE592B970DF600A483B4 /* BillListViewModel.swift */; };
 		8E5CAE5C2B970E0400A483B4 /* BillListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE5B2B970E0400A483B4 /* BillListView.swift */; };
-		8E5CAE5E2B970E1800A483B4 /* Memo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE5D2B970E1800A483B4 /* Memo.swift */; };
-		8E5CAE602B970E2800A483B4 /* MemoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE5F2B970E2800A483B4 /* MemoViewModel.swift */; };
-		8E5CAE622B970E4300A483B4 /* MemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE612B970E4300A483B4 /* MemoView.swift */; };
 		8E5CAE642B970E5B00A483B4 /* Double+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE632B970E5B00A483B4 /* Double+Extensions.swift */; };
 		8E5CAE662B970E6B00A483B4 /* VoiceRecorderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE652B970E6B00A483B4 /* VoiceRecorderViewModel.swift */; };
 		8E5CAE682B970E8700A483B4 /* VoiceRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE672B970E8700A483B4 /* VoiceRecorderView.swift */; };
@@ -57,6 +54,10 @@
 		8E8C17562BAAC8F000BF1E1C /* AuthComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17552BAAC8F000BF1E1C /* AuthComplete.swift */; };
 		8E8C17CA2BABF1A800BF1E1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */; };
 		8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C18052BAC379700BF1E1C /* SwipeItem.swift */; };
+		8E970E172BC3E070003476C4 /* DailyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E162BC3E070003476C4 /* DailyView.swift */; };
+		8E970E192BC3E079003476C4 /* DailyViewmodel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E182BC3E079003476C4 /* DailyViewmodel.swift */; };
+		8E970E1B2BC3E865003476C4 /* DailyCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E1A2BC3E865003476C4 /* DailyCardViewModel.swift */; };
+		8E970E1D2BC405C7003476C4 /* DailyCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E1C2BC405C7003476C4 /* DailyCardView.swift */; };
 		8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA922BAD6B3200C39125 /* PasswordView.swift */; };
 		8ECCFA982BAFE3BD00C39125 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */; };
 		8ECCFADF2BB066D600C39125 /* FloatingToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */; };
@@ -140,9 +141,6 @@
 		8E5CAE572B970DE600A483B4 /* SelectDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectDayView.swift; sourceTree = "<group>"; };
 		8E5CAE592B970DF600A483B4 /* BillListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillListViewModel.swift; sourceTree = "<group>"; };
 		8E5CAE5B2B970E0400A483B4 /* BillListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillListView.swift; sourceTree = "<group>"; };
-		8E5CAE5D2B970E1800A483B4 /* Memo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Memo.swift; sourceTree = "<group>"; };
-		8E5CAE5F2B970E2800A483B4 /* MemoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoViewModel.swift; sourceTree = "<group>"; };
-		8E5CAE612B970E4300A483B4 /* MemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoView.swift; sourceTree = "<group>"; };
 		8E5CAE632B970E5B00A483B4 /* Double+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Extensions.swift"; sourceTree = "<group>"; };
 		8E5CAE652B970E6B00A483B4 /* VoiceRecorderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceRecorderViewModel.swift; sourceTree = "<group>"; };
 		8E5CAE672B970E8700A483B4 /* VoiceRecorderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceRecorderView.swift; sourceTree = "<group>"; };
@@ -161,6 +159,10 @@
 		8E8C17552BAAC8F000BF1E1C /* AuthComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthComplete.swift; sourceTree = "<group>"; };
 		8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8E8C18052BAC379700BF1E1C /* SwipeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeItem.swift; sourceTree = "<group>"; };
+		8E970E162BC3E070003476C4 /* DailyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyView.swift; sourceTree = "<group>"; };
+		8E970E182BC3E079003476C4 /* DailyViewmodel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyViewmodel.swift; sourceTree = "<group>"; };
+		8E970E1A2BC3E865003476C4 /* DailyCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCardViewModel.swift; sourceTree = "<group>"; };
+		8E970E1C2BC405C7003476C4 /* DailyCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCardView.swift; sourceTree = "<group>"; };
 		8ECCFA922BAD6B3200C39125 /* PasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordView.swift; sourceTree = "<group>"; };
 		8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
 		8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingToastView.swift; sourceTree = "<group>"; };
@@ -218,6 +220,7 @@
 				8ECCFBD42BB93AEC00C39125 /* moment-iOS-Info.plist */,
 				8ECCFBB52BB93A4800C39125 /* Font */,
 				8ECCFBB12BB804B900C39125 /* ImagePicker.swift */,
+				8E970E152BC3E05B003476C4 /* DailyView */,
 				8ECCFA992BAFE4A300C39125 /* VoiceRecorder_EX */,
 				8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */,
 				8E15C8702B6527E3001468C7 /* moment_iOSApp.swift */,
@@ -244,9 +247,6 @@
 				8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */,
 				8E5CAE632B970E5B00A483B4 /* Double+Extensions.swift */,
 				8E5CAE692B970E9900A483B4 /* Int-Extensions.swift */,
-				8E5CAE5F2B970E2800A483B4 /* MemoViewModel.swift */,
-				8E5CAE612B970E4300A483B4 /* MemoView.swift */,
-				8E5CAE5D2B970E1800A483B4 /* Memo.swift */,
 				8E5CAE492B970D3B00A483B4 /* CustomNavigationBar.swift */,
 				8E5CAE4B2B970D4F00A483B4 /* NavigationBtnType.swift */,
 				8E5CAE4D2B970D5D00A483B4 /* Todo.swift */,
@@ -369,6 +369,17 @@
 				8E8C17512BAAB65700BF1E1C /* CustomToolTip.swift */,
 			);
 			path = ToolTip;
+			sourceTree = "<group>";
+		};
+		8E970E152BC3E05B003476C4 /* DailyView */ = {
+			isa = PBXGroup;
+			children = (
+				8E970E162BC3E070003476C4 /* DailyView.swift */,
+				8E970E182BC3E079003476C4 /* DailyViewmodel.swift */,
+				8E970E1A2BC3E865003476C4 /* DailyCardViewModel.swift */,
+				8E970E1C2BC405C7003476C4 /* DailyCardView.swift */,
+			);
+			path = DailyView;
 			sourceTree = "<group>";
 		};
 		8ECCFA912BAD6B2200C39125 /* PasswordView */ = {
@@ -626,25 +637,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8E970E192BC3E079003476C4 /* DailyViewmodel.swift in Sources */,
 				8ECCFB612BB29D9100C39125 /* PasswordfindView.swift in Sources */,
 				8E5CAE3E2B970CCA00A483B4 /* PathType.swift in Sources */,
 				8ECCFADF2BB066D600C39125 /* FloatingToastView.swift in Sources */,
 				8E8C174F2BA97B4500BF1E1C /* AuthNumView.swift in Sources */,
 				8E5CAE702B970ED700A483B4 /* NotificationService.swift in Sources */,
 				8E5CAE442B970CFF00A483B4 /* HomeBaseViewModel.swift in Sources */,
-				8E5CAE602B970E2800A483B4 /* MemoViewModel.swift in Sources */,
 				8E5CAE642B970E5B00A483B4 /* Double+Extensions.swift in Sources */,
 				8E2D273B2BA57DE7006248EA /* FSCalendarWrapper.swift in Sources */,
 				8E5CAE402B970CD800A483B4 /* PathModel.swift in Sources */,
-				8E5CAE622B970E4300A483B4 /* MemoView.swift in Sources */,
 				8E5CAE6E2B970EC600A483B4 /* LikeView.swift in Sources */,
-				8E5CAE5E2B970E1800A483B4 /* Memo.swift in Sources */,
 				8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */,
 				8E5CAE502B970D6B00A483B4 /* HomeViewModel.swift in Sources */,
 				8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */,
 				8E5CAE482B970D2700A483B4 /* Date+Extensions.swift in Sources */,
 				8E5CAE462B970D1000A483B4 /* Tab.swift in Sources */,
 				8E5CAE682B970E8700A483B4 /* VoiceRecorderView.swift in Sources */,
+				8E970E1B2BC3E865003476C4 /* DailyCardViewModel.swift in Sources */,
 				8E8C17542BAAC59400BF1E1C /* AddUser.swift in Sources */,
 				8E5CAE5C2B970E0400A483B4 /* BillListView.swift in Sources */,
 				8E5CAE4C2B970D4F00A483B4 /* NavigationBtnType.swift in Sources */,
@@ -662,6 +672,7 @@
 				8E5CAE382B970C5600A483B4 /* OnboardingContent.swift in Sources */,
 				8E5CAE4E2B970D5D00A483B4 /* Todo.swift in Sources */,
 				8E7FB8FE2BA1E66200F05045 /* CustomDevider.swift in Sources */,
+				8E970E172BC3E070003476C4 /* DailyView.swift in Sources */,
 				8E15C8732B6527E3001468C7 /* ContentView.swift in Sources */,
 				8E5CAE522B970DB600A483B4 /* HomeView.swift in Sources */,
 				8E8C17562BAAC8F000BF1E1C /* AuthComplete.swift in Sources */,
@@ -677,6 +688,7 @@
 				8ECCFB632BB29FC000C39125 /* PasswordinsertView.swift in Sources */,
 				8E5CAE6C2B970EAE00A483B4 /* LikeViewModel.swift in Sources */,
 				8E5CAE722B970EE700A483B4 /* AppDelegate.swift in Sources */,
+				8E970E1D2BC405C7003476C4 /* DailyCardView.swift in Sources */,
 				8ECCFBB22BB804B900C39125 /* ImagePicker.swift in Sources */,
 				8E5CAE3C2B970CB300A483B4 /* OnboardingView.swift in Sources */,
 			);

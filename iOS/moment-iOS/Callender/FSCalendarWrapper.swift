@@ -36,6 +36,10 @@ struct SwiftUIFSCalendarWrapper: UIViewRepresentable {
         calendar.backgroundColor = .white
         calendar.appearance.todayColor = .white
         calendar.appearance.selectionColor = .homeRed1
+        calendar.appearance.titleDefaultColor = .black // 기본 날짜 글씨 색상 변경
+            calendar.appearance.titleWeekendColor = .gray // 주말 날짜 글씨 색상 변경
+            calendar.appearance.headerTitleColor = .gray // 헤더의 월 글씨 색상 변경
+            calendar.appearance.weekdayTextColor = .gray // 주중의 요일 글씨 색상 변경
         calendar.appearance.borderRadius = 0.3 // 선택된 날짜의 모서리를 약간 둥글게 설정
 
         return calendar
@@ -63,7 +67,9 @@ struct SwiftUIFSCalendarWrapper: UIViewRepresentable {
                     wrapper.startDate = nil // 도착 날짜가 출발 날짜보다 앞이면 출발 날짜 초기화
                 }
             }
+            
         }
+        
 
     }
 }
