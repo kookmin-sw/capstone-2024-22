@@ -1,0 +1,14 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 102
+
+{
+  "status" : 201,
+  "code" : "201",
+  "msg" : "INSERT SUCCESS",
+  "detailMsg" : "",
+  "data" : { }
+}
+----

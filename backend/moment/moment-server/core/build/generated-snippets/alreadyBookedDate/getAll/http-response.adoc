@@ -1,0 +1,20 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 211
+
+{
+  "status" : 200,
+  "code" : "200",
+  "msg" : "SELECT SUCCESS",
+  "detailMsg" : "",
+  "data" : {
+    "cardViews" : [ {
+      "bookedDate" : "2024-04-11"
+    }, {
+      "bookedDate" : "2023-10-10"
+    } ]
+  }
+}
+----

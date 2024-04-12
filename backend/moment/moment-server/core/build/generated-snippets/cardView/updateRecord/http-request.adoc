@@ -1,0 +1,16 @@
+[source,http,options="nowrap"]
+----
+PUT /core/cardView/1 HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+userId: 1
+Content-Length: 118
+Host: localhost:8080
+
+{
+  "location" : "서울",
+  "weather" : "맑음",
+  "temperature" : "20",
+  "question" : "질문",
+  "stt" : "test"
+}
+----

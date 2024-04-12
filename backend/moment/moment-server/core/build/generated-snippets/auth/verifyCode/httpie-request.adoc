@@ -1,0 +1,8 @@
+[source,bash]
+----
+$ echo '{
+  "code" : "1234"
+}' | http PATCH 'http://localhost:8080/auth/verify' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'userId:1'
+----

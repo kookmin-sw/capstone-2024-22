@@ -1,0 +1,6 @@
+[source,json,options="nowrap"]
+----
+{
+  "code" : "1234"
+}
+----

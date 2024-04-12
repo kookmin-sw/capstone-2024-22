@@ -1,0 +1,33 @@
+[source,json,options="nowrap"]
+----
+{
+  "status" : 200,
+  "code" : "200",
+  "msg" : "SELECT SUCCESS",
+  "detailMsg" : "",
+  "data" : {
+    "trips" : [ {
+      "id" : 1,
+      "email" : "test",
+      "startDate" : "2024-04-11",
+      "endDate" : "2024-04-12",
+      "analyzingCount" : 0,
+      "tripName" : "test"
+    }, {
+      "id" : 2,
+      "email" : "test",
+      "startDate" : "2024-04-11",
+      "endDate" : "2024-04-12",
+      "analyzingCount" : 1,
+      "tripName" : "test"
+    }, {
+      "id" : 3,
+      "email" : "test",
+      "startDate" : "2024-04-11",
+      "endDate" : "2024-04-12",
+      "analyzingCount" : 2,
+      "tripName" : "test"
+    } ]
+  }
+}
+----

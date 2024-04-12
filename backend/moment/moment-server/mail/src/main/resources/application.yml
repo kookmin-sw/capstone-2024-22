@@ -1,5 +1,5 @@
 server:
-  port: 8088
+  port: 8082
 
 spring:
 #  config:
@@ -17,7 +17,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-#      defaultZone: http://host.docker.internal:8761/eureka
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://wasuphj.synology.me:8761/eureka
+#      defaultZone: http://localhost:8761/eureka
 #  instance:
 #    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}

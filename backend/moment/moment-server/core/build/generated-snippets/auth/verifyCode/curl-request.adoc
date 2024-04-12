@@ -1,0 +1,9 @@
+[source,bash]
+----
+$ curl 'http://localhost:8080/auth/verify' -i -X PATCH \
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    -H 'userId: 1' \
+    -d '{
+  "code" : "1234"
+}'
+----

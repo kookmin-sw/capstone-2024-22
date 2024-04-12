@@ -1,0 +1,15 @@
+[source,json,options="nowrap"]
+----
+{
+  "status" : 200,
+  "code" : "200",
+  "msg" : "SELECT SUCCESS",
+  "detailMsg" : "",
+  "data" : {
+    "grantType" : "Bearer",
+    "accessToken" : "accessToken",
+    "refreshToken" : "refresh",
+    "role" : "ROLE_AUTH_USER"
+  }
+}
+----

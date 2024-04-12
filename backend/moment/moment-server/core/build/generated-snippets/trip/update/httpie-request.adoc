@@ -1,0 +1,12 @@
+[source,bash]
+----
+$ echo '{
+  "tripId" : 1,
+  "startDate" : "2024-04-11",
+  "endDate" : "2024-04-12",
+  "tripName" : "test"
+}' | http PUT 'http://localhost:8080/core/trip' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'userId:1' \
+    'Accept:application/json'
+----

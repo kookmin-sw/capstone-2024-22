@@ -1,0 +1,9 @@
+== AlreadyBookedDate
+:doctype: book
+:source-highlighter: highlightjs
+:sectlinks:
+:toc: left
+:toclevels: 3
+=== 예약일 전부 조회
+
+operation::alreadyBookedDate/getAll[snippets="http-request,request-headers,http-response,response-fields"]

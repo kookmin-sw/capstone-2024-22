@@ -1,0 +1,11 @@
+[source,bash]
+----
+$ echo '{
+  "startDate" : "2024-04-11",
+  "endDate" : "2024-04-12",
+  "tripName" : "test"
+}' | http POST 'http://localhost:8080/core/trip/register' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'userId:1' \
+    'Accept:application/json'
+----

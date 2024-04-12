@@ -1,0 +1,36 @@
+|===
+|Path|Type|Description
+
+|`+status+`
+|`+Number+`
+|응답 상태 코드
+
+|`+code+`
+|`+String+`
+|응답 코드
+
+|`+msg+`
+|`+String+`
+|응답 메시지
+
+|`+detailMsg+`
+|`+String+`
+|상세 메시지
+
+|`+data.grantType+`
+|`+String+`
+|토큰 타입
+
+|`+data.accessToken+`
+|`+String+`
+|액세스 토큰
+
+|`+data.refreshToken+`
+|`+String+`
+|리프레시 토큰
+
+|`+data.role+`
+|`+String+`
+|사용자 권한
+
+|===
