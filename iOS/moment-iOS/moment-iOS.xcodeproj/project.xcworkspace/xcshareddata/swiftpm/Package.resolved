@@ -1,6 +1,15 @@
 {
-  "originHash" : "d650b51fe5c68247e24da43058569afdda3b45c0e5694da60f1c73cf9f8cf93c",
+  "originHash" : "fdc712433985a4defd65db632ae70193c4c4d78cd46884edffd91e3ba3b93b40",
   "pins" : [
+    {
+      "identity" : "alamofire",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Alamofire/Alamofire.git",
+      "state" : {
+        "revision" : "f455c2975872ccd2d9c81594c658af65716e9b9a",
+        "version" : "5.9.1"
+      }
+    },
     {
       "identity" : "fscalendar",
       "kind" : "remoteSourceControl",
@@ -17,15 +26,6 @@
       "state" : {
         "revision" : "8c85ff09d474dd3cfb69aba33046395bcf365573",
         "version" : "2.9.1"
-      }
-    },
-    {
-      "identity" : "safeareabrush",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/WallabyStuff/SafeAreaBrush.git",
-      "state" : {
-        "revision" : "4943d253687368afbea7ea09c19530a0361ed613",
-        "version" : "1.0.4"
       }
     },
     {
