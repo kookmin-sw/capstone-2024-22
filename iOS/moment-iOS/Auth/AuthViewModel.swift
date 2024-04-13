@@ -12,9 +12,11 @@ import Alamofire
 
 class AuthViewModel: ObservableObject {
     @Published var email: String = ""
-    // 필요한 경우 추가적인 상태 변수를 선언
+    @Published var password : String = ""
     @Published var verificationCode: String = ""
     @Published var isCodeValid: Bool? = nil
+    @Published var isLoggedIn: Bool = false
+    @Published var loginError: Bool = false
     
     func requestAuthCode() {
         let parameters: [String: Any] = [
@@ -43,27 +45,59 @@ class AuthViewModel: ObservableObject {
     }
     
     func verifyCode(completion: @escaping (Bool) -> Void) {
-           let parameters: [String: String] = [
-               "code": verificationCode
-           ]
-           
-           AF.request("http://wasuphj.synology.me:8000/auth/verify", method: .patch, parameters: parameters, encoding: JSONEncoding.default)
-               .validate()
-               .responseJSON { response in
-                   switch response.result {
-                   case .success:
-                       DispatchQueue.main.async {
-                           self.isCodeValid = true
-                           completion(true)
-                       }
-                   case .failure:
-                       DispatchQueue.main.async {
-                           self.isCodeValid = false
-                           completion(false)
-                       }
-                   }
-               }
-       }
+        let parameters: [String: String] = [
+            "code": verificationCode
+        ]
+        
+        AF.request("http://wasuphj.synology.me:8000/auth/verify", method: .patch, parameters: parameters, encoding: JSONEncoding.default)
+            .validate()
+            .responseJSON { response in
+                switch response.result {
+                case .success:
+                    DispatchQueue.main.async {
+                        self.isCodeValid = true
+                        completion(true)
+                    }
+                case .failure:
+                    DispatchQueue.main.async {
+                        self.isCodeValid = false
+                        completion(false)
+                    }
+                }
+            }
+    }
+    
+    func loginUser() {
+        let parameters = [
+            "email": email,
+            "password": password
+        ]
+        //alexj99@naver.com
+        //1234
+        
+        AF.request("http://wasuphj.synology.me:8000/auth/login", method: .post, parameters: parameters, encoder: JSONParameterEncoder.default)
+            .validate(statusCode: 200..<300)
+            .responseJSON { response in
+                switch response.result {
+                case .success(let value):
+                    DispatchQueue.main.async {
+                        self.isLoggedIn = true
+                        self.loginError = false
+                        print("Response JSON: \(value)")
+                    }
+                case .failure(let error):
+                    DispatchQueue.main.async {
+                        self.isLoggedIn = false
+                        self.loginError = true
+                        if let data = response.data, let errorString = String(data: data, encoding: .utf8) {
+                            print("Error: \(error) \nServer Response: \(errorString)")  // 에러와 서버 응답 함께 출력
+                        }
+                    }
+                }
+                print("Sending parameters: \(parameters)")
+
+            }
+    }
 }
 
 // 서버 응답을 위한 구조체
