@@ -1,24 +1,12 @@
-import socket
-
 from flask import Flask, request, jsonify
 # import test
 import py_eureka_client.eureka_client as eureka_client
 
 
-def get_public_ip():
-    # 현재 인스턴스의 퍼블릭 IP 가져오기
-    return socket.gethostbyname(socket.gethostname())
-
-def get_private_ip():
-    # 현재 인스턴스의 프라이빗 IP 가져오기
-    return socket.gethostbyname(socket.gethostname())
-
-
-print(get_public_ip)
 rest_port = 5000
 eureka_client.init(eureka_server="http://wasuphj.synology.me:8761/eureka",
                     app_name="ai-service",
-                    instance_host=get_public_ip(),
+                    instance_host="localhost",
                     instance_port=rest_port)
 
 app = Flask(__name__)
