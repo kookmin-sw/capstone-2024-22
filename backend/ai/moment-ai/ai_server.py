@@ -24,8 +24,18 @@ def ai_server_run():
     if file_name is None:
         return jsonify({"error": "'file_name' parameter is missing."}), 400
 
-    result = test.main(file_name)
-    return jsonify(result)
+    # for naive demo, for real demo delete output and change result
+    output = dict()
+    output["text"] = "안녕하세요"
+    output["emotions"] = {"sad": 75.3, "happy": 4.7, "angry": 7.1, "neutral": 12.9}
+    output["status"] = "wait"
+    output["error"] = None
+    output["file_name"] = os.path.basename(file_name)
+    output["file_path"] = os.path.dirname(os.path.abspath(file_name))
+    return jsonify(output)
+    
+    # result = test.main(file_name)
+    # return jsonify(result)
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=rest_port, debug=True)
