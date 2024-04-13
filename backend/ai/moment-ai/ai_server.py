@@ -1,12 +1,14 @@
 from flask import Flask, request, jsonify
+import os
 # import test
 import py_eureka_client.eureka_client as eureka_client
 
 
 rest_port = 5000
+instance_ip = "15.164.139.204"
 eureka_client.init(eureka_server="http://wasuphj.synology.me:8761/eureka",
                     app_name="ai-service",
-                    instance_host="localhost",
+                    instance_host=instance_ip,
                     instance_port=rest_port)
 
 app = Flask(__name__)
