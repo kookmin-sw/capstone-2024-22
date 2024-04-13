@@ -8,16 +8,17 @@ from sklearn.model_selection import train_test_split
 
 class CustomDataset(Dataset):
     def __init__(self, csv_file):
-        self.data = pd.read_csv(csv_file)
+        self.data_csv = pd.read_csv(csv_file)
 
     def __len__(self):
-        return len(self.data)
+        return len(self.data_csv)
 
     def __getitem__(self, idx):
         file_name = self.data.iloc[idx]['path']
         label = self.data.iloc[idx]['labels']
         
         if os.path.splitext(file_name)[-1] == '.wav':
+            print(os.path.splitext(file_name))
             feat = None
             
         elif os.path.splitext(file_name)[-1] == '.npy':
@@ -28,7 +29,7 @@ class CustomDataset(Dataset):
 
 if __name__ == '__main__':
   # CSV 파일 경로 및 오디오 파일이 있는 루트 디렉토리 경로
-  csv_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datas/TESS.csv')
+  csv_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datas/DATASETS.csv')
 
   # 데이터셋 객체 생성
   dataset = CustomDataset(csv_file)
@@ -43,6 +44,5 @@ if __name__ == '__main__':
   val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
   test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
   
-  for batch in train_dataloader:
-    print(batch)
-    break
+  print(test_dataloader)
+    
