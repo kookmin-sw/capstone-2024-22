@@ -6,7 +6,7 @@ import py_eureka_client.eureka_client as eureka_client
 rest_port = 5000
 eureka_client.init(eureka_server="http://wasuphj.synology.me:8761/eureka",
                     app_name="ai-service",
-                    instance_host="wasuphj.synology.me",
+                    instance_host="localhost",
                     instance_port=rest_port)
 
 app = Flask(__name__)
