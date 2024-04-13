@@ -83,5 +83,5 @@ def fine_tuning(label_dict, dataset_path_list):
     
     
 label_dict={'ang': 0, 'hap': 1, 'neu': 2, 'sad': 3}
-datasets = ['iemocap', '']
-fine_tuning(label_dict, None)
+datasets = ['RAVDESS', 'SAVEE', 'TESS', 'CREMA-D', 'AIHUB']
+fine_tuning(label_dict, dataset_path_list=datasets)
