@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 
-import test
+# import test
 import py_eureka_client.eureka_client as eureka_client
 
 rest_port = 5000
