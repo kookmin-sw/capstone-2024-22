@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit
 
 
 @HiltAndroidApp
-
 class ApplicationClass: Application() {
     companion object{
         lateinit var tokenSharedPreferences: SharedPreferences
@@ -23,7 +22,7 @@ class ApplicationClass: Application() {
         lateinit var retrofitKakao: Retrofit
         val NAVER_MAP_CLIENT_ID="xnmlzv4mhr"
 
-        val API_URL="http://121.88.137.95:8080/"
+        val API_URL="http://wasuphj.synology.me:8000/"
         val KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/"
         val API_URL_GOOGLE="https://www.googleapis.com"
     }
