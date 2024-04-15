@@ -31,6 +31,7 @@
         <activity android:name=".ui.PostTripActivity"/>
         <activity android:name=".ui.CardActivity"/>
         <activity android:name=".ui.TripFileActivity"/>
+        <activity android:name=".ui.ReciptActivity"/>
     </application>
 
 </manifest>
