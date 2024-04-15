@@ -105,8 +105,8 @@ fun ImgBackButton(onClick : () -> Unit, content : String){
 @Composable
 fun CheckButton( isChecked : MutableState<Boolean>){
 
-    Column(modifier = Modifier.size(16.dp).clickable { isChecked.value = !isChecked.value }) {
-        Image(modifier = Modifier.fillMaxSize(),
+    Column(modifier = Modifier.clickable { isChecked.value = !isChecked.value }) {
+        Image(modifier = Modifier.size(16.dp),
             painter = if(isChecked.value) painterResource(R.drawable.ic_checkbox_true)
             else painterResource(id = R.drawable.ic_checkbox_false),
             contentDescription = "check button")

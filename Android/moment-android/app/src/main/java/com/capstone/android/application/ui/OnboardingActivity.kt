@@ -409,7 +409,7 @@ class OnboardingActivity:ComponentActivity() {
                             recordOpen.value = true
                         }
                     ) {
-                        Image(modifier = Modifier.fillMaxSize(),
+                        Image(modifier = Modifier.size(16.dp),
                             painter = if(agree.value) painterResource(R.drawable.ic_checkbox_true)
                             else painterResource(id = R.drawable.ic_checkbox_false),
                             contentDescription = "check button")
@@ -1238,6 +1238,6 @@ class OnboardingActivity:ComponentActivity() {
     @Preview
     @Composable
     fun OnboardingPreView(){
-        Signup_number()
+        Signup_email()
     }
 }
