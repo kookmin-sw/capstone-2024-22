@@ -336,7 +336,7 @@ struct ReceiptCell: View {
                         
                         
                        
-                            Text(item.name)
+                            Text(item.tripName)
                                 .font(.pretendardExtrabold14)
                                 .foregroundColor(.black)
                                 .zIndex(2)

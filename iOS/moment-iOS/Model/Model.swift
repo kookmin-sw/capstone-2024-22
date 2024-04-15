@@ -24,6 +24,26 @@ struct TripRegistrationResponse: Codable {
     
 }
 
+struct TripsResponse: Codable {
+    let status: Int
+    let code: String
+    let msg: String
+    let detailMsg: String
+    let data: TripsData
+}
+
+struct TripsData: Codable {
+    let trips: [Trip]
+}
+
+struct Trip: Codable {
+    let id: Int
+    let email: String
+    let startDate: String
+    let endDate: String
+    let analyzingCount: Int
+    let tripName: String
+}
 
 struct TripRegistration: Codable {
    

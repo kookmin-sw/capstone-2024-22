@@ -76,7 +76,7 @@ struct HomeView: View {
                             ForEach(homeviewModel.items) { item in
                                 ItemViewCell(item: $homeviewModel.items[homeviewModel.getIndex(item: item)], deleteAction: {
                                     self.itemToDelete = item // 사용자가 삭제할 항목을 설정합니다.
-                                    self.selectedItemName = item.name
+                                    self.selectedItemName = item.tripName
                                     self.showingCustomAlert = true // 삭제 확인 다이얼로그를 표시합니다.
                                 }, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
                                 CustomHomeSubDivider()
@@ -85,6 +85,9 @@ struct HomeView: View {
                     }
                     Spacer()
                 }  .background(Color.homeBack)
+                    .onAppear {
+                        homeviewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
+                               }
                 
                 if showingCustomAlert {
                     
@@ -180,7 +183,7 @@ struct ItemViewCell: View {
                             
                             
                            
-                                Text(item.name)
+                                Text(item.tripName)
                                     .font(.pretendardExtrabold14)
                                     .foregroundColor(.black)
                                     .zIndex(2)
@@ -409,7 +412,7 @@ struct DateRangeView1: View {
                 .padding(.bottom, -10)
             HStack {
                 Spacer() // 좌측 공간을 만들어줌으로써 Text를 우측으로 밀어냄
-                Text(item.name)
+                Text(item.tripName)
                     .font(.pretendardBold22)
                     .padding(.horizontal,10)
                    
