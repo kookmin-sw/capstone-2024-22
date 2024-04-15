@@ -15,6 +15,7 @@
 		8E2D273B2BA57DE7006248EA /* FSCalendarWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D273A2BA57DE7006248EA /* FSCalendarWrapper.swift */; };
 		8E3E7D4D2BC97A63004C6AD1 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 8E3E7D4C2BC97A63004C6AD1 /* Alamofire */; };
 		8E3E7D502BC97AF5004C6AD1 /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 8E3E7D4F2BC97AF5004C6AD1 /* PopupView */; };
+		8E3E7D5E2BCD7C4B004C6AD1 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E3E7D5D2BCD7C4B004C6AD1 /* Model.swift */; };
 		8E5CAE322B970BC800A483B4 /* Time.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE312B970BC800A483B4 /* Time.swift */; };
 		8E5CAE342B970C2C00A483B4 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE332B970C2C00A483B4 /* Color+Extensions.swift */; };
 		8E5CAE362B970C4500A483B4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E5CAE352B970C4500A483B4 /* Assets.xcassets */; };
@@ -135,6 +136,7 @@
 		8E15C88B2B6527E7001468C7 /* moment_iOSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = moment_iOSUITests.swift; sourceTree = "<group>"; };
 		8E15C88D2B6527E7001468C7 /* moment_iOSUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = moment_iOSUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		8E2D273A2BA57DE7006248EA /* FSCalendarWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FSCalendarWrapper.swift; sourceTree = "<group>"; };
+		8E3E7D5D2BCD7C4B004C6AD1 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		8E5CAE312B970BC800A483B4 /* Time.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Time.swift; sourceTree = "<group>"; };
 		8E5CAE332B970C2C00A483B4 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 		8E5CAE352B970C4500A483B4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ../../NAVERRECORD/NaverRECORDAPP/NaverRECORDAPP/Assets.xcassets; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 		8E15C8642B6527E3001468C7 = {
 			isa = PBXGroup;
 			children = (
+				8E3E7D5F2BCD7C50004C6AD1 /* Model */,
 				8ECCFBD42BB93AEC00C39125 /* moment-iOS-Info.plist */,
 				8ECCFBB52BB93A4800C39125 /* Font */,
 				8ECCFBB12BB804B900C39125 /* ImagePicker.swift */,
@@ -340,6 +343,14 @@
 				8E5CAE392B970C9D00A483B4 /* OnboardingViewModel.swift */,
 			);
 			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		8E3E7D5F2BCD7C50004C6AD1 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				8E3E7D5D2BCD7C4B004C6AD1 /* Model.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		8E8C17462BA8575500BF1E1C /* Login */ = {
@@ -711,6 +722,7 @@
 				8E5CAE722B970EE700A483B4 /* AppDelegate.swift in Sources */,
 				8E970F292BC96EBF003476C4 /* AuthViewModel.swift in Sources */,
 				8E970E1D2BC405C7003476C4 /* DailyCardView.swift in Sources */,
+				8E3E7D5E2BCD7C4B004C6AD1 /* Model.swift in Sources */,
 				8ECCFBB22BB804B900C39125 /* ImagePicker.swift in Sources */,
 				8E5CAE3C2B970CB300A483B4 /* OnboardingView.swift in Sources */,
 			);

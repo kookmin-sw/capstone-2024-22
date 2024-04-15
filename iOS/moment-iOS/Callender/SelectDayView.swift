@@ -45,15 +45,16 @@ struct SelectDayView: View {
                     Button("완료") {
                         //TODO: -여기서 여행을 등록하는 api 를 연동해야겠지?
                         
-                        calendarViewModel.tripName = tripName
-                        calendarViewModel.registerTrip { success, errorMessage, statusCode in
-                            if success {
-                                print("여행 등록 성공! 상태 코드: \(statusCode ?? 0)")
-                                self.presentationMode.wrappedValue.dismiss()
-                            } else {
-                                print("여행 등록 실패: \(errorMessage ?? "Unknown error"), 상태 코드: \(statusCode ?? 0)")
-                            }
-                        }
+                        if let startDate = calendarViewModel.startTime, let endDate = calendarViewModel.endTime {
+                            calendarViewModel.registerTrip(tripName: tripName, startDate: startDate, endDate: endDate) { success, errorMessage in
+                                                       if success {
+                                                           print("Trip successfully registered!")
+                                                       } else {
+                                                           print("Failed to register trip: \(errorMessage ?? "Unknown error")")
+                                                       }
+                                                       self.presentationMode.wrappedValue.dismiss() // 작업 완료 후 화면 닫기
+                                                   }
+                                               }
                         // self.presentationMode.wrappedValue.dismiss()
                         
                     }

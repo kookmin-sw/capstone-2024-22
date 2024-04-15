@@ -14,14 +14,6 @@ import Foundation
 
 
 
-struct TripRegistration: Codable {
-   
-    var startDate: String
-    var endDate: String
-    var tripName: String
-}
-
-
 class CalendarViewModel : ObservableObject {
     @Published var tripName : String
     @Published var time : Date
@@ -50,6 +42,13 @@ class CalendarViewModel : ObservableObject {
         self.endTime = endTime
         
     }
+    
+    private let dateFormatter: DateFormatter = {
+           let formatter = DateFormatter()
+           formatter.dateFormat = "yyyy-MM-dd"
+           return formatter
+       }()
+    
     func addSelectedDay(_ day: Date) {
         // 이미 두 날짜가 선택되었다면 초기화
         if selectedDays.count >= 2 {
@@ -66,68 +65,39 @@ class CalendarViewModel : ObservableObject {
         }
     }
     
-    
-    func registerTrip(completion: @escaping (Bool, String?, Int?) -> Void) {
-        guard let start = startTime, let end = endTime, !tripName.isEmpty else {
-           // print(tripName,startTime,endTime)
-            completion(false, "Invalid input: Ensure all fields are filled correctly.", nil)
-            return
-        }
-        
 
-        
+    func registerTrip(tripName: String, startDate: Date, endDate: Date, completion: @escaping (Bool, String?) -> Void) {
         let dateFormatter = DateFormatter()
-           dateFormatter.dateFormat = "yyyy-MM-dd"
-           
-           // 날짜를 "yyyy-MM-dd" 형식의 문자열로 변환
-           let formattedStartDate = dateFormatter.string(from: start)
-           let formattedEndDate = dateFormatter.string(from: end)
-        
-       
-           // 요청 바디 생성
-           let tripData = TripRegistration(
-              
-               startDate: formattedStartDate,
-               endDate: formattedEndDate,
-               tripName: tripName
-           )
-       // print(tripName,startDate,endDate)
-       
-        print("tripData startDate:", tripData.startDate)
-        print("tripData endDate:", tripData.endDate)
-        print("tripData endDate:", tripData.tripName)
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let formattedStartDate = dateFormatter.string(from: startDate)
+        let formattedEndDate = dateFormatter.string(from: endDate)
 
-        
-        let headers: HTTPHeaders = [
-            "Authorization": "\(authToken)",
-            "Accept": "application/json"
+        let tripData = [
+            "startDate": formattedStartDate,
+            "endDate": formattedEndDate,
+            "tripName": tripName
         ]
-        
-        
-        AF.request("http://wasuphj.synology.me:8000/core/trip/register", method: .post, parameters: tripData, encoder: JSONParameterEncoder.default,headers: headers)
-            .responseJSON { response in
-                let statusCode = response.response?.statusCode
+
+        let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
+
+        AF.request("http://wasuphj.synology.me:8000/core/trip/register", method: .post, parameters: tripData, encoder: JSONParameterEncoder.default, headers: headers)
+            .responseDecodable(of: TripRegistrationResponse.self) { response in
                 switch response.result {
-                case .success:
-                    DispatchQueue.main.async {
-                        completion(true, nil, statusCode)
+                case .success(let responseData):
+                    print("Response: \(responseData)")
+                    if responseData.status == 201 {
+                        completion(true, nil) // 성공 시
+                    } else {
+                        completion(false, responseData.msg) // 실패 시 메시지 반환
                     }
-                case .failure:
-                    let errorMessage = response.error?.localizedDescription ?? "Unknown error"
-                    DispatchQueue.main.async {
-                        completion(false, errorMessage, statusCode)
-                    }
+                case .failure(let error):
+                    print("Error: \(error)")
+                    completion(false, error.localizedDescription)
                 }
             }
-       
     }
-}
 
-struct SimpleResponse: Codable {
-    let status: Int
-    let code: String
-    let msg: String
-    let detailMsg: String
+  
 }
 
 
