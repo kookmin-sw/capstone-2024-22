@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "ai-service")
+@FeignClient(name = "ai-service", url = "15.164.139.204:5000")
 public interface AiClient {
 
     /**
