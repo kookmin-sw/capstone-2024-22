@@ -15,9 +15,10 @@ import Foundation
 
 
 struct TripRegistration: Codable {
-    var tripName: String
+   
     var startDate: String
     var endDate: String
+    var tripName: String
 }
 
 
@@ -30,7 +31,7 @@ class CalendarViewModel : ObservableObject {
     @Published var endTime: Date?
     @Published var selectedDays: [Date] = []
     // ui의 상태를 최신화해주는 published를 사용해준다.
-    var authToken: String = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxMzAxMDQ0NywiZXhwIjoxNzU2MjEwNDQ3fQ.psufhNoH1wBQmSpw2TyLKfazOU8U96bJnTE1dh3bASs"//s
+    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxMDkzMDMyMCwiZXhwIjoxNzU0MTMwMzIwfQ.mVy33lNv-by6bWXshsT4xFOwZSWGkOW76GWimliqHP4"
     
     init(
         tripName: String = "",
@@ -68,25 +69,42 @@ class CalendarViewModel : ObservableObject {
     
     func registerTrip(completion: @escaping (Bool, String?, Int?) -> Void) {
         guard let start = startTime, let end = endTime, !tripName.isEmpty else {
-            print(tripName,startTime,endTime)
+           // print(tripName,startTime,endTime)
             completion(false, "Invalid input: Ensure all fields are filled correctly.", nil)
             return
         }
         
+
+        
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        let tripData = TripRegistration(
-            tripName: tripName,
-            startDate: dateFormatter.string(from: start),
-            endDate: dateFormatter.string(from: end)
-        )
+           dateFormatter.dateFormat = "yyyy-MM-dd"
+           
+           // 날짜를 "yyyy-MM-dd" 형식의 문자열로 변환
+           let formattedStartDate = dateFormatter.string(from: start)
+           let formattedEndDate = dateFormatter.string(from: end)
+        
+       
+           // 요청 바디 생성
+           let tripData = TripRegistration(
+              
+               startDate: formattedStartDate,
+               endDate: formattedEndDate,
+               tripName: tripName
+           )
+       // print(tripName,startDate,endDate)
+       
+        print("tripData startDate:", tripData.startDate)
+        print("tripData endDate:", tripData.endDate)
+        print("tripData endDate:", tripData.tripName)
+
         
         let headers: HTTPHeaders = [
-            "Authorization": "Bearer \(authToken)",
+            "Authorization": "\(authToken)",
             "Accept": "application/json"
         ]
         
-        AF.request("http://wasuphj.synology.me:8000/core/trip/register", method: .post, parameters: tripData, encoder: JSONParameterEncoder.default, headers: headers)
+        
+        AF.request("http://wasuphj.synology.me:8000/core/trip/register", method: .post, parameters: tripData, encoder: JSONParameterEncoder.default,headers: headers)
             .responseJSON { response in
                 let statusCode = response.response?.statusCode
                 switch response.result {
@@ -101,6 +119,7 @@ class CalendarViewModel : ObservableObject {
                     }
                 }
             }
+       
     }
 }
 

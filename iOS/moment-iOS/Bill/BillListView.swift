@@ -396,46 +396,56 @@ struct ReceiptDetailView: View {
                         Text("여행의 기록을 한줄로 기록하세요 :)")
                             .font(.pretendardMedium14)
                             .foregroundColor(.gray500)
-                            .padding(.top,30)
+                            .padding(.bottom,30)
                         
-                        HStack(alignment: .center)
-                        {
-                            Image("Locationred")
-                            
-                            Text("북촌 한옥마을")
-                                .font(.pretendardMedium14)
-                                .foregroundColor(.homeRed)
-                            
+                        VStack(spacing:0){
+                            HStack(alignment: .center)
+                            {
+                                Image("Locationred")
+                                
+                                Text("북촌 한옥마을")
+                                    .font(.pretendardMedium14)
+                                    .foregroundColor(.homeRed)
+                                
+                            }
+                            HStack{
+                                Text("서울")
+                                    .font(.pretendardExtrabold45)
+                                    .foregroundColor(.homeRed)
+                            }
                         }
                         
                         
-                        Text("서울")
-                            .font(.pretendardExtrabold45)
-                            .foregroundColor(.homeRed)
                         Image("airplane")
+                            .padding(.bottom,20)
                         
-                        
-                        HStack(alignment: .center)
-                        {
-                            Image("Locationred")
-                            Text("암스테르담 공항")
-                                .font(.pretendardMedium14)
-                                .foregroundColor(.homeRed)
-                            
+                        VStack(spacing:0){
+                            HStack(alignment: .center)
+                            {
+                                Image("Locationred")
+                                Text("암스테르담 공항")
+                                    .font(.pretendardMedium14)
+                                    .foregroundColor(.homeRed)
+                                
+                            }
+                            HStack{
+                                
+                                Text("암스테르담")
+                                    .font(.pretendardExtrabold45)
+                                    .foregroundColor(.homeRed)
+                            }
                         }
                         
-                        
-                        Text("암스테르담")
-                            .font(.pretendardExtrabold45)
-                            .foregroundColor(.homeRed)
-                        
+                        Spacer()
                         Image("cut")
+                            .padding(.bottom,10)
                         
                         StatsView()
                         Spacer()
                     }
                 )
         }
+        
         .frame(width: 335, height: 653)
         
         .cornerRadius(5) // 모서리를 둥글게 처리합니다.
@@ -475,24 +485,52 @@ struct StatsView: View {
                         .multilineTextAlignment(.center)
                 }
                
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading,spacing: 9) {
                     Text("여행 감정")
                         .font(.pretendardMedium11)
                         .foregroundColor(.gray500)
                         .padding(.vertical,10)
-                        
-                    ProgressView(value: 0.6).frame(width: 109,height: 15)
-                        .cornerRadius(3)
-                        .scaleEffect(x: 1, y: 2, anchor: .center)
-                    ProgressView(value: 0.6).frame(width: 109,height: 15)
-                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .padding(.top,6)
                     
-                    ProgressView(value: 0.6).frame(width: 109,height: 15)
-                        .scaleEffect(x: 1, y: 2, anchor: .center)
-                        .cornerRadius(3)
-                    ProgressView(value: 0.6).frame(width: 109,height: 15)
-                        .scaleEffect(x: 1, y: 2, anchor: .center)
-                        .cornerRadius(3)
+                    HStack{
+                        ProgressView(value: 0.6).frame(width: 109,height: 15)
+                            .cornerRadius(3)
+                            .scaleEffect(x: 1, y: 2, anchor: .center)
+                        Image("netral")
+                        
+                        Text("60%")
+                            .font(.pretendardMedium11)
+                            .foregroundColor(.homeRed)
+                            .frame(width: 30)
+                    }
+                    HStack{
+                        ProgressView(value: 0.3).frame(width: 109,height: 15)
+                            .scaleEffect(x: 1, y: 2, anchor: .center)
+                        Image("sad")
+                        Text("30%")
+                            .font(.pretendardMedium11)
+                            .frame(width: 30)
+                    }
+                    
+                    HStack{
+                        ProgressView(value: 0.5).frame(width: 109,height: 15)
+                            .scaleEffect(x: 1, y: 2, anchor: .center)
+                            .cornerRadius(3)
+                        Image("fun")
+                        Text("50%")
+                            .font(.pretendardMedium11)
+                            .frame(width: 30)
+                    }
+                    HStack{
+                        ProgressView(value: 0.2).frame(width: 109,height: 15)
+                            .scaleEffect(x: 1, y: 2, anchor: .center)
+                            .cornerRadius(3)
+                        Image("angry")
+                        Text("20%")
+                            .font(.pretendardMedium11)
+                            .frame(width: 30)
+                    }
+                    Spacer().frame(height: 16)
                 }
                 
             }
