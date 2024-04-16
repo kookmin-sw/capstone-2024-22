@@ -93,10 +93,15 @@ class SplashActivity:ComponentActivity() {
 
         val state = rememberPagerState()
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .background(tertiary_500)) {
             HorizontalPager(
-                modifier = Modifier.padding(top = 0.dp),
+                verticalAlignment = Alignment.Top,
+                modifier = Modifier
+                    .padding(top = 87.dp)
+                    .height(600.dp)
+                    .fillMaxWidth(),
                 count = 4,
                 state = state
             ) { page ->
@@ -106,8 +111,7 @@ class SplashActivity:ComponentActivity() {
                         horizontalAlignment = Alignment.End
                     ) {
                         Intro_Screen(state)
-                        Spacer(modifier = Modifier.height(12.dp))
-                        SmallStartBtn()
+
                     }
                 }
                 if (page == 1) {
@@ -116,8 +120,6 @@ class SplashActivity:ComponentActivity() {
                         horizontalAlignment = Alignment.End
                     ) {
                         Intro_Screen(state)
-                        Spacer(modifier = Modifier.height(12.dp))
-                        SmallStartBtn()
                     }
                 }
                 if (page == 2) {
@@ -126,8 +128,6 @@ class SplashActivity:ComponentActivity() {
                         horizontalAlignment = Alignment.End
                     ) {
                         Intro_Screen(state)
-                        Spacer(modifier = Modifier.height(12.dp))
-                        SmallStartBtn()
 
                     }
                 }
@@ -137,11 +137,22 @@ class SplashActivity:ComponentActivity() {
                         horizontalAlignment = Alignment.End
                     ) {
                         Intro_Screen(state)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        BigButton("시작하기", true,
-                            onClick = {startActivity(Intent(this@SplashActivity, OnboardingActivity::class.java))}
-                        )
+
                     }
+                }
+            }
+            if(state.currentPage == 3){
+                Column(Modifier.padding(horizontal = 20.dp)){
+                    Spacer(modifier = Modifier.height(8.dp))
+                    BigButton("시작하기", true,
+                        onClick = {startActivity(Intent(this@SplashActivity, OnboardingActivity::class.java))}
+                    )
+                }
+            }else{
+                Column(Modifier.padding(horizontal = 20.dp)
+                    .align(Alignment.End)) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    SmallStartBtn()
                 }
             }
         }

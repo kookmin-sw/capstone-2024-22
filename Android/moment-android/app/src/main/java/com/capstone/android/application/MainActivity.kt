@@ -1,5 +1,6 @@
 package com.capstone.android.application
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -86,9 +87,13 @@ import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.screen.BottomNavItem
 import com.capstone.android.application.ui.CardActivity
+import com.capstone.android.application.ui.OnboardingScreen
 import com.capstone.android.application.ui.PostTripActivity
+import com.capstone.android.application.ui.ReciptActivity
+import com.capstone.android.application.ui.ReciptScreen
 import com.capstone.android.application.ui.TripFileActivity
 import com.capstone.android.application.ui.theme.ApplicationTheme
+import com.capstone.android.application.ui.theme.BigButton
 import com.capstone.android.application.ui.theme.FontMoment
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
@@ -111,8 +116,6 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
     lateinit var navController: NavHostController
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -370,12 +373,6 @@ class MainActivity : ComponentActivity() {
                 composable(MainScreen.ReceiptPost.screenRoute){
                     currentSelectedBottomRoute.value = MainScreen.ReceiptPost.rootRoute
                     ReceiptPost()
-                }
-                composable(MainScreen.ReceiptCardChoice.screenRoute)
-                {
-                    currentSelectedBottomRoute.value = MainScreen.ReceiptCardChoice.rootRoute
-
-                    ReceiptCardChoice()
                 }
 
                 composable(MainScreen.HomeTrip.screenRoute){
@@ -888,7 +885,6 @@ class MainActivity : ComponentActivity() {
                                 .background(color = Color.Gray)
                         )
                     }
-
                 }
             }
         }
@@ -900,58 +896,29 @@ class MainActivity : ComponentActivity() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(20.dp)
-            ,
-
             ) {
             Image(
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.test_image), contentDescription = "test"
             )
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                ,
-                onClick = { navController.navigate(MainScreen.ReceiptPost.screenRoute) }
-            ){
-                Text(text = "만들기")
-            }
+            Spacer(modifier = Modifier.height(8.dp))
+            BigButton("만들기", true,  onClick = {startActivity(Intent(this@MainActivity, ReciptActivity::class.java))})
+
         }
     }
 
     @Composable
     fun ReceiptPost(){
+        //영수증 게시
         Text(
             modifier = Modifier
                 .fillMaxSize()
                 .clickable {
-                    navController.navigate(MainScreen.ReceiptCardChoice.screenRoute)
+                    navController.navigate(MainScreen.ReceiptPost.screenRoute)
                 },
             text = "만들기",
             textAlign = TextAlign.Center
         )
-    }
-
-    @Composable
-    fun ReceiptCardChoice(){
-        Text(
-            modifier = Modifier.clickable { navController.navigate(MainScreen.ReceiptPost.screenRoute) },
-            text = "카드뷰"
-        )
-
-//        VerticalGrid(
-//            columns = SimpleGridCells.Fixed(2),
-//            modifier = Modifier.fillMaxSize(),
-//        ) {
-//            repeat(testData.size) {
-//                Box(
-//                    modifier = Modifier
-//                        .background(color = Color.Gray)
-//                ) {
-//
-//                }
-//            }
-//
-//        }
     }
 
     @Composable
@@ -1055,6 +1022,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @SuppressLint("UnrememberedMutableState")
     @Composable
     fun Favorite(){
         var expanded = remember { mutableStateOf(true) }
@@ -1159,7 +1127,8 @@ class MainActivity : ComponentActivity() {
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null
                                 ) {
-                                    cardItems[index].isExpand.value = !cardItems[index].isExpand.value
+                                    cardItems[index].isExpand.value =
+                                        !cardItems[index].isExpand.value
                                 }
 
                         ) {
@@ -1172,7 +1141,8 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .size(26.dp)
                                             .clickable {
-                                                cardItems[index].isFavorite.value = !cardItems[index].isFavorite.value
+                                                cardItems[index].isFavorite.value =
+                                                    !cardItems[index].isFavorite.value
                                             }
                                         ,
                                         painter = painterResource(id = if(cardItems[index].isFavorite.value) R.drawable.ic_heart_red else R.drawable.ic_heart_white),
@@ -1693,7 +1663,7 @@ class MainActivity : ComponentActivity() {
 //            ItemTrip()
 //            RecordDaily()
 //            Setting()
-            Favorite()
+//            ItemTrip()
         }
     }
 

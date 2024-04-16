@@ -17,8 +17,10 @@ val white = Color(0xFFFFFFFF)
 
 val tertiary_500 = Color(0xFFFBFAF7) //background color
 val primary_500 = Color(0xFF99342E)
+val primary_200 = Color(0xFFE3A5A1)
 val neutral_100 = Color(0xFFe7e6e6)
 val neutral_200 = Color(0xFFd6d5d5)
+val neutral_300 = Color(0xFFc3c1c1)
 val neutral_500 = Color(0xFF938F8F)
 val neutral_600 = Color(0xFF706969)
 val negative_600 = Color(0xFFE5102E)
