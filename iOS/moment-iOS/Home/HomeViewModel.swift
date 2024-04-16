@@ -83,56 +83,7 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
         indexToDelete = index
         showingDeleteAlert = true
     }
-    
-//    func deleteItem() {
-//        if let index = indexToDelete {
-//            // items.remove(at: index)
-//            indexToDelete = nil
-//            showingDeleteAlert = false
-//        }
-//    }
-    
-    
-//    func deleteItem(myItem: Item) {
-//        items.removeAll { item in
-//            return item.id == myItem.id
-//        }
-//    }
-//    
-//    func deleteItem(completion: @escaping (Bool, String) -> Void) {
-//        guard let index = indexToDelete, index < items.count else {
-//            completion(false, "Invalid item index.")
-//            return
-//        }
-//        
-//        let itemId = items[index].id
-//        let url = "http://wasuphj.synology.me:8000/core/trip/\(itemId)"
-//        let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
-//
-//        AF.request(url, method: .delete, headers: headers)
-//          .responseDecodable(of: DeleteResponse.self) { response in
-//            switch response.result {
-//            case .success(let deleteResponse):
-//                if deleteResponse.status == 200 {
-//                    // 성공적으로 서버에서 삭제되었을 때, 로컬 배열에서도 해당 아이템 제거
-//                    DispatchQueue.main.async {
-//                        self.items.remove(at: index)
-//                        self.indexToDelete = nil
-//                        self.showingDeleteAlert = false
-//                        completion(true, "DELETE SUCCESS")
-//                    }
-//                } else {
-//                    DispatchQueue.main.async {
-//                        completion(false, deleteResponse.msg)
-//                    }
-//                }
-//            case .failure(let error):
-//                DispatchQueue.main.async {
-//                    completion(false, error.localizedDescription)
-//                }
-//            }
-//        }
-//    }
+ 
     func deleteItem(itemToDelete: Item, completion: @escaping (Bool, String) -> Void) {
         let itemId = itemToDelete.id
         let url = "http://wasuphj.synology.me:8000/core/trip/\(itemId)"
