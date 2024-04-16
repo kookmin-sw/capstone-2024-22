@@ -2,6 +2,7 @@ package com.capstone.android.application.data
 
 import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.data.remote.auth.AuthRetrofitInterface
+import com.capstone.android.application.data.remote.card.CardRetrofitInterface
 import com.capstone.android.application.data.remote.trip.TripRetrofitInterface
 import dagger.Module
 import dagger.Provides
@@ -57,6 +58,12 @@ object ApiModule {
     @Provides
     fun provideAuthService(@BaseRetrofit retrofit: Retrofit): AuthRetrofitInterface {
         return retrofit.create(AuthRetrofitInterface::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideCardService(@BaseRetrofit retrofit:Retrofit) : CardRetrofitInterface{
+        return retrofit.create(CardRetrofitInterface::class.java)
     }
 
 
