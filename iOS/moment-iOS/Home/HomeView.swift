@@ -89,23 +89,26 @@ struct HomeView: View {
                         homeviewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
                                }
                 
-                if showingCustomAlert {
+                if showingCustomAlert ,let itemToDelete = itemToDelete{
                     
                     CustomDialog(
                         isActive: $showingCustomAlert,
                         title: "\(selectedItemName ?? "이 여행")\n 정말 삭제하시겠습니까?",
                         message: "해당 파일에 기록되어있는 녹음카드는\n '일상 기록'으로 이동합니다",
                         yesAction: {
-                            if let item = itemToDelete {
-                                homeviewModel.deleteItem(myItem: item) // 항목 삭제 실행
-                                itemToDelete = nil // 삭제할 아이템 초기화
-                                selectedItemName = nil // 선택한 아이템 이름 초기화
-                            }
-                            showingCustomAlert = false
+                            homeviewModel.deleteItem(itemToDelete: itemToDelete) { success, message in
+                                           if success {
+                                               print("Item successfully deleted.")
+                                           } else {
+                                               print("Failed to delete item: \(message)")
+                                           }
+                                           showingCustomAlert = false
+                                           self.itemToDelete = nil
+                                       }
                         },
                         noAction: {
                             showingCustomAlert = false // 다이얼로그 닫기
-                            itemToDelete = nil // 삭제할 아이템 초기화
+                            self.itemToDelete = nil // 삭제할 아이템 초기화
                         }
                     )
                     .transition(.opacity) // 다이얼로그 등장과 사라짐에 투명도 변화 적용
@@ -278,9 +281,9 @@ extension ItemViewCell {
                 .padding(.trailing, 0)
             
             Button {
-                // 여기에 '삭제' 버튼을 눌렀을 때 수행할 동작을 추가합니다.
-                //deleteDidTapClosure(item)
+              //TODO: - 삭제메서드 호출
                 self.deleteAction()
+                
                 withAnimation {
                     self.item.offset = 0
                 }

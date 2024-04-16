@@ -51,3 +51,13 @@ struct TripRegistration: Codable {
     var endDate: String
     var tripName: String
 }
+
+struct DeleteResponse: Codable {
+    let status: Int
+    let code: String
+    let msg: String
+    let detailMsg: String
+    let data: EmptyData?
+
+    struct EmptyData: Codable {}
+}

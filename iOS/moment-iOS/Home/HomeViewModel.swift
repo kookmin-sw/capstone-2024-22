@@ -7,6 +7,7 @@
 
 import Foundation
 import Alamofire
+import SwiftUI
 
 
 class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있는녀석 가져와서 뷰모델에서 뷰에 넣기 전에 데이터들을 잘 처리해준다 이렇게 해주는게 MVVM 패턴인거거덩
@@ -49,11 +50,7 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
             return item.id == item1.id
         } ?? 0
     }
-    func deleteItem(myItem: Item) {
-        items.removeAll { item in
-            return item.id == myItem.id
-        }
-    }
+    
     var removeTodosCount : Int {
         return removeTodos.count // 여기 카운트는 그냥 제공하는녀석이네 이걸 왜의심했냐면 removeTodos 에 갔는데 데이터셋 Todo 를 가지고있어서 가봤더니 count 가 없네 그래서 count 를 의심했음
         // 여튼 그렇게 해서 INt 형식으로 이번엔 값을 저장을 해주네 ㅇㅇ 아까 전에는 저장안하고 변하면 바로계산해서 쏴주기만했자나
@@ -87,14 +84,84 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
         showingDeleteAlert = true
     }
     
-    func deleteItem() {
-        if let index = indexToDelete {
-            // items.remove(at: index)
-            indexToDelete = nil
-            showingDeleteAlert = false
+//    func deleteItem() {
+//        if let index = indexToDelete {
+//            // items.remove(at: index)
+//            indexToDelete = nil
+//            showingDeleteAlert = false
+//        }
+//    }
+    
+    
+//    func deleteItem(myItem: Item) {
+//        items.removeAll { item in
+//            return item.id == myItem.id
+//        }
+//    }
+//    
+//    func deleteItem(completion: @escaping (Bool, String) -> Void) {
+//        guard let index = indexToDelete, index < items.count else {
+//            completion(false, "Invalid item index.")
+//            return
+//        }
+//        
+//        let itemId = items[index].id
+//        let url = "http://wasuphj.synology.me:8000/core/trip/\(itemId)"
+//        let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
+//
+//        AF.request(url, method: .delete, headers: headers)
+//          .responseDecodable(of: DeleteResponse.self) { response in
+//            switch response.result {
+//            case .success(let deleteResponse):
+//                if deleteResponse.status == 200 {
+//                    // 성공적으로 서버에서 삭제되었을 때, 로컬 배열에서도 해당 아이템 제거
+//                    DispatchQueue.main.async {
+//                        self.items.remove(at: index)
+//                        self.indexToDelete = nil
+//                        self.showingDeleteAlert = false
+//                        completion(true, "DELETE SUCCESS")
+//                    }
+//                } else {
+//                    DispatchQueue.main.async {
+//                        completion(false, deleteResponse.msg)
+//                    }
+//                }
+//            case .failure(let error):
+//                DispatchQueue.main.async {
+//                    completion(false, error.localizedDescription)
+//                }
+//            }
+//        }
+//    }
+    func deleteItem(itemToDelete: Item, completion: @escaping (Bool, String) -> Void) {
+        let itemId = itemToDelete.id
+        let url = "http://wasuphj.synology.me:8000/core/trip/\(itemId)"
+        let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
+
+        AF.request(url, method: .delete, headers: headers)
+          .responseDecodable(of: DeleteResponse.self) { response in
+            switch response.result {
+            case .success(let deleteResponse):
+                if deleteResponse.status == 200 {
+                    DispatchQueue.main.async {
+                        self.items.removeAll { $0.id == itemToDelete.id }
+                        completion(true, deleteResponse.msg)
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        completion(false, deleteResponse.msg)
+                    }
+                }
+            case .failure(let error):
+                print("Response: \(String(describing: response.data))") // 로그로 실제 응답 데이터 출력
+                DispatchQueue.main.async {
+                    completion(false, error.localizedDescription)
+                }
+            }
         }
     }
 }
+
 
 extension HomeViewModel {
     // 가장 가까운 여행의 상태와 이름을 반환하는 함수
