@@ -1,6 +1,7 @@
 package com.capstone.android.application.data
 
 import com.capstone.android.application.app.ApplicationClass
+import com.capstone.android.application.data.remote.auth.AuthRetrofitInterface
 import com.capstone.android.application.data.remote.trip.TripRetrofitInterface
 import dagger.Module
 import dagger.Provides
@@ -20,7 +21,7 @@ object ApiModule {
 
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
-    annotation class TripRetrofit
+    annotation class BaseRetrofit
 
 
 
@@ -35,7 +36,7 @@ object ApiModule {
             .addNetworkInterceptor(ApplicationClass.XAccessTokenInterceptor()) // JWT 자동 헤더 전송
             .build()
 
-    @TripRetrofit
+    @BaseRetrofit
     @Singleton
     @Provides
     fun provideTripRetrofit(okHttpClient: OkHttpClient): Retrofit {
@@ -48,8 +49,14 @@ object ApiModule {
 
     @Singleton
     @Provides
-    fun provideTripService(@TripRetrofit retrofit: Retrofit): TripRetrofitInterface {
+    fun provideTripService(@BaseRetrofit retrofit: Retrofit): TripRetrofitInterface {
         return retrofit.create(TripRetrofitInterface::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideAuthService(@BaseRetrofit retrofit: Retrofit): AuthRetrofitInterface {
+        return retrofit.create(AuthRetrofitInterface::class.java)
     }
 
 
