@@ -99,7 +99,7 @@ dependencies {
 
     val room_version = "2.5.0"
     implementation("androidx.room:room-runtime:$room_version")
-    annotationProcessor("androidx.room:room-compiler:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
 
     val hilt_version = "2.44"
     implementation("com.google.dagger:hilt-android:$hilt_version")
