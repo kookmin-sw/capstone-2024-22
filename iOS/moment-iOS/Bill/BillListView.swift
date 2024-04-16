@@ -25,6 +25,8 @@ struct BillListView: View {
                 AnnouncementView()
                 
                 
+            }.onAppear {
+                homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
             }
             
         }
@@ -106,6 +108,7 @@ struct ReceiptGroupView: View {
                         .cornerRadius(10)
                 }
             }
+            
         }
         .navigationBarTitle("새 예시", displayMode: .inline)
     }
@@ -116,6 +119,9 @@ struct ReceiptGroupView: View {
 private struct AnnouncementView: View {
     @EnvironmentObject private var calendarViewModel: CalendarViewModel
     @EnvironmentObject private var billListViewModel: BillListViewModel
+    @EnvironmentObject var homeViewModel: HomeViewModel
+    
+    
     
     // NavigationLink 활성화를 위한 State 변수들
     @State private var isShowingCreateView = false
@@ -145,10 +151,13 @@ private struct AnnouncementView: View {
                         isShowingReceiptsView = true
                     }
                     .foregroundColor(.white)
+                    .font(.pretendardSemiBold18)
                     .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(10)
+                    .frame(width: 335,height: 52)
+                    .background(Color.homeRed)
+                    .cornerRadius(3)
+                    .padding(.bottom,30)
+                    
                 }
                 
                 
@@ -160,11 +169,17 @@ private struct AnnouncementView: View {
             .foregroundColor(.customGray2)
             .padding()
             .navigationBarTitle("", displayMode: .inline)
+            .onAppear {
+                homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
+            }
         }
     }
 }
 
 struct StatsCardView: View {
+    @EnvironmentObject var homeViewModel: HomeViewModel
+    
+    
     var topColor: Color = .homeRed
     var textColor: Color = .white // 상단 바에 사용할 텍스트 색상
     
@@ -247,6 +262,9 @@ struct StatsCardView: View {
             RoundedRectangle(cornerRadius: 3)
                 .stroke(Color.Secondary50, lineWidth: 1)
         )
+        .onAppear {
+            homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
+        }
     }
 }
 
@@ -284,10 +302,12 @@ struct ReceiptsView: View {
                         }
                     }
                 }
-            
+                
+            }.onAppear {
+                homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
             }
-          
-               
+            
+            
         }
         .navigationBarBackButtonHidden()
     }
@@ -295,9 +315,11 @@ struct ReceiptsView: View {
 
 struct ReceiptCell: View {
     let item: Item
+    @EnvironmentObject var homeViewModel: HomeViewModel
+    
     
     var body: some View {
-
+        
         HStack(spacing: 15) {
             
             
@@ -325,219 +347,283 @@ struct ReceiptCell: View {
                 }
             }
             .padding(.bottom,20)
-                .padding(.horizontal,20)
-            
-           
-              
-                VStack{
-                    HStack(spacing: 10) {
-                        
-                        Spacer()
-                        
-                        
-                       
-                            Text(item.tripName)
-                                .font(.pretendardExtrabold14)
-                                .foregroundColor(.black)
-                                .zIndex(2)
-                        
-                        Rectangle()
-                            .fill(Color.homeRed)
-                            .frame(width: 1, height: 42)
-                            .padding(.leading, 3)
-                            .padding(.trailing, 0)
-                        
-                    }.padding(.horizontal,20)
-                }
+            .padding(.horizontal,20)
             
             
             
+            VStack{
+                HStack(spacing: 10) {
+                    
+                    Spacer()
+                    
+                    
+                    
+                    Text(item.tripName)
+                        .font(.pretendardExtrabold14)
+                        .foregroundColor(.black)
+                        .zIndex(2)
+                    
+                    Rectangle()
+                        .fill(Color.homeRed)
+                        .frame(width: 1, height: 42)
+                        .padding(.leading, 3)
+                        .padding(.trailing, 0)
+                    
+                }.padding(.horizontal,20)
+            }
             
+            
+            
+            
+        }
+        .onAppear {
+            homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
         }
     }
 }
 
 // ReceiptDetailView 정의
 struct ReceiptDetailView: View {
+    @EnvironmentObject var homeViewModel: HomeViewModel
+    @Environment(\.presentationMode) var presentationMode
+    
     var topColor: Color = .homeRed
     var textColor: Color = .white // 상단 바에 사용할 텍스트 색상
     let item : Item
     var body: some View {
-        VStack(spacing: 0) {
-            //ZStack{
-            // 상단 색상 바
-            Rectangle()
-                .fill(topColor)
-                .frame(height: 50) // 상단 바의 높이를 설정합니다.
-                .overlay(
-                    HStack{
-                        Text("암스테르담 성당 여행") // 여기에 원하는 텍스트를 입력합니다.
-                            .foregroundColor(textColor) // 텍스트 색상 설정
-                        
-                            .font(.pretendardMedium14)
-                            .padding()
-                        Spacer()
-                        Image("Logo")
-                            .padding()
-                    }
-                )
+        ZStack{
             
-            // }
-            // 나머지 카드 부분
-            Rectangle()
-                .fill(Color.Secondary50)
-                .frame(height: 603)
-                .overlay(
-                    VStack{
-                        Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이 ")
-                            .font(.pretendardMedium8)
-                            .foregroundColor(.red)
-                        Spacer()
-                        Text("여행의 기록을 한줄로 기록하세요 :)")
-                            .font(.pretendardMedium14)
-                            .foregroundColor(.gray500)
-                            .padding(.bottom,30)
-                        
-                        VStack(spacing:0){
-                            HStack(alignment: .center)
-                            {
-                                Image("Locationred")
-                                
-                                Text("북촌 한옥마을")
-                                    .font(.pretendardMedium14)
-                                    .foregroundColor(.homeRed)
-                                
-                            }
-                            HStack{
-                                Text("서울")
-                                    .font(.pretendardExtrabold45)
-                                    .foregroundColor(.homeRed)
-                            }
+            VStack {
+                HStack {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack {
+                            
+                            Text("뒤로")
                         }
-                        
-                        
-                        Image("airplane")
-                            .padding(.bottom,20)
-                        
-                        VStack(spacing:0){
-                            HStack(alignment: .center)
-                            {
-                                Image("Locationred")
-                                Text("암스테르담 공항")
-                                    .font(.pretendardMedium14)
-                                    .foregroundColor(.homeRed)
-                                
-                            }
-                            HStack{
-                                
-                                Text("암스테르담")
-                                    .font(.pretendardExtrabold45)
-                                    .foregroundColor(.homeRed)
-                            }
-                        }
-                        
-                        Spacer()
-                        Image("cut")
-                            .padding(.bottom,10)
-                        
-                        StatsView()
-                        Spacer()
+                        .padding(.horizontal,20)
+                        .padding()
+                        .font(.yjObangBold15)
+                        .tint(Color.black)
                     }
-                )
+                    Spacer()
+                    
+                    Button(action: {
+                       // presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack {
+                            
+                            Text("저장")
+                        }
+                        .padding(.horizontal,20)
+                        .padding()
+                        .font(.yjObangBold15)
+                        .tint(Color.black)
+                    }
+                   // Spacer()
+                }
+                Spacer()
+            }
+          
+            
+            
+            VStack(spacing: 0) {
+                
+                
+                Rectangle()
+                    .fill(topColor)
+                    .frame(height: 50) // 상단 바의 높이를 설정합니다.
+                    .overlay(
+                        HStack{
+                            Text("암스테르담 성당 여행") // 여기에 원하는 텍스트를 입력합니다.
+                                .foregroundColor(textColor) // 텍스트 색상 설정
+                            
+                                .font(.pretendardMedium14)
+                                .padding()
+                            Spacer()
+                            Image("Logo")
+                                .padding()
+                        }
+                    )
+                
+                // }
+                // 나머지 카드 부분
+                Rectangle()
+                    .fill(Color.Secondary50)
+                    .frame(height: 603)
+                    .overlay(
+                        VStack{
+                            Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이 ")
+                                .font(.pretendardMedium8)
+                                .foregroundColor(.homeRed)
+                            
+                            Spacer()
+                            
+                            Text("여행의 기록을 한줄로 기록하세요 :)")
+                                .font(.pretendardMedium14)
+                                .foregroundColor(.gray500)
+                                .padding(.bottom,30)
+                            
+                            VStack(spacing:0){
+                                HStack(alignment: .center)
+                                {
+                                    Image("Locationred")
+                                    
+                                    Text("북촌 한옥마을")
+                                        .font(.pretendardMedium14)
+                                        .foregroundColor(.homeRed)
+                                    
+                                }
+                                HStack{
+                                    Text("서울")
+                                        .font(.pretendardExtrabold45)
+                                        .foregroundColor(.homeRed)
+                                }
+                            }
+                            
+                            
+                            Image("airplane")
+                                .padding(.bottom,20)
+                            
+                            VStack(spacing:0){
+                                HStack(alignment: .center)
+                                {
+                                    Image("Locationred")
+                                    Text("암스테르담 공항")
+                                        .font(.pretendardMedium14)
+                                        .foregroundColor(.homeRed)
+                                    
+                                }
+                                HStack{
+                                    
+                                    Text("암스테르담")
+                                        .font(.pretendardExtrabold45)
+                                        .foregroundColor(.homeRed)
+                                }
+                            }
+                            
+                            Spacer()
+                            Image("cut")
+                                .padding(.bottom,10)
+                            
+                            StatsView()
+                            Spacer()
+                        }
+                    )
+            }
+            
+            
+            .frame(width: 335, height: 653)
+            
+            .cornerRadius(5) // 모서리를 둥글게 처리합니다.
+            .overlay(
+                RoundedRectangle(cornerRadius: 3)
+                    .stroke(Color.Secondary50, lineWidth: 1)
+            )
+            .onAppear {
+                homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
+            }
+            
+            
         }
-        
-        .frame(width: 335, height: 653)
-        
-        .cornerRadius(5) // 모서리를 둥글게 처리합니다.
-        .overlay(
-            RoundedRectangle(cornerRadius: 3)
-                .stroke(Color.Secondary50, lineWidth: 1)
-        )
+        .navigationBarBackButtonHidden()
     }
 }
 
 
 struct StatsView: View {
     var body: some View {
-      
-        HStack(spacing:20) {
-                VStack(spacing: 10) {
-                    Text("여행 카드")
-                        .font(.pretendardMedium11)
-                        .foregroundColor(.gray500)
-                        .multilineTextAlignment(.center)
-                    Text("27")
-                        .font(.pretendardExtrabold14)
-                        .foregroundColor(.homeRed)
-                        .multilineTextAlignment(.center)
-                    
-                    Text("여행 날짜")
-                        .font(.pretendardMedium11)
-                        .foregroundColor(.gray500)
-                        .multilineTextAlignment(.center)
-                    Text("2024. 03. 05")
-                        .font(.pretendardMedium11)
-                        .foregroundColor(.homeRed)
-                        .multilineTextAlignment(.center)
-                    Text("2024. 03. 13")
-                        .font(.pretendardMedium11)
-                        .foregroundColor(.homeRed)
-                        .multilineTextAlignment(.center)
-                }
-               
-                VStack(alignment: .leading,spacing: 9) {
-                    Text("여행 감정")
-                        .font(.pretendardMedium11)
-                        .foregroundColor(.gray500)
-                        .padding(.vertical,10)
-                        .padding(.top,6)
-                    
-                    HStack{
-                        ProgressView(value: 0.6).frame(width: 109,height: 15)
-                            .cornerRadius(3)
-                            .scaleEffect(x: 1, y: 2, anchor: .center)
-                        Image("netral")
-                        
-                        Text("60%")
-                            .font(.pretendardMedium11)
-                            .foregroundColor(.homeRed)
-                            .frame(width: 30)
-                    }
-                    HStack{
-                        ProgressView(value: 0.3).frame(width: 109,height: 15)
-                            .scaleEffect(x: 1, y: 2, anchor: .center)
-                        Image("sad")
-                        Text("30%")
-                            .font(.pretendardMedium11)
-                            .frame(width: 30)
-                    }
-                    
-                    HStack{
-                        ProgressView(value: 0.5).frame(width: 109,height: 15)
-                            .scaleEffect(x: 1, y: 2, anchor: .center)
-                            .cornerRadius(3)
-                        Image("fun")
-                        Text("50%")
-                            .font(.pretendardMedium11)
-                            .frame(width: 30)
-                    }
-                    HStack{
-                        ProgressView(value: 0.2).frame(width: 109,height: 15)
-                            .scaleEffect(x: 1, y: 2, anchor: .center)
-                            .cornerRadius(3)
-                        Image("angry")
-                        Text("20%")
-                            .font(.pretendardMedium11)
-                            .frame(width: 30)
-                    }
-                    Spacer().frame(height: 16)
-                }
+        
+        HStack(spacing:30) {
+            VStack(spacing: 10) {
+                Text("여행 카드")
+                    .font(.pretendardMedium11)
+                    .foregroundColor(.gray500)
+                    .multilineTextAlignment(.center)
+                Text("27")
+                    .font(.pretendardExtrabold14)
+                    .foregroundColor(.homeRed)
+                    .multilineTextAlignment(.center)
                 
+                Text("여행 날짜")
+                    .font(.pretendardMedium11)
+                    .foregroundColor(.gray500)
+                    .multilineTextAlignment(.center)
+                Text("2024. 03. 05")
+                    .font(.pretendardMedium11)
+                    .foregroundColor(.homeRed)
+                    .multilineTextAlignment(.center)
+                Text("2024. 03. 13")
+                    .font(.pretendardMedium11)
+                    .foregroundColor(.homeRed)
+                    .multilineTextAlignment(.center)
             }
             
-          
+            VStack(alignment: .leading,spacing: 9) {
+                Text("여행 감정")
+                    .font(.pretendardMedium11)
+                    .foregroundColor(.gray500)
+                    //.padding(.vertical,10)
+                    .padding(.top,25)
+                    .padding(.bottom,5)
+                
+                HStack{
+                    ProgressView(value: 0.6).frame(width: 109,height: 15)
+                        .cornerRadius(3)
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .tint(.homeRed)
+                    
+                    Image("netral")
+                    
+                    Text("60%")
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.homeRed)
+                        .frame(width: 30)
+                        
+                }
+                
+                HStack{
+                    ProgressView(value: 0.3).frame(width: 109,height: 15)
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .tint(.Natural300)
+                    Image("sad")
+                    Text("30%")
+                        .font(.pretendardMedium11)
+                        .frame(width: 30)
+                      
+                }
+                
+                HStack{
+                    ProgressView(value: 0.5).frame(width: 109,height: 15)
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .cornerRadius(3)
+                        .tint(.Natural300)
+                    Image("fun")
+                    Text("50%")
+                        .font(.pretendardMedium11)
+                        .frame(width: 30)
+                        
+                }
+                HStack{
+                    ProgressView(value: 0.2).frame(width: 109,height: 15)
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .cornerRadius(3)
+                        .tint(.Natural300)
+                    Image("angry")
+                    Text("20%")
+                        .font(.pretendardMedium11)
+                        .frame(width: 30)
+                        
+                }
+                Spacer().frame(height: 16)
+            }
+            
+        }
         
-     
-      
+        
+        
+        
+        
     }
 }
