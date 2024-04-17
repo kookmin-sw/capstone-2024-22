@@ -386,17 +386,26 @@ struct ReceiptCell: View {
 struct ReceiptDetailView: View {
     @EnvironmentObject var homeViewModel: HomeViewModel
     @Environment(\.presentationMode) var presentationMode
-    
+    @State private var isDialogActive = false
+    @State private var isDialogActiveBillCom = false
     var topColor: Color = .homeRed
     var textColor: Color = .white // 상단 바에 사용할 텍스트 색상
     let item : Item
+    @State private var text: String = ""
+    @State private var starttrip: String = ""
+    @State private var StartLocation : String = ""
+    @State private var EndLocation : String = ""
+    @State private var isEditing: Bool = false
+    
     var body: some View {
         ZStack{
+          
             
             VStack {
                 HStack {
                     Button(action: {
-                        presentationMode.wrappedValue.dismiss()
+                        //
+                        isDialogActive = true
                     }) {
                         HStack {
                             
@@ -411,6 +420,7 @@ struct ReceiptDetailView: View {
                     
                     Button(action: {
                        // presentationMode.wrappedValue.dismiss()
+                       isDialogActiveBillCom = true
                     }) {
                         HStack {
                             
@@ -425,6 +435,7 @@ struct ReceiptDetailView: View {
                 }
                 Spacer()
             }
+          
           
             
             
@@ -453,32 +464,55 @@ struct ReceiptDetailView: View {
                     .fill(Color.Secondary50)
                     .frame(height: 603)
                     .overlay(
-                        VStack{
+                        VStack(alignment:.center){
                             Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이 ")
                                 .font(.pretendardMedium8)
                                 .foregroundColor(.homeRed)
                             
                             Spacer()
                             
-                            Text("여행의 기록을 한줄로 기록하세요 :)")
-                                .font(.pretendardMedium14)
+                            TextField("여행의 기록을 한줄로 기록하세요", text: $text, prompt: Text("여행의 기록을 한줄로 기록하세요").foregroundColor(.Natural200))
                                 .foregroundColor(.gray500)
+                                .font(.pretendardMedium14)
                                 .padding(.bottom,30)
+                                .multilineTextAlignment(.center)
                             
-                            VStack(spacing:0){
-                                HStack(alignment: .center)
+                            
+                            
+                            
+                            
+                            
+                            
+                            VStack(alignment:.center,spacing:0){
+                                HStack(alignment:.center,spacing:1)
                                 {
-                                    Image("Locationred")
+                                 Spacer()
                                     
-                                    Text("북촌 한옥마을")
-                                        .font(.pretendardMedium14)
-                                        .foregroundColor(.homeRed)
+                                       // Image("Locationred")
+                                       
+                                        
+                                        TextField("여행의 기록을 한줄로 기록하세요", text: $starttrip, prompt: Text("여행의 시작은 여기부터").foregroundColor(.Natural200))
+                                            .font(.pretendardMedium14)
+                                            .foregroundColor(.homeRed)  // 글씨 색상 변경
+                                            .multilineTextAlignment(.center)
+                                            .frame(maxWidth:100)
+                                         
                                     
-                                }
+                                   Spacer()
+                                }  
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                
                                 HStack{
-                                    Text("서울")
+                                    TextField("출발지",text:$StartLocation,prompt: Text("출발지").foregroundColor(.Natural200))
                                         .font(.pretendardExtrabold45)
-                                        .foregroundColor(.homeRed)
+                                        .foregroundColor(.homeRed)  // 글씨
+                                        .multilineTextAlignment(.center)
                                 }
                             }
                             
@@ -487,19 +521,24 @@ struct ReceiptDetailView: View {
                                 .padding(.bottom,20)
                             
                             VStack(spacing:0){
-                                HStack(alignment: .center)
+                                HStack(alignment: .center,spacing:0)
                                 {
                                     Image("Locationred")
                                     Text("암스테르담 공항")
                                         .font(.pretendardMedium14)
                                         .foregroundColor(.homeRed)
+                                        .multilineTextAlignment(.leading)
                                     
                                 }
+                                
+                                
+                                
                                 HStack{
                                     
-                                    Text("암스테르담")
+                                    TextField("출발지",text:$EndLocation,prompt: Text("도착지").foregroundColor(.Natural200))
                                         .font(.pretendardExtrabold45)
-                                        .foregroundColor(.homeRed)
+                                        .foregroundColor(.homeRed)  // 글씨
+                                        .multilineTextAlignment(.center)
                                 }
                             }
                             
@@ -524,7 +563,32 @@ struct ReceiptDetailView: View {
             .onAppear {
                 homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
             }
+            if isDialogActive {
+                CustomDialogBill(isActive: $isDialogActive, title: "", message: "앗! 지금 화면을 그냥 나가면 열심히 만든 영수증이 저장되지않아요", yesAction: {
+                    //TODO: - 영수증의 시작뷰로 돌아가야함
+                    print("저장됨")
+                    // 여기에 저장 로직 추가
+                }, noAction: {
+                    //TODO: - dismiss하기
+                    
+                    print("취소됨")
+                })
+            }
             
+            if isDialogActiveBillCom{
+                CustomDialogBillComplete(isActive: $isDialogActive, title: "축하해요", message: "첫번째 영수증이 만들어졌어요!\n 나도이제 여행자", yesAction: {
+                    //TODO: - 영수증의 시작뷰로 돌아가야함
+                    print("저장됨")
+                    // 여기에 저장 로직 추가
+                }, noAction: {
+                    //TODO: - dismiss하기
+                    
+                    print("취소됨")
+                })
+            }
+            VStack{
+                //TODO: - 여기에다가 인디케이터를 넣어줘야함
+            }
             
         }
         .navigationBarBackButtonHidden()
@@ -625,5 +689,147 @@ struct StatsView: View {
         
         
         
+    }
+}
+
+
+struct CustomDialogBill: View {
+    @Binding var isActive: Bool
+    
+    let title: String
+    let message: String
+    let yesAction: () -> Void
+    let noAction: () -> Void
+    @State private var showingCustomAlert = false
+    
+    @State private var offset: CGFloat = 1000
+    @Environment(\.presentationMode) var presentationMode
+    
+    var body: some View {
+        
+        ZStack{
+            Color(showingCustomAlert ? .black : .black)
+                .opacity(showingCustomAlert ? 1.0 : 0.5)
+                .edgesIgnoringSafeArea(.all)
+                .animation(.easeInOut, value: showingCustomAlert)
+            
+            VStack {
+
+                
+                Text(message)
+                    
+                    .font(.pretendardMedium14)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.gray500)
+                    .padding(.bottom)
+                
+                HStack { // 버튼 사이 간격을 0으로 조정
+                    Button {
+                        yesAction()
+                        close()
+                        presentationMode.wrappedValue.dismiss()
+                    } label: {
+                        ZStack {
+                            
+                            Text("나갈게요")
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
+                        }
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
+                    }
+                    
+                    Rectangle() // 빨간색 세로줄 추가
+                        .fill(Color.gray500)
+                        .frame(width: 2, height: 20)
+                    
+                    Button {
+                        noAction()
+                        close()
+                    } label: {
+                        ZStack {
+                            
+                            Text("돌아갈게요")
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
+                        }
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
+                    }
+                }.padding(.bottom,10)
+                
+            }
+            
+            .frame(width: 280, height: 144) // 다이얼로그의 크기 조절
+            
+            .background(.homeBack)
+            .clipShape(RoundedRectangle(cornerRadius: 0))
+        }
+        
+        // .ignoresSafeArea()
+    }
+    
+    func close() {
+        withAnimation(.spring()) {
+            offset = 1000
+            isActive = false
+        }
+    }
+}
+
+
+
+struct CustomDialogBillComplete: View {
+    @Binding var isActive: Bool
+    
+    let title: String
+    let message: String
+    let yesAction: () -> Void
+    let noAction: () -> Void
+    @State private var showingCustomAlert = false
+    
+    @State private var offset: CGFloat = 1000
+    @Environment(\.presentationMode) var presentationMode
+    
+    var body: some View {
+        
+        ZStack{
+            Color(showingCustomAlert ? .black : .black)
+                .opacity(showingCustomAlert ? 1.0 : 0.5)
+                .edgesIgnoringSafeArea(.all)
+                .animation(.easeInOut, value: showingCustomAlert)
+            
+            VStack {
+                Text(title)
+                    .font(.pretendardExtrabold16)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.homeRed)
+                    .padding(.bottom)
+                
+                Text(message)
+                    
+                    .font(.pretendardMedium14)
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.gray500)
+                    .padding(.bottom)
+                
+               
+                
+            }
+            
+            .frame(width: 280, height: 144) // 다이얼로그의 크기 조절
+            
+            .background(.homeBack)
+            .clipShape(RoundedRectangle(cornerRadius: 0))
+        }
+        
+        // .ignoresSafeArea()
+    }
+    
+    func close() {
+        withAnimation(.spring()) {
+            offset = 1000
+            isActive = false
+        }
     }
 }

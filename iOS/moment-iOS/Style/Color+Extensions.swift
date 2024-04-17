@@ -34,5 +34,6 @@ extension Color { // 왜 extension 을 썼지? : extension 은 원래있던 클�
     static let Natural500 = Color("Natural500")
     static let Natural50 = Color("Natural50")
     static let Natural300 = Color("Natural300")
+    static let Natural200 = Color("Natural200")
     
 }
