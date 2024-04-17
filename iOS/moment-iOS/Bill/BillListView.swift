@@ -401,6 +401,9 @@ struct ReceiptDetailView: View {
     @State private var isEditing: Bool = false
     @State private var saveButtonTitle = "저장"
     @State private var backButtonTitle = "뒤로"
+    @State private var inputText: String = ""
+    
+    
     
     var body: some View {
         ZStack{
@@ -415,10 +418,11 @@ struct ReceiptDetailView: View {
                             // 내보내기 기능 실행
                             isDialogActive = true
                             print("두ㅏㅣ로가기")
-                        }else {
+                        } else {
                             let image = snapshot()
                             showShareSheet(image)
                             print("내보내기")
+                            //print(image)
                         }
                     }) {
                         HStack {
@@ -480,11 +484,16 @@ struct ReceiptDetailView: View {
                 Rectangle()
                     .fill(Color.Secondary50)
                     .frame(height: 603)
+                    .border(.gray500)
                     .overlay(
                         VStack(alignment:.center){
-                            Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이 ")
-                                .font(.pretendardMedium8)
-                                .foregroundColor(.homeRed)
+                           
+                                Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이 ")
+                                    .font(.pretendardMedium8)
+                                    .foregroundColor(.homeRed)
+                                    
+                                    
+                            
                             
                             Spacer()
                             
@@ -503,27 +512,21 @@ struct ReceiptDetailView: View {
                             VStack(alignment:.center,spacing:0){
                                 HStack(alignment:.center,spacing:1)
                                 {
-                                    Spacer()
                                     
-                                    // Image("Locationred")
-                                    
-                                    
-                                    TextField("여행의 기록을 한줄로 기록하세요", text: $starttrip, prompt: Text("여행의 시작은 여기부터").foregroundColor(.Natural200))
-                                        .font(.pretendardMedium14)
-                                        .foregroundColor(.homeRed)  // 글씨 색상 변경
-                                        .multilineTextAlignment(.center)
-                                        .frame(maxWidth:100)
-                                    
-                                    
-                                    Spacer()
-                                }
-                                
-                                
-                                
-                                
-                                
-                                
-                                
+                                    Image("Locationred")
+                                                       .resizable()
+                                                       .scaledToFit()
+                                                       .frame(width: 19, height: 19)
+                                                   
+                                                   TextFieldDynamicWidth(title: "여행의 시작은 여기부터", text: $inputText, onEditingChanged: { isEditing in
+                                                       
+                                                   }, onCommit: {
+                                                      
+                                                   })
+                                                   .font(.pretendardMedium14)
+                                                   .foregroundColor(.homeRed)
+                                }.frame(maxWidth: .infinity)
+                               
                                 
                                 HStack{
                                     TextField("출발지",text:$StartLocation,prompt: Text("출발지").foregroundColor(.Natural200))
@@ -541,11 +544,17 @@ struct ReceiptDetailView: View {
                                 HStack(alignment: .center,spacing:0)
                                 {
                                     Image("Locationred")
-                                    Text("암스테르담 공항")
-                                        .font(.pretendardMedium14)
-                                        .foregroundColor(.homeRed)
-                                        .multilineTextAlignment(.leading)
-                                    
+                                                       .resizable()
+                                                       .scaledToFit()
+                                                       .frame(width: 19, height: 19)
+                                                   
+                                                   TextFieldDynamicWidth(title: "기억속에 오래 저장할", text: $EndLocation, onEditingChanged: { isEditing in
+                                                       
+                                                   }, onCommit: {
+                                                      
+                                                   })
+                                                   .font(.pretendardMedium14)
+                                                   .foregroundColor(.homeRed)
                                 }
                                 
                                 
@@ -610,13 +619,14 @@ struct ReceiptDetailView: View {
             }
             
         }
+        .background(.homeBack)
         .navigationBarBackButtonHidden()
         
       
     }
-    // SwiftUI View 내에서 사용될 함수
+    
     private func showShareSheet(_ image: UIImage) {
-        // UIApplication의 rootViewController를 가져옵니다.
+       
         guard let rootVC = UIApplication.shared.windows.first?.rootViewController else {
             return
         }
@@ -635,6 +645,25 @@ struct ReceiptDetailView: View {
         rootVC.present(activityVC, animated: true, completion: nil)
     }
 
+}
+
+
+struct GlobalGeometryGetter: View {
+    @Binding var rect: CGRect
+
+    var body: some View {
+        return GeometryReader { geometry in
+            self.makeView(geometry: geometry)
+        }
+    }
+
+    func makeView(geometry: GeometryProxy) -> some View {
+        DispatchQueue.main.async {
+            self.rect = geometry.frame(in: .global)
+        }
+
+        return Rectangle().fill(Color.clear)
+    }
 }
 
 
