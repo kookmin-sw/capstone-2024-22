@@ -401,55 +401,55 @@ struct ReceiptDetailView: View {
     
     var body: some View {
         ZStack{
-          
+            
             
             VStack {
                 
                 HStack {
-                                   Button(action: {
-                                     
-                                       if backButtonTitle == "뒤로" {
-                                           // 내보내기 기능 실행
-                                           isDialogActive = true
-                                           print("두ㅏㅣ로가기")
-                                       }else {
-                                           //내보내기 기능 추가
-                                          print("내보내기")
-                                       }
-                                   }) {
-                                       HStack {
-                                           Text(backButtonTitle)
-                                       }
-                                       .padding(.horizontal, 20)
-                                       .padding()
-                                       .font(.yjObangBold15)
-                                       .tint(Color.black)
-                                   }
-                                   Spacer()
-                                   
-                                   Button(action: {
-                                       if saveButtonTitle == "저장" {
-                                           saveButtonTitle = "완료"
-                                           backButtonTitle = "내보내기"
-                                           isDialogActiveBillCom = true
-                                       } else {
-                                           // 완료 버튼의 기능
-                                           print("완료")
-                                       }
-                                   }) {
-                                       HStack {
-                                           Text(saveButtonTitle)
-                                       }
-                                       .padding(.horizontal, 20)
-                                       .padding()
-                                       .font(.yjObangBold15)
-                                       .foregroundColor(saveButtonTitle == "완료" ? .homeRed : .black)
-                                   }
-                               }
+                    Button(action: {
+                        
+                        if backButtonTitle == "뒤로" {
+                            // 내보내기 기능 실행
+                            isDialogActive = true
+                            print("두ㅏㅣ로가기")
+                        }else {
+                            //내보내기 기능 추가
+                            print("내보내기")
+                        }
+                    }) {
+                        HStack {
+                            Text(backButtonTitle)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding()
+                        .font(.yjObangBold15)
+                        .tint(Color.black)
+                    }
+                    Spacer()
+                    
+                    Button(action: {
+                        if saveButtonTitle == "저장" {
+                            saveButtonTitle = "완료"
+                            backButtonTitle = "내보내기"
+                            isDialogActiveBillCom = true
+                        } else {
+                            // 완료 버튼의 기능
+                            print("완료")
+                        }
+                    }) {
+                        HStack {
+                            Text(saveButtonTitle)
+                        }
+                        .padding(.horizontal, 20)
+                        .padding()
+                        .font(.yjObangBold15)
+                        .foregroundColor(saveButtonTitle == "완료" ? .homeRed : .black)
+                    }
+                }
                 Spacer()
             }
-          
-          
+            
+            
             
             
             VStack(spacing: 0) {
@@ -499,20 +499,20 @@ struct ReceiptDetailView: View {
                             VStack(alignment:.center,spacing:0){
                                 HStack(alignment:.center,spacing:1)
                                 {
-                                 Spacer()
+                                    Spacer()
                                     
-                                       // Image("Locationred")
-                                       
-                                        
-                                        TextField("여행의 기록을 한줄로 기록하세요", text: $starttrip, prompt: Text("여행의 시작은 여기부터").foregroundColor(.Natural200))
-                                            .font(.pretendardMedium14)
-                                            .foregroundColor(.homeRed)  // 글씨 색상 변경
-                                            .multilineTextAlignment(.center)
-                                            .frame(maxWidth:100)
-                                         
+                                    // Image("Locationred")
                                     
-                                   Spacer()
-                                }  
+                                    
+                                    TextField("여행의 기록을 한줄로 기록하세요", text: $starttrip, prompt: Text("여행의 시작은 여기부터").foregroundColor(.Natural200))
+                                        .font(.pretendardMedium14)
+                                        .foregroundColor(.homeRed)  // 글씨 색상 변경
+                                        .multilineTextAlignment(.center)
+                                        .frame(maxWidth:100)
+                                    
+                                    
+                                    Spacer()
+                                }
                                 
                                 
                                 
@@ -643,7 +643,7 @@ struct StatsView: View {
                 Text("여행 감정")
                     .font(.pretendardMedium11)
                     .foregroundColor(.gray500)
-                    //.padding(.vertical,10)
+                //.padding(.vertical,10)
                     .padding(.top,25)
                     .padding(.bottom,5)
                 
@@ -659,7 +659,7 @@ struct StatsView: View {
                         .font(.pretendardMedium11)
                         .foregroundColor(.homeRed)
                         .frame(width: 30)
-                        
+                    
                 }
                 
                 HStack{
@@ -670,7 +670,7 @@ struct StatsView: View {
                     Text("30%")
                         .font(.pretendardMedium11)
                         .frame(width: 30)
-                      
+                    
                 }
                 
                 HStack{
@@ -682,7 +682,7 @@ struct StatsView: View {
                     Text("50%")
                         .font(.pretendardMedium11)
                         .frame(width: 30)
-                        
+                    
                 }
                 HStack{
                     ProgressView(value: 0.2).frame(width: 109,height: 15)
@@ -693,7 +693,7 @@ struct StatsView: View {
                     Text("20%")
                         .font(.pretendardMedium11)
                         .frame(width: 30)
-                        
+                    
                 }
                 Spacer().frame(height: 16)
             }
@@ -729,10 +729,10 @@ struct CustomDialogBill: View {
                 .animation(.easeInOut, value: showingCustomAlert)
             
             VStack {
-
+                
                 
                 Text(message)
-                    
+                
                     .font(.pretendardMedium14)
                     .multilineTextAlignment(.center)
                     .foregroundColor(.gray500)
@@ -812,13 +812,13 @@ struct CustomDialogBillComplete: View {
             
             Color(showingCustomAlert ? .black : .black)
                 .opacity(showingCustomAlert ? 1.0 : 0.5)
-               
-               
+            
+            
                 .onTapGesture {
-                                 close() // 배경 탭 시 다이얼로그 닫기
-                             }
-                             .animation(.easeInOut, value: showingCustomAlert)
-                             .edgesIgnoringSafeArea(.all)
+                    close() // 배경 탭 시 다이얼로그 닫기
+                }
+                .animation(.easeInOut, value: showingCustomAlert)
+                .edgesIgnoringSafeArea(.all)
             
             VStack {
                 Text(title)
@@ -828,13 +828,13 @@ struct CustomDialogBillComplete: View {
                     .padding(.bottom)
                 
                 Text(message)
-                    
+                
                     .font(.pretendardMedium14)
                     .multilineTextAlignment(.center)
                     .foregroundColor(.gray500)
                     .padding(.bottom)
                 
-               
+                
                 
             }
             
@@ -842,22 +842,22 @@ struct CustomDialogBillComplete: View {
             
             .background(.homeBack)
             .clipShape(RoundedRectangle(cornerRadius: 0))
-//            .onAppear {
-//                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                                self.close()  // 1초 후에 다이얼로그 자동 닫기
-//                            }
-//                        }
+            //            .onAppear {
+            //                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            //                                self.close()  // 1초 후에 다이얼로그 자동 닫기
+            //                            }
+            //                        }
         }
         
         // .ignoresSafeArea()
     }
     
     
-       
-       func close() {
-           withAnimation(.spring()) {
-               offset = 1000  // 다이얼로그가 아래로 이동하며 사라짐
-               isActive = false  // 다이얼로그 비활성화
-           }
-       }
+    
+    func close() {
+        withAnimation(.spring()) {
+            offset = 1000  // 다이얼로그가 아래로 이동하며 사라짐
+            isActive = false  // 다이얼로그 비활성화
+        }
+    }
 }
