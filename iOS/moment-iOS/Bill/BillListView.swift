@@ -396,43 +396,56 @@ struct ReceiptDetailView: View {
     @State private var StartLocation : String = ""
     @State private var EndLocation : String = ""
     @State private var isEditing: Bool = false
+    @State private var saveButtonTitle = "저장"
+    @State private var backButtonTitle = "뒤로"
     
     var body: some View {
         ZStack{
           
             
             VStack {
+                
                 HStack {
-                    Button(action: {
-                        //
-                        isDialogActive = true
-                    }) {
-                        HStack {
-                            
-                            Text("뒤로")
-                        }
-                        .padding(.horizontal,20)
-                        .padding()
-                        .font(.yjObangBold15)
-                        .tint(Color.black)
-                    }
-                    Spacer()
-                    
-                    Button(action: {
-                       // presentationMode.wrappedValue.dismiss()
-                       isDialogActiveBillCom = true
-                    }) {
-                        HStack {
-                            
-                            Text("저장")
-                        }
-                        .padding(.horizontal,20)
-                        .padding()
-                        .font(.yjObangBold15)
-                        .tint(Color.black)
-                    }
-                   // Spacer()
-                }
+                                   Button(action: {
+                                     
+                                       if backButtonTitle == "뒤로" {
+                                           // 내보내기 기능 실행
+                                           isDialogActive = true
+                                           print("두ㅏㅣ로가기")
+                                       }else {
+                                           //내보내기 기능 추가
+                                          print("내보내기")
+                                       }
+                                   }) {
+                                       HStack {
+                                           Text(backButtonTitle)
+                                       }
+                                       .padding(.horizontal, 20)
+                                       .padding()
+                                       .font(.yjObangBold15)
+                                       .tint(Color.black)
+                                   }
+                                   Spacer()
+                                   
+                                   Button(action: {
+                                       if saveButtonTitle == "저장" {
+                                           saveButtonTitle = "완료"
+                                           backButtonTitle = "내보내기"
+                                           isDialogActiveBillCom = true
+                                       } else {
+                                           // 완료 버튼의 기능
+                                           print("완료")
+                                       }
+                                   }) {
+                                       HStack {
+                                           Text(saveButtonTitle)
+                                       }
+                                       .padding(.horizontal, 20)
+                                       .padding()
+                                       .font(.yjObangBold15)
+                                       .foregroundColor(saveButtonTitle == "완료" ? .homeRed : .black)
+                                   }
+                               }
                 Spacer()
             }
           
@@ -576,7 +589,8 @@ struct ReceiptDetailView: View {
             }
             
             if isDialogActiveBillCom{
-                CustomDialogBillComplete(isActive: $isDialogActive, title: "축하해요", message: "첫번째 영수증이 만들어졌어요!\n 나도이제 여행자", yesAction: {
+                
+                CustomDialogBillComplete(isActive: $isDialogActiveBillCom, title: "축하해요", message: "첫번째 영수증이 만들어졌어요!\n 나도이제 여행자", yesAction: {
                     //TODO: - 영수증의 시작뷰로 돌아가야함
                     print("저장됨")
                     // 여기에 저장 로직 추가
@@ -586,6 +600,7 @@ struct ReceiptDetailView: View {
                     print("취소됨")
                 })
             }
+            
             VStack{
                 //TODO: - 여기에다가 인디케이터를 넣어줘야함
             }
@@ -788,16 +803,22 @@ struct CustomDialogBillComplete: View {
     let noAction: () -> Void
     @State private var showingCustomAlert = false
     
-    @State private var offset: CGFloat = 1000
+    @State private var offset: CGFloat = 0
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         
         ZStack{
+            
             Color(showingCustomAlert ? .black : .black)
                 .opacity(showingCustomAlert ? 1.0 : 0.5)
-                .edgesIgnoringSafeArea(.all)
-                .animation(.easeInOut, value: showingCustomAlert)
+               
+               
+                .onTapGesture {
+                                 close() // 배경 탭 시 다이얼로그 닫기
+                             }
+                             .animation(.easeInOut, value: showingCustomAlert)
+                             .edgesIgnoringSafeArea(.all)
             
             VStack {
                 Text(title)
@@ -821,15 +842,22 @@ struct CustomDialogBillComplete: View {
             
             .background(.homeBack)
             .clipShape(RoundedRectangle(cornerRadius: 0))
+//            .onAppear {
+//                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                                self.close()  // 1초 후에 다이얼로그 자동 닫기
+//                            }
+//                        }
         }
         
         // .ignoresSafeArea()
     }
     
-    func close() {
-        withAnimation(.spring()) {
-            offset = 1000
-            isActive = false
-        }
-    }
+    
+       
+       func close() {
+           withAnimation(.spring()) {
+               offset = 1000  // 다이얼로그가 아래로 이동하며 사라짐
+               isActive = false  // 다이얼로그 비활성화
+           }
+       }
 }
