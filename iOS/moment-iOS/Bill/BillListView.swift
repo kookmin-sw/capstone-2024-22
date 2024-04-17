@@ -7,6 +7,8 @@
 
 import Foundation
 import SwiftUI
+import UIKit
+
 
 struct BillListView: View {
     
@@ -297,6 +299,7 @@ struct ReceiptsView: View {
                                 ReceiptCell(item: item)
                             }
                             .padding(.vertical, 10)
+                            .environmentObject(HomeViewModel())
                             CustomHomeSubDivider()
                             
                         }
@@ -413,7 +416,8 @@ struct ReceiptDetailView: View {
                             isDialogActive = true
                             print("두ㅏㅣ로가기")
                         }else {
-                            //내보내기 기능 추가
+                            let image = snapshot()
+                            showShareSheet(image)
                             print("내보내기")
                         }
                     }) {
@@ -573,9 +577,9 @@ struct ReceiptDetailView: View {
                 RoundedRectangle(cornerRadius: 3)
                     .stroke(Color.Secondary50, lineWidth: 1)
             )
-            .onAppear {
-                homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
-            }
+//            .onAppear {
+//                homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
+//            }
             if isDialogActive {
                 CustomDialogBill(isActive: $isDialogActive, title: "", message: "앗! 지금 화면을 그냥 나가면 열심히 만든 영수증이 저장되지않아요", yesAction: {
                     //TODO: - 영수증의 시작뷰로 돌아가야함
@@ -607,7 +611,30 @@ struct ReceiptDetailView: View {
             
         }
         .navigationBarBackButtonHidden()
+        
+      
     }
+    // SwiftUI View 내에서 사용될 함수
+    private func showShareSheet(_ image: UIImage) {
+        // UIApplication의 rootViewController를 가져옵니다.
+        guard let rootVC = UIApplication.shared.windows.first?.rootViewController else {
+            return
+        }
+        
+        // UIActivityViewController 인스턴스 생성
+        let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+
+        // iPad에서는 popover로 표시될 위치를 지정해야 할 수 있습니다.
+        if let popoverController = activityVC.popoverPresentationController {
+            popoverController.sourceView = rootVC.view
+            popoverController.sourceRect = CGRect(x: rootVC.view.bounds.midX, y: rootVC.view.bounds.midY, width: 0, height: 0)
+            popoverController.permittedArrowDirections = []
+        }
+
+        // activityVC를 present합니다.
+        rootVC.present(activityVC, animated: true, completion: nil)
+    }
+
 }
 
 
