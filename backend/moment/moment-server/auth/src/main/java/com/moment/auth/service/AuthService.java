@@ -41,30 +41,46 @@ public class AuthService {
         log.info("sendCode.isSignUp : {}", sendCode.getIsSignUp());
         if (sendCode.getIsSignUp().equals("true")) {
             if(userRepository.existsByEmail(sendCode.getEmail())){
-                throw new AlreadyRegisteredEmailException("이미 가입된 이메일");
+                User user = userRepository.findByEmail(sendCode.getEmail()).orElseThrow(() -> new AlreadyRegisteredEmailException("미 가입된 이메일"));
+                if (user.getRole().equals(Role.ROLE_AUTH_USER)){
+                    throw new AlreadyRegisteredEmailException("이미 가입된 이메일");
+                }
+                String randomCode = RandomStringUtils.randomAlphanumeric(6);
+                String email = sendCode.getEmail();
+                String code = mailService.sendMail(email, "Moment 인증코드", "인증코드 : " + randomCode);
+                if (Objects.equals(code, "success")) {
+                    user.setVerificationCode(randomCode);
+                    userService.save(user);
+                    String accessToken = jwtTokenUtils.generateAccessToken(provider, iss, user.getId(), Role.ROLE_TEMP_USER);
+                    return TokenResponseDTO.GetTempToken.builder()
+                            .grantType("Bearer")
+                            .accessToken(accessToken)
+                            .role(Role.ROLE_TEMP_USER)
+                            .userId(user.getId())
+                            .build();
+                }
+            }else{
+                String randomCode = RandomStringUtils.randomAlphanumeric(6);
+                String randomPassword = RandomStringUtils.randomAlphanumeric(10);
+                String email = sendCode.getEmail();
+                String code = mailService.sendMail(email, "Moment 인증코드", "인증코드 : " + randomCode);
+                if (Objects.equals(code, "success")) {
+                    User user = User.builder()
+                            .email(email)
+                            .password(passwordEncoder.encode(randomPassword))
+                            .role(Role.ROLE_TEMP_USER)
+                            .verificationCode(randomCode)
+                            .build();
+                    userService.save(user);
+                    String accessToken = jwtTokenUtils.generateAccessToken(provider, iss, user.getId(), Role.ROLE_TEMP_USER);
+                    return TokenResponseDTO.GetTempToken.builder()
+                            .grantType("Bearer")
+                            .accessToken(accessToken)
+                            .role(Role.ROLE_TEMP_USER)
+                            .userId(user.getId())
+                            .build();
+                }
             }
-            String randomCode = RandomStringUtils.randomAlphanumeric(6);
-            String randomPassword = RandomStringUtils.randomAlphanumeric(10);
-            String email = sendCode.getEmail();
-            String code = mailService.sendMail(email, "Moment 인증코드", "인증코드 : " + randomCode);
-            if (Objects.equals(code, "success")) {
-                User user = User.builder()
-                        .email(email)
-                        .password(passwordEncoder.encode(randomPassword))
-                        .role(Role.ROLE_TEMP_USER)
-                        .verificationCode(randomCode)
-                        .build();
-                userService.save(user);
-                String accessToken = jwtTokenUtils.generateAccessToken(provider, iss, user.getId(), Role.ROLE_TEMP_USER);
-                return TokenResponseDTO.GetTempToken.builder()
-                        .grantType("Bearer")
-                        .accessToken(accessToken)
-                        .role(Role.ROLE_TEMP_USER)
-                        .userId(user.getId())
-                        .build();
-
-            }
-            else throw new IllegalArgumentException("인증코드 전송 실패");
         }
         else {
             User user = userRepository.findByEmail(sendCode.getEmail()).orElseThrow(() -> new AlreadyRegisteredEmailException("미 가입된 이메일"));
@@ -83,6 +99,7 @@ public class AuthService {
             }
             else throw new IllegalArgumentException("인증코드 전송 실패");
         }
+        return null;
     }
 
 
