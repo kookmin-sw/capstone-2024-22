@@ -402,6 +402,9 @@ struct ReceiptDetailView: View {
     @State private var saveButtonTitle = "저장"
     @State private var backButtonTitle = "뒤로"
     @State private var inputText: String = ""
+    @State private var EndLocationend : String = ""
+    @State private var selectedTab = 0
+
     
     
     
@@ -456,139 +459,160 @@ struct ReceiptDetailView: View {
                 }
                 Spacer()
             }
+            .zIndex(1)
             
             
-            
-            
-            VStack(spacing: 0) {
-                
-                
-                Rectangle()
-                    .fill(topColor)
-                    .frame(height: 50) // 상단 바의 높이를 설정합니다.
-                    .overlay(
-                        HStack{
-                            Text("암스테르담 성당 여행") // 여기에 원하는 텍스트를 입력합니다.
-                                .foregroundColor(textColor) // 텍스트 색상 설정
-                            
-                                .font(.pretendardMedium14)
-                                .padding()
-                            Spacer()
-                            Image("Logo")
-                                .padding()
-                        }
-                    )
-                
-                // }
-                // 나머지 카드 부분
-                Rectangle()
-                    .fill(Color.Secondary50)
-                    .frame(height: 603)
-                    .border(.gray500)
-                    .overlay(
-                        VStack(alignment:.center){
-                           
-                                Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이 ")
-                                    .font(.pretendardMedium8)
-                                    .foregroundColor(.homeRed)
-                                    
-                                    
-                            
-                            
-                            Spacer()
-                            
-                            TextField("여행의 기록을 한줄로 기록하세요", text: $text, prompt: Text("여행의 기록을 한줄로 기록하세요").foregroundColor(.Natural200))
-                                .foregroundColor(.gray500)
-                                .font(.pretendardMedium14)
-                                .padding(.bottom,30)
-                                .multilineTextAlignment(.center)
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            VStack(alignment:.center,spacing:0){
-                                HStack(alignment:.center,spacing:1)
-                                {
-                                    
-                                    Image("Locationred")
-                                                       .resizable()
-                                                       .scaledToFit()
-                                                       .frame(width: 19, height: 19)
-                                                   
-                                                   TextFieldDynamicWidth(title: "여행의 시작은 여기부터", text: $inputText, onEditingChanged: { isEditing in
-                                                       
-                                                   }, onCommit: {
-                                                      
-                                                   })
-                                                   .font(.pretendardMedium14)
-                                                   .foregroundColor(.homeRed)
-                                }.frame(maxWidth: .infinity)
-                               
-                                
+            TabView(selection: $selectedTab) {
+                ForEach(0..<4) { index in
+                    VStack(spacing: 0) {
+                        
+                        
+                        Rectangle()
+                            .fill(topColor)
+                            .frame(height: 50) // 상단 바의 높이를 설정합니다.
+                            .overlay(
                                 HStack{
-                                    TextField("출발지",text:$StartLocation,prompt: Text("출발지").foregroundColor(.Natural200))
-                                        .font(.pretendardExtrabold45)
-                                        .foregroundColor(.homeRed)  // 글씨
-                                        .multilineTextAlignment(.center)
-                                }
-                            }
-                            
-                            
-                            Image("airplane")
-                                .padding(.bottom,20)
-                            
-                            VStack(spacing:0){
-                                HStack(alignment: .center,spacing:0)
-                                {
-                                    Image("Locationred")
-                                                       .resizable()
-                                                       .scaledToFit()
-                                                       .frame(width: 19, height: 19)
-                                                   
-                                                   TextFieldDynamicWidth(title: "기억속에 오래 저장할", text: $EndLocation, onEditingChanged: { isEditing in
-                                                       
-                                                   }, onCommit: {
-                                                      
-                                                   })
-                                                   .font(.pretendardMedium14)
-                                                   .foregroundColor(.homeRed)
-                                }
-                                
-                                
-                                
-                                HStack{
+                                    Text("암스테르담 성당 여행") // 여기에 원하는 텍스트를 입력합니다.
+                                        .foregroundColor(textColor) // 텍스트 색상 설정
                                     
-                                    TextField("출발지",text:$EndLocation,prompt: Text("도착지").foregroundColor(.Natural200))
-                                        .font(.pretendardExtrabold45)
-                                        .foregroundColor(.homeRed)  // 글씨
-                                        .multilineTextAlignment(.center)
+                                        .font(.pretendardMedium14)
+                                        .padding()
+                                    Spacer()
+                                    Image("Logo")
+                                        .padding()
                                 }
-                            }
-                            
-                            Spacer()
-                            Image("cut")
-                                .padding(.bottom,10)
-                            
-                            StatsView()
-                            Spacer()
-                        }
+                            )
+                        
+                        // }
+                        // 나머지 카드 부분
+                        Rectangle()
+                            .fill(Color.Secondary50)
+                            .frame(height: 603)
+                            .border(.gray500)
+                            .overlay(
+                                VStack(alignment:.center){
+                                    
+                                    Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이 ")
+                                        .font(.pretendardMedium8)
+                                        .foregroundColor(.homeRed)
+                                    
+                                    
+                                    
+                                    
+                                    Spacer()
+                                    
+                                    TextField("여행의 기록을 한줄로 기록하세요", text: $text, prompt: Text("여행의 기록을 한줄로 기록하세요").foregroundColor(.Natural200))
+                                        .foregroundColor(.gray500)
+                                        .font(.pretendardMedium14)
+                                        .padding(.bottom,30)
+                                        .multilineTextAlignment(.center)
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    VStack(alignment:.center,spacing:0){
+                                        HStack(alignment:.center,spacing:1)
+                                        {
+                                            
+                                            Image("Locationred")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 19, height: 19)
+                                            
+                                            TextFieldDynamicWidth(title: "여행의 시작은 여기부터", text: $inputText, onEditingChanged: { isEditing in
+                                                
+                                            }, onCommit: {
+                                                
+                                            })
+                                            .font(.pretendardMedium14)
+                                            .foregroundColor(.homeRed)
+                                        }.frame(maxWidth: .infinity)
+                                        
+                                        
+                                        HStack{
+                                            TextField("출발지",text:$StartLocation,prompt: Text("출발지").foregroundColor(.Natural200))
+                                                .font(.pretendardExtrabold45)
+                                                .foregroundColor(.homeRed)  // 글씨
+                                                .multilineTextAlignment(.center)
+                                        }
+                                    }
+                                    
+                                    
+                                    Image("airplane")
+                                        .padding(.bottom,20)
+                                    
+                                    VStack(spacing:0){
+                                        HStack(alignment: .center,spacing:0)
+                                        {
+                                            Image("Locationred")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 19, height: 19)
+                                            
+                                            TextFieldDynamicWidth(title: "기억속에 오래 저장할", text: $EndLocationend, onEditingChanged: { isEditing in
+                                                
+                                            }, onCommit: {
+                                                
+                                            })
+                                            .font(.pretendardMedium14)
+                                            .foregroundColor(.homeRed)
+                                        }
+                                        
+                                        
+                                        
+                                        HStack{
+                                            
+                                            TextField("출발지",text:$EndLocation,prompt: Text("도착지").foregroundColor(.Natural200))
+                                                .font(.pretendardExtrabold45)
+                                                .foregroundColor(.homeRed)  // 글씨
+                                                .multilineTextAlignment(.center)
+                                        }
+                                    }
+                                    
+                                    Spacer()
+                                    Image("cut")
+                                        .padding(.bottom,10)
+                                    
+                                    StatsView()
+                                    Spacer()
+                                }
+                            )
+                    }
+                    .tag(index)
+                    
+                    .frame(width: 335, height: 653)
+                    
+                    .cornerRadius(5) // 모서리를 둥글게 처리합니다.
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 3)
+                            .stroke(Color.Secondary50, lineWidth: 1)
                     )
-            }
+                   
+                }
+                
+                
+                
+                //TODO: - 여기에다가 두번째 디자인 카드를 추가하고 index 1 번으로 추가한다
+                
+                
+            } .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                .zIndex(0)
+                .overlay(
+                          VStack {
+                              Spacer()
+                              CustomTabIndicator(
+                                  numberOfTabs: 4,
+                                  selectedTab: selectedTab,
+                                  accentColor: .gray500,
+                                  inactiveColor: .Natural100
+                              )
+                          }
+                          .padding(.bottom), alignment: .bottom
+                      )
             
-            
-            .frame(width: 335, height: 653)
-            
-            .cornerRadius(5) // 모서리를 둥글게 처리합니다.
-            .overlay(
-                RoundedRectangle(cornerRadius: 3)
-                    .stroke(Color.Secondary50, lineWidth: 1)
-            )
-//            .onAppear {
-//                homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
-//            }
             if isDialogActive {
                 CustomDialogBill(isActive: $isDialogActive, title: "", message: "앗! 지금 화면을 그냥 나가면 열심히 만든 영수증이 저장되지않아요", yesAction: {
                     //TODO: - 영수증의 시작뷰로 돌아가야함
@@ -613,55 +637,72 @@ struct ReceiptDetailView: View {
                     print("취소됨")
                 })
             }
-            
-            VStack{
-                //TODO: - 여기에다가 인디케이터를 넣어줘야함
-            }
+              
+          
             
         }
         .background(.homeBack)
         .navigationBarBackButtonHidden()
         
-      
+        
     }
     
     private func showShareSheet(_ image: UIImage) {
-       
+        
         guard let rootVC = UIApplication.shared.windows.first?.rootViewController else {
             return
         }
         
         // UIActivityViewController 인스턴스 생성
         let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
-
+        
         // iPad에서는 popover로 표시될 위치를 지정해야 할 수 있습니다.
         if let popoverController = activityVC.popoverPresentationController {
             popoverController.sourceView = rootVC.view
             popoverController.sourceRect = CGRect(x: rootVC.view.bounds.midX, y: rootVC.view.bounds.midY, width: 0, height: 0)
             popoverController.permittedArrowDirections = []
         }
-
+        
         // activityVC를 present합니다.
         rootVC.present(activityVC, animated: true, completion: nil)
     }
+    
+}
 
+struct CustomTabIndicator: View {
+    var numberOfTabs: Int
+    var selectedTab: Int
+    var accentColor: Color
+    var inactiveColor: Color
+
+    var body: some View {
+        HStack {
+            ForEach(0..<numberOfTabs, id: \.self) { index in
+                Rectangle()
+                    .fill(index == selectedTab ? accentColor : inactiveColor)
+                    .frame(width:20,height: 3)
+                    .cornerRadius(3)
+            }
+        }
+        // 추가적인 스타일링은 여기에...
+    }
 }
 
 
 struct GlobalGeometryGetter: View {
     @Binding var rect: CGRect
-
+    
     var body: some View {
         return GeometryReader { geometry in
             self.makeView(geometry: geometry)
         }
     }
-
+    
     func makeView(geometry: GeometryProxy) -> some View {
         DispatchQueue.main.async {
             self.rect = geometry.frame(in: .global)
         }
-
+        
         return Rectangle().fill(Color.clear)
     }
 }
@@ -898,14 +939,10 @@ struct CustomDialogBillComplete: View {
             
             .background(.homeBack)
             .clipShape(RoundedRectangle(cornerRadius: 0))
-            //            .onAppear {
-            //                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            //                                self.close()  // 1초 후에 다이얼로그 자동 닫기
-            //                            }
-            //                        }
+            
         }
         
-        // .ignoresSafeArea()
+      
     }
     
     
