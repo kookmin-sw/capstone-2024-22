@@ -5,6 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="author" content="== Introduction">
 <title>Moment Application API Document</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -441,6 +442,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="header">
 <h1>Moment Application API Document</h1>
 <div class="details">
+<span id="author" class="author">== Introduction</span><br>
 <span id="revnumber">version 0.0.1-SNAPSHOT</span>
 </div>
 <div id="toc" class="toc2">
@@ -482,6 +484,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel3">
 <li><a href="#_여행파일id로_카드뷰_전체_조회_http_request">HTTP request</a></li>
 <li><a href="#_여행파일id로_카드뷰_전체_조회_request_headers">Request headers</a></li>
+<li><a href="#_여행파일id로_카드뷰_전체_조회_path_parameters">Path parameters</a></li>
 <li><a href="#_여행파일id로_카드뷰_전체_조회_http_response">HTTP response</a></li>
 <li><a href="#_여행파일id로_카드뷰_전체_조회_response_fields">Response fields</a></li>
 </ul>
@@ -655,7 +658,7 @@ Content-Length: 211
   "detailMsg" : "",
   "data" : {
     "cardViews" : [ {
-      "bookedDate" : "2024-04-11"
+      "bookedDate" : "2024-04-18"
     }, {
       "bookedDate" : "2023-10-10"
     } ]
@@ -1120,6 +1123,28 @@ Host: localhost:8080</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>userId</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Bearer Token</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_여행파일id로_카드뷰_전체_조회_path_parameters"><a class="link" href="#_여행파일id로_카드뷰_전체_조회_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /core/cardView/all/{tripFileId}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tripFileId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">여행 파일 ID</p></td>
 </tr>
 </tbody>
 </table>
@@ -2454,8 +2479,8 @@ Content-Length: 83
 Host: localhost:8080
 
 {
-  "startDate" : "2024-04-11",
-  "endDate" : "2024-04-12",
+  "startDate" : "2024-04-18",
+  "endDate" : "2024-04-19",
   "tripName" : "test"
 }</code></pre>
 </div>
@@ -2487,8 +2512,8 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{
-  "startDate" : "2024-04-11",
-  "endDate" : "2024-04-12",
+  "startDate" : "2024-04-18",
+  "endDate" : "2024-04-19",
   "tripName" : "test"
 }</code></pre>
 </div>
@@ -2653,22 +2678,22 @@ Content-Length: 628
     "trips" : [ {
       "id" : 1,
       "email" : "test",
-      "startDate" : "2024-04-11",
-      "endDate" : "2024-04-12",
+      "startDate" : "2024-04-18",
+      "endDate" : "2024-04-19",
       "analyzingCount" : 0,
       "tripName" : "test"
     }, {
       "id" : 2,
       "email" : "test",
-      "startDate" : "2024-04-11",
-      "endDate" : "2024-04-12",
+      "startDate" : "2024-04-18",
+      "endDate" : "2024-04-19",
       "analyzingCount" : 1,
       "tripName" : "test"
     }, {
       "id" : 3,
       "email" : "test",
-      "startDate" : "2024-04-11",
-      "endDate" : "2024-04-12",
+      "startDate" : "2024-04-18",
+      "endDate" : "2024-04-19",
       "analyzingCount" : 2,
       "tripName" : "test"
     } ]
@@ -2762,8 +2787,8 @@ Host: localhost:8080
 
 {
   "tripId" : 1,
-  "startDate" : "2024-04-11",
-  "endDate" : "2024-04-12",
+  "startDate" : "2024-04-18",
+  "endDate" : "2024-04-19",
   "tripName" : "test"
 }</code></pre>
 </div>
@@ -2796,8 +2821,8 @@ Host: localhost:8080
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{
   "tripId" : 1,
-  "startDate" : "2024-04-11",
-  "endDate" : "2024-04-12",
+  "startDate" : "2024-04-18",
+  "endDate" : "2024-04-19",
   "tripName" : "test"
 }</code></pre>
 </div>
@@ -3043,7 +3068,7 @@ Content-Length: 102
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-04-11 20:06:57 +0900
+Last updated 2024-04-18 18:03:09 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
