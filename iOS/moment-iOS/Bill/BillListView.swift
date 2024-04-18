@@ -39,6 +39,7 @@ struct BillListView: View {
 struct ReceiptGroupView: View {
     var body: some View {
         ScrollView{
+            //TODO: - 여기서는 뒤로가기버튼의 위치가 빌리스트 홈뷰여야함 
             VStack{
                 HStack
                 {
@@ -404,122 +405,140 @@ struct ReceiptDetailView: View {
     @State private var inputText: String = ""
     @State private var EndLocationend : String = ""
     @State private var selectedTab = 0
-    
+    @State private var showingGroup = false
     
     
     
     var body: some View {
-        ZStack{
-            
-            
-            VStack {
+      
+            ZStack{
                 
-                HStack {
-                    Button(action: {
+                
+                VStack {
+                    
+                    HStack {
+                        Button(action: {
+                            
+                            if backButtonTitle == "뒤로" {
+                                // 내보내기 기능 실행
+                                isDialogActive = true
+                                print("두ㅏㅣ로가기")
+                            } else {
+                                // "내보내기" 버튼의 기능을 실행
+                                let image: UIImage
+                                switch selectedTab {
+                                case 0:
+                                    // 태그 1인 경우 ReceiptBillView1의 스냅샷 캡쳐
+                                    image = ReceiptBillView1(item: item).snapshot()
+                                case 1:
+                                    // 태그 2인 경우 ReceiptView의 스냅샷 캡쳐
+                                    image = ReceiptView().snapshot()
+                                default:
+                                    // 기본값 설정, 필요에 따라 수정 가능
+                                    image = UIImage()
+                                }
+                                showShareSheet(image)
+                                print("내보내기")
+                            }
+                        }) {
+                            HStack {
+                                Text(backButtonTitle)
+                            }
+                            .padding(.horizontal, 20)
+                            .padding()
+                            .font(.yjObangBold15)
+                            .tint(Color.black)
+                        }
+                        Spacer()
                         
-                        if backButtonTitle == "뒤로" {
-                            // 내보내기 기능 실행
-                            isDialogActive = true
-                            print("두ㅏㅣ로가기")
-                        } else {
-                            let image = ReceiptBillView1(item: item).snapshot()
-                            showShareSheet(image)
-                            print("내보내기")
-                            //print(image)
+                        Button(action: {
+                            if saveButtonTitle == "저장" {
+                                saveButtonTitle = "완료"
+                                backButtonTitle = "내보내기"
+                                isDialogActiveBillCom = true
+                            } else {
+                                // 완료 버튼의 기능
+                                
+                               
+                                self.showingGroup = true
+                                print("완료")
+                            }
+                        }) {
+                            HStack {
+                                Text(saveButtonTitle)
+                            }
+                            .padding(.horizontal, 20)
+                            .padding()
+                            .font(.yjObangBold15)
+                            .foregroundColor(saveButtonTitle == "완료" ? .homeRed : .black)
                         }
-                    }) {
-                        HStack {
-                            Text(backButtonTitle)
-                        }
-                        .padding(.horizontal, 20)
-                        .padding()
-                        .font(.yjObangBold15)
-                        .tint(Color.black)
                     }
                     Spacer()
-                    
-                    Button(action: {
-                        if saveButtonTitle == "저장" {
-                            saveButtonTitle = "완료"
-                            backButtonTitle = "내보내기"
-                            isDialogActiveBillCom = true
-                        } else {
-                            // 완료 버튼의 기능
-                            print("완료")
-                        }
-                    }) {
-                        HStack {
-                            Text(saveButtonTitle)
-                        }
-                        .padding(.horizontal, 20)
-                        .padding()
-                        .font(.yjObangBold15)
-                        .foregroundColor(saveButtonTitle == "완료" ? .homeRed : .black)
-                    }
                 }
-                Spacer()
-            }
-            .zIndex(1)
-            
-            
-            TabView(selection: $selectedTab) {
-                ForEach(0..<4) { index in
-                    ReceiptBillView1(item: item)
-                        .tag(0)
-                    ReceiptView()
-                        .tag(1)
+                .zIndex(1)
+                
+                
+                TabView(selection: $selectedTab) {
+                    ForEach(0..<4) { index in
+                        ReceiptBillView1(item: item)
+                            .tag(0)
+                        ReceiptView()
+                            .tag(1)
+                    }
+                    
+                    
+                    
+                    //TODO: - 여기에다가 두번째 디자인 카드를 추가하고 index 1 번으로 추가한다
+                    
+                    
+                } .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                    .zIndex(0)
+                    .overlay(
+                        VStack {
+                            Spacer()
+                            CustomTabIndicator(
+                                numberOfTabs: 4,
+                                selectedTab: selectedTab,
+                                accentColor: .gray500,
+                                inactiveColor: .Natural100
+                            )
+                        }
+                            .padding(.bottom), alignment: .bottom
+                    )
+                
+                if isDialogActive {
+                    CustomDialogBill(isActive: $isDialogActive, title: "", message: "앗! 지금 화면을 그냥 나가면 열심히 만든 영수증이 저장되지않아요", yesAction: {
+                        //TODO: - 영수증의 시작뷰로 돌아가야함
+                        print("저장됨")
+                        // 여기에 저장 로직 추가
+                    }, noAction: {
+                        //TODO: - dismiss하기
+                        
+                        print("취소됨")
+                    })
+                }
+                
+                if isDialogActiveBillCom{
+                    
+                    CustomDialogBillComplete(isActive: $isDialogActiveBillCom, title: "축하해요", message: "첫번째 영수증이 만들어졌어요!\n 나도이제 여행자", yesAction: {
+                        //TODO: - 영수증의 시작뷰로 돌아가야함
+                        print("저장됨")
+                        // 여기에 저장 로직 추가
+                    }, noAction: {
+                        //TODO: - dismiss하기
+                        
+                        print("취소됨")
+                    })
                 }
                 
                 
-                
-                //TODO: - 여기에다가 두번째 디자인 카드를 추가하고 index 1 번으로 추가한다
-                
-                
-            } .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                .zIndex(0)
-                .overlay(
-                    VStack {
-                        Spacer()
-                        CustomTabIndicator(
-                            numberOfTabs: 4,
-                            selectedTab: selectedTab,
-                            accentColor: .gray500,
-                            inactiveColor: .Natural100
-                        )
-                    }
-                        .padding(.bottom), alignment: .bottom
-                )
-            
-            if isDialogActive {
-                CustomDialogBill(isActive: $isDialogActive, title: "", message: "앗! 지금 화면을 그냥 나가면 열심히 만든 영수증이 저장되지않아요", yesAction: {
-                    //TODO: - 영수증의 시작뷰로 돌아가야함
-                    print("저장됨")
-                    // 여기에 저장 로직 추가
-                }, noAction: {
-                    //TODO: - dismiss하기
+                NavigationLink(destination : ReceiptGroupView(),isActive: $showingGroup){
+                    EmptyView()
                     
-                    print("취소됨")
-                })
+                }
             }
-            
-            if isDialogActiveBillCom{
-                
-                CustomDialogBillComplete(isActive: $isDialogActiveBillCom, title: "축하해요", message: "첫번째 영수증이 만들어졌어요!\n 나도이제 여행자", yesAction: {
-                    //TODO: - 영수증의 시작뷰로 돌아가야함
-                    print("저장됨")
-                    // 여기에 저장 로직 추가
-                }, noAction: {
-                    //TODO: - dismiss하기
-                    
-                    print("취소됨")
-                })
-            }
-            
-            
-            
-        }
-        .background(.homeBack)
-        .navigationBarBackButtonHidden()
+            .background(.homeBack)
+            .navigationBarBackButtonHidden()
         
         
     }
