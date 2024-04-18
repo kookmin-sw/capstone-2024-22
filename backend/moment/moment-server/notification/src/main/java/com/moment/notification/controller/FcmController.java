@@ -14,7 +14,7 @@ import java.io.IOException;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping("/fcm")
+@RequestMapping("/noti")
 public class FcmController {
     private final FcmService fcmService;
 
@@ -23,7 +23,7 @@ public class FcmController {
         return new ResponseEntity<>("test", HttpStatus.OK);
     }
 
-    @PostMapping("/send")
+    @PostMapping("/fcm/send")
     public ResponseEntity<Integer> pushMessage(@RequestBody @Validated FcmSendDto fcmSendDto) throws IOException {
         log.debug("[+] 푸시 메시지를 전송합니다. ");
         int result = fcmService.sendMessageTo(fcmSendDto);
