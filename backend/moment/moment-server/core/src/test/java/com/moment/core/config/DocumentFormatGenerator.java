@@ -17,4 +17,11 @@ public interface DocumentFormatGenerator {
     static Attributes.Attribute getBooleanFormat() { // (3)
         return key("format").value("true or false");
     }
+
+    static Attributes.Attribute getReceiptFormat() {
+        return key("format").value("A for AirplaneTicket or B for BusTicket");
+    }
+    static Attributes.Attribute getStringNumFormat(int length) {
+        return key("format").value("String of max length " + length);
+    }
 }
