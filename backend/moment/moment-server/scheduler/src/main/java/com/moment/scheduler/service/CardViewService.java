@@ -30,7 +30,7 @@ public class CardViewService {
 
     @Async
     public void getIncompleteCardViews() {
-        List<CardView> cards = cardViewRepository.findAllByRecordFileStatus("WAIT");
+        List<CardView> cards = cardViewRepository.findAllByRecordFileStatusIn(List.of("WAIT", "FAIL"));
         for (CardView card : cards) {
             AiModelRunResponseDTO.RunModel ret = aiService.runAi(card.getRecordFileName());
             log.info("ret.status : " + ret.getStatus());
@@ -42,7 +42,7 @@ public class CardViewService {
             log.info("ret.error : " + ret.getError());
             log.info("ret.file_name : " + ret.getFile_name());
             log.info("ret.file_path : " + ret.getFile_path());
-            if (Objects.equals(ret.getStatus(), "success")){
+            if (Objects.equals(ret.getStatus(), "wait")){
                 card.setRecordFileStatus("DONE");
                 card.setStt(ret.getText());
                 card.setHappy(ret.getEmotions().getHappy());
