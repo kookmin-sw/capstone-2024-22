@@ -118,21 +118,7 @@ struct OnboardingView: View {
                             .environmentObject(homeViewModel)// 이렇게. environment 를 달아놧다는것은 해당뷰에서도
                             .environmentObject(billListViewModel)//안에 들어가있는 녀석을 호출햇 ㅓ사용할수있다는 말을 뜻한다
                             .environmentObject(cardviewModel)
-                        
-//                    case.todoView :
-//                        TodoView()
-//                            .navigationBarBackButtonHidden()
-//                            .environmentObject(homeViewModel)
-                        
-                    case let .memoView(isCreateMode, memo):
-                                 MemoView(
-                                   memoViewModel: isCreateMode
-                                   ? .init(memo: .init(title: "", content: "", date: .now))
-                                   : .init(memo: memo ?? .init(title: "", content: "", date: .now)),
-                                   isCreateMode: isCreateMode
-                                 )
-                                   .navigationBarBackButtonHidden()
-                                   .environmentObject(billListViewModel)
+                  
                     case .LoginView:
                         LoginView()
                             .navigationBarBackButtonHidden()

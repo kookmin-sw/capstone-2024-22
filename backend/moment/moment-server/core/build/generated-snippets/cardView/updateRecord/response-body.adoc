@@ -1,0 +1,10 @@
+[source,json,options="nowrap"]
+----
+{
+  "status" : 200,
+  "code" : "200",
+  "msg" : "UPDATE SUCCESS",
+  "detailMsg" : "",
+  "data" : { }
+}
+----

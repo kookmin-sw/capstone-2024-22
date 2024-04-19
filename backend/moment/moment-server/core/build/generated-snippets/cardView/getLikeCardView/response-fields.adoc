@@ -1,0 +1,88 @@
+|===
+|Path|Type|Description
+
+|`+status+`
+|`+Number+`
+|응답 상태 코드
+
+|`+code+`
+|`+String+`
+|응답 코드
+
+|`+msg+`
+|`+String+`
+|응답 메시지
+
+|`+detailMsg+`
+|`+String+`
+|상세 메시지
+
+|`+data.cardViews[].id+`
+|`+Number+`
+|cardView ID
+
+|`+data.cardViews[].tripFileId+`
+|`+Number+`
+|tripFile ID
+
+|`+data.cardViews[].recordedAt+`
+|`+String+`
+|녹음 시점
+
+|`+data.cardViews[].recordFileName+`
+|`+String+`
+|파일이름
+
+|`+data.cardViews[].recordFileUrl+`
+|`+String+`
+|파일 저장 위치
+
+|`+data.cardViews[].location+`
+|`+String+`
+|위치
+
+|`+data.cardViews[].recordFileLength+`
+|`+Number+`
+|파일길이
+
+|`+data.cardViews[].weather+`
+|`+String+`
+|날씨
+
+|`+data.cardViews[].temperature+`
+|`+String+`
+|온도
+
+|`+data.cardViews[].stt+`
+|`+String+`
+|STT
+
+|`+data.cardViews[].happy+`
+|`+Number+`
+|기쁨
+
+|`+data.cardViews[].sad+`
+|`+Number+`
+|슬픔
+
+|`+data.cardViews[].angry+`
+|`+Number+`
+|화남
+
+|`+data.cardViews[].neutral+`
+|`+Number+`
+|중립
+
+|`+data.cardViews[].question+`
+|`+String+`
+|질문
+
+|`+data.cardViews[].loved+`
+|`+Boolean+`
+|즐겨찾기
+
+|`+data.cardViews[].recordFileStatus+`
+|`+String+`
+|분석 상태
+
+|===

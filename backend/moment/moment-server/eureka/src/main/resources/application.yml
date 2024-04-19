@@ -16,5 +16,5 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-#      defaultZone: http://host.docker.internal:${server.port}/eureka/
-      defaultZone: http://localhost:${server.port}/eureka/
+      defaultZone: http://wasuphj.synology.me:8761/eureka
+#      defaultZone: http://localhost:${server.port}/eureka/

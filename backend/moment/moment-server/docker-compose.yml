@@ -1,4 +1,4 @@
-version: '1.0'
+version: '3.3'
 
 services:
 
@@ -8,7 +8,7 @@ services:
     build:
       context: eureka/.
     ports:
-      - "8761:8761"  # 호스트 머신의 8080 포트와 컨테이너 내부의 8080 포트를 매핑
+      - "8761:8761"  # 호스트 머신의 8761 포트와 컨테이너 내부의 8761 포트를 매핑
     logging:
       driver: "json-file"
       options:
@@ -44,7 +44,7 @@ services:
     ports:
       - "8080:8080"  # 호스트 머신의 8080 포트와 컨테이너 내부의 8080 포트를 매핑
     depends_on:
-      db:  # db 서비스가 먼저 실행되어야 함
+      db-core:  # db 서비스가 먼저 실행되어야 함
         condition: service_healthy
 #      eureka-server:
 #        condition: service_healthy
@@ -54,7 +54,7 @@ services:
 #      retries: 5
 #    restart: on-failure
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/moment_core?createDatabaseIfNotExist=TRUE&useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-core:3306/moment_core?createDatabaseIfNotExist=TRUE&useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root1234
     logging:
@@ -64,10 +64,66 @@ services:
         max-file: "10"
     networks:
       - moment-net
-  #    volumes:
-  #      - /c/Users/jykim/TheWayHome_Server/src/main/resources/static/images:/app/src/main/resources/static/images
+    volumes:
+      - /root/files/record:/files/record
 
-  db:
+  # 스케줄러 서버
+  scheduler:
+      image: moment-scheduler:0.0.1  # 스프링부트 어플리케이션의 이미지 이름과 태그
+      container_name: moment-scheduler-server  # 컨테이너 이름
+      build:
+        context: scheduler/.
+      ports:
+        - "8081:8081"  # 호스트 머신의 8081 포트와 컨테이너 내부의 8081 포트를 매핑
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:mysql://db-core:3306/moment_core?createDatabaseIfNotExist=TRUE&useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
+        SPRING_DATASOURCE_USERNAME: root
+        SPRING_DATASOURCE_PASSWORD: root1234
+      depends_on:
+        db-core:  # db 서비스가 먼저 실행되어야 함
+          condition: service_healthy
+      networks:
+        - moment-net
+  # 메일 서버
+  mail:
+    image: mail:0.0.1  # 스프링부트 어플리케이션의 이미지 이름과 태그
+    container_name: mail-server  # 컨테이너 이름
+    build:
+      context: mail/.
+    ports:
+      - "8082:8082"  # 호스트 머신의 8082 포트와 컨테이너 내부의 8082 포트를 매핑
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    networks:
+      - moment-net
+  # Auth 서버
+  auth:
+    image: auth:0.0.1  # 스프링부트 어플리케이션의 이미지 이름과 태그
+    container_name: auth-server  # 컨테이너 이름
+    build:
+        context: auth/.
+    ports:
+        - "8083:8083"  # 호스트 머신의 8083 포트와 컨테이너 내부의 8083 포트를 매핑
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-auth:3306/moment_auth?createDatabaseIfNotExist=TRUE&useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root1234
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    depends_on:
+      db-auth: # db 서비스가 먼저 실행되어야 함
+        condition: service_healthy
+    networks:
+        - moment-net
+
+  # 코어 서버 디비
+  db-core:
     image: mysql:8.0  # MySQL 이미지 이름과 태그
     container_name: moment-core-db  # 컨테이너 이름
     ports:
@@ -85,8 +141,47 @@ services:
     volumes:
       - moment_core_data:/var/lib/mysql
 
+  # 스케줄러 서버 디비
+#  db-scheduler:
+#    image: mysql:8.0  # MySQL 이미지 이름과 태그
+#    container_name: moment-scheduler-db  # 컨테이너 이름
+#    ports:
+#      - "23306:3306"  # 호스트 머신의 23306 포트와 컨테이너 내부의 3306 포트를 매핑
+#    command: --default-authentication-plugin=mysql_native_password  # MySQL 8.0 이상 버전일 경우 인증 방식 지정
+#    environment:
+#      MYSQL_ROOT_PASSWORD: root1234
+#      MYSQL_DATABASE: moment_scheduler
+#    networks:
+#      - moment-net
+#    healthcheck:
+#      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+#      timeout: 20s
+#      retries: 10
+#    volumes:
+#      - moment_scheduler_data:/var/lib/mysql
+
+    # Auth 서버 디비
+  db-auth:
+    image: mysql:8.0  # MySQL 이미지 이름과 태그
+    container_name: moment-auth-db  # 컨테이너 이름
+    ports:
+      - "33306:3306"  # 호스트 머신의 33306 포트와 컨테이너 내부의 3306 포트를 매핑
+    command: --default-authentication-plugin=mysql_native_password  # MySQL 8.0 이상 버전일 경우 인증 방식 지정
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: moment_auth
+    networks:
+      - moment-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    volumes:
+      - moment_auth_data:/var/lib/mysql
+
 volumes:
     moment_core_data:
+    moment_auth_data:
 
 
 networks:

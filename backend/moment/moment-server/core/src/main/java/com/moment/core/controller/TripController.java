@@ -57,7 +57,7 @@ public class TripController {
     }
 
     // 여행 삭제
-    @DeleteMapping()
+    @DeleteMapping("/{tripId}")
     @Operation(summary = "여행 삭제", description = "여행을 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
@@ -66,7 +66,7 @@ public class TripController {
     })
     public ResponseEntity<APIResponse> deleteTrip(
             @RequestHeader Long userId,
-            @RequestParam Long tripId
+            @PathVariable Long tripId
     ) {
         userService.validateUserWithTrip(userId, tripId);
         tripService.delete(tripId);

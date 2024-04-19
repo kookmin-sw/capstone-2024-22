@@ -1,0 +1,86 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - deploy/v1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./backend/moment/moment-server
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: 17  # 원하는 Java 버전으로 변경
+          distribution: 'temurin'
+
+      - uses: actions/checkout@v3
+
+      - run: touch ./backend/moment/moment-server/auth/src/main/resources/application.properties
+      - run: echo "${{ secrets.AUTH_PROPERTIES }}" > ./backend/moment/moment-server/auth/src/main/resources/application.properties
+
+      - run: touch ./backend/moment/moment-server/core/src/main/resources/application.properties
+      - run: echo "${{ secrets.CORE_PROPERTIES }}" > ./backend/moment/moment-server/core/src/main/resources/application.properties
+
+      - run: touch ./backend/moment/moment-server/mail/src/main/resources/application.properties
+      - run: echo "${{ secrets.MAIL_PROPERTIES }}" > ./backend/moment/moment-server/mail/src/main/resources/application.properties
+
+      - run: touch ./backend/moment/moment-server/scheduler/src/main/resources/application.properties
+      - run: echo "${{ secrets.SCHEDULER_PROPERTIES }}" > ./backend/moment/moment-server/scheduler/src/main/resources/application.properties
+
+
+#      - run: cat ./src/main/resources/application.properties
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+#
+#      - name: Build with Gradle
+#        uses: gradle/gradle-build-action@v2
+#        with:
+#          arguments: build -x test
+#          build-root-directory: ./backend/moment/moment-server
+#          gradle-version: 7.5
+#
+#      - name: Deploy to Server
+#        uses: actions/checkout@v3
+
+#      - run: |
+#          docker-compose up --build
+#        working-directory: ${{ env.working-directory }}
+
+          # 서버에 애플리케이션 배포 스크립트 실행
+        # 예: scp, SSH, Docker, Kubernetes 등을 사용하여 배포
+  deploy:
+    env:
+      working-directory: ./backend/moment/moment-server
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - uses: actions/checkout@v3
+      - name: Add Server key
+        run: |
+          touch key.txt
+          echo "${{ secrets.SERVER_KEY }}" > key.txt
+          chmod 600 key.txt
+        working-directory: ${{ env.working-directory }}
+      - name: Deploy the application
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+        run: |
+          chmod 755 ./deploy.sh
+          set -e
+          ./deploy.sh
+        working-directory: ${{ env.working-directory }}

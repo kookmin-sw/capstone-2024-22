@@ -19,6 +19,7 @@ extension Font {
     // Extrabold
     static let pretendardExtrabold16 : Font = .custom("Pretendard-ExtraBold", size: 16)
     static let pretendardExtrabold14 : Font = .custom("Pretendard-ExtraBold", size: 14)
+    static let pretendardExtrabold45 : Font = .custom("Pretendard-ExtraBold", size: 45)
     
     // Medium
     static let pretendardMedium18: Font = .custom("Pretendard-Medium", size: 18)
@@ -26,6 +27,7 @@ extension Font {
     static let pretendardMedium14: Font = .custom("Pretendard-Medium", size: 14)
     static let pretendardMedium13: Font = .custom("Pretendard-Medium", size: 13)
     static let pretendardMedium11: Font = .custom("Pretendard-Medium", size: 11)
+    static let pretendardMedium8: Font = .custom("Pretendard-Medium", size: 8)
     
     // obang
     static let yjObangBold15 : Font = .custom("YJ_Obang-Bold", size: 15)

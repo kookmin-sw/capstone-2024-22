@@ -19,11 +19,14 @@
 *.tar.gz
 *.rar
 
+!**/gradle-wrapper.jar
+!**/gradle-wrapper.properties
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
 
-*.properties
+
 /.gradle/8.5/fileHashes/fileHashes.bin
 /.gradle/buildOutputCleanup/buildOutputCleanup.lock
 /.gradle/8.5/checksums/checksums.lock
@@ -34,15 +37,15 @@ replay_pid*
 /.gradle/file-system.probe
 /.gradle/8.5/fileHashes/fileHashes.lock
 /.idea/gradle.xml
-/core/gradle/wrapper/gradle-wrapper.jar
-/eureka/gradle/wrapper/gradle-wrapper.jar
-/gateway/gradle/wrapper/gradle-wrapper.jar
-/core/gradlew
-/eureka/gradlew
-/gateway/gradlew
-/core/gradlew.bat
-/eureka/gradlew.bat
-/gateway/gradlew.bat
+#/core/gradle/wrapper/gradle-wrapper.jar
+#/eureka/gradle/wrapper/gradle-wrapper.jar
+#/gateway/gradle/wrapper/gradle-wrapper.jar
+#/core/gradlew
+#/eureka/gradlew
+#/gateway/gradlew
+#/core/gradlew.bat
+#/eureka/gradlew.bat
+#/gateway/gradlew.bat
 /.idea/jarRepositories.xml
 /.idea/jpa-buddy.xml
 /.gradle/8.5/fileChanges/last-build.bin
@@ -57,6 +60,6 @@ replay_pid*
 /.idea/modules/eureka/root.eureka.main.iml
 /.gradle/8.5/checksums/sha1-checksums.bin
 /.idea/vcs.xml
-/ai/gradlew
+#/ai/gradlew
 .DS_Store
 */.DS_Store

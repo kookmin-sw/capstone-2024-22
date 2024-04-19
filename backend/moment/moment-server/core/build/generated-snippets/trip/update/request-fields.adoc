@@ -1,0 +1,24 @@
+|===
+|필드명|타입|필수값|양식|설명
+
+|`+tripId+`
+|`+Number+`
+|true
+|
+|여행 ID
+|`+startDate+`
+|`+String+`
+|true
+|yyyy-MM-dd
+|출발일
+|`+endDate+`
+|`+String+`
+|true
+|yyyy-MM-dd
+|도착일
+|`+tripName+`
+|`+String+`
+|true
+|
+|여행 이름
+|===

@@ -2,9 +2,7 @@ package com.moment.auth.dto.request;
 
 
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.*;
 
 
 public class AuthRequest {
@@ -12,6 +10,7 @@ public class AuthRequest {
     //자체회원가입 폼
     @Getter
     @Setter
+    @Builder
     public static class Login {
 
         private String email;
@@ -23,19 +22,26 @@ public class AuthRequest {
 
     @Getter
     @Setter
+    @Builder
     public static class SendCode {
         private String email;
-        private boolean isSignUp;
+        private String isSignUp;
     }
 
     @Getter
     @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class VerifyCode {
         private String code;
     }
 
     @Getter
     @Setter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class ChangePassword {
 
         private String code;

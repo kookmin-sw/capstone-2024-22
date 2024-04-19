@@ -1,0 +1,10 @@
+|===
+|Part|Description
+
+|`+recordFile+`
+|녹음 파일
+
+|`+uploadRecord+`
+|녹음 정보
+
+|===

@@ -1,0 +1,9 @@
+[source,bash]
+----
+$ echo '{
+  "code" : "1234",
+  "newPassword" : "12345"
+}' | http PATCH 'http://localhost:8080/auth/password' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'userId:1'
+----

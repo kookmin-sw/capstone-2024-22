@@ -1,0 +1,24 @@
+|===
+|Path|Type|Description
+
+|`+location+`
+|`+String+`
+|녹음본 장소
+
+|`+recordedAt+`
+|`+String+`
+|녹음 시점
+
+|`+temperature+`
+|`+String+`
+|온도
+
+|`+weather+`
+|`+String+`
+|날씨
+
+|`+question+`
+|`+String+`
+|질문
+
+|===

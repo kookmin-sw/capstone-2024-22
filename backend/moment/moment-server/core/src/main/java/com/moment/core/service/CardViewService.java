@@ -8,6 +8,7 @@ import com.moment.core.domain.user.UserRepository;
 import com.moment.core.dto.request.CardViewRequestDTO;
 import com.moment.core.dto.response.CardViewResponseDTO;
 import com.moment.core.exception.UserNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class CardViewService {
     private final CardViewRepository cardViewRepository;
     private final UserRepository userRepository;
@@ -63,7 +65,7 @@ public class CardViewService {
         // recordFile의 길이 받아오기
         long length = recordFile.getSize();
 
-        // 파일 이름 생성 -> 파일이름 + 날짜시간
+        // 파일 이름 생성
         String fileName = createFileName(recordFile.getOriginalFilename());
 
         // 로컬 저장소에 파일 저장

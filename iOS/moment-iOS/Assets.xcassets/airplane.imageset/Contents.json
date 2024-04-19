@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Airplane (飞机).png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

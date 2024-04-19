@@ -1,0 +1,30 @@
+[source,json,options="nowrap"]
+----
+{
+  "status" : 200,
+  "code" : "200",
+  "msg" : "SELECT SUCCESS",
+  "detailMsg" : "",
+  "data" : {
+    "tripFiles" : [ {
+      "id" : 1,
+      "tripId" : 1,
+      "email" : "test",
+      "yearDate" : "2024-04-11",
+      "analyzingCount" : 1
+    }, {
+      "id" : 2,
+      "tripId" : 2,
+      "email" : "test",
+      "yearDate" : "2024-04-12",
+      "analyzingCount" : 2
+    }, {
+      "id" : 3,
+      "tripId" : 3,
+      "email" : "test",
+      "yearDate" : "2024-04-13",
+      "analyzingCount" : 1
+    } ]
+  }
+}
+----
