@@ -13,4 +13,6 @@ public interface CardViewRepository extends JpaRepository<CardView, Long> {
     Long countByTripFile(TripFile tripFile);
 
     List<CardView> findByTripFile_User_IdAndIsLovedOrderByRecordedAt(Long userId, Boolean isLoved);
+
+    List<CardView> findAllByTripFile(TripFile tripFile);
 }
