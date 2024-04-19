@@ -122,6 +122,22 @@ services:
     networks:
         - moment-net
 
+  # noti-server
+  notification:
+    image: notification:0.0.1  # 스프링부트 어플리케이션의 이미지 이름과 태그
+    container_name: notification-server  # 컨테이너 이름
+    build:
+      context: notification/.
+    ports:
+    - "8084:8084"  # 호스트 머신의 8084 포트와 컨테이너 내부의 8084 포트를 매핑
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    networks:
+      - moment-net
+
   # 코어 서버 디비
   db-core:
     image: mysql:8.0  # MySQL 이미지 이름과 태그
