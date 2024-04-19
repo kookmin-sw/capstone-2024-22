@@ -76,7 +76,7 @@ struct HomeView: View {
                             ForEach(homeviewModel.items) { item in
                                 ItemViewCell(item: $homeviewModel.items[homeviewModel.getIndex(item: item)], deleteAction: {
                                     self.itemToDelete = item // 사용자가 삭제할 항목을 설정합니다.
-                                    self.selectedItemName = item.name
+                                    self.selectedItemName = item.tripName
                                     self.showingCustomAlert = true // 삭제 확인 다이얼로그를 표시합니다.
                                 }, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
                                 CustomHomeSubDivider()
@@ -85,24 +85,30 @@ struct HomeView: View {
                     }
                     Spacer()
                 }  .background(Color.homeBack)
+                    .onAppear {
+                        homeviewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
+                               }
                 
-                if showingCustomAlert {
+                if showingCustomAlert ,let itemToDelete = itemToDelete{
                     
                     CustomDialog(
                         isActive: $showingCustomAlert,
                         title: "\(selectedItemName ?? "이 여행")\n 정말 삭제하시겠습니까?",
                         message: "해당 파일에 기록되어있는 녹음카드는\n '일상 기록'으로 이동합니다",
                         yesAction: {
-                            if let item = itemToDelete {
-                                homeviewModel.deleteItem(myItem: item) // 항목 삭제 실행
-                                itemToDelete = nil // 삭제할 아이템 초기화
-                                selectedItemName = nil // 선택한 아이템 이름 초기화
-                            }
-                            showingCustomAlert = false
+                            homeviewModel.deleteItem(itemToDelete: itemToDelete) { success, message in
+                                           if success {
+                                               print("Item successfully deleted.")
+                                           } else {
+                                               print("Failed to delete item: \(message)")
+                                           }
+                                           showingCustomAlert = false
+                                           self.itemToDelete = nil
+                                       }
                         },
                         noAction: {
                             showingCustomAlert = false // 다이얼로그 닫기
-                            itemToDelete = nil // 삭제할 아이템 초기화
+                            self.itemToDelete = nil // 삭제할 아이템 초기화
                         }
                     )
                     .transition(.opacity) // 다이얼로그 등장과 사라짐에 투명도 변화 적용
@@ -180,7 +186,7 @@ struct ItemViewCell: View {
                             
                             
                            
-                                Text(item.name)
+                                Text(item.tripName)
                                     .font(.pretendardExtrabold14)
                                     .foregroundColor(.black)
                                     .zIndex(2)
@@ -275,9 +281,9 @@ extension ItemViewCell {
                 .padding(.trailing, 0)
             
             Button {
-                // 여기에 '삭제' 버튼을 눌렀을 때 수행할 동작을 추가합니다.
-                //deleteDidTapClosure(item)
+              //TODO: - 삭제메서드 호출
                 self.deleteAction()
+                
                 withAnimation {
                     self.item.offset = 0
                 }
@@ -409,7 +415,7 @@ struct DateRangeView1: View {
                 .padding(.bottom, -10)
             HStack {
                 Spacer() // 좌측 공간을 만들어줌으로써 Text를 우측으로 밀어냄
-                Text(item.name)
+                Text(item.tripName)
                     .font(.pretendardBold22)
                     .padding(.horizontal,10)
                    

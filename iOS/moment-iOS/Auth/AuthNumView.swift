@@ -11,6 +11,8 @@ struct AuthNumView: View {
     @State private var email: String = ""
     @EnvironmentObject private var pathModel: PathModel
     //@Binding var isDisplayTooltip: Bool
+    @EnvironmentObject var authViewModel: AuthViewModel
+    @State private var tempCodeColor: Color = .white
     
     var body: some View {
         VStack{
@@ -28,7 +30,7 @@ struct AuthNumView: View {
                     Spacer()
                 }
             }
-           
+            
             Spacer().frame(height: 190)
             VStack(spacing:20){
                 
@@ -44,7 +46,7 @@ struct AuthNumView: View {
                             .font(.pretendardMedium11)
                             .frame(width: 340, height: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/)
                             .padding(.bottom, 72)
-                           
+                        
                     }
                     .frame(width: 210, height: 25)
                     Spacer()
@@ -61,11 +63,12 @@ struct AuthNumView: View {
                     Spacer()
                 }.padding(.bottom,1)
             }
-            TextField("인증번호를 입력하세요", text: $email)
+            TextField("인증번호를 입력하세요", text: $authViewModel.verificationCode)
             
                 .padding()
                 .frame(height: 44)
                 .overlay(Rectangle().frame(height: 1), alignment: .bottom)
+                .background(tempCodeColor)
                 .padding(.horizontal,20)
             
             HStack{
@@ -74,7 +77,7 @@ struct AuthNumView: View {
                     .font(.pretendardMedium11)
                     .padding(.top, 1)
                     .padding(.horizontal, 20)
-                    Spacer()
+                Spacer()
             }
             VStack{
                 HStack {
@@ -109,25 +112,29 @@ struct AuthNumView: View {
             Spacer()
             
             VStack{
-                Button(
-                    action: {
-                        pathModel.paths.append(.AddUser)
-                    },
-                    label: {
-                        Text("다음")
-                            .font(.pretendardSemiBold18)
-                            .frame(minWidth: 0, maxWidth: .infinity)
-                            .padding()
-                            .background(Color.homeRed)
-                            .foregroundColor(.white)
-                            .cornerRadius(3)
+                Button("다음") {
+                    authViewModel.verifyCode { isValid in
+                        if isValid {
+                            pathModel.paths.append(.AddUser) // 인증 성공, 다음 화면으로
+                        } else {
+                            tempCodeColor = .red  // 인증 실패, 색상 변경
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                self.tempCodeColor = .white  // 1.5초 후 색상 원래대로
+                            }
+                        }
                     }
-                )
+                }
+                .font(.pretendardSemiBold18)
+                .frame(minWidth: 0, maxWidth: .infinity)
+                .padding()
+                .background(Color.homeRed)
+                .foregroundColor(.white)
+                .cornerRadius(3)
                 
                 
             }
             .padding()
-          
+            
         }.navigationBarBackButtonHidden(true)
     }
 }

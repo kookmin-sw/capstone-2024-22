@@ -11,6 +11,7 @@ import SwiftUI
 struct moment_iOSApp: App {
     
     var homeViewModel = HomeViewModel()
+    var authViewModel = AuthViewModel()
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     //@ 부터 Adaptor 까지 기존 uikit 에 있던 기능들을 swiftui 에서 사용할 수 있도록 해놓은것이구만
@@ -19,6 +20,7 @@ struct moment_iOSApp: App {
         WindowGroup {// 여기서 앱메인 뷰를 그리고
             OnboardingView() // 이게 어떤 뷰부터 시작할지를 정해주는거구만
                 .environmentObject(homeViewModel)
+                .environmentObject(authViewModel) 
             
         }
         

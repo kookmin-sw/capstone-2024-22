@@ -77,7 +77,7 @@ struct CardView: View {
                         
                         HStack {
                             Spacer()
-                            Text(item.name)
+                            Text(item.tripName)
                                 .font(.pretendardBold22)
                                 .foregroundColor(.black)
                         }

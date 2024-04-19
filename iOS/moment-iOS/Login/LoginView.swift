@@ -12,34 +12,43 @@ import UIKit
 
 struct LoginView: View {
     @EnvironmentObject private var pathModel: PathModel
+    @StateObject private var authViewModel = AuthViewModel()
     @State private var isLoading: Bool = false
 
     var body: some View {
         VStack {
-            StartHomeBtnView {
+            StartHomeBtnView(authViewModel:authViewModel) {
+//                isLoading = true
+//                authViewModel.loginUser()
                 isLoading = true
-                loginUser()
+                authViewModel.loginUser()
             }
 
             if isLoading {
                 LoadingView()  // 로딩 뷰 활성화
             }
+            if authViewModel.loginError {
+                           Text("로그인 실패: 잘못된 이메일 또는 비밀번호")
+                               .foregroundColor(.red)
+                               .padding()
+                       }
+            
+        }.onChange(of: authViewModel.isLoggedIn) { isLoggedIn in
+            if isLoggedIn {
+                pathModel.paths.append(.homeBaseView)  // 로그인 성공
+            }
         }
+        
     }
 
-    private func loginUser() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.isLoading = false
-            self.pathModel.paths.append(.homeBaseView)  // 로그인 성공
-        }
-    }
+
 }
 
 
 
-private struct StartHomeBtnView: View {
+ struct StartHomeBtnView: View {
     @EnvironmentObject private var pathModel: PathModel
-    
+    @ObservedObject var authViewModel: AuthViewModel
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var isPasswordVisible: Bool = false
@@ -47,7 +56,7 @@ private struct StartHomeBtnView: View {
     
     var onLogin: () -> Void
     
-    fileprivate var body: some View {
+     var body: some View {
         Spacer()
         VStack {
             HStack(alignment: .bottom) {
@@ -59,7 +68,7 @@ private struct StartHomeBtnView: View {
                 
                 Spacer()
             }
-            TextField("이메일을 입력해 주세요.", text: $email)
+            TextField("이메일을 입력해 주세요.", text: $authViewModel.email)
                 .padding()
                 .frame(height: 44)
                 .overlay(Rectangle().frame(height: 1), alignment: .bottom)
@@ -76,9 +85,9 @@ private struct StartHomeBtnView: View {
             }
             HStack {
                 if isPasswordVisible {
-                    TextField("비밀번호를 입력해 주세요.", text: $password)
+                    TextField("비밀번호를 입력해 주세요.", text: $authViewModel.password)
                 } else {
-                    SecureField("비밀번호를 입력해 주세요.", text: $password)
+                    SecureField("비밀번호를 입력해 주세요.", text: $authViewModel.password)
                 }
                 Button(action: {
                     isPasswordVisible.toggle()
@@ -126,6 +135,7 @@ private struct StartHomeBtnView: View {
         VStack {
             Button(action: {
                 // 로그인 버튼 동작 구현
+                authViewModel.loginUser()
                 pathModel.paths.append(.homeBaseView)
             }, label: {
                 Text("로그인")
@@ -159,12 +169,12 @@ private struct StartHomeBtnView: View {
 struct IsLoginView: View {
     @EnvironmentObject private var pathModel: PathModel
     @State private var isLoading: Bool = false
-    
+    @StateObject private var authViewModel = AuthViewModel()
     var body: some View {
         ZStack {
-            StartHomeBtnView(onLogin: {
+            StartHomeBtnView(authViewModel: authViewModel, onLogin: {
                 isLoading = true
-                loginUser()
+                //loginUser()
             })
             
             if isLoading {
@@ -173,13 +183,13 @@ struct IsLoginView: View {
         }
     }
     
-    private func loginUser() {
-        // 로그인 로직 구현. 예시로 2초 후에 로그인이 완료되었다고 가정
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            isLoading = false  // 로그인 시도 후 isLoading 상태 업데이트
-            pathModel.paths.append(.homeBaseView) // 로그인 성공 시 홈 뷰로 전환
-        }
-    }
+//    private func loginUser() {
+//        // 로그인 로직 구현. 예시로 2초 후에 로그인이 완료되었다고 가정
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//            isLoading = false  // 로그인 시도 후 isLoading 상태 업데이트
+//            pathModel.paths.append(.homeBaseView) // 로그인 성공 시 홈 뷰로 전환
+//        }
+//    }
 }
 
 

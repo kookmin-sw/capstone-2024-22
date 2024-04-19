@@ -25,7 +25,7 @@ struct SelectDayView: View {
         formatter.dateFormat = "yyyy.MM.dd" // 직접 날짜 형식을 지정
         return formatter
     }
-
+    
     
     var body: some View {
         ZStack{
@@ -43,7 +43,19 @@ struct SelectDayView: View {
                     }
                     Spacer()
                     Button("완료") {
-                        self.presentationMode.wrappedValue.dismiss()
+                        //TODO: -여기서 여행을 등록하는 api 를 연동해야겠지?
+                        
+                        if let startDate = calendarViewModel.startTime, let endDate = calendarViewModel.endTime {
+                            calendarViewModel.registerTrip(tripName: tripName, startDate: startDate, endDate: endDate) { success, errorMessage in
+                                                       if success {
+                                                           print("Trip successfully registered!")
+                                                       } else {
+                                                           print("Failed to register trip: \(errorMessage ?? "Unknown error")")
+                                                       }
+                                                       self.presentationMode.wrappedValue.dismiss() // 작업 완료 후 화면 닫기
+                                                   }
+                                               }
+                        // self.presentationMode.wrappedValue.dismiss()
                         
                     }
                     .font(.yjObangBold15)
@@ -68,10 +80,10 @@ struct SelectDayView: View {
                     .padding(.top, 20)
                 
                 HStack(spacing:20) {
-                                   CustomTabField(selectedTab: $selectedTab, date: calendarViewModel.startTime, dateFormatter: dateFormatter, title: "출발 날짜", tag: 0, isCalendarVisible: $isCalendarVisible)
-                                   
-                                   CustomTabField(selectedTab: $selectedTab, date: calendarViewModel.endTime, dateFormatter: dateFormatter, title: "도착 날짜", tag: 1, isCalendarVisible: .constant(false)) // 도착 날짜 태그에는 isCalendarVisible을 변경하지 않음
-                               }
+                    CustomTabField(selectedTab: $selectedTab, date: calendarViewModel.startTime, dateFormatter: dateFormatter, title: "출발 날짜", tag: 0, isCalendarVisible: $isCalendarVisible)
+                    
+                    CustomTabField(selectedTab: $selectedTab, date: calendarViewModel.endTime, dateFormatter: dateFormatter, title: "도착 날짜", tag: 1, isCalendarVisible: .constant(false)) // 도착 날짜 태그에는 isCalendarVisible을 변경하지 않음
+                }
                 .padding(.horizontal)
                 if isCalendarVisible {
                     SwiftUIFSCalendarWrapper(startDate: $calendarViewModel.startTime, endDate: $calendarViewModel.endTime, tab: selectedTab)
@@ -91,10 +103,10 @@ struct SelectDayView: View {
                     Color.clear.frame(width: 340, height: 460)
                 }
             } .animation(.easeInOut, value: isCalendarVisible) // 선택적: 달력 표시/숨김에 애니메이션 적용
-            .navigationBarBackButtonHidden(true)
-            .padding()
+                .navigationBarBackButtonHidden(true)
+                .padding()
             
-           
+            
             
         }
     }
@@ -111,8 +123,8 @@ struct CustomTabField: View {
     
     var body: some View {
         Button(action: {
-                  self.selectedTab = self.tag
-                  self.isCalendarVisible.toggle()
+            self.selectedTab = self.tag
+            self.isCalendarVisible.toggle()
         }) {
             Text(date != nil ? dateFormatter.string(from: date!) : title)
                 .font(.pretendardMedium16)

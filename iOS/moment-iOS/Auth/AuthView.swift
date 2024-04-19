@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Alamofire
 
 struct AuthView: View {
     @State private var email: String = ""
@@ -17,6 +18,7 @@ struct AuthView: View {
     @State private var isAgreeRequired2: Bool = false
     @State private var isAgreeRequired3: Bool = false
     @Environment(\.presentationMode) var presentationMode
+    @StateObject private var authViewModel = AuthViewModel()
     
     var heightFactor: CGFloat {
         UIScreen.main.bounds.height > 800 ? 3.6 : 3
@@ -58,14 +60,13 @@ struct AuthView: View {
                     }.padding(.bottom,1)
                     
                     TextField("인증 가능한 이메일을 입력하세요. ", text: $email)
-                    
-                    
                         .padding()
                         .frame(height: 44)
                         .overlay(Rectangle().frame(height: 1), alignment: .bottom)
                         .padding(.horizontal,20)
                     
-                    // Text and Spacer
+                   
+                    
                     HStack {
                         Text("해당 이메일은 본인인증 수단으로서 활용되며\n비밀번호 분실시 복구코드를 보내드리는 용도로 사용됩니다.")
                             .font(.pretendardMedium11)
@@ -118,6 +119,8 @@ struct AuthView: View {
                     VStack {
                         Button(
                             action: {
+                                authViewModel.email = email
+                                authViewModel.requestAuthCode()
                                 pathModel.paths.append(.AuthNumView)
                             },
                             label: {
