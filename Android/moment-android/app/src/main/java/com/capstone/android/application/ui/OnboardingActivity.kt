@@ -64,10 +64,10 @@ import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
 import com.capstone.android.application.app.composable.MomentTextField
 import com.capstone.android.application.presentation.CountViewModel
-import com.capstone.android.application.ui.theme.BackButton_Onboarding
 import com.capstone.android.application.ui.theme.BigButton
 import com.capstone.android.application.ui.theme.CheckButton
 import com.capstone.android.application.ui.theme.CountText
+import com.capstone.android.application.ui.theme.ImgBackButton
 import com.capstone.android.application.ui.theme.P_Bold30
 import com.capstone.android.application.ui.theme.P_ExtraBold16
 import com.capstone.android.application.ui.theme.P_Medium11
@@ -162,7 +162,7 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(top = 54.dp)
                     .wrapContentSize()
             ) {
-                BackButton(onClick = {startActivity(Intent(this@OnboardingActivity, SplashActivity::class.java))}, "로그인")
+                ImgBackButton(onClick = {startActivity(Intent(this@OnboardingActivity, SplashActivity::class.java))}, "로그인")
             }
 
             Column(
@@ -343,7 +343,7 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(top = 54.dp)
                     .wrapContentSize()
             ) {
-                BackButton(onClick = {
+                ImgBackButton(onClick = {
                     navController.navigate(OnboardingScreen.Login.name)
                 }, "회원가입")
             }
@@ -409,7 +409,7 @@ class OnboardingActivity:ComponentActivity() {
                             recordOpen.value = true
                         }
                     ) {
-                        Image(modifier = Modifier.fillMaxSize(),
+                        Image(modifier = Modifier.size(16.dp),
                             painter = if(agree.value) painterResource(R.drawable.ic_checkbox_true)
                             else painterResource(id = R.drawable.ic_checkbox_false),
                             contentDescription = "check button")
@@ -564,7 +564,7 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(top = 54.dp)
                     .wrapContentSize()
             ) {
-                BackButton(onClick = {
+                ImgBackButton(onClick = {
                     navController.navigate(OnboardingScreen.Signup_email.name)
                 }, "회원가입")
             }
@@ -722,7 +722,7 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(top = 54.dp)
                     .wrapContentSize()
             ) {
-                BackButton(onClick = {
+                ImgBackButton(onClick = {
                     navController.navigate(OnboardingScreen.Signup_number.name)
                 }, "회원가입")
             }
@@ -865,7 +865,7 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(top = 54.dp)
                     .wrapContentSize()
             ) {
-                BackButton(onClick = {
+                ImgBackButton(onClick = {
                     navController.navigate(OnboardingScreen.Login.name)
                 }, "비밀번호 찾기")
             }
@@ -947,7 +947,7 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(top = 54.dp)
                     .wrapContentSize()
             ) {
-                BackButton(onClick = {
+                ImgBackButton(onClick = {
                     navController.navigate(OnboardingScreen.Signup_email.name)
                 }, "비밀번호 찾기")
             }
@@ -1102,7 +1102,7 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(top = 54.dp)
                     .wrapContentSize()
             ) {
-                BackButton(onClick = {
+                ImgBackButton(onClick = {
                     navController.navigate(OnboardingScreen.Signup_number.name)
                 }, "비밀번호 찾기")
             }
@@ -1219,7 +1219,7 @@ class OnboardingActivity:ComponentActivity() {
         }
     }
 
-    @Composable
+    /*@Composable
     fun BackButton(onClick : () -> Unit, content : String){
         Row(modifier = Modifier
             .wrapContentWidth()
@@ -1230,7 +1230,7 @@ class OnboardingActivity:ComponentActivity() {
             Spacer(modifier = Modifier.width(16.dp))
             P_SemiBold18(content, black)
         }
-    }
+    }*/
 
 
 
@@ -1238,6 +1238,6 @@ class OnboardingActivity:ComponentActivity() {
     @Preview
     @Composable
     fun OnboardingPreView(){
-        Signup_number()
+        Signup_email()
     }
 }

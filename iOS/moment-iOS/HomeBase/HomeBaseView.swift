@@ -52,7 +52,7 @@ struct HomeBaseView: View {
                     case .voiceRecorder:
                         VoiceRecorderView()
                     case .Like:
-                        LikeView(day: Date(), item: Item(name: "선유도", startdate: "0305", enddate: "0315"), audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
+                        LikeView(day: Date(), item: Item(id: 1, tripName: "선유도", startdate: "0305", enddate: "0315"), audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
 
                     case .setting:
                         SettingView(showDialog : $showingCustomAlertInSetting, showDialogGoodbye: $showDialogGoodbyeAlert)

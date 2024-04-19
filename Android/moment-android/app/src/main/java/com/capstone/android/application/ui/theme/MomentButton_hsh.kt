@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material3.Button
@@ -81,7 +82,13 @@ fun BigButton(name : String, enable : Boolean, onClick : () -> Unit){
 }
 
 @Composable
-fun BackButton_Onboarding(onClick : () -> Unit){
+fun ImgBackButton(onClick : () -> Unit, content : String){
+    Row(modifier = Modifier
+        .wrapContentWidth()
+        .height(20.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+        Spacer(modifier = Modifier.width(10.dp))
+
         Image(painter = painterResource(R.drawable.ic_btn_back_onboarding),
             contentDescription = "로그인에서 뒤로가는 버튼",
             modifier = Modifier
@@ -90,15 +97,16 @@ fun BackButton_Onboarding(onClick : () -> Unit){
                 .padding(end = 0.dp)
                 .clickable { onClick() })
 
+        Spacer(modifier = Modifier.width(16.dp))
+        P_SemiBold18(content, black)
+    }
 }
 
 @Composable
 fun CheckButton( isChecked : MutableState<Boolean>){
 
-
-
-    Column(modifier = Modifier.size(16.dp).clickable { isChecked.value = !isChecked.value }) {
-        Image(modifier = Modifier.fillMaxSize(),
+    Column(modifier = Modifier.clickable { isChecked.value = !isChecked.value }) {
+        Image(modifier = Modifier.size(16.dp),
             painter = if(isChecked.value) painterResource(R.drawable.ic_checkbox_true)
             else painterResource(id = R.drawable.ic_checkbox_false),
             contentDescription = "check button")

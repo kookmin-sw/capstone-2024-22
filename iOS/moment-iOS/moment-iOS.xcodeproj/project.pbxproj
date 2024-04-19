@@ -13,6 +13,9 @@
 		8E15C88C2B6527E7001468C7 /* moment_iOSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E15C88B2B6527E7001468C7 /* moment_iOSUITests.swift */; };
 		8E15C88E2B6527E7001468C7 /* moment_iOSUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E15C88D2B6527E7001468C7 /* moment_iOSUITestsLaunchTests.swift */; };
 		8E2D273B2BA57DE7006248EA /* FSCalendarWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D273A2BA57DE7006248EA /* FSCalendarWrapper.swift */; };
+		8E3E7D4D2BC97A63004C6AD1 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 8E3E7D4C2BC97A63004C6AD1 /* Alamofire */; };
+		8E3E7D502BC97AF5004C6AD1 /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 8E3E7D4F2BC97AF5004C6AD1 /* PopupView */; };
+		8E3E7D5E2BCD7C4B004C6AD1 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E3E7D5D2BCD7C4B004C6AD1 /* Model.swift */; };
 		8E5CAE322B970BC800A483B4 /* Time.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE312B970BC800A483B4 /* Time.swift */; };
 		8E5CAE342B970C2C00A483B4 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE332B970C2C00A483B4 /* Color+Extensions.swift */; };
 		8E5CAE362B970C4500A483B4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E5CAE352B970C4500A483B4 /* Assets.xcassets */; };
@@ -43,9 +46,11 @@
 		8E5CAE702B970ED700A483B4 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE6F2B970ED700A483B4 /* NotificationService.swift */; };
 		8E5CAE722B970EE700A483B4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE712B970EE700A483B4 /* AppDelegate.swift */; };
 		8E5CAE742B970EF400A483B4 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE732B970EF400A483B4 /* SettingView.swift */; };
-		8E747AF72B84DC1400D9302D /* SafeAreaBrush in Frameworks */ = {isa = PBXBuildFile; productRef = 8E747AF62B84DC1400D9302D /* SafeAreaBrush */; };
 		8E747AFC2B860E3C00D9302D /* FSCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = 8E747AFB2B860E3C00D9302D /* FSCalendar */; };
 		8E7FB8FE2BA1E66200F05045 /* CustomDevider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E7FB8FD2BA1E66200F05045 /* CustomDevider.swift */; };
+		8E86C0662BD0100C00291360 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C0652BD0100C00291360 /* View+Extensions.swift */; };
+		8E86C0682BD0103F00291360 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C0672BD0103F00291360 /* ActivityView.swift */; };
+		8E86C06A2BD0357F00291360 /* TextFieldDynamicWidth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C0692BD0357F00291360 /* TextFieldDynamicWidth.swift */; };
 		8E8C17452BA8575000BF1E1C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17442BA8575000BF1E1C /* LoginView.swift */; };
 		8E8C17482BA85AE200BF1E1C /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17472BA85AE200BF1E1C /* AuthView.swift */; };
 		8E8C174F2BA97B4500BF1E1C /* AuthNumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C174E2BA97B4500BF1E1C /* AuthNumView.swift */; };
@@ -58,10 +63,11 @@
 		8E970E192BC3E079003476C4 /* DailyViewmodel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E182BC3E079003476C4 /* DailyViewmodel.swift */; };
 		8E970E1B2BC3E865003476C4 /* DailyCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E1A2BC3E865003476C4 /* DailyCardViewModel.swift */; };
 		8E970E1D2BC405C7003476C4 /* DailyCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E1C2BC405C7003476C4 /* DailyCardView.swift */; };
+		8E970F272BC96AC3003476C4 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970F262BC96AC3003476C4 /* LoginViewModel.swift */; };
+		8E970F292BC96EBF003476C4 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970F282BC96EBF003476C4 /* AuthViewModel.swift */; };
 		8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA922BAD6B3200C39125 /* PasswordView.swift */; };
 		8ECCFA982BAFE3BD00C39125 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */; };
 		8ECCFADF2BB066D600C39125 /* FloatingToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */; };
-		8ECCFAE32BB0672C00C39125 /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECCFAE22BB0672C00C39125 /* PopupView */; };
 		8ECCFB1F2BB1CA5600C39125 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB1E2BB1CA5600C39125 /* Item.swift */; };
 		8ECCFB612BB29D9100C39125 /* PasswordfindView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB602BB29D9100C39125 /* PasswordfindView.swift */; };
 		8ECCFB632BB29FC000C39125 /* PasswordinsertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFB622BB29FC000C39125 /* PasswordinsertView.swift */; };
@@ -110,6 +116,19 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		8E970F302BC975AB003476C4 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		8E15C86D2B6527E3001468C7 /* moment-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "moment-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E15C8702B6527E3001468C7 /* moment_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = moment_iOSApp.swift; sourceTree = "<group>"; };
@@ -120,6 +139,7 @@
 		8E15C88B2B6527E7001468C7 /* moment_iOSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = moment_iOSUITests.swift; sourceTree = "<group>"; };
 		8E15C88D2B6527E7001468C7 /* moment_iOSUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = moment_iOSUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		8E2D273A2BA57DE7006248EA /* FSCalendarWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FSCalendarWrapper.swift; sourceTree = "<group>"; };
+		8E3E7D5D2BCD7C4B004C6AD1 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		8E5CAE312B970BC800A483B4 /* Time.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Time.swift; sourceTree = "<group>"; };
 		8E5CAE332B970C2C00A483B4 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 		8E5CAE352B970C4500A483B4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ../../NAVERRECORD/NaverRECORDAPP/NaverRECORDAPP/Assets.xcassets; sourceTree = "<group>"; };
@@ -151,6 +171,9 @@
 		8E5CAE712B970EE700A483B4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8E5CAE732B970EF400A483B4 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		8E7FB8FD2BA1E66200F05045 /* CustomDevider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDevider.swift; sourceTree = "<group>"; };
+		8E86C0652BD0100C00291360 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
+		8E86C0672BD0103F00291360 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
+		8E86C0692BD0357F00291360 /* TextFieldDynamicWidth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldDynamicWidth.swift; sourceTree = "<group>"; };
 		8E8C17442BA8575000BF1E1C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		8E8C17472BA85AE200BF1E1C /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		8E8C174E2BA97B4500BF1E1C /* AuthNumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthNumView.swift; sourceTree = "<group>"; };
@@ -163,6 +186,8 @@
 		8E970E182BC3E079003476C4 /* DailyViewmodel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyViewmodel.swift; sourceTree = "<group>"; };
 		8E970E1A2BC3E865003476C4 /* DailyCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCardViewModel.swift; sourceTree = "<group>"; };
 		8E970E1C2BC405C7003476C4 /* DailyCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCardView.swift; sourceTree = "<group>"; };
+		8E970F262BC96AC3003476C4 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
+		8E970F282BC96EBF003476C4 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		8ECCFA922BAD6B3200C39125 /* PasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordView.swift; sourceTree = "<group>"; };
 		8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
 		8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingToastView.swift; sourceTree = "<group>"; };
@@ -191,9 +216,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8ECCFAE32BB0672C00C39125 /* PopupView in Frameworks */,
-				8E747AF72B84DC1400D9302D /* SafeAreaBrush in Frameworks */,
+				8E3E7D502BC97AF5004C6AD1 /* PopupView in Frameworks */,
 				8E747AFC2B860E3C00D9302D /* FSCalendar in Frameworks */,
+				8E3E7D4D2BC97A63004C6AD1 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -217,6 +242,7 @@
 		8E15C8642B6527E3001468C7 = {
 			isa = PBXGroup;
 			children = (
+				8E3E7D5F2BCD7C50004C6AD1 /* Model */,
 				8ECCFBD42BB93AEC00C39125 /* moment-iOS-Info.plist */,
 				8ECCFBB52BB93A4800C39125 /* Font */,
 				8ECCFBB12BB804B900C39125 /* ImagePicker.swift */,
@@ -325,10 +351,19 @@
 			path = Onboarding;
 			sourceTree = "<group>";
 		};
+		8E3E7D5F2BCD7C50004C6AD1 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				8E3E7D5D2BCD7C4B004C6AD1 /* Model.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		8E8C17462BA8575500BF1E1C /* Login */ = {
 			isa = PBXGroup;
 			children = (
 				8E8C17442BA8575000BF1E1C /* LoginView.swift */,
+				8E970F262BC96AC3003476C4 /* LoginViewModel.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -337,6 +372,7 @@
 			isa = PBXGroup;
 			children = (
 				8E8C17472BA85AE200BF1E1C /* AuthView.swift */,
+				8E970F282BC96EBF003476C4 /* AuthViewModel.swift */,
 				8E8C174E2BA97B4500BF1E1C /* AuthNumView.swift */,
 				8E8C17532BAAC59400BF1E1C /* AddUser.swift */,
 				8E8C17552BAAC8F000BF1E1C /* AuthComplete.swift */,
@@ -359,6 +395,8 @@
 				8E5CAE332B970C2C00A483B4 /* Color+Extensions.swift */,
 				8E5CAE472B970D2700A483B4 /* Date+Extensions.swift */,
 				8ECCFBD52BB93BC100C39125 /* Font+Extensions.swift */,
+				8E86C0652BD0100C00291360 /* View+Extensions.swift */,
+				8E86C0692BD0357F00291360 /* TextFieldDynamicWidth.swift */,
 			);
 			path = Style;
 			sourceTree = "<group>";
@@ -440,6 +478,7 @@
 			children = (
 				8E5CAE592B970DF600A483B4 /* BillListViewModel.swift */,
 				8E5CAE5B2B970E0400A483B4 /* BillListView.swift */,
+				8E86C0672BD0103F00291360 /* ActivityView.swift */,
 			);
 			path = Bill;
 			sourceTree = "<group>";
@@ -487,6 +526,7 @@
 				8E15C8692B6527E3001468C7 /* Sources */,
 				8E15C86A2B6527E3001468C7 /* Frameworks */,
 				8E15C86B2B6527E3001468C7 /* Resources */,
+				8E970F302BC975AB003476C4 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -494,9 +534,9 @@
 			);
 			name = "moment-iOS";
 			packageProductDependencies = (
-				8E747AF62B84DC1400D9302D /* SafeAreaBrush */,
 				8E747AFB2B860E3C00D9302D /* FSCalendar */,
-				8ECCFAE22BB0672C00C39125 /* PopupView */,
+				8E3E7D4C2BC97A63004C6AD1 /* Alamofire */,
+				8E3E7D4F2BC97AF5004C6AD1 /* PopupView */,
 			);
 			productName = "moment-iOS";
 			productReference = 8E15C86D2B6527E3001468C7 /* moment-iOS.app */;
@@ -571,9 +611,9 @@
 			);
 			mainGroup = 8E15C8642B6527E3001468C7;
 			packageReferences = (
-				8E747AF52B84DC1400D9302D /* XCRemoteSwiftPackageReference "SafeAreaBrush" */,
 				8E747AFA2B860E3C00D9302D /* XCRemoteSwiftPackageReference "FSCalendar" */,
-				8ECCFAE12BB0672B00C39125 /* XCRemoteSwiftPackageReference "PopupView" */,
+				8E3E7D4B2BC97A63004C6AD1 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				8E3E7D4E2BC97AF5004C6AD1 /* XCRemoteSwiftPackageReference "PopupView" */,
 			);
 			productRefGroup = 8E15C86E2B6527E3001468C7 /* Products */;
 			projectDirPath = "";
@@ -650,6 +690,7 @@
 				8E5CAE6E2B970EC600A483B4 /* LikeView.swift in Sources */,
 				8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */,
 				8E5CAE502B970D6B00A483B4 /* HomeViewModel.swift in Sources */,
+				8E970F272BC96AC3003476C4 /* LoginViewModel.swift in Sources */,
 				8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */,
 				8E5CAE482B970D2700A483B4 /* Date+Extensions.swift in Sources */,
 				8E5CAE462B970D1000A483B4 /* Tab.swift in Sources */,
@@ -669,6 +710,7 @@
 				8ECCFB1F2BB1CA5600C39125 /* Item.swift in Sources */,
 				8E5CAE3A2B970C9D00A483B4 /* OnboardingViewModel.swift in Sources */,
 				8ECCFBD62BB93BC100C39125 /* Font+Extensions.swift in Sources */,
+				8E86C0682BD0103F00291360 /* ActivityView.swift in Sources */,
 				8E5CAE382B970C5600A483B4 /* OnboardingContent.swift in Sources */,
 				8E5CAE4E2B970D5D00A483B4 /* Todo.swift in Sources */,
 				8E7FB8FE2BA1E66200F05045 /* CustomDevider.swift in Sources */,
@@ -683,12 +725,16 @@
 				8ECCFBD92BB9463700C39125 /* CardViewModel.swift in Sources */,
 				8E5CAE342B970C2C00A483B4 /* Color+Extensions.swift in Sources */,
 				8E5CAE5A2B970DF600A483B4 /* BillListViewModel.swift in Sources */,
+				8E86C06A2BD0357F00291360 /* TextFieldDynamicWidth.swift in Sources */,
 				8ECCFBA72BB59F0100C39125 /* CardView.swift in Sources */,
+				8E86C0662BD0100C00291360 /* View+Extensions.swift in Sources */,
 				8E5CAE742B970EF400A483B4 /* SettingView.swift in Sources */,
 				8ECCFB632BB29FC000C39125 /* PasswordinsertView.swift in Sources */,
 				8E5CAE6C2B970EAE00A483B4 /* LikeViewModel.swift in Sources */,
 				8E5CAE722B970EE700A483B4 /* AppDelegate.swift in Sources */,
+				8E970F292BC96EBF003476C4 /* AuthViewModel.swift in Sources */,
 				8E970E1D2BC405C7003476C4 /* DailyCardView.swift in Sources */,
+				8E3E7D5E2BCD7C4B004C6AD1 /* Model.swift in Sources */,
 				8ECCFBB22BB804B900C39125 /* ImagePicker.swift in Sources */,
 				8E5CAE3C2B970CB300A483B4 /* OnboardingView.swift in Sources */,
 			);
@@ -1030,12 +1076,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		8E747AF52B84DC1400D9302D /* XCRemoteSwiftPackageReference "SafeAreaBrush" */ = {
+		8E3E7D4B2BC97A63004C6AD1 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/WallabyStuff/SafeAreaBrush.git";
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.4;
+				minimumVersion = 5.9.1;
+			};
+		};
+		8E3E7D4E2BC97AF5004C6AD1 /* XCRemoteSwiftPackageReference "PopupView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/PopupView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.1;
 			};
 		};
 		8E747AFA2B860E3C00D9302D /* XCRemoteSwiftPackageReference "FSCalendar" */ = {
@@ -1046,31 +1100,23 @@
 				minimumVersion = 2.8.4;
 			};
 		};
-		8ECCFAE12BB0672B00C39125 /* XCRemoteSwiftPackageReference "PopupView" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/exyte/PopupView.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.9.1;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		8E747AF62B84DC1400D9302D /* SafeAreaBrush */ = {
+		8E3E7D4C2BC97A63004C6AD1 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8E747AF52B84DC1400D9302D /* XCRemoteSwiftPackageReference "SafeAreaBrush" */;
-			productName = SafeAreaBrush;
+			package = 8E3E7D4B2BC97A63004C6AD1 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		8E3E7D4F2BC97AF5004C6AD1 /* PopupView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E3E7D4E2BC97AF5004C6AD1 /* XCRemoteSwiftPackageReference "PopupView" */;
+			productName = PopupView;
 		};
 		8E747AFB2B860E3C00D9302D /* FSCalendar */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E747AFA2B860E3C00D9302D /* XCRemoteSwiftPackageReference "FSCalendar" */;
 			productName = FSCalendar;
-		};
-		8ECCFAE22BB0672C00C39125 /* PopupView */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8ECCFAE12BB0672B00C39125 /* XCRemoteSwiftPackageReference "PopupView" */;
-			productName = PopupView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

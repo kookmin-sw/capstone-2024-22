@@ -1,5 +1,6 @@
 package com.capstone.android.application.presentation
 
+
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -11,9 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.max
-
-class TestViewModel {
-}
 
 
 class CountViewModel : ViewModel(){
