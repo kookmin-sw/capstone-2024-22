@@ -58,6 +58,13 @@ spring:
           uri: lb://auth-service
           predicates:
             - Path=/auth/**
+        - id: notiservice
+          uri: lb://noti-service
+          predicates:
+            - Path=/noti/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - AuthorizedUserJwtFilter
 
 
   application:
