@@ -404,12 +404,15 @@ struct ReceiptDetailView: View {
     @State private var isEditing: Bool = false
     @State private var saveButtonTitle = "저장"
     @State private var backButtonTitle = "뒤로"
+<<<<<<< HEAD
     @State private var inputText: String = ""
     @State private var EndLocationend : String = ""
     @State private var selectedTab = 0
     @State private var showingGroup = false
     
     
+=======
+>>>>>>> parent of 3ed1193 (text center alignment add)
     
     var body: some View {
       
@@ -454,6 +457,7 @@ struct ReceiptDetailView: View {
                         }
                         Spacer()
                         
+<<<<<<< HEAD
                         Button(action: {
                             if saveButtonTitle == "저장" {
                                 saveButtonTitle = "완료"
@@ -474,6 +478,16 @@ struct ReceiptDetailView: View {
                             .padding()
                             .font(.yjObangBold15)
                             .foregroundColor(saveButtonTitle == "완료" ? .homeRed : .black)
+=======
+                        if backButtonTitle == "뒤로" {
+                            // 내보내기 기능 실행
+                            isDialogActive = true
+                            print("두ㅏㅣ로가기")
+                        }else {
+                            let image = snapshot()
+                            showShareSheet(image)
+                            print("내보내기")
+>>>>>>> parent of 3ed1193 (text center alignment add)
                         }
                     }
                     Spacer()
@@ -509,6 +523,7 @@ struct ReceiptDetailView: View {
                             .padding(.bottom), alignment: .bottom
                     )
                 
+<<<<<<< HEAD
                 if isDialogActive {
                     CustomDialogBill(isActive: $isDialogActive, title: "", message: "앗! 지금 화면을 그냥 나가면 열심히 만든 영수증이 저장되지않아요", yesAction: {
                         //TODO: - 영수증의 시작뷰로 돌아가야함
@@ -520,6 +535,126 @@ struct ReceiptDetailView: View {
                         print("취소됨")
                     })
                 }
+=======
+                // }
+                // 나머지 카드 부분
+                Rectangle()
+                    .fill(Color.Secondary50)
+                    .frame(height: 603)
+                    .overlay(
+                        VStack(alignment:.center){
+                            Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이 ")
+                                .font(.pretendardMedium8)
+                                .foregroundColor(.homeRed)
+                            
+                            Spacer()
+                            
+                            TextField("여행의 기록을 한줄로 기록하세요", text: $text, prompt: Text("여행의 기록을 한줄로 기록하세요").foregroundColor(.Natural200))
+                                .foregroundColor(.gray500)
+                                .font(.pretendardMedium14)
+                                .padding(.bottom,30)
+                                .multilineTextAlignment(.center)
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            VStack(alignment:.center,spacing:0){
+                                HStack(alignment:.center,spacing:1)
+                                {
+                                    Spacer()
+                                    
+                                    // Image("Locationred")
+                                    
+                                    
+                                    TextField("여행의 기록을 한줄로 기록하세요", text: $starttrip, prompt: Text("여행의 시작은 여기부터").foregroundColor(.Natural200))
+                                        .font(.pretendardMedium14)
+                                        .foregroundColor(.homeRed)  // 글씨 색상 변경
+                                        .multilineTextAlignment(.center)
+                                        .frame(maxWidth:100)
+                                    
+                                    
+                                    Spacer()
+                                }
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                HStack{
+                                    TextField("출발지",text:$StartLocation,prompt: Text("출발지").foregroundColor(.Natural200))
+                                        .font(.pretendardExtrabold45)
+                                        .foregroundColor(.homeRed)  // 글씨
+                                        .multilineTextAlignment(.center)
+                                }
+                            }
+                            
+                            
+                            Image("airplane")
+                                .padding(.bottom,20)
+                            
+                            VStack(spacing:0){
+                                HStack(alignment: .center,spacing:0)
+                                {
+                                    Image("Locationred")
+                                    Text("암스테르담 공항")
+                                        .font(.pretendardMedium14)
+                                        .foregroundColor(.homeRed)
+                                        .multilineTextAlignment(.leading)
+                                    
+                                }
+                                
+                                
+                                
+                                HStack{
+                                    
+                                    TextField("출발지",text:$EndLocation,prompt: Text("도착지").foregroundColor(.Natural200))
+                                        .font(.pretendardExtrabold45)
+                                        .foregroundColor(.homeRed)  // 글씨
+                                        .multilineTextAlignment(.center)
+                                }
+                            }
+                            
+                            Spacer()
+                            Image("cut")
+                                .padding(.bottom,10)
+                            
+                            StatsView()
+                            Spacer()
+                        }
+                    )
+            }
+            
+            
+            .frame(width: 335, height: 653)
+            
+            .cornerRadius(5) // 모서리를 둥글게 처리합니다.
+            .overlay(
+                RoundedRectangle(cornerRadius: 3)
+                    .stroke(Color.Secondary50, lineWidth: 1)
+            )
+//            .onAppear {
+//                homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
+//            }
+            if isDialogActive {
+                CustomDialogBill(isActive: $isDialogActive, title: "", message: "앗! 지금 화면을 그냥 나가면 열심히 만든 영수증이 저장되지않아요", yesAction: {
+                    //TODO: - 영수증의 시작뷰로 돌아가야함
+                    print("저장됨")
+                    // 여기에 저장 로직 추가
+                }, noAction: {
+                    //TODO: - dismiss하기
+                    
+                    print("취소됨")
+                })
+            }
+            
+            if isDialogActiveBillCom{
+>>>>>>> parent of 3ed1193 (text center alignment add)
                 
                 if isDialogActiveBillCom{
                     
@@ -540,14 +675,28 @@ struct ReceiptDetailView: View {
                     
                 }
             }
+<<<<<<< HEAD
             .background(.homeBack)
             .navigationBarBackButtonHidden()
         
+=======
+            
+            VStack{
+                //TODO: - 여기에다가 인디케이터를 넣어줘야함
+            }
+            
+        }
+        .navigationBarBackButtonHidden()
+>>>>>>> parent of 3ed1193 (text center alignment add)
         
     }
-    
+    // SwiftUI View 내에서 사용될 함수
     private func showShareSheet(_ image: UIImage) {
+<<<<<<< HEAD
         
+=======
+        // UIApplication의 rootViewController를 가져옵니다.
+>>>>>>> parent of 3ed1193 (text center alignment add)
         guard let rootVC = UIApplication.shared.windows.first?.rootViewController else {
             return
         }
@@ -602,6 +751,7 @@ struct CustomTabIndicator: View {
 }
 
 
+<<<<<<< HEAD
 struct GlobalGeometryGetter: View {
     @Binding var rect: CGRect
     
@@ -621,6 +771,8 @@ struct GlobalGeometryGetter: View {
 }
 
 
+=======
+>>>>>>> parent of 3ed1193 (text center alignment add)
 struct StatsView: View {
     var body: some View {
         
