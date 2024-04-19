@@ -1,13 +1,19 @@
 package com.capstone.android.application.app.composable
 
 import android.util.Log
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -17,28 +23,45 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
+import androidx.constraintlayout.compose.Dimension
 import androidx.core.graphics.toColorInt
 import com.capstone.android.application.ui.theme.HintText
 import com.capstone.android.application.ui.theme.PretendardFamily
 import com.capstone.android.application.ui.theme.black
 import com.capstone.android.application.ui.theme.neutral_100
 import com.capstone.android.application.ui.theme.tertiary_500
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -131,6 +154,170 @@ fun MomentTextField(
                     start = 0.dp, top = 1.dp, end = 1.dp, bottom = 3.dp
                 )
             )
+        }
+    }
+}
+
+@Composable
+fun FancyProgressBar(
+    modifier: Modifier,
+    progress: Float = 0f.coerceIn(0f, 1f),
+    leftColor: Color = Color.Black,
+    rightColor: Color = Color("#938F8F".toColorInt()),
+    indicatorColor: Color = Color("#99342E".toColorInt()),
+    textStyle: TextStyle = TextStyle(color = Color.White),
+    cornerRaduis: Dp = 10.dp,
+    onDragEnd: (Float) -> Unit,
+    onDrag: (Float) -> Unit,
+) {
+
+    var offsetX = remember { mutableFloatStateOf(0f) }
+    var progressBarWidthInDp = remember { mutableStateOf(Dp(0f)) }
+
+    val guidelinePercentage = remember {
+        derivedStateOf {
+            Dp(offsetX.value) / progressBarWidthInDp.value
+        }
+    }
+
+    LaunchedEffect(progress) {
+        offsetX.value = progress.coerceIn(0f, 1f).times(progressBarWidthInDp.value).value
+    }
+    val isAnimatePercentageUp = remember {
+        derivedStateOf {
+            guidelinePercentage.value < 0.2f || guidelinePercentage.value > 0.8f
+        }
+    }
+
+    val animation = animateDpAsState(
+        targetValue = if (isAnimatePercentageUp.value) -Dp(35f) else Dp(0f),
+        label = "Text Animation"
+    )
+    Box(
+        modifier = modifier
+            .clip(
+                RoundedCornerShape(10.dp)
+            )
+            .onSizeChanged {
+                progressBarWidthInDp.value = it.width.dp
+            },
+        contentAlignment = Alignment.Center
+    ) {
+
+        val constraints = ConstraintSet {
+            //References of widgets in the layout
+            val leftBox = createRefFor("leftBox")
+            val rightBox = createRefFor("rightBox")
+            val indicator = createRefFor("indicator")
+
+            val leftPercentage = createRefFor("leftPercentage")
+            val rightPercentage = createRefFor("rightPercentage")
+
+            val guideLine = createGuidelineFromStart(guidelinePercentage.value)
+
+            //set constraints to the widgets
+            constrain(leftBox)
+            {
+                top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(guideLine, margin = 0.dp)
+                width = Dimension.fillToConstraints
+                height = Dimension.preferredValue(4.dp)
+            }
+
+
+            constrain(leftPercentage)
+            {
+                top.linkTo(leftBox.top)
+                bottom.linkTo(leftBox.bottom)
+                start.linkTo(leftBox.start, margin = 5.dp)
+            }
+
+            constrain(rightPercentage)
+            {
+                top.linkTo(leftBox.top)
+                bottom.linkTo(leftBox.bottom)
+                end.linkTo(rightBox.end, margin = 5.dp)
+            }
+
+            constrain(rightBox)
+            {
+                top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
+                end.linkTo(parent.end)
+                start.linkTo(guideLine, margin = 0.dp)
+                width = Dimension.fillToConstraints
+                height = Dimension.preferredValue(4.dp)
+            }
+
+            constrain(indicator)
+            {
+                top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
+                height = Dimension.preferredValue(12.dp)
+            }
+
+        }
+        ConstraintLayout(
+            constraints,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(12.dp)
+        ) {
+
+            //Left progress
+            Box(
+                modifier = Modifier
+                    .layoutId("leftBox")
+                    .background(
+                        shape = RoundedCornerShape(cornerRaduis),
+                        color = leftColor
+                    )
+            )
+
+            //Right progress
+            Box(
+                modifier = Modifier
+                    .layoutId("rightBox")
+                    .background(
+                        shape = RoundedCornerShape(cornerRaduis),
+                        color = rightColor
+                    )
+            )
+
+            Box(modifier = Modifier
+                .layoutId("indicator")
+                .offset { IntOffset(offsetX.value.roundToInt(), 0) }
+                .width(5.dp)
+                .background(shape = RoundedCornerShape(5.dp), color = indicatorColor)
+                .pointerInput(Unit) {
+                    detectDragGestures(onDragEnd = { onDragEnd(guidelinePercentage.value) }) { change, dragAmount ->
+                        change.consume()
+                        offsetX.value = (offsetX.value + dragAmount.x)
+                            .coerceIn(0f, progressBarWidthInDp.value.value)
+                        onDrag(guidelinePercentage.value)
+                    }
+
+                }
+            )
+
+            Text(
+                text = "${String.format("%.0f", guidelinePercentage.value * 100)}%",
+                modifier = Modifier
+                    .layoutId("leftPercentage")
+                    .offset(y = animation.value),
+                style = textStyle
+            )
+
+            Text(
+                text = "${String.format("%.0f", (1 - guidelinePercentage.value) * 100)}%",
+                modifier = Modifier
+                    .layoutId("rightPercentage")
+                    .offset(y = animation.value),
+                style = textStyle
+            )
+
         }
     }
 }
