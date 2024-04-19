@@ -9,7 +9,7 @@ import Foundation
 
 
 import Foundation
-import CoreLocation
+
 
 class HomeBaseViewModel: ObservableObject {//클래스가 구현되어있고 옵저버블옵젝트 프로토콜을 따르면서 homeview 에서 이클래스안에 데이터와 인스턴스를 사용할수있도록 이 프로토콜을 사용한거다 그래서 여기서 변한 친구들의 데이터들을 이프로토콜을 구독하는 녀석들한테 데이터를 업데이트해줄수있음
   @Published var selectedTab: Tab // 여기서일단 어떤 뷰에 있는 지알려줄려고 이넘타입의 클래스인 Tab 열거형의 타입을 따른다고 알려주고있고 퍼블리시드는 이변수가 변하게되면 해당 데이터를 업뎃해주겠다라는 모습이보임 근데 그럼 State랑 은뭐가다름 ? 둘다똑같잖아 ㅋㅋ
@@ -19,8 +19,8 @@ class HomeBaseViewModel: ObservableObject {//클래스가 구현되어있고 옵
   @Published var memosCount: Int//
   @Published var voiceRecordersCount: Int//
     @Published var isRecording = false
-  
     
+  
   init(
     selectedTab: Tab = .Home,
     todosCount: Int = 0,
@@ -32,42 +32,7 @@ class HomeBaseViewModel: ObservableObject {//클래스가 구현되어있고 옵
     self.memosCount = memosCount
     self.voiceRecordersCount = voiceRecordersCount
   }
-    
-    func reverseGeocoding(latitude: CLLocationDegrees, longitude: CLLocationDegrees,completion : @escaping(String) -> ()){
-                let geocoder = CLGeocoder()
-                let location = CLLocation(latitude: latitude, longitude: longitude)
-        
-            geocoder.reverseGeocodeLocation(location) {placemarks, error in
-                if let placemark = placemarks?.first {
-                    let address = placemark.address!
-                    completion(address)
-                }
-            }
-        }
-}
-extension CLPlacemark {
-
-    var address: String? {
-        
-       var result = ""
-        
-        if let city = locality {
-            result += "\(city)"
-        }
-            
-//        if let subcity = sublocality {
-//            result += " \(subcity)"
-//          
-//        }
-
-       return result
-       
-    }
-
-}
-
-
-
+}// 초기화해주고 클래스안에 인스턴스에 대한 접근
 
 extension HomeBaseViewModel { // class 의 추가적인 기능을 만들기 위해서 extension 으로 확장해주고
   func setTodosCount(_ count: Int) {
@@ -86,5 +51,4 @@ extension HomeBaseViewModel { // class 의 추가적인 기능을 만들기 위�
     selectedTab = tab
   }
 }
-
 // 이하 생략 모두 같음

@@ -50,11 +50,6 @@
 		8E7FB8FE2BA1E66200F05045 /* CustomDevider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E7FB8FD2BA1E66200F05045 /* CustomDevider.swift */; };
 		8E86C0662BD0100C00291360 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C0652BD0100C00291360 /* View+Extensions.swift */; };
 		8E86C0682BD0103F00291360 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C0672BD0103F00291360 /* ActivityView.swift */; };
-<<<<<<< HEAD
-		8E86C06A2BD0357F00291360 /* TextFieldDynamicWidth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C0692BD0357F00291360 /* TextFieldDynamicWidth.swift */; };
-		8E86C06C2BD255D800291360 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C06B2BD255D800291360 /* LocationManager.swift */; };
-=======
->>>>>>> parent of 3ed1193 (text center alignment add)
 		8E8C17452BA8575000BF1E1C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17442BA8575000BF1E1C /* LoginView.swift */; };
 		8E8C17482BA85AE200BF1E1C /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17472BA85AE200BF1E1C /* AuthView.swift */; };
 		8E8C174F2BA97B4500BF1E1C /* AuthNumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C174E2BA97B4500BF1E1C /* AuthNumView.swift */; };
@@ -177,11 +172,6 @@
 		8E7FB8FD2BA1E66200F05045 /* CustomDevider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDevider.swift; sourceTree = "<group>"; };
 		8E86C0652BD0100C00291360 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
 		8E86C0672BD0103F00291360 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
-<<<<<<< HEAD
-		8E86C0692BD0357F00291360 /* TextFieldDynamicWidth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldDynamicWidth.swift; sourceTree = "<group>"; };
-		8E86C06B2BD255D800291360 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
-=======
->>>>>>> parent of 3ed1193 (text center alignment add)
 		8E8C17442BA8575000BF1E1C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		8E8C17472BA85AE200BF1E1C /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		8E8C174E2BA97B4500BF1E1C /* AuthNumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthNumView.swift; sourceTree = "<group>"; };
@@ -250,7 +240,6 @@
 		8E15C8642B6527E3001468C7 = {
 			isa = PBXGroup;
 			children = (
-				8E86C06D2BD255DC00291360 /* LocationService */,
 				8E3E7D5F2BCD7C50004C6AD1 /* Model */,
 				8ECCFBD42BB93AEC00C39125 /* moment-iOS-Info.plist */,
 				8ECCFBB52BB93A4800C39125 /* Font */,
@@ -291,6 +280,7 @@
 				8E15C8802B6527E7001468C7 /* moment-iOSTests */,
 				8E15C88A2B6527E7001468C7 /* moment-iOSUITests */,
 				8E15C86E2B6527E3001468C7 /* Products */,
+				8E86C12B2BD2C7A400291360 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -368,12 +358,11 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		8E86C06D2BD255DC00291360 /* LocationService */ = {
+		8E86C12B2BD2C7A400291360 /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
-				8E86C06B2BD255D800291360 /* LocationManager.swift */,
 			);
-			path = LocationService;
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		8E8C17462BA8575500BF1E1C /* Login */ = {
@@ -741,11 +730,6 @@
 				8ECCFBD92BB9463700C39125 /* CardViewModel.swift in Sources */,
 				8E5CAE342B970C2C00A483B4 /* Color+Extensions.swift in Sources */,
 				8E5CAE5A2B970DF600A483B4 /* BillListViewModel.swift in Sources */,
-<<<<<<< HEAD
-				8E86C06C2BD255D800291360 /* LocationManager.swift in Sources */,
-				8E86C06A2BD0357F00291360 /* TextFieldDynamicWidth.swift in Sources */,
-=======
->>>>>>> parent of 3ed1193 (text center alignment add)
 				8ECCFBA72BB59F0100C39125 /* CardView.swift in Sources */,
 				8E86C0662BD0100C00291360 /* View+Extensions.swift in Sources */,
 				8E5CAE742B970EF400A483B4 /* SettingView.swift in Sources */,
