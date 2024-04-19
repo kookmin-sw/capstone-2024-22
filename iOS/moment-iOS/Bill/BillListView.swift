@@ -1,3 +1,5 @@
+
+
 //
 //  MemoListView.swift
 //  moment-iOS
@@ -39,7 +41,7 @@ struct BillListView: View {
 struct ReceiptGroupView: View {
     var body: some View {
         ScrollView{
-            //TODO: - 여기서는 뒤로가기버튼의 위치가 빌리스트 홈뷰여야함 
+            //TODO: - 여기서는 뒤로가기버튼의 위치가 빌리스트 홈뷰여야함
             VStack{
                 HStack
                 {
@@ -429,6 +431,7 @@ struct ReceiptDetailView: View {
                                 switch selectedTab {
                                 case 0:
                                     // 태그 1인 경우 ReceiptBillView1의 스냅샷 캡쳐
+                                    
                                     image = ReceiptBillView1(item: item).snapshot()
                                 case 1:
                                     // 태그 2인 경우 ReceiptView의 스냅샷 캡쳐
@@ -562,6 +565,20 @@ struct ReceiptDetailView: View {
         // activityVC를 present합니다.
         rootVC.present(activityVC, animated: true, completion: nil)
     }
+    
+    func captureSnapshot() {
+        let hostingController = UIHostingController(rootView: ReceiptDetailView(item:item))
+        let targetSize = hostingController.view.intrinsicContentSize
+        hostingController.view.bounds = CGRect(origin: .zero, size: targetSize)
+        hostingController.view.layoutIfNeeded()
+
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+        let image = renderer.image { _ in
+            hostingController.view.drawHierarchy(in: hostingController.view.bounds, afterScreenUpdates: true)
+        }
+        showShareSheet(image)
+    }
+
     
 }
 
@@ -803,6 +820,7 @@ struct ReceiptBillView1 : View {
     @State private var inputText: String = ""
     @State private var EndLocationend : String = ""
     @State private var selectedTab = 0
+    @State private var forceUpdate = ""
     
     var body: some View{
         VStack(spacing: 0) {
@@ -931,6 +949,38 @@ struct ReceiptBillView1 : View {
             RoundedRectangle(cornerRadius: 3)
                 .stroke(Color.Secondary50, lineWidth: 1)
         )
+        
+    }
+    private func showShareSheet(_ image: UIImage) {
+        
+        guard let rootVC = UIApplication.shared.windows.first?.rootViewController else {
+            return
+        }
+        
+        // UIActivityViewController 인스턴스 생성
+        let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        
+        // iPad에서는 popover로 표시될 위치를 지정해야 할 수 있습니다.
+        if let popoverController = activityVC.popoverPresentationController {
+            popoverController.sourceView = rootVC.view
+            popoverController.sourceRect = CGRect(x: rootVC.view.bounds.midX, y: rootVC.view.bounds.midY, width: 0, height: 0)
+            popoverController.permittedArrowDirections = []
+        }
+        
+        // activityVC를 present합니다.
+        rootVC.present(activityVC, animated: true, completion: nil)
+    }
+    
+    func captureSnapshot() {
+        let hostingController = UIHostingController(rootView: ReceiptBillView1(item:item))
+        let targetSize = hostingController.view.intrinsicContentSize
+        hostingController.view.bounds = CGRect(origin: .zero, size: targetSize)
+        hostingController.view.layoutIfNeeded()
+
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+        let image = renderer.image { _ in
+            hostingController.view.drawHierarchy(in: hostingController.view.bounds, afterScreenUpdates: true)
+        }
         
     }
 }
@@ -1104,7 +1154,7 @@ struct ReceiptView: View {
             
         }
         // .fill(Color.white) // 전체 색상을 회색으로 설정
-        .frame(width: 335, height: 653)
+        .frame(width: 335, height: 653) // 335,653
         .cornerRadius(5) // 모서리를 둥글게 처리합니다.
         .overlay(
             RoundedRectangle(cornerRadius: 3)
@@ -1154,6 +1204,39 @@ struct ReceiptView: View {
         
         
     }
+    private func showShareSheet(_ image: UIImage) {
+        
+        guard let rootVC = UIApplication.shared.windows.first?.rootViewController else {
+            return
+        }
+        
+        // UIActivityViewController 인스턴스 생성
+        let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        
+        // iPad에서는 popover로 표시될 위치를 지정해야 할 수 있습니다.
+        if let popoverController = activityVC.popoverPresentationController {
+            popoverController.sourceView = rootVC.view
+            popoverController.sourceRect = CGRect(x: rootVC.view.bounds.midX, y: rootVC.view.bounds.midY, width: 0, height: 0)
+            popoverController.permittedArrowDirections = []
+        }
+        
+        // activityVC를 present합니다.
+        rootVC.present(activityVC, animated: true, completion: nil)
+    }
+    
+    func captureSnapshot() {
+        let hostingController = UIHostingController(rootView: ReceiptView())
+        let targetSize = hostingController.view.intrinsicContentSize
+        hostingController.view.bounds = CGRect(origin: .zero, size: targetSize)
+        hostingController.view.layoutIfNeeded()
+
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+        let image = renderer.image { _ in
+            hostingController.view.drawHierarchy(in: hostingController.view.bounds, afterScreenUpdates: true)
+        }
+        showShareSheet(image)
+    }
+
 }
 struct SentimentTrackerView: View {
     var body: some View {
@@ -1210,28 +1293,5 @@ struct SentimentTrackerView: View {
                             .tint(.green)
                     }
                 }
-                Spacer().frame(width: 48)
-                VStack {
-                    Spacer()
-                    Text("27")
-                        .foregroundColor(.homeRed)
-                        .font(.yjObangBold20)
-                        .frame(width: 60,height: 60)
-                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 2))
-                    Spacer()
-                }
-                .frame(width: 60, height: 60)
-                .padding(.trailing,50)
-                
-            }
-        }
-        Spacer().frame(height: 30)
-    }
+            }}}
 }
-
-
-//    .padding()
-//    // Date range at the bottom
-//    Text("2024. 03. 05 / 2024. 03. 13")
-//        .font(.caption)
-//        .padding(.top, 20)

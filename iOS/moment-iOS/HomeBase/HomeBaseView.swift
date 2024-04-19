@@ -53,7 +53,7 @@ struct HomeBaseView: View {
                         VoiceRecorderView()
                     case .Like:
                         LikeView(day: Date(), item: Item(id: 1, tripName: "선유도", startdate: "0305", enddate: "0315"), audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
-
+                        
                     case .setting:
                         SettingView(showDialog : $showingCustomAlertInSetting, showDialogGoodbye: $showDialogGoodbyeAlert)
                     }
@@ -86,7 +86,7 @@ struct HomeBaseView: View {
                         .frame(width: 50, height: 50)
                         .offset(y: -edges!.bottom - 40) // 이미지 위치 조정
                 }
-               // .background(Color.homeBack) // 탭 바 배경색
+                // .background(Color.homeBack) // 탭 바 배경색
             }
             .edgesIgnoringSafeArea(.bottom)
             //.background(Color.homeBack.ignoresSafeArea(.all, edges: .all))
@@ -109,8 +109,8 @@ struct HomeBaseView: View {
             showingCustomAlertInSetting || showingCustomAlertInHome || showDialogGoodbyeAlert ? Color.black.opacity(0.5) : Color.homeBack
         )
         .edgesIgnoringSafeArea(.all)
-
-            
+        
+        
         
         
         .onChange(of: homeBaseViewModel.isRecording) { newValue in
@@ -225,16 +225,21 @@ struct BottomSheetView1: View {
                         }
                     }
                     .onAppear {
+                        
                         timerRunning = true
                         audioRecorderManager.startRecording()
                         timeElapsed = 0
+                        
+                        
                     }
+                
                     .onDisappear {
                         audioRecorderManager.stopRecording()
                         timerRunning = false
                         timeElapsed = 0
                         
                     }
+                
                 
                 // 추가 텍스트
                 Text("열심히 듣고 있어요")
@@ -285,7 +290,7 @@ struct BottomSheetView1: View {
                             print("녹음 저장")
                             isPresented = false
                             // ViewModel에서 녹음 중지
-                           
+                            
                             recordBtn = false  // 버튼 상태 업데이트
                             timerRunning = false  // 타이머 중지
                             wasDeleted = true
