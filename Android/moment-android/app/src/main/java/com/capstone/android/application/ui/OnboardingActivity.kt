@@ -185,6 +185,34 @@ class OnboardingActivity:ComponentActivity() {
             Log.d("waegwgwae",response.toString())
         }
 
+        // 인증코드 요청
+        authViewModel.postAuthAuthCodeSuccess.observe(this@OnboardingActivity){ response->
+            if(navController.currentDestination?.route == OnboardingScreen.Signup_email.name){
+                navController.navigate(OnboardingScreen.Signup_number.name)
+            }
+
+            if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
+                navController.navigate(OnboardingScreen.FindPassword_number.name)
+            }
+            userId=response.data.userId
+        }
+
+        // 인증코드 요청 실패
+        authViewModel.postAuthAuthCodeFailure.observe(this@OnboardingActivity){ response->
+
+        }
+
+        // 인증코드 확인
+        authViewModel.patchAuthAuthCodeConfirmSuccess.observe(this@OnboardingActivity){ response ->
+            navController.navigate(OnboardingScreen.Signup.name)
+        }
+
+        // 인증코드 확인 실패
+        authViewModel.patchAuthAuthCodeConfirmFailure.observe(this@OnboardingActivity){ response->
+
+        }
+
+
 
 
 
@@ -496,7 +524,12 @@ class OnboardingActivity:ComponentActivity() {
                 BigButton(
                     "다음", true
                 ) {
-
+                    authViewModel.postAuthAuthCode(
+                        body = PostAuthAuthCodeRequest(
+                            email = email.value,
+                            isSignUp = "true"
+                        )
+                    )
 
                 }
             }else{
@@ -760,7 +793,12 @@ class OnboardingActivity:ComponentActivity() {
             ) {
                 if ( number.value.isNotEmpty()){
                     BigButton("다음", true) {
-
+                        authViewModel.patchAuthAuthCodeConfirm(
+                            body = PatchAuthAuthCodeConfirmRequest(
+                                userId = userId.toString(),
+                                code = number.value
+                            )
+                        )
 
                     }
                 }else{
@@ -996,7 +1034,12 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(bottom = 72.dp),
             ) {if (id.value.isNotEmpty()){
                 BigButton("다음", true) {
-
+                    authViewModel.postAuthAuthCode(
+                        body = PostAuthAuthCodeRequest(
+                            email = id.value,
+                            isSignUp = "false"
+                        )
+                    )
 
                 }
             }else{
