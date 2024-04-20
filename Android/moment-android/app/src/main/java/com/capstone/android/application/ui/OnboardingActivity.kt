@@ -31,7 +31,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -42,19 +41,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -78,7 +73,6 @@ import com.capstone.android.application.ui.theme.P_ExtraBold16
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
 import com.capstone.android.application.ui.theme.P_Medium18
-import com.capstone.android.application.ui.theme.P_SemiBold18
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
 import com.capstone.android.application.ui.theme.negative_600
@@ -87,10 +81,7 @@ import com.capstone.android.application.ui.theme.primary_500
 import com.capstone.android.application.ui.theme.tertiary_500
 import com.capstone.android.application.ui.theme.white
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 enum class OnboardingScreen(){
     Login,
@@ -212,7 +203,15 @@ class OnboardingActivity:ComponentActivity() {
 
         }
 
+        // 비밀번호 변경
+        authViewModel.patchAuthChangePasswordSuccess.observe(this@OnboardingActivity){ response->
+            navController.navigate(OnboardingScreen.Login.name)
+        }
 
+        // 비밀번호 변경 실패
+        authViewModel.patchAuthChangePasswordFailure.observe(this@OnboardingActivity){ response->
+
+        }
 
 
 
@@ -412,7 +411,7 @@ class OnboardingActivity:ComponentActivity() {
 
         //bottomsheet
         val sheetState = rememberModalBottomSheetState()
-        var recordOpen = remember { mutableStateOf(false)}
+        val recordOpen = remember { mutableStateOf(false)}
 
         val agree1 = remember { mutableStateOf(false) }
         val agree2 = remember { mutableStateOf(false) }
@@ -649,7 +648,7 @@ class OnboardingActivity:ComponentActivity() {
 
         val timeLeft by countViewModel.timeLeft.collectAsState()
         val number = remember{mutableStateOf("")}
-        var signnumState = remember {mutableStateOf(true)}
+        val signnumState = remember {mutableStateOf(true)}
         val focusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
 
@@ -820,7 +819,7 @@ class OnboardingActivity:ComponentActivity() {
         val passwordcheck = remember{
             mutableStateOf("")
         }
-        var pwequel = remember{ mutableStateOf(true) }
+        val pwequel = remember{ mutableStateOf(true) }
         val focusManager = LocalFocusManager.current
         val focusRequester = remember { FocusRequester() }
 
@@ -1300,7 +1299,12 @@ class OnboardingActivity:ComponentActivity() {
                 if (password.value.isNotEmpty() && passwordcheck.value.isNotEmpty()) {
                     BigButton("로그인하기", true) {
                         if (password.value == passwordcheck.value) {
-
+                            authViewModel.patchAuthChangePassword(
+                                body = PatchAuthChangePasswordRequest(
+                                    code = code,
+                                    newPassword = password.value
+                                )
+                            )
                             pwequel.value = true
 
                         } else {
