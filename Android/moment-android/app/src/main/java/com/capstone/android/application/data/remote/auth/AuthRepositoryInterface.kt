@@ -6,24 +6,24 @@ import com.capstone.android.application.data.remote.auth.auth_code_confirm.reque
 import com.capstone.android.application.data.remote.auth.change_password.request.PatchAuthChangePasswordRequest
 import com.capstone.android.application.data.remote.auth.login.request.PostAuthLoginRequest
 import com.capstone.android.application.data.remote.auth.login.response.PostAuthLoginResponse
+import com.capstone.android.application.domain.response.ApiResponse
 import com.capstone.android.application.domain.response.MomentResponse
-import retrofit2.Response
 
 interface AuthRepositoryInterface {
 
     suspend fun postAuthLogin(
         body : PostAuthLoginRequest
-    ) : Response<PostAuthLoginResponse>
+    ) : ApiResponse<PostAuthLoginResponse>
     suspend fun patchAuthCodeAChangePassword(
         body: PatchAuthChangePasswordRequest
-    ) : Response<MomentResponse>
+    ) : ApiResponse<MomentResponse>
 
     suspend fun postAuthAuthCode(
         body : PostAuthAuthCodeRequest
-    ) : Response<PostAuthAuthCodeResponse>
+    ) : ApiResponse<PostAuthAuthCodeResponse>
 
     suspend fun patchAuthAuthCodeConfirm(
         body : PatchAuthAuthCodeConfirmRequest
-    ) : Response<MomentResponse>
+    ) : ApiResponse<MomentResponse>
 
 }
