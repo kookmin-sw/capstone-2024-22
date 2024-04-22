@@ -140,6 +140,7 @@ class MainActivity : ComponentActivity() {
         }
         tripViewModel.getTripAll()
         tripViewModel.getTripAllSuccess.observe(this@MainActivity){ response->
+            tripList.clear()
             response.data.trips.forEach {
 
                 tripList.add(Trip(
@@ -150,6 +151,11 @@ class MainActivity : ComponentActivity() {
         }
         tripViewModel.getTripAllFailure.observe(this@MainActivity){ response->
             Log.d("weagewagaew","${response.exception.message}")
+        }
+
+        tripViewModel.deleteTripSuccess.observe(this@MainActivity){ response->
+            Log.d("waegewgwgw","weagew")
+            tripViewModel.getTripAll()
         }
 
 
@@ -548,7 +554,7 @@ class MainActivity : ComponentActivity() {
                 items(
                     count = tripList.size,
                     itemContent = {index->
-                        ItemTrip(type = 0, tripName = tripList[index].tripName,startDate=tripList[index].startDate, endDate = tripList[index].endDate)
+                        ItemTrip(type = 0,id=tripList[index].id, tripName = tripList[index].tripName,startDate=tripList[index].startDate, endDate = tripList[index].endDate)
 
 //                        if(it==1){
 //                            // '현재 여행중이에요' 알람
@@ -671,7 +677,7 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun ItemTrip(type:Int,tripName:String,startDate:String,endDate:String){
+    fun ItemTrip(type:Int,id:Int,tripName:String,startDate:String,endDate:String){
         val density = LocalDensity.current
         val defaultActionSize = 80.dp
         val endActionSizePx = with(density) { (defaultActionSize * 2).toPx() }
@@ -802,6 +808,9 @@ class MainActivity : ComponentActivity() {
                     Text(
                         modifier = Modifier.clickable {
                             Toast.makeText(this@MainActivity,"삭제",Toast.LENGTH_SHORT).show()
+                            tripViewModel.deleteTrip(
+                                tripId = id
+                            )
                         },
                         text = "삭제",
                         fontFamily = FontMoment.obangFont,
