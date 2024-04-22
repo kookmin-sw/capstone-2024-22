@@ -1,5 +1,6 @@
 package com.capstone.android.application.presentation
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -62,7 +63,9 @@ class TripViewModel @Inject constructor(private val tripRepository:TripRepositor
     fun getTripAll(){
         viewModelScope.launch {
             try {
+
                 val response = tripRepository.getTripAll()
+                Log.d("Awegewagaew",response.toString())
                 if(response is ApiResponse.Success){
                     getTripAllSuccess.postValue(response.data)
                 }else{
@@ -70,6 +73,7 @@ class TripViewModel @Inject constructor(private val tripRepository:TripRepositor
                 }
 
             } catch (e: HttpException) {
+                Log.d("Awegeawgaewgaew","${e.message}")
                 getTripAllFailure.postValue(ApiResponse.Error(e))
                 // Handle specific HTTP error codes
                 when (e.code()) {
@@ -79,11 +83,13 @@ class TripViewModel @Inject constructor(private val tripRepository:TripRepositor
                     // Handle other error codes
                 }
             } catch (e: IOException) {
+                Log.d("Awegeawgaewgaew","${e.message}")
                 getTripAllFailure.postValue(ApiResponse.Error(e))
 
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
+                Log.d("Awegeawgaewgaew","${e.message}")
                 getTripAllFailure.postValue(ApiResponse.Error(e))
 
                 // Handle other generic exceptions
