@@ -134,13 +134,14 @@ class TripViewModel @Inject constructor(private val tripRepository:TripRepositor
     }
 
     fun deleteTrip(
-        userId:Int
+        tripId:Int,
+
     ){
         viewModelScope.launch {
             try {
 
                 val response = tripRepository.deleteTrip(
-                    userId = userId
+                    tripId = tripId
                 )
 
                 if(response is ApiResponse.Success){
