@@ -22,9 +22,9 @@ class TripRepository @Inject constructor(private val tripRetrofitInterface:TripR
     }
 
     override suspend fun deleteTrip(
-        userId:Int
+        tripId:Int
     ): ApiResponse<MomentResponse> {
-        return tripRetrofitInterface.deleteTripDelete(userId = userId)
+        return tripRetrofitInterface.deleteTripDelete(tripId = tripId)
     }
 
     override suspend fun patchTrip(

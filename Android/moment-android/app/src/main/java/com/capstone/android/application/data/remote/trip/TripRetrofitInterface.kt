@@ -11,6 +11,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface TripRetrofitInterface {
@@ -22,9 +23,9 @@ interface TripRetrofitInterface {
         @Body body: PostTripRegisterRequest
     ): ApiResponse<MomentResponse>
 
-    @DELETE("/core/trip")
+    @DELETE("/core/trip/{tripId}")
     suspend fun deleteTripDelete(
-        @Query("userId") userId:Int
+        @Path(value = "tripId") tripId : Int
     ) : ApiResponse<MomentResponse>
 
     @PATCH("/core/trip")
