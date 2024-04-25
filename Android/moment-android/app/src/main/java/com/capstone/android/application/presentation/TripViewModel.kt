@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capstone.android.application.data.remote.trip.TripRepository
 import com.capstone.android.application.data.remote.trip.model.trip_all.GetTripAllResponse
-import com.capstone.android.application.data.remote.trip.model.trip_patch.request.PostTripPatchRequest
+import com.capstone.android.application.data.remote.trip.model.trip_put.request.PutTripRequest
 import com.capstone.android.application.data.remote.trip.model.trip_register.request.PostTripRegisterRequest
 import com.capstone.android.application.domain.response.ApiResponse
 import com.capstone.android.application.domain.response.MomentResponse
@@ -50,12 +50,12 @@ class TripViewModel @Inject constructor(private val tripRepository:TripRepositor
     }
 
     // 여행수정 성공
-    val patchTripSuccess : MutableLiveData<MomentResponse> by lazy {
+    val putTripSuccess : MutableLiveData<MomentResponse> by lazy {
         MutableLiveData<MomentResponse>()
     }
 
     // 여행수정 실패
-    val patchTripFailure:MutableLiveData<ApiResponse.Error<Exception>> by lazy {
+    val putTripFailure:MutableLiveData<ApiResponse.Error<Exception>> by lazy {
         MutableLiveData<ApiResponse.Error<Exception>>()
     }
 
@@ -171,26 +171,24 @@ class TripViewModel @Inject constructor(private val tripRepository:TripRepositor
         }
     }
 
-    fun patchTrip(
-        userId : Int,
-        body : PostTripPatchRequest
+    fun putTrip(
+        body : PutTripRequest
     ){
         viewModelScope.launch {
             try {
 
-                val response = tripRepository.patchTrip(
-                    userId = userId,
+                val response = tripRepository.putTrip(
                     body = body
                 )
                 if(response is ApiResponse.Success){
-                    patchTripSuccess.postValue(response.data)
+                    putTripSuccess.postValue(response.data)
                 }else{
 
                 }
 
 
             } catch (e:HttpException){
-                patchTripFailure.postValue(ApiResponse.Error(e))
+                putTripFailure.postValue(ApiResponse.Error(e))
                 when(e.code()){
                     404 -> {
 
@@ -198,9 +196,9 @@ class TripViewModel @Inject constructor(private val tripRepository:TripRepositor
                 }
 
             } catch (e:IOException){
-                patchTripFailure.postValue(ApiResponse.Error(e))
+                putTripFailure.postValue(ApiResponse.Error(e))
             } catch (e:Exception){
-                patchTripFailure.postValue(ApiResponse.Error(e))
+                putTripFailure.postValue(ApiResponse.Error(e))
             }
 
         }
