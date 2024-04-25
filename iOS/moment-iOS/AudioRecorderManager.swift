@@ -8,6 +8,7 @@
 import Foundation
 
 import AVFoundation
+import Alamofire
 import CoreLocation
 
 
@@ -25,7 +26,9 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
     var recordedFiles = [URL]()
     var locationManager = CLLocationManager()
     @Published var currentLocation: CLLocation?
+    @Published var currentAddress: String?
 
+    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxMDkzMDMyMCwiZXhwIjoxNzU0MTMwMzIwfQ.mVy33lNv-by6bWXshsT4xFOwZSWGkOW76GWimliqHP4"
     
     override init() {
             super.init()
@@ -51,16 +54,15 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
         }
     }
     
-   
     func stopRecording() {
         locationManager.stopUpdatingLocation()
-      
         audioRecorder?.stop()
-        if let url = audioRecorder?.url {
-            self.recordedFiles.append(self.audioRecorder!.url)
+        
+        if let url = audioRecorder?.url, let location = currentLocation {
+            self.recordedFiles.append(url)
             self.isRecording = false
             
-            // 새로운 폴더 경로 생성
+            // 파일을 적절한 디렉토리로 이동
             let fileManager = FileManager.default
             let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
             let recordingsDirectory = documentsDirectory.appendingPathComponent("Recordings")
@@ -72,27 +74,46 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
                 print("Failed to create directory: \(error)")
             }
             
-            // 녹음 파일을 "Recordings" 폴더로 이동
             let newFileURL = recordingsDirectory.appendingPathComponent(url.lastPathComponent)
-            
             do {
                 if fileManager.fileExists(atPath: newFileURL.path) {
                     // 동일한 이름의 파일이 이미 있으면 삭제
                     try fileManager.removeItem(at: newFileURL)
                 }
-                
                 // 파일 이동
                 try fileManager.moveItem(at: url, to: newFileURL)
                 print("File moved to \(newFileURL.path)")
             } catch {
                 print("Failed to move file: \(error)")
             }
-            if let location = currentLocation {
-                        fetchWeatherData(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+
+            // 날씨 데이터 가져오기
+            fetchWeatherData(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { temperature, weather in
+                // 주소 가져오기
+                self.geocodeLocation(location: location) { address in
+                    let formattedDate = DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .short)
+                    
+                    print("Temperature: \(temperature)")
+                                   print("Weather: \(weather)")
+                                   print("Address: \(address ?? "No address found")")
+                                   print("Recorded At: \(formattedDate)")
+                    // 서버에 업로드
+                    DispatchQueue.main.async {
+                        if let address = address {
+                            self.uploadRecordedData(recordFileURL: newFileURL, location: address, recordedAt: formattedDate, temperature: temperature, weather: weather, question: "오늘 날씨는 어때요?")
+                        } else {
+                            print("주소 정보가 없어서 데이터를 전송할 수 없습니다.")
+                        }
+                   
                     }
+                    
+                }
+                
+            }
         }
-        
     }
+
+
     
     private func getDocumentsDirectory() -> URL {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
@@ -105,39 +126,52 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
             currentLocation = location  // 최신 위치 정보를 저장
             print("Current location: \(location)")
             
-            geocodeLocation(location: location)
+            geocodeLocation(location: location) { address in
+                if let address = address {
+                    print("Resolved Address: \(address)")
+                    // 필요한 추가 작업 수행
+                } else {
+                    print("Address resolution failed.")
+                }
+            }
         }
     }
+
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Failed to find user's location: \(error.localizedDescription)")
     }
     
-    func geocodeLocation(location: CLLocation) {
+    func geocodeLocation(location: CLLocation, completion: @escaping (String?) -> Void) {
         let geocoder = CLGeocoder()
-        geocoder.reverseGeocodeLocation(location) { (placemarks, error) in
+        geocoder.reverseGeocodeLocation(location) { placemarks, error in
             if let error = error {
-                print("역 지오코딩 실패: \(error.localizedDescription)")
+                print("Geocoding failed: \(error.localizedDescription)")
+                completion(nil)  // 오류가 발생하면 nil 반환
                 return
             }
             
             if let placemarks = placemarks, let placemark = placemarks.first {
-                // 여기에서 placemark 객체에 접근하여 상세 주소 정보를 가져옵니다.
                 let address = [
-                    placemark.thoroughfare,  // 도로명
-                    placemark.subThoroughfare,  // 도로명에 대한 상세 번호
-                    placemark.locality,  // 도시
-                    placemark.administrativeArea,  // 주, 도
-                    placemark.country  // 나라
+                    placemark.thoroughfare,
+                    placemark.subThoroughfare,
+                    placemark.locality,
+                    placemark.administrativeArea,
+                    placemark.country
                 ].compactMap { $0 }.joined(separator: ", ")
                 
-                print("현재 위치의 주소: \(address)")
+                completion(address)  // 성공적으로 주소를 구성하면 반환
             } else {
-                print("받아온 위치 정보가 없습니다.")
+                print("No address found.")
+                completion(nil)  // 주소를 찾지 못하면 nil 반환
             }
         }
     }
-    func fetchWeatherData(latitude: Double, longitude: Double) {
+
+
+    
+    
+    func fetchWeatherData(latitude: Double, longitude: Double, completion: @escaping (String, String) -> Void) {
         let apiKey = "040a03e00601edb517a2b4ba4ce5550d" // 여기에 발급받은 API 키를 입력하세요.
         let urlString = "https://api.openweathermap.org/data/2.5/weather?lat=\(latitude)&lon=\(longitude)&appid=\(apiKey)&units=metric"
         guard let url = URL(string: urlString) else {
@@ -161,6 +195,58 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
         }
         task.resume()
     }
+    
+    func parseWeatherData(data: Data) -> (temperature: String, weather: String)? {
+        do {
+            // JSON 데이터를 딕셔너리로 변환합니다.
+            if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+               let main = json["main"] as? [String: Any],
+               let weatherArray = json["weather"] as? [[String: Any]],
+               let weather = weatherArray.first {
+                let temperature = String(format: "%.1f", main["temp"] as! Double)  // 온도를 문자열로 변환
+                let weatherDescription = weather["description"] as! String  // 날씨 상태를 문자열로 변환
+                return (temperature, weatherDescription)
+            }
+        } catch {
+            print("Failed to decode weather data: \(error.localizedDescription)")
+        }
+        return nil
+    }
+
+
+    func uploadRecordedData(recordFileURL: URL, location: String, recordedAt: String, temperature: String, weather: String, question: String) {
+        let urlString = "http://wasuphj.synology.me:8000/core/cardView/upload"  // 서버의 URL
+       // let headers: HTTPHeaders = ["userId": "1"]  // 필요한 경우 추가 헤더 설정
+
+        let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
+        
+        AF.upload(multipartFormData: { multipartFormData in
+            // 녹음 파일을 멀티파트 폼 데이터에 추가
+            multipartFormData.append(recordFileURL, withName: "recordFile", fileName: recordFileURL.lastPathComponent, mimeType: "audio/mp3")
+
+            // JSON 메타데이터 생성 및 추가
+            let jsonPart: [String: Any] = [
+                "location": location,
+                "recordedAt": recordedAt,
+                "temperature": temperature,
+                "weather": weather,
+                "question": question
+            ]
+            
+            if let jsonData = try? JSONSerialization.data(withJSONObject: jsonPart, options: []) {
+                multipartFormData.append(jsonData, withName: "uploadRecord", mimeType: "application/json")
+            }
+            
+        }, to: urlString, method: .post, headers: headers).responseJSON { response in
+            switch response.result {
+            case .success(let value):
+                print("Upload successful: \(value)")
+            case .failure(let error):
+                print("Upload failed: \(error)")
+            }
+        }
+    }
+
 
 
 }
