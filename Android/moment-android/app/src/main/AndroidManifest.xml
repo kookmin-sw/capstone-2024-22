@@ -36,6 +36,7 @@
         <activity android:name=".ui.CardActivity"/>
         <activity android:name=".ui.TripFileActivity"/>
         <activity android:name=".ui.ReciptActivity"/>
+        <activity android:name=".ui.PatchTripActivity"/>
     </application>
 
 </manifest>
