@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
@@ -90,6 +92,7 @@ import com.capstone.android.application.app.screen.BottomNavItem
 import com.capstone.android.application.domain.Trip
 import com.capstone.android.application.presentation.TripViewModel
 import com.capstone.android.application.ui.CardActivity
+import com.capstone.android.application.ui.PatchTripActivity
 import com.capstone.android.application.ui.PostTripActivity
 import com.capstone.android.application.ui.ReciptActivity
 import com.capstone.android.application.ui.TripFileActivity
@@ -112,7 +115,11 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
+import java.nio.Buffer
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -135,26 +142,66 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun MainRoot(){
+        val postTrip =
+            rememberLauncherForActivityResult(
+                ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == 1) {
+//                    val intent = result.data
+                    tripViewModel.getTripAll()
+                    //do something here
+                }
+
+                if (result.resultCode == 2) {
+//                    val intent = result.data
+                    tripViewModel.getTripAll()
+                    //do something here
+                }
+            }
         val tripList = remember {
             mutableStateListOf<Trip>()
         }
-        tripViewModel.getTripAll()
-        tripViewModel.getTripAllSuccess.observe(this@MainActivity){ response->
-            tripList.clear()
-            response.data.trips.forEach {
-
-                tripList.add(Trip(
-                    id=it.id,tripName = it.tripName, startDate = it.startDate, endDate = it.endDate
-                ))
+        val test:Int = 4
+        val colorName: Result<String> = runCatching {
+            when (test) {
+                1 -> "파란색"
+                2 -> "빨간색"
+                3 -> "노란색"
+                else -> throw Error("처음 들어보는 색")
             }
-
+        }.onSuccess { it:String ->
+            Log.d("awegweagewag",it)
+        }.onFailure { it:Throwable ->
+            //실패시만 실행 (try - catch문의 catch와 유사)
+            Log.d("awegweagewag",it.message.toString())
         }
+
+
+
+
+        tripViewModel.getTripAll()
+
+        tripViewModel.getTripAllSuccess.observe(this@MainActivity){ response->
+
+            response.data.trips.mapNotNull { trip -> runCatching { Trip(id=trip.id,tripName = trip.tripName, startDate = trip.startDate, endDate = trip.endDate) }
+                .onSuccess {
+                    tripList.clear()
+                }.onFailure {
+                }.getOrNull()
+            }.forEach {
+                tripList.add(it)
+            }
+        }
+
         tripViewModel.getTripAllFailure.observe(this@MainActivity){ response->
-            Log.d("weagewagaew","${response.exception.message}")
+
         }
 
         tripViewModel.deleteTripSuccess.observe(this@MainActivity){ response->
-            Log.d("waegewgwgw","weagew")
+            runCatching {
+                when(response.status){
+
+                }
+            }
             tripViewModel.getTripAll()
         }
 
@@ -347,7 +394,10 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .clickable {
                                         when(title.value){
-                                            "추가" -> {startActivity(Intent(this@MainActivity,PostTripActivity::class.java))}
+                                            "추가" -> {
+                                                val intent = Intent(this@MainActivity,PostTripActivity::class.java)
+                                                postTrip.launch(intent)
+                                            }
                                             "영수증 모아보기" -> {}
                                             "작게보기" -> {}
                                         }
@@ -789,7 +839,12 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Text(
                         modifier = Modifier.clickable {
-                            Toast.makeText(this@MainActivity,"수정",Toast.LENGTH_SHORT).show()
+                            val intent = Intent(this@MainActivity, PatchTripActivity::class.java)
+                            intent.putExtra("tripId",id)
+                            intent.putExtra("startDate",startDate)
+                            intent.putExtra("endDate",endDate)
+                            intent.putExtra("tripName",tripName)
+                            startActivity(intent)
                         },
                         text = "수정",
                         fontFamily = FontMoment.obangFont,
