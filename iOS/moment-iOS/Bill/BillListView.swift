@@ -576,7 +576,7 @@ struct ReceiptDetailView: View {
         let image = renderer.image { _ in
             hostingController.view.drawHierarchy(in: hostingController.view.bounds, afterScreenUpdates: true)
         }
-        showShareSheet(image)
+        showShareSheet(image) // 이미지화 한거 캡쳐하기
     }
 
     
