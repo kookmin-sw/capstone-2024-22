@@ -2,10 +2,8 @@ package com.capstone.android.application.app.composable
 
 import android.util.Log
 import android.widget.CalendarView
-import androidx.activity.compose.setContent
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -70,14 +68,14 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import androidx.core.graphics.toColorInt
-import com.capstone.android.application.data.remote.trip.model.trip_register.request.PostTripRegisterRequest
 import com.capstone.android.application.ui.theme.FontMoment
 import com.capstone.android.application.ui.theme.HintText
 import com.capstone.android.application.ui.theme.PretendardFamily
 import com.capstone.android.application.ui.theme.black
-import com.capstone.android.application.ui.theme.neutral_100
 import com.capstone.android.application.ui.theme.tertiary_500
+import java.text.SimpleDateFormat
 import kotlin.math.roundToInt
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -342,7 +340,7 @@ fun FancyProgressBar(
 @Composable
 fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String>,endDate:MutableState<String>,onClicked: () -> Unit){
 
-
+    val dateFormat = SimpleDateFormat("yyyy-MM-HH")
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
@@ -356,8 +354,7 @@ fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String
                     title = {
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth()
-                            ,
+                                .fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
@@ -385,7 +382,7 @@ fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String
                                 fontFamily = FontMoment.obangFont,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp,
-                                color = Color("#938F8F".toColorInt())
+                                color = if(tripName.value.isNotEmpty() && startDate.value!="츨발 날짜" && endDate.value!="도착 날짜") Color.Black else Color("#938F8F".toColorInt())
                             )
                             Spacer(modifier = Modifier.width(40.dp))
                         }
@@ -423,7 +420,10 @@ fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String
                             color = Color.Black
                         ),
                         modifier = Modifier.fillMaxWidth(),
-                        value = tripName.value, onValueChange = {tripName.value = it},
+                        value = tripName.value, onValueChange = {
+                            tripName.value = it
+                            Log.d("awegwagwea",it.toString())
+                                                                },
                         colors = TextFieldDefaults.textFieldColors(
                             backgroundColor = Color.Transparent,
                             focusedIndicatorColor = Color.Black,
@@ -494,12 +494,22 @@ fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String
                             .background(color = Color.White),
                         factory = { CalendarView(it) },
                         update = {
+//                            if(startDate.value!="출발 날짜"){
+//                                val strDate: String = startDate.value
+//
+//                                val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+//                                val currentDay: Date = dateFormat.parse(strDate, ParsePosition(0))
+//                                val currentLong: Long = currentDay.getTime()
+//                                it.date = currentLong
+//                            }
+
+
                             it.setOnDateChangeListener{calendarView,year,month,day->
                                 if(currentCalendarFocus.value == 0){
-                                    startDate.value = "$year-$month-$day"
+                                    startDate.value = convertDateFormat(year=year,month=month+1,day=day)
                                     it.minDate
                                 }else{
-                                    endDate.value = "$year-$month-$day"
+                                    endDate.value = convertDateFormat(year=year,month=month+1,day=day)
                                 }
                             }
                         }
@@ -511,6 +521,23 @@ fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String
         }
 }
 
+fun convertDateFormat(year:Int , month:Int,day:Int):String{
+    var dateMonth = ""
+    var dateDay = ""
+    if(month<10){
+        dateMonth="0${month}"
+    }else{
+        dateMonth="${month}"
+    }
+
+    if(day<10){
+        dateDay="0${day}"
+    }else{
+        dateDay="${day}"
+    }
+
+    return "${year}-${dateMonth}-${dateDay}"
+}
 
 
 
