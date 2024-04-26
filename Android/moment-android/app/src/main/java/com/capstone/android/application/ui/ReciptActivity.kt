@@ -52,12 +52,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
+import com.capstone.android.application.app.composable.CustomNoTitleCheckDialog
+import com.capstone.android.application.presentation.CustomNoTitleCheckViewModel
 import com.capstone.android.application.ui.theme.ApplicationTheme
 import com.capstone.android.application.ui.theme.ImgBackButton
 import com.capstone.android.application.ui.theme.P_Black45
@@ -230,6 +233,12 @@ class ReciptActivity : ComponentActivity() {
         val page = 2
         val state = rememberPagerState()
 
+        val viewModel: CustomNoTitleCheckViewModel = viewModel()
+        val CustomNoTitleCheckDialogState = viewModel.CustomNoTitleCheckDialogState.value
+
+        val receiptIntent = Intent(this@ReciptActivity, MainActivity::class.java)
+        receiptIntent.putExtra("MoveScreen", "Receipt")
+
         val intro = remember { mutableStateOf("") }
         val depart_small = remember { mutableStateOf("") }
         val depart = remember { mutableStateOf("") }
@@ -282,8 +291,20 @@ class ReciptActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
-                        .clickable { navController.navigate(ReciptScreen.TripChoice.name) }) {
+                        .clickable { viewModel.showCustomNoTitleCheckDialog() }) {
                     YJ_Bold15("뒤로", black)
+                }
+
+                if (CustomNoTitleCheckDialogState.description.isNotBlank()){
+                    CustomNoTitleCheckDialog(
+                        description = CustomNoTitleCheckDialogState.description,
+                        checkleft = CustomNoTitleCheckDialogState.checkleft,
+                        checkright = CustomNoTitleCheckDialogState.checkright,
+                        onClickleft = { startActivity( receiptIntent ) },
+                        onClickright = {CustomNoTitleCheckDialogState.onClickright()},
+                        onClickCancel = {CustomNoTitleCheckDialogState.onClickCancel()},
+
+                        )
                 }
                 Column(
                     Modifier
