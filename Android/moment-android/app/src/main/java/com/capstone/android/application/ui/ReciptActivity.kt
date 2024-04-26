@@ -114,7 +114,10 @@ class ReciptActivity : ComponentActivity() {
             ) { innerPadding ->
                 NavHost(
                     modifier = Modifier.padding(innerPadding),
-                    navController = navController, startDestination = ReciptScreen.TripChoice.name
+                    navController = navController,
+                    startDestination =
+                    if(movenav == "ReceiptPost_Big") ReciptScreen.ReceiptPost_Big.name
+                    else ReciptScreen.MakeTripChoice.name
                 ) {
                     composable(route = ReciptScreen.MakeTripChoice.name) { MakeTripChoice() }
                     composable(route = ReciptScreen.MakeTrip.name) { MakeTrip() }
@@ -183,7 +186,7 @@ class ReciptActivity : ComponentActivity() {
         Column(
             modifier = Modifier
                 .background(color = tertiary_500)
-                .clickable { navController.navigate(ReciptScreen.Horizontal_Theme.name) },
+                .clickable { navController.navigate(ReciptScreen.MakeTrip.name) },
         ) {
             Box(
                 modifier = Modifier
@@ -275,7 +278,6 @@ class ReciptActivity : ComponentActivity() {
                 persent = "5%"
             )
         )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
