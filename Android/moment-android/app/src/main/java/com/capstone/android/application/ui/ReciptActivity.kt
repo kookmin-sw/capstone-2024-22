@@ -80,6 +80,7 @@ import com.capstone.android.application.ui.theme.tertiary_500
 import com.capstone.android.application.ui.theme.white
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 
 
@@ -87,6 +88,9 @@ enum class ReciptScreen(){
     TripChoice,
     Horizontal_Theme,
     SaveRecipt
+    ReceiptPost_Big,
+    EditReceipt,
+    SaveEditReceipt
 }
 
 class ReciptActivity : ComponentActivity() {
@@ -96,6 +100,9 @@ class ReciptActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             navController = rememberNavController()
+
+            val movenav = intent.getStringExtra("MoveScreen")
+
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
@@ -109,6 +116,9 @@ class ReciptActivity : ComponentActivity() {
                     composable(route = ReciptScreen.TripChoice.name) { TripChoice() }
                     composable(route = ReciptScreen.Horizontal_Theme.name) { Horizontal_Theme() }
                     composable(route = ReciptScreen.SaveRecipt.name) { SaveRecipt("theme1") }
+                    composable(route = ReciptScreen.ReceiptPost_Big.name) { ReceiptPost_Big() }
+                    composable(route = ReciptScreen.EditReceipt.name) { EditReceipt () }
+                    composable(route = ReciptScreen.SaveEditReceipt.name) { SaveEditReceipt ("theme1") }
                 }
             }
         }
@@ -1326,6 +1336,213 @@ class ReciptActivity : ComponentActivity() {
             }
         }
     }
+
+    @Composable
+    fun ReceiptPost_Big(){
+        //모아보기에서 영수증 하나 선택해서 크게 보는 화면 (수정, 내보내기 가능)
+
+        var intent = Intent(this@ReciptActivity, MainActivity::class.java)
+        intent.putExtra("MoveScreen", "ReceiptPost")
+
+        val chosenTheme  = "theme1"
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = tertiary_500)
+                .padding(horizontal = 20.dp)
+        ) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                ,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    Modifier
+                        .padding(vertical = 10.dp, horizontal = 14.dp)
+                        .clickable { startActivity(intent) }) {
+                    YJ_Bold15("뒤로", black)
+                }
+                Column() {
+                    Row(){
+                        Column(
+                            Modifier
+                                .padding(vertical = 10.dp, horizontal = 14.dp)
+                                .clickable { }) {
+                            YJ_Bold15("내보내기", black)
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Column(
+                            Modifier
+                                .padding(vertical = 10.dp, horizontal = 14.dp)
+                                .clickable {
+                                    navController.navigate(ReciptScreen.EditReceipt.name)
+                                    }) {
+                            YJ_Bold15("수정", black)
+                        }
+                    }
+
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 앞에서 불러온 화면 데이터 받아와서 수정안되는 버전으로 넣기
+            if (chosenTheme == "theme1") {
+                SaveTheme1()
+            }
+            if(chosenTheme == "theme2"){
+                SaveTheme2()
+
+            }
+        }
+
+    }
+
+    @SuppressLint("UnrememberedMutableState")
+    @OptIn(ExperimentalPagerApi::class)
+    @Composable
+    fun EditReceipt(){
+        val page = 2
+        val state = rememberPagerState()
+
+        val viewModel: CustomNoTitleCheckViewModel = viewModel()
+        val CustomNoTitleCheckDialogState = viewModel.CustomNoTitleCheckDialogState.value
+
+        val receiptIntent = Intent(this@ReciptActivity, MainActivity::class.java)
+        receiptIntent.putExtra("MoveScreen", "ReceiptPost")
+
+        val intro = remember { mutableStateOf("") }
+        val depart_small = remember { mutableStateOf("") }
+        val depart = remember { mutableStateOf("") }
+        val arrive_small = remember { mutableStateOf("") }
+        val arrive = remember { mutableStateOf("") }
+
+        val emotionList = mutableStateListOf<Emotion>()
+
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_common,
+                text = "평범해요",
+                persent = "60%"
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_happy,
+                text = "즐거워요",
+                persent = "20%"
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_angry,
+                text = "화가나요",
+                persent = "15%"
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_sad,
+                text = "슬퍼요 ",
+                persent = "5%"
+            )
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = tertiary_500)
+        ) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    Modifier
+                        .padding(vertical = 10.dp, horizontal = 14.dp)
+                        .clickable { viewModel.showCustomNoTitleCheckDialog() }) {
+                    YJ_Bold15("뒤로", black)
+
+                    if (CustomNoTitleCheckDialogState.description.isNotBlank()){
+                        CustomNoTitleCheckDialog(
+                            description = CustomNoTitleCheckDialogState.description,
+                            checkleft = CustomNoTitleCheckDialogState.checkleft,
+                            checkright = CustomNoTitleCheckDialogState.checkright,
+                            onClickleft = { startActivity( receiptIntent ) },
+                            onClickright = {CustomNoTitleCheckDialogState.onClickright()},
+                            onClickCancel = {CustomNoTitleCheckDialogState.onClickCancel()},
+
+                            )
+                    }
+                }
+                Column(
+                    Modifier
+                        .padding(vertical = 10.dp, horizontal = 14.dp)
+                        .clickable { navController.navigate(ReciptScreen.SaveEditReceipt.name) }) {
+                    YJ_Bold15("저장", black)
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Horizontal_Theme(page,state,intro, depart_small, depart, arrive_small, arrive, emotionList)
+        }
+    }
+    @Composable
+    fun SaveEditReceipt(chosenTheme: String){
+
+        val chosenTheme  = "theme1"
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = tertiary_500)
+                .padding(horizontal = 20.dp)
+        ) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                ,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    Modifier
+                        .padding(vertical = 10.dp, horizontal = 14.dp)
+                        .clickable { }) {
+                    YJ_Bold15("내보내기", black)
+                }
+                Column(
+                    Modifier
+                        .padding(vertical = 10.dp, horizontal = 14.dp)
+                        .clickable {
+                            val intent = Intent(
+                                this@ReciptActivity,
+                                MainActivity::class.java
+                            )
+                            intent.putExtra("MoveScreen","ReceiptPost")
+                            startActivity( intent )
+                        }) {
+                    YJ_Bold15("완료", primary_500)
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 앞에서 불러온 화면 데이터 받아와서 수정안되는 버전으로 넣기
+            if (chosenTheme == "theme1") {
+                SaveTheme1()
+            }
+            if(chosenTheme == "theme2"){
+                SaveTheme2()
+
+            }
+        }
+    }
+
 
     @Preview(apiLevel = 33)
     @Composable
