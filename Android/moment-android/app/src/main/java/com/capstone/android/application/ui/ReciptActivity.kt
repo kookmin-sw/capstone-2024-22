@@ -60,6 +60,7 @@ import androidx.navigation.compose.rememberNavController
 import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
 import com.capstone.android.application.app.composable.CustomNoTitleCheckDialog
+import com.capstone.android.application.data.local.Emotion
 import com.capstone.android.application.presentation.CustomNoTitleCheckViewModel
 import com.capstone.android.application.ui.theme.ApplicationTheme
 import com.capstone.android.application.ui.theme.ImgBackButton
@@ -130,11 +131,6 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
-    data class Emotion(
-        val icon: Int,
-        val text: String,
-        val persent: String
-    )
 
     @Composable
     fun MakeTripChoice(){
