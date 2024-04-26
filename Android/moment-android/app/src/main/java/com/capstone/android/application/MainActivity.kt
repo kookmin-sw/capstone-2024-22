@@ -908,18 +908,115 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ReceiptPost(){
+    fun ReceiptPost(EditCheckState: MutableState<Boolean>, ReceiptCheckState: MutableState<Boolean>) {
         //영수증 게시
-        Text(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable {
-                    navController.navigate(MainScreen.ReceiptPost.screenRoute)
-                },
-            text = "만들기",
-            textAlign = TextAlign.Center
-        )
+        val testList = mutableListOf<Int>(1,2,3,4,5,6,7,8,9,10,11)
+
+
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)) {
+
+            MyGrid(testList, 2, EditCheckState,ReceiptCheckState)
+        }
     }
+    @Composable
+    fun MyGrid(
+        content: List<Int>,
+        columnSize: Int,
+        EditCheckState: MutableState<Boolean>,
+        ReceiptCheckState: MutableState<Boolean>
+    ){
+        val rowsCount = 1 + (content.size -1)/columnSize // row 개수
+        BoxWithConstraints {
+            val maxWidth = this.maxWidth
+
+            LazyColumn {
+                items(rowsCount) { rowIndex ->
+                    val rangeStart = rowIndex*columnSize
+                    var rangeEnd = rangeStart + columnSize -1
+                    if (rangeEnd > content.lastIndex) rangeEnd = content.lastIndex // row로 표현될 list의 range를 계산, slice하여 row 생성
+                    RowOfGrid(content.slice(rangeStart..rangeEnd), maxWidth/columnSize, EditCheckState, ReceiptCheckState)
+                }
+            }
+
+        }
+    }
+
+    @Composable
+    fun RowOfGrid(
+        rowList: List<Int>,
+        columnWidth: Dp,
+        EditCheckState: MutableState<Boolean>,
+        ReceiptCheckState: MutableState<Boolean>
+    ) {
+
+        val interactionSource = remember { MutableInteractionSource() }
+
+        var intent = Intent(this@MainActivity, ReciptActivity::class.java)
+        intent.putExtra("MoveScreen", "ReceiptPost_Big")
+
+        LazyRow {
+            items(rowList.size) { index ->
+
+                val item = rowList[index]
+                Log.d("hihihi", "RowOfGrid: $item")
+                val checkState = rememberSaveable { mutableStateOf(false) }
+
+                Box( modifier = Modifier
+                    .width(columnWidth)
+                    .height(224.dp)
+                    .padding(horizontal = 25.dp, vertical = 8.dp)
+                    .background(Color.Gray)
+                    .clickable {
+                        if (!EditCheckState.value) {
+                            startActivity(intent)
+                        } else checkState.value = !checkState.value
+                    }) {
+
+                    if (EditCheckState.value){
+                        Column(
+                            Modifier
+                                .padding(10.dp)
+                                .align(Alignment.BottomEnd)) {
+                            Column(
+                                Modifier
+                                    .size(32.dp)
+                                    .background(
+                                        if (!checkState.value) neutral_500 else white,
+                                        shape = RoundedCornerShape(3.dp)
+                                    )
+                                    .border(
+                                        0.5.dp, black,
+                                        shape = RoundedCornerShape(3.dp)
+                                    )
+                            ) {
+
+                            }
+                        }
+                        if(checkState.value){
+                            Column(
+                                Modifier
+                                    .padding(10.dp)
+                                    .align(Alignment.BottomEnd)) {
+                                Column(Modifier.size(32.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center) {
+                                    Image(
+                                        painter = painterResource(R.drawable.ic_receipt_check_red),
+                                        contentDescription = "장소",
+                                        Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     @Composable
     fun Record(){
