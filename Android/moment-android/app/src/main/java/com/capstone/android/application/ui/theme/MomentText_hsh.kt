@@ -97,6 +97,21 @@ fun P_Medium14(content: String, color: Color){
     )
 }
 
+//옮길 때 전체 수정하기
+@Composable
+fun P_Medium14_center(content: String, color: Color, Align: TextAlign){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+            textAlign = Align)
+    )
+}
+
+
 @Composable
 fun P_Medium18(content: String, color: Color){
     Text(
