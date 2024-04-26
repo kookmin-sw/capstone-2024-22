@@ -387,7 +387,12 @@ class MainActivity : ComponentActivity() {
         ) { innerPadding ->
             NavHost(
                 navController,
-                startDestination = BottomNavItem.Home.screenRoute,
+                startDestination =
+                when(movenav){
+                    "Receipt" -> BottomNavItem.Receipt.screenRoute
+                    "ReceiptPost" -> MainScreen.ReceiptPost.screenRoute
+                    else -> BottomNavItem.Home.screenRoute
+                },
                 Modifier.padding(innerPadding)
             ) {
                 composable(BottomNavItem.Home.screenRoute) {
@@ -398,7 +403,6 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(BottomNavItem.Receipt.screenRoute) {
                     currentSelectedBottomRoute.value = "Receipt"
-
                     Receipt()
                     title.value = "영수증 모아보기"
                 }
@@ -952,7 +956,8 @@ class MainActivity : ComponentActivity() {
                 painter = painterResource(id = R.drawable.test_image), contentDescription = "test"
             )
             Spacer(modifier = Modifier.height(8.dp))
-            BigButton("만들기", true,  onClick = {startActivity(Intent(this@MainActivity, ReciptActivity::class.java))})
+            BigButton("만들기", true,
+                onClick = {startActivity(Intent(this@MainActivity, ReciptActivity::class.java))})
 
         }
     }
