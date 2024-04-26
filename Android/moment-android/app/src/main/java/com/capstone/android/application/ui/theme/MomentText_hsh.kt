@@ -60,6 +60,32 @@ fun P_SemiBold18(content: String, color: Color){
             fontSize = 18.sp)
     )
 }
+
+@Composable
+fun P_Medium(content: String, color: Color, size: TextUnit){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = size)
+    )
+}
+@Composable
+fun P_Medium_Oneline(content: String, color: Color, size: TextUnit){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = size),
+        overflow = TextOverflow.Clip,
+        maxLines = 1
+    )
+}
+
 @Composable
 fun P_Medium8(content: String, color: Color){
     Text(
@@ -147,7 +173,17 @@ fun P_ExtraBold14(content: String, color: Color){
             fontSize = 14.sp)
     )
 }
-
+@Composable
+fun P_ExtraBold(content: String, color: Color, size: TextUnit){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = size)
+    )
+}
 
 @Composable
 fun P_Bold30(content: String, color: Color, textAlign: TextAlign){
@@ -184,6 +220,18 @@ fun P_Black50(content: String, color: Color){
             fontSize = 50.sp)
     )
 }
+@Composable
+fun YJ_Bold(content: String, color: Color, size: TextUnit){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = FontMoment.obangFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = size)
+    )
+}
+
 
 @Composable
 fun YJ_Bold15(content: String, color: Color){
