@@ -85,9 +85,9 @@ import com.google.accompanist.pager.rememberPagerState
 
 
 enum class ReciptScreen(){
-    TripChoice,
-    Horizontal_Theme,
-    SaveRecipt
+    MakeTripChoice,
+    MakeTrip,
+    SaveRecipt,
     ReceiptPost_Big,
     EditReceipt,
     SaveEditReceipt
@@ -113,8 +113,8 @@ class ReciptActivity : ComponentActivity() {
                     modifier = Modifier.padding(innerPadding),
                     navController = navController, startDestination = ReciptScreen.TripChoice.name
                 ) {
-                    composable(route = ReciptScreen.TripChoice.name) { TripChoice() }
-                    composable(route = ReciptScreen.Horizontal_Theme.name) { Horizontal_Theme() }
+                    composable(route = ReciptScreen.MakeTripChoice.name) { MakeTripChoice() }
+                    composable(route = ReciptScreen.MakeTrip.name) { MakeTrip() }
                     composable(route = ReciptScreen.SaveRecipt.name) { SaveRecipt("theme1") }
                     composable(route = ReciptScreen.ReceiptPost_Big.name) { ReceiptPost_Big() }
                     composable(route = ReciptScreen.EditReceipt.name) { EditReceipt () }
@@ -131,25 +131,25 @@ class ReciptActivity : ComponentActivity() {
     )
 
     @Composable
-    fun TripChoice(){
-        Log.d("where", "TripChoice: ")
+    fun MakeTripChoice(){
+
         val scrollState = rememberScrollState()
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color("#C3C1C1".toColorInt()))
+                .background(color = tertiary_500)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(734.dp)
-                    .padding(start = 18.dp)
+                    .fillMaxHeight()
+                    .padding(horizontal = 20.dp)
                     .align(Alignment.Center)
                     .background(color = tertiary_500)
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(top = 23.dp, start = 8.dp)
+                        .padding(top = 23.dp)
                         .wrapContentSize()
                 ) {
                     ImgBackButton(onClick = {startActivity(Intent(this@ReciptActivity, MainActivity::class.java))}, "여행 선택하기")
@@ -157,7 +157,7 @@ class ReciptActivity : ComponentActivity() {
                 Column(
                     modifier = Modifier
                         .padding(top = 12.dp)
-                        .padding(horizontal = 11.dp)
+                        .padding(horizontal = 0.dp)
                         .wrapContentSize()
                         .verticalScroll(scrollState)
                 ) {
@@ -226,7 +226,7 @@ class ReciptActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
     @OptIn(ExperimentalPagerApi::class)
     @Composable
-    fun Horizontal_Theme(){
+    fun MakeTrip(){
         val page = 2
         val state = rememberPagerState()
 
@@ -294,28 +294,45 @@ class ReciptActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            HorizontalPager(
-                verticalAlignment = Alignment.Top,
-                modifier = Modifier
-                    .height(651.dp)
-                    .fillMaxWidth(),
-                count = page,
-                state = state
-            ) { page ->
-                if (page == 0) {
-                    Column(Modifier.padding(horizontal = 20.dp) ){
-                        EditTripTheme1(intro, depart_small, depart, arrive_small, arrive, emotionList)
-                    }
-                }
-                if (page == 1) {
-                    Column(Modifier.padding(horizontal = 20.dp)){
-                        EditTripTheme2(intro, depart_small, depart, arrive_small, arrive, emotionList)
-                    }
+            Horizontal_Theme(page,state,intro, depart_small, depart, arrive_small, arrive, emotionList)
+        }
+    }
+
+    @SuppressLint("UnrememberedMutableState")
+    @OptIn(ExperimentalPagerApi::class)
+    @Composable
+    fun Horizontal_Theme(
+        page: Int,
+        state: PagerState,
+        intro: MutableState<String>,
+        depart_small: MutableState<String>,
+        depart: MutableState<String>,
+        arrive_small: MutableState<String>,
+        arrive: MutableState<String>,
+        emotionList: SnapshotStateList<Emotion>
+    ) {
+
+        HorizontalPager(
+            verticalAlignment = Alignment.Top,
+            modifier = Modifier
+                .height(651.dp)
+                .fillMaxWidth(),
+            count = page,
+            state = state
+        ) { page ->
+            if (page == 0) {
+                Column(Modifier.padding(horizontal = 20.dp) ){
+                    EditTripTheme1(intro, depart_small, depart, arrive_small, arrive, emotionList)
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            DotsIndicator(totalDots = page, selectedIndex = state.currentPage)
+            if (page == 1) {
+                Column(Modifier.padding(horizontal = 20.dp)){
+                    EditTripTheme2(intro, depart_small, depart, arrive_small, arrive, emotionList)
+                }
+            }
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        DotsIndicator(totalDots = page, selectedIndex = state.currentPage)
     }
 
     @SuppressLint("UnrememberedMutableState")
