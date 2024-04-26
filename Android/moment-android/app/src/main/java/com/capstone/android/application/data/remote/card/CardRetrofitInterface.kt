@@ -16,8 +16,10 @@ interface CardRetrofitInterface {
         @Path(value = "cardViewId") cardViewId:Int
     ) : Response<MomentResponse>
 
-    @GET("/core/cardView/all")
-    suspend fun getCardAll():Response<CardResponse>
+    @GET("/core/cardView/all/{tripFileId}")
+    suspend fun getCardAll(
+        @Path(value = "tripFileId") tripFileId:Int
+    ):Response<CardResponse>
 
     @PUT("/core/cardView/{cardViewId}")
     suspend fun putCardModify(

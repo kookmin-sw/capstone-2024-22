@@ -13,8 +13,10 @@ class CardRepository @Inject constructor(private val cardRetrofitInterface: Card
         )
     }
 
-    override suspend fun getCardAll(): Response<CardResponse> {
-        return cardRetrofitInterface.getCardAll()
+    override suspend fun getCardAll(
+        tripFileId:Int
+    ): Response<CardResponse> {
+        return cardRetrofitInterface.getCardAll(tripFileId = tripFileId)
     }
 
     override suspend fun putCardModify(

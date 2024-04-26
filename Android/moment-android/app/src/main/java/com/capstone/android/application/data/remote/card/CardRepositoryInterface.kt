@@ -10,7 +10,9 @@ interface CardRepositoryInterface {
         cardViewId:Int
     ):Response<MomentResponse>
 
-    suspend fun getCardAll():Response<CardResponse>
+    suspend fun getCardAll(
+        tripFileId:Int
+    ):Response<CardResponse>
 
     suspend fun putCardModify(
         cardViewId:Int,

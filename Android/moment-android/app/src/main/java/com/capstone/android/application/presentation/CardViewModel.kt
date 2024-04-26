@@ -43,10 +43,10 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
         }
     }
 
-    fun getCardAll(){
+    fun getCardAll(tripFileId:Int){
         viewModelScope.launch {
             try {
-                val data = cardRepository.getCardAll()
+                val data = cardRepository.getCardAll(tripFileId = tripFileId)
 
             } catch (e: HttpException) {
                 Log.d("awegawegaew","404")
