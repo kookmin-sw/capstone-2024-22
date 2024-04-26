@@ -1,33 +1,36 @@
 package com.capstone.android.application.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.tooling.preview.Preview
 import com.capstone.android.application.app.composable.MomentUiTripInfo
-import com.capstone.android.application.data.remote.trip.model.trip_register.request.PostTripRegisterRequest
+import com.capstone.android.application.data.remote.trip.model.trip_put.request.PutTripRequest
 import com.capstone.android.application.presentation.TripViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.Exception
+
 
 @AndroidEntryPoint
-class PostTripActivity:ComponentActivity() {
-    private val tripViewModel : TripViewModel by viewModels()
-    @OptIn(ExperimentalMaterial3Api::class)
+class PatchTripActivity:ComponentActivity() {
+    private val tripViewModel: TripViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val mainIntent=intent
-        tripViewModel.getTripAllSuccess.observe(this@PostTripActivity){
-            setResult(1,mainIntent)
+        tripViewModel.putTripSuccess.observe(this@PatchTripActivity){
+            setResult(2,mainIntent)
             finish()
         }
 
+
         setContent{
+            val tripId = remember {
+                mutableStateOf(0)
+            }
             val tripName = remember{
                 mutableStateOf("")
             }
@@ -39,9 +42,28 @@ class PostTripActivity:ComponentActivity() {
                 mutableStateOf("도착 날짜")
             }
 
+            try {
+                mainIntent?.let {
+                    tripId.value = it.getIntExtra("tripId",0)
+                    startDate.value = it.getStringExtra("startDate")!!
+                    endDate.value=it.getStringExtra("endDate")!!
+                    tripName.value=it.getStringExtra("tripName")!!
+                }
+
+            }catch (e:Exception){
+                Toast.makeText(this@PatchTripActivity,"server error",Toast.LENGTH_SHORT).show()
+                finish()
+            }
+
+
+
+
+
+
             MomentUiTripInfo(tripName = tripName, startDate = startDate, endDate = endDate, onClicked = {
-                tripViewModel.postTripRegister(
-                    body = PostTripRegisterRequest(
+                tripViewModel.putTrip(
+                    body = PutTripRequest(
+                        tripId = tripId.value,
                         startDate=startDate.value,
                         endDate=endDate.value,
                         tripName=tripName.value
@@ -50,12 +72,5 @@ class PostTripActivity:ComponentActivity() {
                 )
             })
         }
-
-    }
-
-    @Preview
-    @Composable
-    fun PostTripActivityPreview(){
-//        Main()
     }
 }

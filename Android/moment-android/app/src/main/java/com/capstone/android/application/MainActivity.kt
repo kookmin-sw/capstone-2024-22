@@ -4,8 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -42,7 +46,6 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ModalBottomSheet
@@ -86,11 +89,12 @@ import coil.request.ImageRequest
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.screen.BottomNavItem
+import com.capstone.android.application.domain.Trip
+import com.capstone.android.application.presentation.TripViewModel
 import com.capstone.android.application.ui.CardActivity
-import com.capstone.android.application.ui.OnboardingScreen
+import com.capstone.android.application.ui.PatchTripActivity
 import com.capstone.android.application.ui.PostTripActivity
 import com.capstone.android.application.ui.ReciptActivity
-import com.capstone.android.application.ui.ReciptScreen
 import com.capstone.android.application.ui.TripFileActivity
 import com.capstone.android.application.ui.theme.ApplicationTheme
 import com.capstone.android.application.ui.theme.BigButton
@@ -109,17 +113,25 @@ import com.capstone.android.application.ui.theme.white
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
+import java.nio.Buffer
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     lateinit var navController: NavHostController
+    private val tripViewModel : TripViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
             ApplicationTheme {
                 // A surface container using the 'background' color from the theme
                 MainRoot()
@@ -130,6 +142,69 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun MainRoot(){
+        val postTrip =
+            rememberLauncherForActivityResult(
+                ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == 1) {
+//                    val intent = result.data
+                    tripViewModel.getTripAll()
+                    //do something here
+                }
+
+                if (result.resultCode == 2) {
+//                    val intent = result.data
+                    tripViewModel.getTripAll()
+                    //do something here
+                }
+            }
+        val tripList = remember {
+            mutableStateListOf<Trip>()
+        }
+        val test:Int = 4
+        val colorName: Result<String> = runCatching {
+            when (test) {
+                1 -> "파란색"
+                2 -> "빨간색"
+                3 -> "노란색"
+                else -> throw Error("처음 들어보는 색")
+            }
+        }.onSuccess { it:String ->
+            Log.d("awegweagewag",it)
+        }.onFailure { it:Throwable ->
+            //실패시만 실행 (try - catch문의 catch와 유사)
+            Log.d("awegweagewag",it.message.toString())
+        }
+
+
+
+
+        tripViewModel.getTripAll()
+
+        tripViewModel.getTripAllSuccess.observe(this@MainActivity){ response->
+
+            response.data.trips.mapNotNull { trip -> runCatching { Trip(id=trip.id,tripName = trip.tripName, startDate = trip.startDate, endDate = trip.endDate) }
+                .onSuccess {
+                    tripList.clear()
+                }.onFailure {
+                }.getOrNull()
+            }.forEach {
+                tripList.add(it)
+            }
+        }
+
+        tripViewModel.getTripAllFailure.observe(this@MainActivity){ response->
+
+        }
+
+        tripViewModel.deleteTripSuccess.observe(this@MainActivity){ response->
+            runCatching {
+                when(response.status){
+
+                }
+            }
+            tripViewModel.getTripAll()
+        }
+
 
         navController = rememberNavController()
         val bottomItems = listOf<BottomNavItem>(
@@ -319,7 +394,10 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .clickable {
                                         when(title.value){
-                                            "추가" -> {startActivity(Intent(this@MainActivity,PostTripActivity::class.java))}
+                                            "추가" -> {
+                                                val intent = Intent(this@MainActivity,PostTripActivity::class.java)
+                                                postTrip.launch(intent)
+                                            }
                                             "영수증 모아보기" -> {}
                                             "작게보기" -> {}
                                         }
@@ -343,8 +421,8 @@ class MainActivity : ComponentActivity() {
             ) {
                 composable(BottomNavItem.Home.screenRoute) {
                     currentSelectedBottomRoute.value = "Home"
-
-                    Home()
+                    Log.d("waegwagewa",tripList.toString())
+                    Home(tripList)
                     title.value = "추가"
                 }
                 composable(BottomNavItem.Receipt.screenRoute) {
@@ -395,7 +473,10 @@ class MainActivity : ComponentActivity() {
     }
     @OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
     @Composable
-    fun Home(){
+    fun Home(tripList:MutableList<Trip>){
+
+
+        Log.d("weagawegawe",tripList.toString())
 
         val density = LocalDensity.current
         val defaultActionSize = 80.dp
@@ -521,17 +602,20 @@ class MainActivity : ComponentActivity() {
                     .padding(start = 16.dp, end = 4.dp)
             ){
                 items(
-                    count = 8,
-                    itemContent = {
-                        if(it==1){
-                            ItemTrip(type = 1)
-                        }else if(it==2){
-                            ItemTrip(type = 2)
-                        }else{
-                            ItemTrip(type = 0)
+                    count = tripList.size,
+                    itemContent = {index->
+                        ItemTrip(type = 0,id=tripList[index].id, tripName = tripList[index].tripName,startDate=tripList[index].startDate, endDate = tripList[index].endDate)
 
-                        }
-
+//                        if(it==1){
+//                            // '현재 여행중이에요' 알람
+//                            ItemTrip(type = 1)
+//                        }else if(it==2){
+//                            // '카드 분석중이에요' 알람
+//                            ItemTrip(type = 2)
+//                        }else{
+//                            ItemTrip(type = 0)
+//
+//                        }
 
                     }
                 )
@@ -643,7 +727,7 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun ItemTrip(type:Int){
+    fun ItemTrip(type:Int,id:Int,tripName:String,startDate:String,endDate:String){
         val density = LocalDensity.current
         val defaultActionSize = 80.dp
         val endActionSizePx = with(density) { (defaultActionSize * 2).toPx() }
@@ -703,12 +787,12 @@ class MainActivity : ComponentActivity() {
 
                     Column {
                         Text(
-                            text = "2024.03.05",
+                            text = startDate,
                             fontSize = 11.sp,
                             color = Color.Black
                         )
                         Text(
-                            text = "2024.03.05",
+                            text = endDate,
                             fontSize = 11.sp,
                             color = Color.Black
                         )
@@ -724,7 +808,7 @@ class MainActivity : ComponentActivity() {
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = "전라도의 선유도",
+                        text = tripName,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -754,6 +838,14 @@ class MainActivity : ComponentActivity() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
+                        modifier = Modifier.clickable {
+                            val intent = Intent(this@MainActivity, PatchTripActivity::class.java)
+                            intent.putExtra("tripId",id)
+                            intent.putExtra("startDate",startDate)
+                            intent.putExtra("endDate",endDate)
+                            intent.putExtra("tripName",tripName)
+                            startActivity(intent)
+                        },
                         text = "수정",
                         fontFamily = FontMoment.obangFont,
                         fontWeight = FontWeight.Bold,
@@ -769,6 +861,12 @@ class MainActivity : ComponentActivity() {
                     )
                     Spacer(modifier = Modifier.width(26.dp))
                     Text(
+                        modifier = Modifier.clickable {
+                            Toast.makeText(this@MainActivity,"삭제",Toast.LENGTH_SHORT).show()
+                            tripViewModel.deleteTrip(
+                                tripId = id
+                            )
+                        },
                         text = "삭제",
                         fontFamily = FontMoment.obangFont,
                         fontWeight = FontWeight.Bold,
