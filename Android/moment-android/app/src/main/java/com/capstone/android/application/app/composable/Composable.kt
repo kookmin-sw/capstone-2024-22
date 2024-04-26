@@ -7,17 +7,27 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,23 +53,35 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import androidx.core.graphics.toColorInt
+import com.capstone.android.application.ui.theme.ApplicationTheme
 import com.capstone.android.application.ui.theme.HintText
+import com.capstone.android.application.ui.theme.P_ExtraBold16
+import com.capstone.android.application.ui.theme.P_Medium14
+import com.capstone.android.application.ui.theme.P_Medium14_center
 import com.capstone.android.application.ui.theme.PretendardFamily
+import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
 import com.capstone.android.application.ui.theme.neutral_100
+import com.capstone.android.application.ui.theme.neutral_500
+import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.tertiary_500
 import kotlin.math.roundToInt
 
@@ -324,4 +346,155 @@ fun FancyProgressBar(
 
 
 
+@Composable
+fun CustomNoTitleCheckDialog(
+    description: String,
+    checkleft: String,
+    checkright: String,
+    onClickCancel: () -> Unit,
+    onClickleft: () -> Unit,
+    onClickright: () -> Unit
+){
+    Dialog(onDismissRequest = { onClickCancel() },
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
+    ) {
+        Card(modifier = Modifier
+            .fillMaxSize()
+            .wrapContentHeight()
+            .padding(horizontal = 40.dp)){
+            Column(modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .background(tertiary_500)) {
+
+                Column(
+                    Modifier
+                        .wrapContentSize()
+                        .padding(top = 20.dp, bottom = 16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    P_Medium14_center(content = description, color = neutral_600, TextAlign.Center)
+                }
+
+                Row(
+                    Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically){
+                    Column(
+                        Modifier
+                            .padding(8.dp)
+                            .weight(0.2f)
+                            .clickable { onClickleft() },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center) {
+                        YJ_Bold15(content = checkleft, color = black)
+                    }
+                    Divider(
+                        Modifier
+                            .width(2.dp)
+                            .height(20.dp), neutral_500)
+
+                    Column(
+                        Modifier
+                            .padding(8.dp)
+                            .weight(0.2f)
+                            .clickable { onClickright() },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center) {
+                        YJ_Bold15(content = checkright, color = black)
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+// 제목 다이얼로그
+@Composable
+fun CustomTitleCheckDialog(
+    title : String,
+    description: String,
+    checkleft: String,
+    checkright: String,
+    onClickCancel: () -> Unit,
+    onClickleft: () -> Unit,
+    onClickright: () -> Unit
+){
+    Dialog(onDismissRequest = { onClickCancel() },
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
+    ) {
+        Card(modifier = Modifier
+            .fillMaxSize()
+            .wrapContentHeight()
+            .padding(horizontal = 40.dp)){
+            Column(modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .background(tertiary_500)) {
+
+                Column(
+                    Modifier
+                        .wrapContentSize()
+                        .padding(top = 20.dp, bottom = 16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    P_ExtraBold16(content = title, color = black)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    P_Medium14_center(content = description, color = neutral_600, TextAlign.Center)
+                }
+
+                Row(
+                    Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically){
+                    Column(
+                        Modifier
+                            .padding(8.dp)
+                            .weight(0.2f)
+                            .clickable { onClickleft() },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center) {
+                        YJ_Bold15(content = checkleft, color = black)
+                    }
+                    Divider(
+                        Modifier
+                            .width(2.dp)
+                            .height(20.dp), neutral_500)
+
+                    Column(
+                        Modifier
+                            .padding(8.dp)
+                            .weight(0.2f)
+                            .clickable { onClickright() },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center) {
+                        YJ_Bold15(content = checkright, color = black)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(apiLevel = 33)
+@Composable
+fun ReciptPreview() {
+    ApplicationTheme {
+    }
+}
 
