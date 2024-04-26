@@ -21,6 +21,7 @@ import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +35,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,7 +44,6 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ModalBottomSheet
@@ -57,6 +58,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,10 +73,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -83,14 +87,16 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.capstone.android.application.app.composable.CustomNoTitleCheckDialog
+import com.capstone.android.application.app.composable.CustomTitleCheckDialog
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.screen.BottomNavItem
+import com.capstone.android.application.presentation.CustomNoTitleCheckViewModel
+import com.capstone.android.application.presentation.CustomTitleCheckViewModel
 import com.capstone.android.application.ui.CardActivity
-import com.capstone.android.application.ui.OnboardingScreen
 import com.capstone.android.application.ui.PostTripActivity
 import com.capstone.android.application.ui.ReciptActivity
-import com.capstone.android.application.ui.ReciptScreen
 import com.capstone.android.application.ui.TripFileActivity
 import com.capstone.android.application.ui.theme.ApplicationTheme
 import com.capstone.android.application.ui.theme.BigButton
@@ -148,18 +154,26 @@ class MainActivity : ComponentActivity() {
         val currentSelectedBottomRoute = remember{
             mutableStateOf("홈")
         }
-        //bottomsheet
+        //Record Bottomsheet
         val sheetState = rememberModalBottomSheetState(/*
             initialValue = ModalBottomSheetValue.Hidden,
             confirmStateChange = {false}*/
         )
-        var recordOpen = remember { mutableStateOf(false)}
+
+        val recordOpen = remember { mutableStateOf(false)}
+        var EditCheckState = remember { mutableStateOf(false) }
+        var ReceiptCheckState = remember { mutableStateOf(true) }
+
+        val viewModel: CustomTitleCheckViewModel = viewModel()
+        val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
 
         if(recordOpen.value) {
             RecordNavigatesheet(recordOpen,
                 sheetState = sheetState,
                 closeSheet = { recordOpen.value = false })
         }
+
+        val movenav = intent.getStringExtra("MoveScreen")
 
         Scaffold(
             modifier = Modifier
@@ -300,35 +314,70 @@ class MainActivity : ComponentActivity() {
 
 
                             navController.currentDestination.let {
-                                if(it==null || it.route=="Home"){
-
-                                }else{
-                                    Log.d("wegewag",it.route.toString())
-
-                                    Text(
-                                        text = "뒤로",
-                                        fontFamily = FontMoment.obangFont,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 15.sp
-                                    )
+                                when(it?.route){
+                                    null ->  " "
+                                    "Home" ->  " "
+                                    "Receipt" ->  " "
+                                    "ReceiptPost" ->
+                                        if(!EditCheckState.value){
+                                            Column(Modifier.clickable { navController.navigate(BottomNavItem.Receipt.screenRoute) }) {
+                                                Text(
+                                                    text = "뒤로",
+                                                    fontFamily = FontMoment.obangFont,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 15.sp)
+                                            }
+                                        }else{
+                                            Column(
+                                                Modifier
+                                                    .wrapContentSize()
+                                                    .clickable { EditCheckState.value = false }) {
+                                                YJ_Bold15(content = "완료", color = black)
+                                            }
+                                        }
+                                    "Favorite" -> " "
+                                    "Setting" ->  " "
+                                    else -> null
                                 }
                             }
 
                             Spacer(Modifier.weight(1f))
-                            Text(
-                                modifier = Modifier
-                                    .clickable {
-                                        when(title.value){
-                                            "추가" -> {startActivity(Intent(this@MainActivity,PostTripActivity::class.java))}
-                                            "영수증 모아보기" -> {}
-                                            "작게보기" -> {}
-                                        }
-                                    },
-                                text = title.value,
-                                fontFamily = FontMoment.obangFont,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp
-                            )
+                            Column() {
+                                Text(
+                                    modifier = Modifier
+                                        .clickable(enabled = if(title.value == "삭제" && !ReceiptCheckState.value) false else true) {
+                                            when(title.value){
+                                                "추가" -> {startActivity(Intent(this@MainActivity,PostTripActivity::class.java))}
+                                                "영수증 모아보기" -> {
+                                                    startActivity(Intent(this@MainActivity,MainActivity::class.java).putExtra("MoveScreen", "ReceiptPost"))
+                                                    /*navController.navigate(MainScreen.ReceiptPost.rootRoute)*/}
+                                                "작게보기" -> {}
+                                                "편집" -> { EditCheckState.value = true }
+                                                "삭제" ->
+                                                    viewModel.showCustomTitleCheckDialog()
+                                            }
+                                        },
+                                    text = title.value,
+                                    fontFamily = FontMoment.obangFont,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 15.sp,
+                                    color = if(title.value == "삭제"){
+                                        if(ReceiptCheckState.value) primary_500 else neutral_500
+                                    }  else black
+                                )
+                                if (CustomTitleCheckDialogState.title.isNotBlank()) {
+                                    CustomTitleCheckDialog(
+                                        title = CustomTitleCheckDialogState.title,
+                                        description = CustomTitleCheckDialogState.description,
+                                        checkleft = CustomTitleCheckDialogState.checkleft,
+                                        checkright = CustomTitleCheckDialogState.checkright,
+                                        onClickleft = { CustomTitleCheckDialogState.onClickleft() },
+                                        onClickright = { CustomTitleCheckDialogState.onClickright() },
+                                        onClickCancel = { CustomTitleCheckDialogState.onClickCancel() },
+                                    )
+                                }
+                            }
+
                         }
 
                     }
@@ -372,7 +421,8 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(MainScreen.ReceiptPost.screenRoute){
                     currentSelectedBottomRoute.value = MainScreen.ReceiptPost.rootRoute
-                    ReceiptPost()
+                    ReceiptPost(EditCheckState,ReceiptCheckState)
+                    if (EditCheckState.value) title.value = "삭제" else title.value = "편집"
                 }
 
                 composable(MainScreen.HomeTrip.screenRoute){
