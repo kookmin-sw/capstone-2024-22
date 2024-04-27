@@ -2,13 +2,13 @@ import boto3
 import pandas as pd
 
 # todo : GPU, CPU State 상태 확인
-import sys
-sys.path.append('./')
+import sys, os
+sys.path.append(os.getcwd())
 print(sys.path)
 import whisper.whisper as whisper
 import argparse
 import json, torch
-import glob, os
+import glob
 
 from dataclasses import dataclass
 import numpy as np
