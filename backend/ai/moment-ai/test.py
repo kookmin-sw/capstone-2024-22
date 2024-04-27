@@ -4,7 +4,8 @@ import pandas as pd
 # todo : GPU, CPU State 상태 확인
 import sys, os
 print(os.getcwd())
-import whisper.whisper as whisper
+from whisper import whisper
+# import whisper.whisper as whisper
 import argparse
 import json, torch
 import glob
