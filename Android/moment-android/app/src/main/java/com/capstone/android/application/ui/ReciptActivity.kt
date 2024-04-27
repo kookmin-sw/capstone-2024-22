@@ -436,14 +436,12 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if (depart_small.value.isNotEmpty()) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_location_red),
-                        contentDescription = "장소",
-                        Modifier.size(19.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                }
+                Image(
+                    painter = painterResource(R.drawable.ic_location_red),
+                    contentDescription = "장소",
+                    Modifier.size(19.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
                 ReciptTextField(
                     hint = "기억 속에 오래 저장할",
                     onValueChanged = {depart_small.value = it },
@@ -495,14 +493,12 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if (arrive_small.value.isNotEmpty()) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_location_red),
-                        contentDescription = "장소",
-                        Modifier.size(19.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                }
+                Image(
+                    painter = painterResource(R.drawable.ic_location_red),
+                    contentDescription = "장소",
+                    Modifier.size(19.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
                 ReciptTextField(
                     hint = "기억 속에 오래 저장할",
                     onValueChanged = { arrive_small.value = it },
@@ -701,14 +697,12 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if (depart_small.value.isNotEmpty()) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_location_grey),
-                        contentDescription = "장소",
-                        Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                }
+                Image(
+                    painter = painterResource(R.drawable.ic_location_grey),
+                    contentDescription = "장소",
+                    Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
                 ReciptTextField(
                     hint = "기억 속에 오래 저장할",
                     onValueChanged = { depart_small.value = it },
@@ -760,14 +754,12 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if (depart_small.value.isNotEmpty()) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_location_grey),
-                        contentDescription = "장소",
-                        Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                }
+                Image(
+                    painter = painterResource(R.drawable.ic_location_grey),
+                    contentDescription = "장소",
+                    Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
                 ReciptTextField(
                     hint = "기억 속에 오래 저장할",
                     onValueChanged = {arrive_small.value = it },

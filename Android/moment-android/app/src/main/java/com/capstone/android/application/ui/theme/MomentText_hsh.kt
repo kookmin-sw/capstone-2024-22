@@ -315,21 +315,7 @@ fun ReciptTextField(
                 innerTextField = it,
                 singleLine = true,
                 enabled = true,
-                placeholder = { if (text.value.isNotEmpty())
-                    Row(verticalAlignment = Alignment.CenterVertically){
-                        if(type == "small") {Image(painter = painterResource(R.drawable.ic_location_red), contentDescription = "장소", Modifier.size(19.dp))
-                            Spacer(modifier = Modifier.width(4.dp))}
-                        if(type == "small1") {Image( painter = painterResource(R.drawable.ic_location_grey), contentDescription = "장소", Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))}
-                        ReciptHintText(content = "", fontweight, fontsize, type)
-                    }
-                    else Row(verticalAlignment = Alignment.CenterVertically){
-                        if(type == "small") {Image(painter = painterResource(R.drawable.ic_location_red), contentDescription = "장소", Modifier.size(19.dp))
-                            Spacer(modifier = Modifier.width(4.dp))}
-                        if(type == "small1") {Image(painter = painterResource(R.drawable.ic_location_grey), contentDescription = "장소", Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))}
-                        ReciptHintText(hint, fontweight, fontsize, type)
-                } },
+                placeholder = {  ReciptHintText(hint, fontweight, fontsize, type) },
                 interactionSource = remember { MutableInteractionSource() },
                 contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
                     start = 0.dp, top = 0.dp, end = 0.dp, bottom = 0.dp
