@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,18 +31,20 @@ public class CardViewService {
     private final TripService tripService;
     private final TripFileService tripFileService;
     private final ImageFileService imageFileService;
+    private final S3Service s3Service;
 
 
     @Value("${file.path}")
     private String filePath;
 
     @Autowired
-    public CardViewService(CardViewRepository cardViewRepository, UserRepository userRepository, TripService tripService, TripFileService tripFileService, ImageFileService imageFileService) {
+    public CardViewService(CardViewRepository cardViewRepository, UserRepository userRepository, TripService tripService, TripFileService tripFileService, ImageFileService imageFileService, S3Service s3Service) {
         this.cardViewRepository = cardViewRepository;
         this.userRepository = userRepository;
         this.tripService = tripService;
         this.tripFileService = tripFileService;
         this.imageFileService = imageFileService;
+        this.s3Service = s3Service;
     }
 
 
@@ -69,7 +72,7 @@ public class CardViewService {
         String fileName = createFileName(recordFile.getOriginalFilename());
 
         // 로컬 저장소에 파일 저장
-        recordFile.transferTo(new File(getFullPath(fileName)));
+        String url = s3Service.uploadToS3(recordFile, userId, fileName, true);
 
         CardView cardView = CardView.builder()
                 .recordedAt(uploadRecord.getRecordedAt())
@@ -83,7 +86,7 @@ public class CardViewService {
                 .location(uploadRecord.getLocation())
                 .recordFileStatus("WAIT")
                 .recordFileLength(length)
-                .recordFileUrl("")
+                .recordFileUrl(url)
                 .recordFileName(fileName)
 //                .user(user)
                 .tripFile(tripFile)
@@ -100,7 +103,7 @@ public class CardViewService {
 
     private String createFileName(String originalFilename) {
         String ext = extractExt(originalFilename);
-        String uuid = UUID.randomUUID().toString();
+        String uuid = LocalDateTime.now().toString();
         return uuid + "." + ext;
     }
 

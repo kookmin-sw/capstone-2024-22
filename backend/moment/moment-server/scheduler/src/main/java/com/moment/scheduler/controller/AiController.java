@@ -17,8 +17,8 @@ public class AiController {
 
     private final AiService aiService;
 
-    @PostMapping("/run")
-    public AiModelRunResponseDTO.RunModel runAi(@RequestBody AiModelRunRequestDTO.RunModel request) {
-        return aiService.runAi(request.getFile_name());
-    }
+//    @PostMapping("/run")
+//    public AiModelRunResponseDTO.RunModel runAi(@RequestBody AiModelRunRequestDTO.RunModel request) {
+//        return aiService.runAi(request.getFile_name());
+//    }
 }

@@ -35,6 +35,9 @@ public class UserService {
         User user = User.builder()
                 .id(request.getId())
                 .email(request.getEmail())
+                .notification(request.isNotification())
+                .dataUsage(request.isDataUsage())
+                .firebaseToken(request.getFirebaseToken())
                 .build();
 //        em.persist(user);
         User managedUser = em.merge(user);
@@ -72,5 +75,13 @@ public class UserService {
         if (!cardView.getTripFile().getUser().equals(user)) {
             throw new UserNotValidException("해당 카드뷰는 유저의 카드뷰가 아닙니다.");
         }
+    }
+
+    public void updateUserSetting(UserRequestDTO.updateUser request, Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+        user.setNotification(request.isNotification());
+        user.setDataUsage(request.isDataUsage());
+        user.setFirebaseToken(request.getFirebaseToken());
+        userRepository.save(user);
     }
 }
