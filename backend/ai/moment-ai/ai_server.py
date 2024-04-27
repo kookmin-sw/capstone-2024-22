@@ -30,13 +30,13 @@ def ai_server_run():
     output = dict()
     output["text"] = "안녕하세요"
     output["emotions"] = {"sad": 75.3, "happy": 4.7, "angry": 7.1, "neutral": 12.9}
-    output["status"] = "wait"
+    output["status"] = "200"
     output["error"] = None
-    output["file_name"] = os.path.basename(file_name)
-    output["file_path"] = os.path.dirname(os.path.abspath(file_name))
+    output["file_name"] = file_name
+    output["file_path"] = file_path
     return jsonify(output)
     
-    # result = test.main(file_name)
+    # result = test.main(file_path, file_name)
     # return jsonify(result)
 
 if __name__ == '__main__':

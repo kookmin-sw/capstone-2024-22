@@ -1,3 +1,6 @@
+import boto3
+import pandas as pd
+
 # todo : GPU, CPU State 상태 확인
 
 import whisper.whisper as whisper
@@ -88,12 +91,11 @@ def run_model_on_gpu(models:dict, source_file, output):
               
               output["emotion"]= feats
           
-      
-      output["status"] = "success"
       # return output
     
     except Exception as e:
       print(f"Failed to run model on GPU: {e}")
+      output['status'] = '400'
       output["error"] = f"{e}"
   
   
@@ -157,28 +159,49 @@ def run_model_on_cpu(models:dict, source_file, output):
             output["emotion"]= feats
         
     
-    output["status"] = "success"
     # return output
   
   except Exception as e:
     print(f"Failed to run model on CPU: {e}")
+    output['status'] = '400'
     output["error"] = f"{e}"
   
   # return output
 
 
 
-def main(file_name):  
+def main(file_name, file_path=None):  
+  # config model
   output = dict()
   
   output["text"] = None
   output["emotions"] = None
-  output["status"] = "wait"
+  output["status"] = "200"
   output["error"] = None
-  output["file_name"] = os.path.basename(file_name)
-  output["file_path"] = os.path.dirname(os.path.abspath(file_name))
+  output["file_name"] = file_name
+  output["file_path"] = file_path
   
-  source_file = os.path.join(args.source_path, file_name)
+  # connect s3
+  key_csv = pd.read_csv('s3_key.csv')
+  ACCESS_KEY = key_csv['Access key ID'].to_list()[0]
+  SECRET_KEY = key_csv['Secret access key'].to_list()[0]
+  
+  bucket_name = 'kmumoment'
+  region = 'ap-northeast-2'
+  prefix = 'users'
+
+  s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
+  s3_file = os.path.join(file_path, file_name)
+  source_file = os.path.join('./source', file_name)
+  
+  try:
+    s3.download_file(bucket_name, s3_file, source_file)
+  
+  except:
+    output['status'] = '404'
+    output['error'] = 's3 download_file error'
+    return output
+    
 
   # load model
   # print("\n\nload model ------------------------------------------------------------------------------")
@@ -207,7 +230,7 @@ def main(file_name):
   # output = run_model_on_gpu(models_dict, source_file, output)
   run_model_on_gpu(models_dict, source_file, output)
   
-  if output["status"] == "success":
+  if output["status"] == "200":
       # print("Model ran successfully on GPU.")
       pass
   
@@ -215,13 +238,14 @@ def main(file_name):
       # if model failed on GPU, then run on CPU
       # output = run_model_on_cpu(models_dict, source_file, output)
       run_model_on_cpu(models_dict, source_file, output)
-      if output["status"] == "success":
+      if output["status"] == "200":
           # print("Model ran successfully on CPU.")
           pass
 
       else:
           # print("Model could not be run on GPU or CPU. Please check your model or system configuration.")
-          output["status"] = "failure"
+          output["status"] = "400"
+          output['error'] = "Model could not be run on GPU or CPU. Please check your model or system configuration."
     
 
 
@@ -234,7 +258,6 @@ def main(file_name):
     with open(output_name, "wt") as fp:
       fp.write(json.dumps(output))
       fp.close()
-  
   
   # print result
   # print("\n\nresult ------------------------------------------------------------------------------")
