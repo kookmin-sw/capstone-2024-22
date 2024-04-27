@@ -154,7 +154,7 @@ class ReciptActivity : ComponentActivity() {
                         .padding(top = 23.dp)
                         .wrapContentSize()
                 ) {
-                    ImgBackButton(onClick = {startActivity(Intent(this@ReciptActivity, MainActivity::class.java))}, "여행 선택하기")
+                    ImgBackButton(onClick = {startActivity(Intent(this@ReciptActivity, MainActivity::class.java).putExtra("MoveScreen","Receipt"))}, "여행 선택하기")
                 }
                 Column(
                     modifier = Modifier
