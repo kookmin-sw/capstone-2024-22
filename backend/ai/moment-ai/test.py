@@ -2,7 +2,8 @@ import boto3
 import pandas as pd
 
 # todo : GPU, CPU State 상태 확인
-
+import sys
+sys.path.append('./whisper')
 import whisper.whisper as whisper
 import argparse
 import json, torch
