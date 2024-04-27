@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class AiService {
     private final AiClient aiClient;
-    private final static String file_path = "";
+    private final static String file_path = "users/";
 
-    public AiModelRunResponseDTO.RunModel runAi(String fileName) {
+    public AiModelRunResponseDTO.RunModel runAi(String fileName, Long userId) {
         return aiClient.runAi(
                 AiModelRunRequestDTO.RunModel.builder()
                         .file_name(fileName)
-                        .file_path(file_path)
+                        .file_path(file_path + userId + "/")
                         .build()
         );
     }
