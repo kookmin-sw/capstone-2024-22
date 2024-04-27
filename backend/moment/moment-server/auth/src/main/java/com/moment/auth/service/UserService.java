@@ -24,6 +24,9 @@ public class UserService {
                     .builder()
                     .email(user.getEmail())
                     .id(user.getId())
+                    .notification(false)
+                    .dataUsage(false)
+                    .firebaseToken("")
                     .build()
             );
         }catch (Exception e){
