@@ -4,6 +4,7 @@ import pandas as pd
 # todo : GPU, CPU State 상태 확인
 import sys, os
 sys.path.append('.')
+sys.path.append('..')
 from whisper import whisper
 # import whisper.whisper as whisper
 import argparse
