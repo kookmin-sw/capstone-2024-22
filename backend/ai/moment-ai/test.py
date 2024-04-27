@@ -249,7 +249,8 @@ def main(file_name, file_path=None):
           output["status"] = "400"
           output['error'] = "Model could not be run on GPU or CPU. Please check your model or system configuration."
     
-
+  if os.path.exists(source_file):
+    os.remove(source_file)
 
   
   # save outout
