@@ -103,16 +103,15 @@ public class AuthService {
     }
 
 
-    public void verifyCode(AuthRequest.VerifyCode verifyCode, Long userId) {
+    public TokenResponseDTO.GetToken verifyCode(AuthRequest.VerifyCode verifyCode, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("잘못된 유저 정보"));
         if(!Objects.equals(user.getVerificationCode(), verifyCode.getCode())) throw new IllegalArgumentException("잘못된 인증코드");
         if (user.getRole() == Role.ROLE_TEMP_USER) {
             userService.registerUserToCoreServer(user);
             user.setRole(Role.ROLE_AUTH_USER);
         }
-
-
         userService.save(user);
+        return jwtTokenUtils.generateToken(provider, iss, user.getId(), user.getRole());
     }
 
     public void changePassword(AuthRequest.ChangePassword changePassword, Long userId) {

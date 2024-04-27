@@ -15,6 +15,11 @@ public class UserRequestDTO {
 
         private Long id;
 
+        private boolean notification;
+
+        private boolean dataUsage;
+
+        private String firebaseToken;
 
     }
 }
