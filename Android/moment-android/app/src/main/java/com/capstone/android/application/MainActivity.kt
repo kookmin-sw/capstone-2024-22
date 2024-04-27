@@ -88,17 +88,16 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.capstone.android.application.app.composable.CustomNoTitleCheckDialog
 import com.capstone.android.application.app.composable.CustomTitleCheckDialog
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.screen.BottomNavItem
 import com.capstone.android.application.data.local.Emotion
-import com.capstone.android.application.presentation.CustomNoTitleCheckViewModel
 import com.capstone.android.application.presentation.CustomTitleCheckViewModel
 import com.capstone.android.application.ui.CardActivity
 import com.capstone.android.application.ui.PostTripActivity
 import com.capstone.android.application.ui.ReciptActivity
+import com.capstone.android.application.ui.ReciptScreen
 import com.capstone.android.application.ui.TripFileActivity
 import com.capstone.android.application.ui.theme.ApplicationTheme
 import com.capstone.android.application.ui.theme.BigButton
@@ -378,7 +377,9 @@ class MainActivity : ComponentActivity() {
                                         description = CustomTitleCheckDialogState.description,
                                         checkleft = CustomTitleCheckDialogState.checkleft,
                                         checkright = CustomTitleCheckDialogState.checkright,
-                                        onClickleft = { CustomTitleCheckDialogState.onClickleft() },
+                                        onClickleft = {
+                                            CustomTitleCheckDialogState.onClickleft()
+                                            EditCheckState.value = false },
                                         onClickright = { CustomTitleCheckDialogState.onClickright() },
                                         onClickCancel = { CustomTitleCheckDialogState.onClickCancel() },
                                     )
@@ -410,6 +411,7 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(BottomNavItem.Receipt.screenRoute) {
                     currentSelectedBottomRoute.value = "Receipt"
+
                     Receipt()
                     title.value = "영수증 모아보기"
                 }
