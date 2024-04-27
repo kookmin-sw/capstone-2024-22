@@ -37,7 +37,6 @@ def run_model_on_gpu(models:dict, source_file, output):
   if torch.cuda.is_available():
     try:
       for model_name, model_config in models.items():
-        
         if model_name == "whisper":
           # for demo
           output["text"] = "안녕하세요."
@@ -91,6 +90,8 @@ def run_model_on_gpu(models:dict, source_file, output):
               
               output["emotion"]= feats
           
+      output['status'] = '200'
+      output['error'] = None
       # return output
     
     except Exception as e:
@@ -158,7 +159,8 @@ def run_model_on_cpu(models:dict, source_file, output):
             
             output["emotion"]= feats
         
-    
+    output['status'] = '200'
+    output['error'] = None
     # return output
   
   except Exception as e:
@@ -176,8 +178,8 @@ def main(file_name, file_path=None):
   
   output["text"] = None
   output["emotions"] = None
-  output["status"] = "200"
-  output["error"] = None
+  output["status"] = "400"
+  output["error"] = "not implements error"
   output["file_name"] = file_name
   output["file_path"] = file_path
   
@@ -268,7 +270,9 @@ def main(file_name, file_path=None):
   return output
 
 if __name__ == "__main__":
-  file_name = "../moment_ai/test.mp4" if args.file_path is None else args.file_path
-  print(file_name)
-  result = main(file_name)
-  print(result)
+  # file_name = "../moment_ai/test.mp4" if args.file_path is None else args.file_path
+  file_path = 'users/1/'
+  file_name = '2024-04-27T17:44:39.710243.mp4'
+  print(file_path, file_name)
+  result = main(file_path=file_path, file_name=file_name)
+  print('results :', result)
