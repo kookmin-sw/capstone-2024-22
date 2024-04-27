@@ -445,7 +445,7 @@ class ReciptActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(4.dp))
                 }
                 ReciptTextField(
-                    hint = "북촌 한옥마을",
+                    hint = "기억 속에 오래 저장할",
                     onValueChanged = {depart_small.value = it },
                     text = depart_small,
                     keyboardType = KeyboardType.Text,
@@ -464,7 +464,7 @@ class ReciptActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.Center
             ) {
                 ReciptTextField(
-                    hint = "서울",
+                    hint = "출발지",
                     onValueChanged = {depart.value = it },
                     text = depart,
                     keyboardType = KeyboardType.Text,
@@ -504,7 +504,7 @@ class ReciptActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(4.dp))
                 }
                 ReciptTextField(
-                    hint = "암스테르담 공항",
+                    hint = "기억 속에 오래 저장할",
                     onValueChanged = { arrive_small.value = it },
                     text = arrive_small,
                     keyboardType = KeyboardType.Text,
@@ -523,7 +523,7 @@ class ReciptActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.Center
             ) {
                 ReciptTextField(
-                    hint = "암스테르담",
+                    hint = "도착지",
                     onValueChanged = {arrive.value = it },
                     text = arrive,
                     keyboardType = KeyboardType.Text,
@@ -626,7 +626,7 @@ class ReciptActivity : ComponentActivity() {
 
         Box(
             modifier = Modifier
-                .height(577.dp)
+                .height(651.dp)
                 .fillMaxWidth()
                 .background(
                     color = white,
@@ -641,7 +641,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 23.dp, start = 36.dp)
+                    .padding(top = 21.dp, start = 36.dp)
             ) {
                 ReciptTextField(
                     hint = "여행의 기록을 한 줄로 기록하세요:)",
@@ -676,7 +676,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 430.dp, start = 28.dp, end = 10.dp),
+                    .padding(top = 484.dp, start = 28.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 P_Medium14(content = "전라도의 선유도", color = black)
@@ -697,7 +697,7 @@ class ReciptActivity : ComponentActivity() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 10.dp, start = 28.dp, top = 100.dp),
+                    .padding(end = 10.dp, start = 28.dp, top = 109.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -710,7 +710,7 @@ class ReciptActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(4.dp))
                 }
                 ReciptTextField(
-                    hint = "북촌 한옥마을",
+                    hint = "기억 속에 오래 저장할",
                     onValueChanged = { depart_small.value = it },
                     text = depart_small,
                     keyboardType = KeyboardType.Text,
@@ -724,12 +724,12 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 10.dp, start = 28.dp, top = 115.dp),
+                    .padding(end = 10.dp, start = 28.dp, top = 133.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 ReciptTextField(
-                    hint = "서울",
+                    hint = "출발지",
                     onValueChanged = {depart.value = it },
                     text = depart,
                     keyboardType = KeyboardType.Text,
@@ -743,7 +743,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 10.dp, start = 28.dp, top = 179.dp),
+                    .padding(end = 10.dp, start = 28.dp, top = 202.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -756,7 +756,7 @@ class ReciptActivity : ComponentActivity() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 10.dp, start = 28.dp, top = 281.dp),
+                    .padding(end = 10.dp, start = 28.dp, top = 312.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -769,7 +769,7 @@ class ReciptActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(4.dp))
                 }
                 ReciptTextField(
-                    hint = "암스테르담 공항",
+                    hint = "기억 속에 오래 저장할",
                     onValueChanged = {arrive_small.value = it },
                     text = arrive_small,
                     keyboardType = KeyboardType.Text,
@@ -783,12 +783,12 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 10.dp, start = 28.dp, top = 297.dp),
+                    .padding(end = 10.dp, start = 28.dp, top = 336.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 ReciptTextField(
-                    hint = "군산",
+                    hint = "도착지",
                     onValueChanged = {arrive.value = it },
                     text = arrive,
                     keyboardType = KeyboardType.Text,
@@ -809,6 +809,35 @@ class ReciptActivity : ComponentActivity() {
                     Modifier.width(107.dp)
                 ) {
                     P_Medium11(content = "여행 감정", color = neutral_500)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        emotionList.forEach { item ->
+                            Row(
+                                modifier = Modifier.height(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+
+                                Image(
+                                    modifier = Modifier.size(14.dp),
+                                    painter = painterResource(id = item.icon),
+                                    contentDescription = ""
+                                )
+                                Spacer(modifier = Modifier.width(7.5.dp))
+                                Column(
+                                    modifier = Modifier.width(83.dp)
+                                ) {
+                                    LinearProgressIndicator(
+                                        progress = { 0.4f },
+                                        modifier = Modifier.height(4.dp),
+                                        color = primary_500,
+                                        strokeCap = StrokeCap.Round
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
                 Column(
                     Modifier.padding(start = 60.dp),
@@ -867,7 +896,7 @@ class ReciptActivity : ComponentActivity() {
                 }
             }
 
-            Column(Modifier.padding(top = 400.dp)) {
+            Column(Modifier.padding(top = 453.dp)) {
                 Image(
                     painter = painterResource(R.drawable.img_cutline_circle),
                     contentDescription = "로고",
