@@ -207,7 +207,8 @@ def main(file_name, file_path=None):
 
   # load model
   # print("\n\nload model ------------------------------------------------------------------------------")
-  stt_model = whisper.load_model(args.whisper_version)
+  stt_model = None
+  # stt_model = whisper.load_model(args.whisper_version)
   
   ser_model_dir = "./emotion2vec/upstream"
   ser_checkpoint_dir = "./emotion2vec/emotion2vec_base/emotion2vec_base.pt"
