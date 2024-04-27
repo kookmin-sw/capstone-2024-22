@@ -1190,7 +1190,7 @@ class ReciptActivity : ComponentActivity() {
     fun SaveTheme2(){
         Box(
             modifier = Modifier
-                .height(577.dp)
+                .height(651.dp)
                 .fillMaxWidth()
                 .background(
                     color = white,
@@ -1205,7 +1205,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 23.dp, start = 36.dp)
+                    .padding(top = 21.dp, start = 36.dp)
             ) {
                 P_Medium14(content = "여행의 기록을 한 줄로 기록하세요:)", color = neutral_500)
             }
@@ -1231,7 +1231,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 430.dp, start = 28.dp, end = 10.dp),
+                    .padding(top = 484.dp, start = 28.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 P_Medium14(content = "전라도의 선유도", color = black)
@@ -1252,7 +1252,7 @@ class ReciptActivity : ComponentActivity() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 10.dp, start = 28.dp, top = 100.dp),
+                    .padding(end = 10.dp, start = 28.dp, top = 109.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -1268,7 +1268,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 10.dp, start = 28.dp, top = 115.dp),
+                    .padding(end = 10.dp, start = 28.dp, top = 133.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -1278,7 +1278,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 10.dp, start = 28.dp, top = 179.dp),
+                    .padding(end = 10.dp, start = 28.dp, top = 202.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -1291,7 +1291,7 @@ class ReciptActivity : ComponentActivity() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 10.dp, start = 28.dp, top = 281.dp),
+                    .padding(end = 10.dp, start = 28.dp, top = 312.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -1307,7 +1307,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(end = 10.dp, start = 28.dp, top = 297.dp),
+                    .padding(end = 10.dp, start = 28.dp, top = 336.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -1382,7 +1382,7 @@ class ReciptActivity : ComponentActivity() {
                 }
             }
 
-            Column(Modifier.padding(top = 400.dp)) {
+            Column(Modifier.padding(top = 453.dp)) {
                 Image(
                     painter = painterResource(R.drawable.img_cutline_circle),
                     contentDescription = "로고",
