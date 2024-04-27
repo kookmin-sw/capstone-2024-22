@@ -50,12 +50,11 @@ public class AuthController {
 
     // 인증코드 검증
     @PatchMapping("/verify")
-    public ResponseEntity<APIResponse> verifyCode(
+    public ResponseEntity<APIResponse<TokenResponseDTO.GetToken>> verifyCode(
             @RequestBody AuthRequest.VerifyCode verifyCode,
             @RequestHeader Long userId
             ) {
-        authService.verifyCode(verifyCode, userId);
-        return ResponseEntity.ok(APIResponse.of(SuccessCode.UPDATE_SUCCESS));
+        return ResponseEntity.ok(APIResponse.of(SuccessCode.UPDATE_SUCCESS, authService.verifyCode(verifyCode, userId)));
     }
 
     // 비밀번호 변경
