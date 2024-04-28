@@ -111,6 +111,8 @@ import com.capstone.android.application.ui.theme.P_Medium_Oneline
 import com.capstone.android.application.ui.theme.YJ_Bold
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
+import com.capstone.android.application.ui.theme.neutral_200
+import com.capstone.android.application.ui.theme.neutral_400
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.primary_200
@@ -1824,33 +1826,33 @@ class MainActivity : ComponentActivity() {
 
         emotionList.add(
             Emotion(
-                icon = R.drawable.ic_receipt1_emotion_common_1,
+                icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = "60%"
+                persent = 60
             )
         )
         emotionList.add(
             Emotion(
-                icon = R.drawable.ic_receipt1_emotion_happy_1,
+                icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
-                persent = "20%"
+                persent = 20
             )
         )
         emotionList.add(
             Emotion(
-                icon = R.drawable.ic_receipt1_emotion_angry_1,
+                icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = "15%"
+                persent = 15
             )
         )
         emotionList.add(
             Emotion(
-                icon = R.drawable.ic_receipt1_emotions_sad_1,
+                icon = R.drawable.ic_emotion_sad,
                 text = "슬퍼요 ",
-                persent = "5%"
+                persent = 5
             )
         )
-
+        emotionList.sortedByDescending { it.persent }
         Box(
             modifier = Modifier
                 .height(244.dp)
@@ -2013,7 +2015,7 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier
                                 .fillMaxWidth()
                         ) {
-                            emotionList.forEach { item ->
+                            emotionList.forEachIndexed { index, item ->
                                 Row(
                                     modifier = Modifier.height(8.dp),
                                     verticalAlignment = Alignment.CenterVertically
@@ -2022,20 +2024,40 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier.width(40.dp)
                                     )  {
                                         LinearProgressIndicator(
-                                            progress = { 0.4f },
+                                            progress = { item.persent.toFloat() / 100 },
                                             modifier = Modifier.height(3.dp),
-                                            color = primary_500,
+                                            color = when (index) {
+                                                0 -> primary_500
+                                                1 -> neutral_600
+                                                2 -> neutral_400
+                                                3 -> neutral_200
+                                                else -> primary_500
+                                            },
                                             strokeCap = StrokeCap.Round
                                         )
                                     }
                                     Spacer(modifier = Modifier.width(4.2.dp))
                                     Image(
                                         modifier = Modifier.size(5.dp),
-                                        painter = painterResource(id = item.icon),
+                                        painter = painterResource(
+                                            id = Theme1_Emotion(
+                                                item.text,
+                                                index
+                                            )
+                                        ),
                                         contentDescription = ""
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    P_Medium(content = "60%", color = primary_500,4.sp)
+                                    P_Medium(
+                                        content = item.persent.toString() + "%",
+                                        color = when (index) {
+                                            0 -> primary_500
+                                            1 -> neutral_600
+                                            2 -> neutral_400
+                                            3 -> neutral_200
+                                            else -> primary_500
+                                        }, 4.sp
+                                    )
                                 }
                             }
                         }
@@ -2053,34 +2075,33 @@ class MainActivity : ComponentActivity() {
 
         emotionList.add(
             Emotion(
-                icon = R.drawable.ic_receipt2_emotion_common,
+                icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = "60%"
+                persent = 60
             )
         )
         emotionList.add(
             Emotion(
-                icon = R.drawable.ic_receipt2_emotion_happy,
+                icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
-                persent = "20%"
+                persent = 20
             )
         )
         emotionList.add(
             Emotion(
-                icon = R.drawable.ic_receipt2_emotion_angry,
+                icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = "15%"
+                persent = 15
             )
         )
         emotionList.add(
             Emotion(
-                icon = R.drawable.ic_receipt2_emotions_sad,
+                icon = R.drawable.ic_emotion_sad,
                 text = "슬퍼요 ",
-                persent = "5%"
+                persent = 5
             )
         )
-
-
+        emotionList.sortedByDescending { it.persent }
         Box(
             modifier = Modifier
                 .height(244.dp)
@@ -2096,6 +2117,18 @@ class MainActivity : ComponentActivity() {
                 )
         )
         {
+            Column(
+                modifier = Modifier
+                    .width(3.74.dp)
+                    .padding(top = 15.dp)
+                    .fillMaxHeight()
+                    .background(
+                        color = primary_500,
+                        shape = RoundedCornerShape(bottomEnd = 2.dp)
+                    )
+                    .align(Alignment.BottomEnd)
+            ) {}
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -2203,7 +2236,7 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .fillMaxWidth()
                                     ) {
-                                        emotionList.forEach { item ->
+                                        emotionList.forEachIndexed { index, item ->
                                             Row(
                                                 modifier = Modifier.height(6.dp),
                                                 verticalAlignment = Alignment.CenterVertically
@@ -2211,17 +2244,27 @@ class MainActivity : ComponentActivity() {
 
                                                 Image(
                                                     modifier = Modifier.size(5.dp),
-                                                    painter = painterResource(id = item.icon),
+                                                    painter = painterResource(
+                                                        id = Theme2_Emotion(
+                                                            kind = item.text
+                                                        )
+                                                    ),
                                                     contentDescription = ""
                                                 )
                                                 Spacer(modifier = Modifier.width(3.dp))
                                                 Column(
                                                     modifier = Modifier.width(32.dp)
-                                                )  {
+                                                ) {
                                                     LinearProgressIndicator(
-                                                        progress = { 0.4f },
+                                                        progress = { item.persent.toFloat() / 100 },
                                                         modifier = Modifier.height(1.5.dp),
-                                                        color = primary_500,
+                                                        color = when (index) {
+                                                            0 -> primary_500
+                                                            1 -> neutral_600
+                                                            2 -> neutral_400
+                                                            3 -> neutral_200
+                                                            else -> primary_500
+                                                        },
                                                         strokeCap = StrokeCap.Round
                                                     )
                                                 }
@@ -2289,7 +2332,6 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
-
             Column(Modifier.padding(top = 140.dp)) {
                 Image(
                     painter = painterResource(R.drawable.img_cutline_circle),
@@ -2302,6 +2344,53 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
+    @Composable
+    fun Theme1_Emotion(kind: String, index: Int): Int {
+
+        when(kind){
+            "평범해요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_common_1
+                1 -> R.drawable.ic_receipt1_emotion_common_2
+                2 -> R.drawable.ic_receipt1_emotion_common_3
+                3 -> R.drawable.ic_receipt1_emotion_common_4
+                else -> R.drawable.ic_receipt1_emotion_common_1
+            }
+            "화가나요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_angry_1
+                1 -> R.drawable.ic_receipt1_emotion_angry_2
+                2 -> R.drawable.ic_receipt1_emotion_angry_3
+                3 -> R.drawable.ic_receipt1_emotion_angry_4
+                else -> R.drawable.ic_receipt1_emotion_angry_1
+            }
+            "즐거워요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_happy_1
+                1 -> R.drawable.ic_receipt1_emotion_happy_2
+                2 -> R.drawable.ic_receipt1_emotion_happy_3
+                3 -> R.drawable.ic_receipt1_emotion_happy_4
+                else -> R.drawable.ic_receipt1_emotion_happy_1
+            }
+            "슬퍼요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_sad_1
+                1 -> R.drawable.ic_receipt1_emotion_sad_2
+                2 -> R.drawable.ic_receipt1_emotion_sad_3
+                3 -> R.drawable.ic_receipt1_emotion_sad_4
+                else -> R.drawable.ic_receipt1_emotion_sad_1
+            }
+            else -> return R.drawable.ic_emotion_angry
+        }
+    }
+    @Composable
+    fun Theme2_Emotion(kind: String): Int {
+
+        return when(kind){
+            "평범해요" -> R.drawable.ic_receipt2_emotion_common
+            "화가나요" -> R.drawable.ic_receipt2_emotion_angry
+            "즐거워요" -> R.drawable.ic_receipt2_emotion_happy
+            "슬퍼요" -> R.drawable.ic_receipt2_emotions_sad
+            else -> R.drawable.ic_receipt2_emotion_common
+        }
+    }
 
     @SuppressLint("UnrememberedMutableState")
     @Preview(apiLevel = 33)
