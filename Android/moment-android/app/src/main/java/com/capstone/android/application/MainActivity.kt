@@ -93,7 +93,7 @@ import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.screen.BottomNavItem
 import com.capstone.android.application.data.local.Emotion
-import com.capstone.android.application.presentation.CustomTitleCheckViewModel
+import com.capstone.android.application.domain.CustomTitleCheckViewModel
 import com.capstone.android.application.ui.CardActivity
 import com.capstone.android.application.ui.PostTripActivity
 import com.capstone.android.application.ui.ReciptActivity
