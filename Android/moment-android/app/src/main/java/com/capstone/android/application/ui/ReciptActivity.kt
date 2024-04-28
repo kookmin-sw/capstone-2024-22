@@ -122,14 +122,48 @@ class ReciptActivity : ComponentActivity() {
                 ) {
                     composable(route = ReciptScreen.MakeTripChoice.name) { MakeTripChoice() }
                     composable(route = ReciptScreen.MakeTrip.name) { MakeTrip() }
-                    composable(route = ReciptScreen.SaveRecipt.name) { SaveRecipt("theme1") }
-                    composable(route = ReciptScreen.ReceiptPost_Big.name) { ReceiptPost_Big() }
+                    composable(route = ReciptScreen.SaveRecipt.name) {
+                        val theme = remember {
+                            navController.previousBackStackEntry?.savedStateHandle?.get<Int>("theme")
+                        }
+                        if (theme != null) {
+                            SaveRecipt(theme)
+                        }
+                    }
+                    composable(route = ReciptScreen.ReceiptPost_Big.name) {
+                        //MainAvtivity 영수증모아보기에서 선택한 데이터로 크게 띄움
+                        ReceiptPost_Big(/*receiptcontent*/) }
                     composable(route = ReciptScreen.EditReceipt.name) { EditReceipt () }
-                    composable(route = ReciptScreen.SaveEditReceipt.name) { SaveEditReceipt ("theme1") }
+                    composable(route = ReciptScreen.SaveEditReceipt.name) {
+                        val theme = remember {
+                            navController.previousBackStackEntry?.savedStateHandle?.get<Int>("theme")
+                        }
+                        val receipt_content = remember {
+                            navController.previousBackStackEntry?.savedStateHandle?.get<ReceiptContent>("receipt_content")
+                        }
+                        if (theme != null) {
+                            if (receipt_content != null) {
+                                SaveEditReceipt (theme,receipt_content)
+                            }
+                        }
+                    }
                 }
             }
         }
     }
+
+    data class ReceiptContent(
+        val intro: MutableState<String>,
+        val depart_small: MutableState<String>,
+        val depart: MutableState<String>,
+        val arrive_small: MutableState<String>,
+        val arrive: MutableState<String>,
+        val cardnum: Int,
+        val publicationdate: String,
+        val startdate: String,
+        val enddate: String,
+        val emotionList: SnapshotStateList<Emotion>
+    )
 
 
     @Composable
@@ -243,7 +277,10 @@ class ReciptActivity : ComponentActivity() {
         val depart = remember { mutableStateOf("") }
         val arrive_small = remember { mutableStateOf("") }
         val arrive = remember { mutableStateOf("") }
-
+        val cardnum = 27
+        val publicationdate = "2024.02.25"
+        val startdate = "2024.02.25"
+        val enddate = "2024.02.27"
         val emotionList = mutableStateListOf<Emotion>()
 
         emotionList.add(
@@ -307,13 +344,20 @@ class ReciptActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
-                        .clickable { navController.navigate(ReciptScreen.SaveRecipt.name) }) {
+                        .clickable {
+                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                key = "theme",
+                                value = state.currentPage
+                            )
+                            navController.navigate(ReciptScreen.SaveRecipt.name)
+                        }) {
                     YJ_Bold15("완료", black)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            Horizontal_Theme(page,state,intro, depart_small, depart, arrive_small, arrive, emotionList)
+            Horizontal_Theme(page,state,ReceiptContent(intro, depart_small, depart, arrive_small, arrive,
+                cardnum,publicationdate,startdate,enddate, emotionList))
         }
     }
 
@@ -323,12 +367,7 @@ class ReciptActivity : ComponentActivity() {
     fun Horizontal_Theme(
         page: Int,
         state: PagerState,
-        intro: MutableState<String>,
-        depart_small: MutableState<String>,
-        depart: MutableState<String>,
-        arrive_small: MutableState<String>,
-        arrive: MutableState<String>,
-        emotionList: SnapshotStateList<Emotion>
+        receiptcontent: ReceiptContent
     ) {
 
         HorizontalPager(
@@ -341,12 +380,12 @@ class ReciptActivity : ComponentActivity() {
         ) { page ->
             if (page == 0) {
                 Column(Modifier.padding(horizontal = 20.dp) ){
-                    EditTripTheme1(intro, depart_small, depart, arrive_small, arrive, emotionList)
+                    EditTripTheme1(receiptcontent)
                 }
             }
             if (page == 1) {
                 Column(Modifier.padding(horizontal = 20.dp)){
-                    EditTripTheme2(intro, depart_small, depart, arrive_small, arrive, emotionList)
+                    EditTripTheme2(receiptcontent)
                 }
             }
         }
@@ -357,12 +396,7 @@ class ReciptActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
     @Composable
     fun EditTripTheme1(
-        intro: MutableState<String>,
-        depart_small: MutableState<String>,
-        depart: MutableState<String>,
-        arrive_small: MutableState<String>,
-        arrive: MutableState<String>,
-        emotionList: SnapshotStateList<Emotion>
+        receiptcontent: ReceiptContent
     ) {
 
         Box(
@@ -405,10 +439,10 @@ class ReciptActivity : ComponentActivity() {
                 ) {
                     Spacer(modifier = Modifier.height(1.dp))
                     P_Medium8(
-                        " 티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                                "티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                                "티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                                "티켓이 발행된 날짜는 2024 02 15 입니다. ", primary_200
+                        " 티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다." +
+                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다." +
+                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다." +
+                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다.", primary_200
                     )
                 }
                 Spacer(modifier = Modifier.height(26.dp))
@@ -418,8 +452,8 @@ class ReciptActivity : ComponentActivity() {
                 ) {
                     ReciptTextField(
                         hint = "여행의 기록을 한 줄로 기록하세요:)",
-                        onValueChanged = { intro.value = it },
-                        text = intro,
+                        onValueChanged = { receiptcontent.intro.value = it },
+                        text = receiptcontent.intro,
                         keyboardType = KeyboardType.Text,
                         textcolor = neutral_500,
                         fontweight = FontWeight.Medium,
@@ -444,8 +478,8 @@ class ReciptActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.width(4.dp))
                 ReciptTextField(
                     hint = "기억 속에 오래 저장할",
-                    onValueChanged = {depart_small.value = it },
-                    text = depart_small,
+                    onValueChanged = {receiptcontent.depart_small.value = it },
+                    text = receiptcontent.depart_small,
                     keyboardType = KeyboardType.Text,
                     textcolor = primary_500,
                     fontweight = FontWeight.Medium,
@@ -463,8 +497,8 @@ class ReciptActivity : ComponentActivity() {
             ) {
                 ReciptTextField(
                     hint = "출발지",
-                    onValueChanged = {depart.value = it },
-                    text = depart,
+                    onValueChanged = {receiptcontent.depart.value = it },
+                    text = receiptcontent.depart,
                     keyboardType = KeyboardType.Text,
                     textcolor = primary_500,
                     fontweight = FontWeight.Black,
@@ -501,8 +535,8 @@ class ReciptActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.width(4.dp))
                 ReciptTextField(
                     hint = "기억 속에 오래 저장할",
-                    onValueChanged = { arrive_small.value = it },
-                    text = arrive_small,
+                    onValueChanged = { receiptcontent.arrive_small.value = it },
+                    text = receiptcontent.arrive_small,
                     keyboardType = KeyboardType.Text,
                     textcolor = primary_500,
                     fontweight = FontWeight.Medium,
@@ -520,8 +554,8 @@ class ReciptActivity : ComponentActivity() {
             ) {
                 ReciptTextField(
                     hint = "도착지",
-                    onValueChanged = {arrive.value = it },
-                    text = arrive,
+                    onValueChanged = {receiptcontent.arrive.value = it },
+                    text = receiptcontent.arrive,
                     keyboardType = KeyboardType.Text,
                     textcolor = primary_500,
                     fontweight = FontWeight.Black,
@@ -556,13 +590,13 @@ class ReciptActivity : ComponentActivity() {
                 ) {
                     P_Medium11(content = "여행 카드", color = neutral_500)
                     Spacer(modifier = Modifier.height(10.dp))
-                    P_ExtraBold14(content = "27", color = primary_500)
+                    P_ExtraBold14(content =receiptcontent.cardnum.toString(), color = primary_500)
                     Spacer(modifier = Modifier.height(30.dp))
                     P_Medium11(content = "여행 날짜", color = neutral_500)
                     Spacer(modifier = Modifier.height(6.dp))
-                    P_Medium11(content = "2024.02.15", color = primary_500)
+                    P_Medium11(content = receiptcontent.startdate, color = primary_500)
                     Spacer(modifier = Modifier.height(5.dp))
-                    P_Medium11(content = "2024.02.15", color = primary_500)
+                    P_Medium11(content = receiptcontent.enddate, color = primary_500)
                 }
                 Spacer(modifier = Modifier.width(50.dp))
                 Column() {
@@ -578,7 +612,7 @@ class ReciptActivity : ComponentActivity() {
                             modifier = Modifier
                                 .fillMaxWidth()
                         ) {
-                            emotionList.forEach { item ->
+                            receiptcontent.emotionList.forEach { item ->
                                 Row(
                                     modifier = Modifier.height(25.dp),
                                     verticalAlignment = Alignment.CenterVertically
@@ -612,12 +646,7 @@ class ReciptActivity : ComponentActivity() {
 
     @Composable
     fun EditTripTheme2(
-        intro: MutableState<String>,
-        depart_small: MutableState<String>,
-        depart: MutableState<String>,
-        arrive_small: MutableState<String>,
-        arrive: MutableState<String>,
-        emotionList: SnapshotStateList<Emotion>
+        receiptcontent: ReceiptContent
     ) {
 
         Box(
@@ -641,8 +670,8 @@ class ReciptActivity : ComponentActivity() {
             ) {
                 ReciptTextField(
                     hint = "여행의 기록을 한 줄로 기록하세요:)",
-                    onValueChanged = { intro.value = it },
-                    text = intro,
+                    onValueChanged = { receiptcontent.intro.value = it },
+                    text = receiptcontent.intro,
                     keyboardType = KeyboardType.Text,
                     textcolor = neutral_500,
                     fontweight = FontWeight.Medium,
@@ -662,10 +691,10 @@ class ReciptActivity : ComponentActivity() {
 
             ) {
                 P_Medium8(
-                    " 티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                            "티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                            "티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                            "티켓이 발행된 날짜는 2024 02 15 입니다. ", primary_200
+                    " 티켓이 발행된 날짜는"+ receiptcontent.publicationdate +"입니다. " +
+                            "티켓이 발행된 날짜는"+ receiptcontent.publicationdate +"입니다. " +
+                            "티켓이 발행된 날짜는"+ receiptcontent.publicationdate +"입니다. " +
+                            "티켓이 발행된 날짜는"+ receiptcontent.publicationdate +"입니다. ", primary_200
                 )
             }
 
@@ -705,8 +734,8 @@ class ReciptActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.width(4.dp))
                 ReciptTextField(
                     hint = "기억 속에 오래 저장할",
-                    onValueChanged = { depart_small.value = it },
-                    text = depart_small,
+                    onValueChanged = { receiptcontent.depart_small.value = it },
+                    text = receiptcontent.depart_small,
                     keyboardType = KeyboardType.Text,
                     textcolor = neutral_600,
                     fontweight = FontWeight.Medium,
@@ -724,8 +753,8 @@ class ReciptActivity : ComponentActivity() {
             ) {
                 ReciptTextField(
                     hint = "출발지",
-                    onValueChanged = {depart.value = it },
-                    text = depart,
+                    onValueChanged = {receiptcontent.depart.value = it },
+                    text = receiptcontent.depart,
                     keyboardType = KeyboardType.Text,
                     textcolor = black,
                     fontweight = FontWeight.Black,
@@ -762,8 +791,8 @@ class ReciptActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.width(4.dp))
                 ReciptTextField(
                     hint = "기억 속에 오래 저장할",
-                    onValueChanged = {arrive_small.value = it },
-                    text = arrive_small,
+                    onValueChanged = {receiptcontent.arrive_small.value = it },
+                    text = receiptcontent.arrive_small,
                     keyboardType = KeyboardType.Text,
                     textcolor = neutral_600,
                     fontweight = FontWeight.Medium,
@@ -781,8 +810,8 @@ class ReciptActivity : ComponentActivity() {
             ) {
                 ReciptTextField(
                     hint = "도착지",
-                    onValueChanged = {arrive.value = it },
-                    text = arrive,
+                    onValueChanged = {receiptcontent.arrive.value = it },
+                    text = receiptcontent.arrive,
                     keyboardType = KeyboardType.Text,
                     textcolor = black,
                     fontweight = FontWeight.Black,
@@ -805,7 +834,7 @@ class ReciptActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
-                        emotionList.forEach { item ->
+                        receiptcontent.emotionList.forEach { item ->
                             Row(
                                 modifier = Modifier.height(16.dp),
                                 verticalAlignment = Alignment.CenterVertically
@@ -852,7 +881,7 @@ class ReciptActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        YJ_Bold20(content = "27", color = primary_500)
+                        YJ_Bold20(content = receiptcontent.cardnum.toString(), color = primary_500)
                     }
                 }
             }
@@ -861,9 +890,9 @@ class ReciptActivity : ComponentActivity() {
                     .padding(bottom = 1.dp, end = 18.dp)
                     .align(Alignment.BottomEnd)
             ) {
-                P_Medium11(content = "2024 . 02 . 15", color = neutral_500)
+                P_Medium11(content = receiptcontent.startdate, color = neutral_500)
                 P_Medium11(content = " / ", color = neutral_500)
-                P_Medium11(content = "2024 . 02 . 15", color = neutral_500)
+                P_Medium11(content = receiptcontent.enddate, color = neutral_500)
             }
 
 
@@ -934,10 +963,53 @@ class ReciptActivity : ComponentActivity() {
     }
 
     @Composable
-    fun SaveRecipt(chosenTheme: String){
+    fun SaveRecipt(theme: Int){
 
-        val chosenTheme  = "theme1"
+        val intro = remember { mutableStateOf("") }
+        val depart_small = remember { mutableStateOf("") }
+        val depart = remember { mutableStateOf("") }
+        val arrive_small = remember { mutableStateOf("") }
+        val arrive = remember { mutableStateOf("") }
+        val cardnum = 27
+        val publicationdate = "2024.02.25"
+        val startdate = "2024.02.25"
+        val enddate = "2024.02.27"
 
+        intro.value = "한줄 소개 입니다"
+        depart.value = "서울"
+        depart_small.value = "서울숲"
+        arrive.value = "부산"
+        arrive_small.value = "해운대"
+
+        val emotionList = mutableStateListOf<Emotion>()
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_common,
+                text = "평범해요",
+                persent = "60%"
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_happy,
+                text = "즐거워요",
+                persent = "20%"
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_angry,
+                text = "화가나요",
+                persent = "15%"
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_sad,
+                text = "슬퍼요 ",
+                persent = "5%"
+            )
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -973,19 +1045,20 @@ class ReciptActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 앞에서 불러온 화면 데이터 받아와서 수정안되는 버전으로 넣기
-            if (chosenTheme == "theme1") {
-                SaveTheme1()
+            if (theme == 0) {
+                SaveTheme1(ReceiptContent(intro, depart_small, depart, arrive_small, arrive,
+                    cardnum,publicationdate,startdate,enddate, emotionList))
             }
-            if(chosenTheme == "theme2"){
-                SaveTheme2()
+            if(theme == 1){
+                SaveTheme2(ReceiptContent(intro, depart_small, depart, arrive_small, arrive,
+                    cardnum,publicationdate,startdate,enddate, emotionList))
 
             }
         }
     }
 
     @Composable
-    fun SaveTheme1(){
+    fun SaveTheme1(receiptcontent: ReceiptContent){
         Box(
             modifier = Modifier
                 .height(651.dp)
@@ -1026,10 +1099,10 @@ class ReciptActivity : ComponentActivity() {
                 ) {
                     Spacer(modifier = Modifier.height(1.dp))
                     P_Medium8(
-                        " 티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                                "티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                                "티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                                "티켓이 발행된 날짜는 2024 02 15 입니다. ", primary_200
+                        " 티켓이 발행된 날짜는" + receiptcontent.publicationdate+ "입니다. " +
+                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate+ "입니다. " +
+                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다. " +
+                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다. ", primary_200
                     )
                 }
                 Spacer(modifier = Modifier.height(26.dp))
@@ -1037,7 +1110,7 @@ class ReciptActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    P_Medium14(content = "여행의 기록을 한 줄로 기록하세요:)", color = neutral_500)
+                    P_Medium14(content = receiptcontent.intro.value, color = neutral_500)
                 }
             }
 
@@ -1054,7 +1127,7 @@ class ReciptActivity : ComponentActivity() {
                     Modifier.size(19.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium14(content = "북촌한옥마을", color = primary_500)
+                P_Medium14(content = receiptcontent.depart_small.value, color = primary_500)
             }
 
             Column(
@@ -1064,7 +1137,7 @@ class ReciptActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                P_Black50("서울", primary_500)
+                P_Black50(receiptcontent.depart.value, primary_500)
             }
 
             Column(
@@ -1093,7 +1166,7 @@ class ReciptActivity : ComponentActivity() {
                     Modifier.size(19.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium14(content = "암스테르담 공항", color = primary_500)
+                P_Medium14(content = receiptcontent.arrive_small.value, color = primary_500)
             }
 
             Column(
@@ -1103,7 +1176,7 @@ class ReciptActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                P_Black50(content = "암스테르담", color = primary_500)
+                P_Black50(content = receiptcontent.arrive.value, color = primary_500)
             }
 
             Row(
@@ -1134,13 +1207,13 @@ class ReciptActivity : ComponentActivity() {
                 ) {
                     P_Medium11(content = "여행 카드", color = neutral_500)
                     Spacer(modifier = Modifier.height(10.dp))
-                    P_ExtraBold14(content = "27", color = primary_500)
+                    P_ExtraBold14(content = receiptcontent.cardnum.toString(), color = primary_500)
                     Spacer(modifier = Modifier.height(30.dp))
                     P_Medium11(content = "여행 날짜", color = neutral_500)
                     Spacer(modifier = Modifier.height(6.dp))
-                    P_Medium11(content = "2024.02.15", color = primary_500)
+                    P_Medium11(content = receiptcontent.startdate, color = primary_500)
                     Spacer(modifier = Modifier.height(5.dp))
-                    P_Medium11(content = "2024.02.15", color = primary_500)
+                    P_Medium11(content = receiptcontent.enddate, color = primary_500)
                 }
                 Spacer(modifier = Modifier.width(50.dp))
                 Column() {
@@ -1187,7 +1260,7 @@ class ReciptActivity : ComponentActivity() {
     }
 
     @Composable
-    fun SaveTheme2(){
+    fun SaveTheme2(receiptcontent: ReceiptContent){
         Box(
             modifier = Modifier
                 .height(651.dp)
@@ -1207,7 +1280,7 @@ class ReciptActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(top = 21.dp, start = 36.dp)
             ) {
-                P_Medium14(content = "여행의 기록을 한 줄로 기록하세요:)", color = neutral_500)
+                P_Medium14(content = receiptcontent.intro.value, color = neutral_500)
             }
 
             Column(Modifier.padding(top = 51.dp)) {
@@ -1221,10 +1294,10 @@ class ReciptActivity : ComponentActivity() {
 
             ) {
                 P_Medium8(
-                    " 티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                            "티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                            "티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                            "티켓이 발행된 날짜는 2024 02 15 입니다. ", primary_200
+                    " 티켓이 발행된 날짜는"+receiptcontent.publicationdate+ "입니다. " +
+                            "티켓이 발행된 날짜는"+receiptcontent.publicationdate+ "입니다. " +
+                            "티켓이 발행된 날짜는"+receiptcontent.publicationdate+ "입니다. " +
+                            "티켓이 발행된 날짜는"+receiptcontent.publicationdate+ "입니다. ", primary_200
                 )
             }
 
@@ -1262,7 +1335,7 @@ class ReciptActivity : ComponentActivity() {
                     Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium11(content = "북촌 한옥마을", color =neutral_600)
+                P_Medium11(content = receiptcontent.depart_small.value, color =neutral_600)
             }
 
             Column(
@@ -1272,7 +1345,7 @@ class ReciptActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                P_Black45(content = "서울", color = black)
+                P_Black45(content = receiptcontent.depart.value, color = black)
             }
 
             Column(
@@ -1301,7 +1374,7 @@ class ReciptActivity : ComponentActivity() {
                     Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium11(content = "암스테르담 공항", color = neutral_600)
+                P_Medium11(content = receiptcontent.arrive_small.value, color = neutral_600)
             }
 
             Column(
@@ -1311,7 +1384,7 @@ class ReciptActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                P_Black45(content = "군산", color = black)
+                P_Black45(content = receiptcontent.arrive.value, color = black)
             }
 
             Row(
@@ -1346,7 +1419,7 @@ class ReciptActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        YJ_Bold20(content = "27", color = primary_500)
+                        YJ_Bold20(content = receiptcontent.cardnum.toString(), color = primary_500)
                     }
                 }
             }
@@ -1355,9 +1428,9 @@ class ReciptActivity : ComponentActivity() {
                     .padding(bottom = 1.dp, end = 18.dp)
                     .align(Alignment.BottomEnd)
             ) {
-                P_Medium11(content = "2024 . 02 . 15", color = neutral_500)
+                P_Medium11(content = receiptcontent.startdate, color = neutral_500)
                 P_Medium11(content = " / ", color = neutral_500)
-                P_Medium11(content = "2024 . 02 . 15", color = neutral_500)
+                P_Medium11(content = receiptcontent.enddate, color = neutral_500)
             }
 
 
@@ -1402,7 +1475,48 @@ class ReciptActivity : ComponentActivity() {
         intent.putExtra("MoveScreen", "ReceiptPost")
 
         val chosenTheme  = "theme1"
-
+        val intro = remember { mutableStateOf("") }
+        val depart_small = remember { mutableStateOf("") }
+        val depart = remember { mutableStateOf("") }
+        val arrive_small = remember { mutableStateOf("") }
+        val arrive = remember { mutableStateOf("") }
+        val cardnum = 27
+        val publicationdate = "2024.02.25"
+        val startdate = "2024.02.25"
+        val enddate = "2024.02.27"
+        val emotionList = mutableStateListOf<Emotion>()
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_common,
+                text = "평범해요",
+                persent = "60%"
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_happy,
+                text = "즐거워요",
+                persent = "20%"
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_angry,
+                text = "화가나요",
+                persent = "15%"
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_sad,
+                text = "슬퍼요 ",
+                persent = "5%"
+            )
+        )
+        val receiptcontent = ReceiptContent(
+            intro, depart_small, depart, arrive_small, arrive,
+            cardnum, publicationdate, startdate, enddate, emotionList
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -1447,10 +1561,10 @@ class ReciptActivity : ComponentActivity() {
 
             // 앞에서 불러온 화면 데이터 받아와서 수정안되는 버전으로 넣기
             if (chosenTheme == "theme1") {
-                SaveTheme1()
+                SaveTheme1(receiptcontent)
             }
             if(chosenTheme == "theme2"){
-                SaveTheme2()
+                SaveTheme2(receiptcontent)
 
             }
         }
@@ -1475,7 +1589,10 @@ class ReciptActivity : ComponentActivity() {
         val depart = remember { mutableStateOf("") }
         val arrive_small = remember { mutableStateOf("") }
         val arrive = remember { mutableStateOf("") }
-
+        val cardnum = 27
+        val publicationdate = "2024.02.25"
+        val startdate = "2024.02.25"
+        val enddate = "2024.02.27"
         val emotionList = mutableStateListOf<Emotion>()
 
         emotionList.add(
@@ -1540,19 +1657,31 @@ class ReciptActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
-                        .clickable { navController.navigate(ReciptScreen.SaveEditReceipt.name) }) {
+                        .clickable {
+                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                key = "theme",
+                                value = state.currentPage
+                            )
+                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                key = "receipt_content",
+                                value = ReceiptContent(
+                                    intro, depart_small, depart, arrive_small, arrive,
+                                    cardnum, publicationdate, startdate, enddate, emotionList
+                                )
+                            )
+                            navController.navigate(ReciptScreen.SaveEditReceipt.name)
+                        }) {
                     YJ_Bold15("저장", black)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            Horizontal_Theme(page,state,intro, depart_small, depart, arrive_small, arrive, emotionList)
+            Horizontal_Theme(page,state,ReceiptContent(intro, depart_small, depart, arrive_small, arrive,
+                cardnum, publicationdate, startdate, enddate,emotionList))
         }
     }
     @Composable
-    fun SaveEditReceipt(chosenTheme: String){
-
-        val chosenTheme  = "theme1"
+    fun SaveEditReceipt(theme :Int, receiptcontent: ReceiptContent){
 
         Column(
             modifier = Modifier
@@ -1581,8 +1710,8 @@ class ReciptActivity : ComponentActivity() {
                                 this@ReciptActivity,
                                 MainActivity::class.java
                             )
-                            intent.putExtra("MoveScreen","ReceiptPost")
-                            startActivity( intent )
+                            intent.putExtra("MoveScreen", "ReceiptPost")
+                            startActivity(intent)
                         }) {
                     YJ_Bold15("완료", primary_500)
                 }
@@ -1590,11 +1719,11 @@ class ReciptActivity : ComponentActivity() {
             Spacer(modifier = Modifier.height(8.dp))
 
             // 앞에서 불러온 화면 데이터 받아와서 수정안되는 버전으로 넣기
-            if (chosenTheme == "theme1") {
-                SaveTheme1()
+            if (theme == 0) {
+                SaveTheme1(receiptcontent)
             }
-            if(chosenTheme == "theme2"){
-                SaveTheme2()
+            if(theme == 1){
+                SaveTheme2(receiptcontent)
 
             }
         }
