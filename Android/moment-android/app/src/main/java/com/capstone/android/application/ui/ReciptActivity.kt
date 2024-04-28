@@ -75,7 +75,9 @@ import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.YJ_Bold20
 import com.capstone.android.application.ui.theme.black
 import com.capstone.android.application.ui.theme.neutral_100
+import com.capstone.android.application.ui.theme.neutral_200
 import com.capstone.android.application.ui.theme.neutral_300
+import com.capstone.android.application.ui.theme.neutral_400
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.primary_200
@@ -287,30 +289,31 @@ class ReciptActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = "60%"
+                persent = 60
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
-                persent = "20%"
+                persent = 20
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = "15%"
+                persent = 15
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요 ",
-                persent = "5%"
+                text = "슬퍼요",
+                persent = 5
             )
         )
+        emotionList.sortByDescending { it.persent }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -986,30 +989,31 @@ class ReciptActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = "60%"
+                persent = 60
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
-                persent = "20%"
+                persent = 20
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = "15%"
+                persent = 15
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요 ",
-                persent = "5%"
+                text = "슬퍼요",
+                persent = 5
             )
         )
+        emotionList.sortByDescending { it.persent }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -1489,30 +1493,31 @@ class ReciptActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = "60%"
+                persent = 60
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
-                persent = "20%"
+                persent = 20
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = "15%"
+                persent = 15
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_sad,
                 text = "슬퍼요 ",
-                persent = "5%"
+                persent = 5
             )
         )
+        emotionList.sortByDescending { it.persent }
         val receiptcontent = ReceiptContent(
             intro, depart_small, depart, arrive_small, arrive,
             cardnum, publicationdate, startdate, enddate, emotionList
@@ -1599,31 +1604,31 @@ class ReciptActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = "60%"
+                persent = 60
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
-                persent = "20%"
+                persent = 20
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = "15%"
+                persent = 15
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_sad,
                 text = "슬퍼요 ",
-                persent = "5%"
+                persent = 5
             )
         )
-
+        emotionList.sortByDescending { it.persent }
         Column(
             modifier = Modifier
                 .fillMaxSize()
