@@ -610,12 +610,11 @@ class ReciptActivity : ComponentActivity() {
                             .fillMaxWidth()
                     ) {
 
-
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                         ) {
-                            receiptcontent.emotionList.forEach { item ->
+                            receiptcontent.emotionList.forEachIndexed { index, item ->
                                 Row(
                                     modifier = Modifier.height(25.dp),
                                     verticalAlignment = Alignment.CenterVertically
@@ -624,20 +623,27 @@ class ReciptActivity : ComponentActivity() {
                                         modifier = Modifier.width(109.dp)
                                     )  {
                                         LinearProgressIndicator(
-                                            progress = { 0.4f },
+                                            progress = { item.persent.toFloat()/100 },
                                             modifier = Modifier.height(8.dp),
-                                            color = primary_500,
+                                            color = when(index)
+                                            {
+                                                0 -> primary_500
+                                                1 -> neutral_600
+                                                2 -> neutral_400
+                                                3 -> neutral_200
+                                                else -> primary_500
+                                            },
                                             strokeCap = StrokeCap.Round
                                         )
                                     }
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Image(
                                         modifier = Modifier.size(12.dp),
-                                        painter = painterResource(id = item.icon),
+                                        painter = painterResource(id =Theme1_Emotion(item.text,index)),
                                         contentDescription = ""
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    P_Medium11(content = "60%", color = primary_500)
+                                    P_Medium11(content = item.persent.toString()+"%", color = primary_500)
                                 }
                             }
                         }
@@ -837,7 +843,7 @@ class ReciptActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
-                        receiptcontent.emotionList.forEach { item ->
+                        receiptcontent.emotionList.forEachIndexed { index, item ->
                             Row(
                                 modifier = Modifier.height(16.dp),
                                 verticalAlignment = Alignment.CenterVertically
@@ -845,7 +851,7 @@ class ReciptActivity : ComponentActivity() {
 
                                 Image(
                                     modifier = Modifier.size(14.dp),
-                                    painter = painterResource(id = item.icon),
+                                    painter = painterResource(id = Theme2_Emotion(kind = item.text)),
                                     contentDescription = ""
                                 )
                                 Spacer(modifier = Modifier.width(7.5.dp))
@@ -853,9 +859,16 @@ class ReciptActivity : ComponentActivity() {
                                     modifier = Modifier.width(83.dp)
                                 ) {
                                     LinearProgressIndicator(
-                                        progress = { 0.4f },
-                                        modifier = Modifier.height(4.dp),
-                                        color = primary_500,
+                                        progress = { item.persent.toFloat()/100 },
+                                        modifier = Modifier.height(8.dp),
+                                        color = when(index)
+                                        {
+                                            0 -> primary_500
+                                            1 -> neutral_600
+                                            2 -> neutral_400
+                                            3 -> neutral_200
+                                            else -> primary_500
+                                        },
                                         strokeCap = StrokeCap.Round
                                     )
                                 }
@@ -1227,36 +1240,38 @@ class ReciptActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
-                        /*Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            emotionList.forEach { item ->
-                                Row(
-                                    modifier = Modifier.height(25.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(
-                                        modifier = Modifier.width(109.dp)
-                                    )  {
-                                        LinearProgressIndicator(
-                                            progress = { 0.4f },
-                                            modifier = Modifier.height(8.dp),
-                                            color = primary_500,
-                                            strokeCap = StrokeCap.Round
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Image(
-                                        modifier = Modifier.size(12.dp),
-                                        painter = painterResource(id = item.icon),
-                                        contentDescription = ""
+                        receiptcontent.emotionList.forEachIndexed { index, item ->
+                            Row(
+                                modifier = Modifier.height(25.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(
+                                    modifier = Modifier.width(109.dp)
+                                )  {
+                                    LinearProgressIndicator(
+                                        progress = { item.persent.toFloat()/100 },
+                                        modifier = Modifier.height(8.dp),
+                                        color = when(index)
+                                        {
+                                            0 -> primary_500
+                                            1 -> neutral_600
+                                            2 -> neutral_400
+                                            3 -> neutral_200
+                                            else -> primary_500
+                                        },
+                                        strokeCap = StrokeCap.Round
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    P_Medium11(content = "60%", color = primary_500)
                                 }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Image(
+                                    modifier = Modifier.size(12.dp),
+                                    painter = painterResource(id =Theme1_Emotion(item.text,index)),
+                                    contentDescription = ""
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                P_Medium11(content = item.persent.toString()+"%", color = primary_500)
                             }
-                        }*/
+                        }
                     }
                 }
             }
@@ -1401,6 +1416,42 @@ class ReciptActivity : ComponentActivity() {
                     Modifier.width(107.dp)
                 ) {
                     P_Medium11(content = "여행 감정", color = neutral_500)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        receiptcontent.emotionList.forEachIndexed { index, item ->
+                            Row(
+                                modifier = Modifier.height(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+
+                                Image(
+                                    modifier = Modifier.size(14.dp),
+                                    painter = painterResource(id = Theme2_Emotion(kind = item.text)),
+                                    contentDescription = ""
+                                )
+                                Spacer(modifier = Modifier.width(7.5.dp))
+                                Column(
+                                    modifier = Modifier.width(83.dp)
+                                ) {
+                                    LinearProgressIndicator(
+                                        progress = { item.persent.toFloat()/100 },
+                                        modifier = Modifier.height(8.dp),
+                                        color = when(index)
+                                        {
+                                            0 -> primary_500
+                                            1 -> neutral_600
+                                            2 -> neutral_400
+                                            3 -> neutral_200
+                                            else -> primary_500
+                                        },
+                                        strokeCap = StrokeCap.Round
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
                 Column(
                     Modifier.padding(start = 60.dp),
