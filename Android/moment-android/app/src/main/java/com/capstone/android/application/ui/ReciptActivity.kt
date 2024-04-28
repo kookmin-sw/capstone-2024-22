@@ -1734,7 +1734,54 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
+    @Composable
+    fun Theme1_Emotion(kind: String, index: Int): Int {
 
+        when(kind){
+            "평범해요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_common_1
+                1 -> R.drawable.ic_receipt1_emotion_common_2
+                2 -> R.drawable.ic_receipt1_emotion_common_3
+                3 -> R.drawable.ic_receipt1_emotion_common_4
+                else -> R.drawable.ic_receipt1_emotion_common_1
+            }
+            "화가나요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_angry_1
+                1 -> R.drawable.ic_receipt1_emotion_angry_2
+                2 -> R.drawable.ic_receipt1_emotion_angry_3
+                3 -> R.drawable.ic_receipt1_emotion_angry_4
+                else -> R.drawable.ic_receipt1_emotion_angry_1
+            }
+            "즐거워요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_happy_1
+                1 -> R.drawable.ic_receipt1_emotion_happy_2
+                2 -> R.drawable.ic_receipt1_emotion_happy_3
+                3 -> R.drawable.ic_receipt1_emotion_happy_4
+                else -> R.drawable.ic_receipt1_emotion_happy_1
+            }
+            "슬퍼요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_sad_1
+                1 -> R.drawable.ic_receipt1_emotion_sad_2
+                2 -> R.drawable.ic_receipt1_emotion_sad_3
+                3 -> R.drawable.ic_receipt1_emotion_sad_4
+                else -> R.drawable.ic_receipt1_emotion_sad_1
+            }
+            else -> return R.drawable.ic_emotion_angry
+        }
+    }
+    @Composable
+    fun Theme2_Emotion(kind: String): Int {
+
+        return when(kind){
+            "평범해요" -> R.drawable.ic_receipt2_emotion_common
+            "화가나요" -> R.drawable.ic_receipt2_emotion_angry
+            "즐거워요" -> R.drawable.ic_receipt2_emotion_happy
+            "슬퍼요" -> R.drawable.ic_receipt2_emotions_sad
+            else -> R.drawable.ic_receipt2_emotion_common
+        }
+    }
+
+    @SuppressLint("UnrememberedMutableState")
     @Preview(apiLevel = 33)
     @Composable
     fun ReciptPreview() {
