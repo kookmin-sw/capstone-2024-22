@@ -7,8 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.capstone.android.application.data.local.CustomNoTitleCheckDialogState
-import com.capstone.android.application.data.local.CustomTitleCheckDialogState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

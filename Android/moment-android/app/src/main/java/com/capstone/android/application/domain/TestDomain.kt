@@ -4,13 +4,31 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.capstone.android.application.data.local.CustomNoTitleCheckDialogState
-import com.capstone.android.application.data.local.CustomTitleCheckDialogState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 class TestDomain {
 }
+
+data class CustomNoTitleCheckDialogState(
+    val description: String = "",
+    val checkleft: String = "",
+    val checkright: String = "",
+    val onClickleft: () -> Unit = {},
+    val onClickright: () -> Unit = {},
+    val onClickCancel: () -> Unit = {},
+)
+
+data class CustomTitleCheckDialogState(
+    val title: String = "",
+    val description: String = "",
+    val checkleft: String = "",
+    val checkright: String = "",
+    val onClickleft: () -> Unit = {},
+    val onClickright: () -> Unit = {},
+    val onClickCancel: () -> Unit = {},
+)
+
 
 //제목없는 선택형 다이얼로그
 @HiltViewModel
