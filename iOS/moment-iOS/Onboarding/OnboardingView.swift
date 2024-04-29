@@ -18,7 +18,8 @@ struct OnboardingView: View {
     @State private var showingCustomAlert = false
     @StateObject private var cardviewModel = CardViewModel()
     //@StateObject private var viewModel = OnboardingViewModel()
-        @State private var currentPage = 0
+    @State private var currentPage = 0
+   // @State var cardItem : CardItem1
     
     var body: some View {
         

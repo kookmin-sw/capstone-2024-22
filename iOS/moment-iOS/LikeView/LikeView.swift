@@ -157,10 +157,10 @@ struct AccordionLikeView: View {
         VStack {
             Spacer().frame(height: 40)
             locationAndTimeInfo
-            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, longText: "\(cardItem.exampleText)")
-            DynamicGradientImagePicker()
+            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItem.stt)")
+            DynamicGradientImagePicker(cardViewModel: cardViewModel)
             Spacer().frame(height: 30)
-            EmotionView()
+            EmotionView(cardViewModel: cardViewModel)
         }
     }
     
@@ -178,10 +178,10 @@ struct AccordionLikeView: View {
         }
         HStack {
             Image("CardTime")
-            Text(cardItem.date).font(.pretendardMedium11)
+            Text(cardItem.recordedAt).font(.pretendardMedium11)
             Spacer()
             CustomCarbarDivider()
-            Text(cardItem.time).font(.pretendardMedium11)
+            Text(cardItem.recordedAt).font(.pretendardMedium11)
         }
     }
 }
@@ -206,7 +206,7 @@ struct HeaderLikeView: View {
                     
                     
                 }
-                Text("\(cardItem.time)") // 타이틀 예시
+                Text("\(cardItem.recordedAt)") // 타이틀 예시
                     .foregroundColor(.black)
                     .font(.pretendardExtrabold14)
                 Spacer()
@@ -244,11 +244,12 @@ struct HeaderLikeView: View {
 struct DynamicGradientRectangleLikeView: View {
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     let longText: String
+    @ObservedObject var cardViewModel: CardViewModel
     
     var body: some View {
         //ScrollView {
         VStack {
-            AudioPlayerControls(audioRecorderManager: audioRecorderManager)
+            AudioPlayerControls(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
                 .padding()
             
             Text(longText)

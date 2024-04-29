@@ -42,4 +42,7 @@ extension Date {
         return formatter.string(from: self)
         //여기는 보이스레코더 부분에 사용할 현재날짜와 시간에 대한 내용이 들어가있다.
     }
+   
+
 }
+

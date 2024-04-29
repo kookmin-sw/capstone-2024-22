@@ -27,6 +27,7 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
     var locationManager = CLLocationManager()
     @Published var currentLocation: CLLocation?
     @Published var currentAddress: String?
+    
 
     var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxMDkzMDMyMCwiZXhwIjoxNzU0MTMwMzIwfQ.mVy33lNv-by6bWXshsT4xFOwZSWGkOW76GWimliqHP4"
     
@@ -35,8 +36,15 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
             locationManager.delegate = self
             locationManager.requestWhenInUseAuthorization()  // 사용자에게 위치 정보 사용 권한을 요청
         }
+    
+    func iso8601String(from date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)  // UTC 시간대 사용
+        return formatter.string(from: date)
+    }
     func startRecording() {
-       // locationManager.startUpdatingLocation()
+        locationManager.startUpdatingLocation()
         //굳이 시작할때부터 계속 위치를 업데이트할 필요없음
         
         let fileURL = getDocumentsDirectory().appendingPathComponent("recording-\(Date().timeIntervalSince1970).m4a")// 녹음 파일 저장 경로 설정
@@ -57,7 +65,7 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
             print("녹음 중 오류 발생: \(error.localizedDescription)")
         }
     }
-    
+
     func stopRecording() {
         locationManager.stopUpdatingLocation()
         audioRecorder?.stop()
@@ -77,7 +85,6 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
                     try fileManager.removeItem(at: newFileURL)
                 }
                 try fileManager.moveItem(at: url, to: newFileURL)
-                print("File moved to \(newFileURL.path)")
                 
                 let group = DispatchGroup()
                 var finalTemperature: String?
@@ -98,11 +105,12 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
                 }
                 
                 group.notify(queue: .main) {
+                    let recordedAt = self.iso8601String(from: Date())
                     if let temperature = finalTemperature, let weather = finalWeather, let address = finalAddress {
-                        self.uploadRecordedData(recordFileURL: newFileURL, location: address, recordedAt: DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .short), temperature: temperature, weather: weather, question: "오늘 날씨는 어때요?")
-                        print("데이터가 성공적으로 업로드 되었습니다.")
+                        print("Date: \(recordedAt), Location: \(address), Temperature: \(temperature), Weather: \(weather)")
+                        self.uploadRecordedData(recordFileURL: newFileURL, location: address, recordedAt: recordedAt, temperature: temperature, weather: weather, question: "오늘 날씨는 어때요?")
                     } else {
-                        print("데이터 전송이 실패하였습니다")
+                        print("Failed to fetch all required data.")
                     }
                 }
             } catch {
@@ -302,3 +310,59 @@ extension AudioRecorderManager {
         }
     }
 }
+
+
+
+
+//    func stopRecording() {
+//        locationManager.stopUpdatingLocation()
+//        audioRecorder?.stop()
+//
+//        if let url = audioRecorder?.url, let location = currentLocation {
+//            self.recordedFiles.append(url)
+//            self.isRecording = false
+//
+//            let fileManager = FileManager.default
+//            let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+//            let recordingsDirectory = documentsDirectory.appendingPathComponent("Recordings")
+//
+//            do {
+//                try fileManager.createDirectory(at: recordingsDirectory, withIntermediateDirectories: true, attributes: nil)
+//                let newFileURL = recordingsDirectory.appendingPathComponent(url.lastPathComponent)
+//                if fileManager.fileExists(atPath: newFileURL.path) {
+//                    try fileManager.removeItem(at: newFileURL)
+//                }
+//                try fileManager.moveItem(at: url, to: newFileURL)
+//                print("File moved to \(newFileURL.path)")
+//
+//                let group = DispatchGroup()
+//                var finalTemperature: String?
+//                var finalWeather: String?
+//                var finalAddress: String?
+//
+//                group.enter()
+//                fetchWeatherData(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { temperature, weather in
+//                    finalTemperature = temperature
+//                    finalWeather = weather
+//                    group.leave()
+//                }
+//
+//                group.enter()
+//                geocodeLocation(location: location) { address in
+//                    finalAddress = address
+//                    group.leave()
+//                }
+//
+//                group.notify(queue: .main) {
+//                    if let temperature = finalTemperature, let weather = finalWeather, let address = finalAddress {
+//                        self.uploadRecordedData(recordFileURL: newFileURL, location: address, recordedAt: DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .short), temperature: temperature, weather: weather, question: "오늘 날씨는 어때요?")
+//                        print("데이터가 성공적으로 업로드 되었습니다.")
+//                    } else {
+//                        print("데이터 전송이 실패하였습니다")
+//                    }
+//                }
+//            } catch {
+//                print("Failed to create directory or move file: \(error)")
+//            }
+//        }
+//    }

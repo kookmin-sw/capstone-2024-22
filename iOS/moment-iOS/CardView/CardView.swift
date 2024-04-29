@@ -10,6 +10,7 @@ import SwiftUI
 struct CardView: View {
     var day: Date
     var item: Item
+   
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @State private var isDeleteMode = false // 삭제 모드 상태
@@ -27,6 +28,7 @@ struct CardView: View {
                 ZStack {
                     
                     VStack {
+                        
                         HStack {
                             Button(action: {
                                 // "뒤로" 버튼의 액션: 현재 뷰를 종료
@@ -101,7 +103,7 @@ struct CardView: View {
                     
                     
                 }.background(Color.homeBack)
-                
+                   
             }
             if showConfirmationDialog {
                 CustomConfirmationDialog(
@@ -124,7 +126,11 @@ struct CardView: View {
         }
         .navigationBarBackButtonHidden(true)
         
-        
+        .onAppear {
+            print("뷰 나타남 ")
+            cardViewModel.fetchAllCardViews()
+            // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
+        }
         
     }
 }
@@ -196,13 +202,16 @@ struct CustomConfirmationDialog: View {
         .onTapGesture {
             // 배경 탭시 다이얼로그 닫기 (선택적)
         }
+        
     }
+    
     func close() {
         withAnimation(.spring()) {
             offset = 1000
             isActive = false
         }
     }
+    
 }
 
 struct AccordionView: View {
@@ -235,7 +244,7 @@ struct AccordionView: View {
                 DisclosureGroup(isExpanded: $isExpanded) {
                     contentVStack
                 } label: {
-                    HeaderView(isExpanded: $isExpanded, cardItem: cardItem)
+                    HeaderView(isExpanded: $isExpanded, cardItem: cardItem, cardViewModel: cardViewModel)
                 }
                 .accentColor(.black)
                 
@@ -256,7 +265,11 @@ struct AccordionView: View {
         }
         
         .animation(.default, value: isEditing) // 편집 모드 변화에 따른 애니메이션
+        .onAppear {
+            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
+                    }
     }
+    
     
     
     
@@ -268,11 +281,14 @@ struct AccordionView: View {
         VStack {
             Spacer().frame(height: 40)
             locationAndTimeInfo
-            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, longText: "\(cardItem.exampleText)")
-            DynamicGradientImagePicker()
+            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItem.stt)")
+            DynamicGradientImagePicker(cardViewModel: cardViewModel)
             Spacer().frame(height: 30)
-            EmotionView()
+            EmotionView(cardViewModel: cardViewModel)
         }
+        .onAppear {
+            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
+                    }
     }
     
     // 위치 및 시간 정보를 보여주는 HStack을 별도의 ViewBuilder로 추출
@@ -289,11 +305,15 @@ struct AccordionView: View {
         }
         HStack {
             Image("CardTime")
-            Text(cardItem.date).font(.pretendardMedium11)
+            Text(cardItem.recordedAt).font(.pretendardMedium11)
+            //날짜부가 들어가야함
             Spacer()
             CustomCarbarDivider()
-            Text(cardItem.time).font(.pretendardMedium11)
+            Text(cardItem.recordedAt).font(.pretendardMedium11) // 시간부만 들어가야함
         }
+        .onAppear {
+            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
+                    }
     }
 }
 
@@ -305,6 +325,7 @@ struct HeaderView: View {
     @Binding var isExpanded: Bool
     @State private var isHeartFilled = false // 하트가 채워졌는지 여부
     var cardItem: CardItem1
+    @ObservedObject var cardViewModel: CardViewModel
     var body: some View {
         VStack{
             HStack {
@@ -315,7 +336,7 @@ struct HeaderView: View {
                     Image(isHeartFilled ? "HeartFill" : "HeartEmpty")
                     
                 }
-                Text("\(cardItem.time)") // 타이틀 예시
+                Text("\(cardItem.recordedAt)") // 타이틀 예시
                     .foregroundColor(.black)
                     .font(.pretendardExtrabold14)
                 Spacer()
@@ -347,17 +368,23 @@ struct HeaderView: View {
                 }
             }
         }
+        .onAppear {
+            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
+                    }
     }
 }
 
+
+
 struct DynamicGradientRectangleView: View {
     @ObservedObject var audioRecorderManager: AudioRecorderManager
+    @ObservedObject var cardViewModel: CardViewModel
     let longText: String
     
     var body: some View {
         //ScrollView {
         VStack {
-            AudioPlayerControls(audioRecorderManager: audioRecorderManager)
+            AudioPlayerControls(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
                 .padding()
             
             Text(longText)
@@ -371,14 +398,18 @@ struct DynamicGradientRectangleView: View {
         // .padding(.horizontal,3)
         .frame(width: 340)
         //}
+        .onAppear {
+            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
+                    }
     }
+    
 }
 
 struct DynamicGradientImagePicker: View {
     @State private var showingImagePicker = false
     @State private var showingAddButton = false // 처음에는 추가 버튼이 보이지 않음
     @State private var selectedImages: [UIImage?] = []
-    
+    @ObservedObject var cardViewModel: CardViewModel
     var body: some View {
         VStack {
             
@@ -461,6 +492,7 @@ struct DynamicGradientImagePicker: View {
 //CustomEmotionViewDivider()
 
 struct EmotionView: View {
+    @ObservedObject var cardViewModel: CardViewModel
     var body: some View {
         VStack {
             HStack{
@@ -481,6 +513,9 @@ struct EmotionView: View {
             emotionRow(imageName: "sad", emotionText: "슬퍼요", progressValue: 0.05, percentage: "5%")
         }
         .padding(.horizontal, 1) // HStack에 패딩을 적용하여 내용이 화면 가장자리에 붙지 않도록 합니다.
+        .onAppear {
+            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
+                    }
     }
     
     @ViewBuilder
@@ -510,6 +545,9 @@ struct EmotionView: View {
             
             // Spacer() // 오른쪽에 Spacer를 추가하여 모든 요소를 왼쪽으로 정렬합니다.
         }
+        .onAppear {
+            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
+                    }
     }
     private func getColorForEmotion(emotionText: String) -> Color {
         switch emotionText {
@@ -530,7 +568,7 @@ struct EmotionView: View {
 
 struct AudioPlayerControls: View {
     @ObservedObject var audioRecorderManager: AudioRecorderManager
-    
+    @ObservedObject var cardViewModel: CardViewModel
     var body: some View {
         // 녹음 파일 재생 관련 UI 구성
         // 예시: 재생, 정지 버튼 등
@@ -550,7 +588,9 @@ struct AudioPlayerControls: View {
                 }
             }
             Spacer()
-        }
+        }.onAppear {
+            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
+                    }
         
     }
 }
