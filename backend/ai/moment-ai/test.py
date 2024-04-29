@@ -5,6 +5,7 @@ import pandas as pd
 import sys, os
 # print(os.getcwd())
 print(sys.path)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__name__), 'whisper')))
 import whisper.whisper as whisper
 import argparse
 import json, torch
@@ -18,6 +19,7 @@ import fairseq
 
 from funasr import AutoModel
 from pydub import AudioSegment
+print(sys.path)
 
 @dataclass
 class UserDirModule:
