@@ -10,6 +10,7 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 
@@ -33,8 +34,18 @@ class ApplicationClass: Application() {
             applicationContext.getSharedPreferences("TOKEN", MODE_PRIVATE)
 
         initRetrofitInstance()
+//        디버그 모드일 때 적용
+//        if (BuildConfig.DEBUG) {
+//            Timber.plant(Timber.DebugTree())
+//        }
 
 
+        if(true){
+            Timber.plant(Timber.DebugTree())
+            Timber.i("ApplicationClass Success")
+        }else{
+//            Timber.plant(ReleaseTree())
+        }
     }
 
 
