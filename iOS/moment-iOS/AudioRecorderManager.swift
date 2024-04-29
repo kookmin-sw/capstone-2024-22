@@ -36,7 +36,8 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
             locationManager.requestWhenInUseAuthorization()  // 사용자에게 위치 정보 사용 권한을 요청
         }
     func startRecording() {
-        locationManager.startUpdatingLocation()
+       // locationManager.startUpdatingLocation()
+        //굳이 시작할때부터 계속 위치를 업데이트할 필요없음
         
         let fileURL = getDocumentsDirectory().appendingPathComponent("recording-\(Date().timeIntervalSince1970).m4a")// 녹음 파일 저장 경로 설정
         //녹음설정하기
@@ -59,68 +60,57 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
     
     func stopRecording() {
         locationManager.stopUpdatingLocation()
-        // 위치 정보 업데이트 중지
         audioRecorder?.stop()
-        //녹음중지
         
-        if let url = audioRecorder?.url, let location = currentLocation {  // 녹음 파일이 존재하고, 위치 정보가 있을 경우 처리
-            // 녹음 파일 배열에 추가
+        if let url = audioRecorder?.url, let location = currentLocation {
             self.recordedFiles.append(url)
-            // 녹음 상태 업데이트
             self.isRecording = false
             
-            // 파일을 적절한 디렉토리로 이동
             let fileManager = FileManager.default
             let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
             let recordingsDirectory = documentsDirectory.appendingPathComponent("Recordings")
             
-            do {  // 디렉토리 생성
-                // "Recordings" 폴더가 없으면 생성
-                try fileManager.createDirectory(at: recordingsDirectory, withIntermediateDirectories: true, attributes: nil)
-            } catch {
-                print("Failed to create directory: \(error)")
-            }
-            
-            let newFileURL = recordingsDirectory.appendingPathComponent(url.lastPathComponent)  // 녹음 파일 이동
             do {
+                try fileManager.createDirectory(at: recordingsDirectory, withIntermediateDirectories: true, attributes: nil)
+                let newFileURL = recordingsDirectory.appendingPathComponent(url.lastPathComponent)
                 if fileManager.fileExists(atPath: newFileURL.path) {
-                    // 동일한 이름의 파일이 이미 있으면 삭제
                     try fileManager.removeItem(at: newFileURL)
                 }
-                // 파일 이동
                 try fileManager.moveItem(at: url, to: newFileURL)
                 print("File moved to \(newFileURL.path)")
-            } catch {
-                print("Failed to move file: \(error)")
-            }
-
-            // 날씨 데이터 가져오기
-//            fetchWeatherData(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { temperature, weather in
-                // 날씨 데이터와 주소 정보 가져오기
-                // 주소 가져오기
-//                self.geocodeLocation(location: location) { address in
-                    let formattedDate = DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .short)
-                    
-//                    print("Temperature: \(temperature)")
-//                    print("Weather: \(weather)")
-//                    print("Address: \(address ?? "No address found")")
-                    print("Recorded At: \(formattedDate)")
-                    // 서버에 업로드
-                    DispatchQueue.main.async {
-//                        if let address = address {
-                            self.uploadRecordedData(recordFileURL: newFileURL, location: "address", recordedAt: "2024-02-08T14:30:00", temperature: "temperature", weather: "weather", question: "오늘 날씨는 어때요?")
-                            print("여기까지 흘러옴")
-//                        } else {
-//                            print("주소 정보가 없어서 데이터를 전송할 수 없습니다.")
-//                        }
-                   
-//                    }
-                    
-//                }
                 
+                let group = DispatchGroup()
+                var finalTemperature: String?
+                var finalWeather: String?
+                var finalAddress: String?
+                
+                group.enter()
+                fetchWeatherData(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { temperature, weather in
+                    finalTemperature = temperature
+                    finalWeather = weather
+                    group.leave()
+                }
+                
+                group.enter()
+                geocodeLocation(location: location) { address in
+                    finalAddress = address
+                    group.leave()
+                }
+                
+                group.notify(queue: .main) {
+                    if let temperature = finalTemperature, let weather = finalWeather, let address = finalAddress {
+                        self.uploadRecordedData(recordFileURL: newFileURL, location: address, recordedAt: DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .short), temperature: temperature, weather: weather, question: "오늘 날씨는 어때요?")
+                        print("데이터가 성공적으로 업로드 되었습니다.")
+                    } else {
+                        print("데이터 전송이 실패하였습니다")
+                    }
+                }
+            } catch {
+                print("Failed to create directory or move file: \(error)")
             }
         }
     }
+
 
 
     
@@ -180,30 +170,33 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
 
     
     
-    func fetchWeatherData(latitude: Double, longitude: Double, completion: @escaping (String, String) -> Void) {
-        let apiKey = "040a03e00601edb517a2b4ba4ce5550d" // 여기에 발급받은 API 키를 입력하세요.
+    func fetchWeatherData(latitude: Double, longitude: Double, completion: @escaping (String?, String?) -> Void) {
+        let apiKey = "040a03e00601edb517a2b4ba4ce5550d"
         let urlString = "https://api.openweathermap.org/data/2.5/weather?lat=\(latitude)&lon=\(longitude)&appid=\(apiKey)&units=metric"
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
+            completion(nil, nil)
             return
         }
 
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data, error == nil else {
                 print("Error fetching weather data: \(error?.localizedDescription ?? "Unknown error")")
+                completion(nil, nil)
                 return
             }
 
-            do {
-                // JSON 데이터를 파싱합니다.
-                let json = try JSONSerialization.jsonObject(with: data, options: [])
-                print("Weather Data: \(json)")
-            } catch {
-                print("Failed to decode weather data: \(error.localizedDescription)")
+            let weatherData = self.parseWeatherData(data: data)
+            if let temperature = weatherData?.temperature, let weather = weatherData?.weather {
+                completion(temperature, weather)
+            } else {
+                completion(nil, nil)
             }
         }
         task.resume()
     }
+
+    
     
     func parseWeatherData(data: Data) -> (temperature: String, weather: String)? {
         do {
