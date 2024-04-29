@@ -27,6 +27,7 @@ public class S3Service {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+    private final String s3folderPath = "users/";
 
     public String uploadFile(MultipartFile image, Long userId, String fileName, boolean isRecord) throws IOException {
         this.validateImageFileExtention(image.getOriginalFilename());
@@ -37,7 +38,7 @@ public class S3Service {
         }
     }
     public String uploadToS3(MultipartFile image, Long userId, String fileName, boolean isRecord) throws IOException {
-        String s3FileName = "users/" + userId.toString() + "/" + fileName; //S3에 저장될 파일 명
+        String s3FileName = s3folderPath + userId.toString() + "/" + fileName; //S3에 저장될 파일 명
         String extention = Objects.requireNonNull(image.getOriginalFilename()).substring(image.getOriginalFilename().lastIndexOf("."));
 
         InputStream is = image.getInputStream();
@@ -58,7 +59,7 @@ public class S3Service {
             //S3로 putObject 할 때 사용할 요청 객체
             //생성자 : bucket 이름, 파일 명, byteInputStream, metadata
             PutObjectRequest putObjectRequest =
-                    new PutObjectRequest(bucket, s3FileName + extention, byteArrayInputStream, metadata)
+                    new PutObjectRequest(bucket, s3FileName, byteArrayInputStream, metadata)
                             .withCannedAcl(CannedAccessControlList.PublicRead);
 
             //실제로 S3에 이미지 데이터를 넣는 부분이다.
@@ -87,7 +88,7 @@ public class S3Service {
     }
 
     public void deleteFile(String originalFilename)  {
-        amazonS3.deleteObject(bucket, originalFilename);
+        amazonS3.deleteObject(bucket, s3folderPath + originalFilename);
     }
 
     public void createFolder(String folderName) {
