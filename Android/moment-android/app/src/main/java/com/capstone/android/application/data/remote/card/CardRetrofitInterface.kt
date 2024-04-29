@@ -3,8 +3,8 @@ package com.capstone.android.application.data.remote.card
 import com.capstone.android.application.data.remote.card.model.card_modify.request.PutCardModifyRequest
 import com.capstone.android.application.data.remote.card.model.card_post.response.PostCardUploadResponse
 import com.capstone.android.application.domain.response.ApiResponse
-import com.capstone.android.application.domain.response.card.CardResponse
 import com.capstone.android.application.domain.response.MomentResponse
+import com.capstone.android.application.domain.response.card.CardResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -34,7 +34,7 @@ interface CardRetrofitInterface {
     @GET("/core/cardView/all/{tripFileId}")
     suspend fun getCardAll(
         @Path(value = "tripFileId") tripFileId:Int
-    ):Response<CardResponse>
+    ):ApiResponse<CardResponse>
 
     @PUT("/core/cardView/{cardViewId}")
     suspend fun putCardModify(

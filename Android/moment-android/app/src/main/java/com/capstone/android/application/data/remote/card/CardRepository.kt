@@ -3,8 +3,8 @@ package com.capstone.android.application.data.remote.card
 import com.capstone.android.application.data.remote.card.model.card_modify.request.PutCardModifyRequest
 import com.capstone.android.application.data.remote.card.model.card_post.response.PostCardUploadResponse
 import com.capstone.android.application.domain.response.ApiResponse
-import com.capstone.android.application.domain.response.card.CardResponse
 import com.capstone.android.application.domain.response.MomentResponse
+import com.capstone.android.application.domain.response.card.CardResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -29,7 +29,7 @@ class CardRepository @Inject constructor(private val cardRetrofitInterface: Card
 
     override suspend fun getCardAll(
         tripFileId:Int
-    ): Response<CardResponse> {
+    ): ApiResponse<CardResponse> {
         return cardRetrofitInterface.getCardAll(tripFileId = tripFileId)
     }
 
