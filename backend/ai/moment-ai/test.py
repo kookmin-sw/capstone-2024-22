@@ -32,7 +32,7 @@ parser = argparse.ArgumentParser()
 # parser.add_argument('--source-path', default="/Users/jykim/Desktop/moment/files", help="target directory path")
 parser.add_argument('--source-path', default="./source", help="target directory path")
 parser.add_argument('--file-path', default=None, help="target file path")
-parser.add_argument('--whisper-version', default="tiny", choices=["tiny", "base", "small", "medium", "large", "large-v2", "large-v3"], help="whisper model version")
+parser.add_argument('--whisper-version', default="large-v2", choices=["tiny", "base", "small", "medium", "large", "large-v2", "large-v3"], help="whisper model version")
 parser.add_argument('--save-path', default=None, help="save output(json) directory path")
 parser.add_argument('--granularity', type=str, default="utterance", help='which granularity to use, frame or utterance')
 
