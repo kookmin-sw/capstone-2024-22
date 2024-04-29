@@ -10,22 +10,20 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 
 @HiltAndroidApp
-
 class ApplicationClass: Application() {
     companion object{
         lateinit var tokenSharedPreferences: SharedPreferences
 
         lateinit var retrofit: Retrofit
         lateinit var retrofitKakao: Retrofit
-        val NAVER_MAP_CLIENT_ID="xnmlzv4mhr"
 
-        val API_URL="http://121.88.137.95:8080/"
+        val API_URL="http://wasuphj.synology.me:8000/"
         val KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/"
-        val API_URL_GOOGLE="https://www.googleapis.com"
     }
 
 
@@ -36,8 +34,18 @@ class ApplicationClass: Application() {
             applicationContext.getSharedPreferences("TOKEN", MODE_PRIVATE)
 
         initRetrofitInstance()
+//        디버그 모드일 때 적용
+//        if (BuildConfig.DEBUG) {
+//            Timber.plant(Timber.DebugTree())
+//        }
 
 
+        if(true){
+            Timber.plant(Timber.DebugTree())
+            Timber.i("ApplicationClass Success")
+        }else{
+//            Timber.plant(ReleaseTree())
+        }
     }
 
 
@@ -57,7 +65,7 @@ class ApplicationClass: Application() {
             proceed(
                 request()
                     .newBuilder()
-                    .addHeader("Authorization", "Bearer ${tokenSharedPreferences.getString("TOKEN","")}")
+                    .addHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxMDkzMDMyMCwiZXhwIjoxNzU0MTMwMzIwfQ.mVy33lNv-by6bWXshsT4xFOwZSWGkOW76GWimliqHP4")
                     .build()
             )
         }

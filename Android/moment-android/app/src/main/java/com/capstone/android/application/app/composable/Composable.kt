@@ -1,9 +1,9 @@
 package com.capstone.android.application.app.composable
 
 import android.util.Log
+import android.widget.CalendarView
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -29,11 +29,16 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
+import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -67,11 +72,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import androidx.core.graphics.toColorInt
 import com.capstone.android.application.ui.theme.ApplicationTheme
+import com.capstone.android.application.ui.theme.FontMoment
 import com.capstone.android.application.ui.theme.HintText
 import com.capstone.android.application.ui.theme.P_ExtraBold16
 import com.capstone.android.application.ui.theme.P_Medium14
@@ -83,7 +90,9 @@ import com.capstone.android.application.ui.theme.neutral_100
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.tertiary_500
+import java.text.SimpleDateFormat
 import kotlin.math.roundToInt
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -344,6 +353,208 @@ fun FancyProgressBar(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String>,endDate:MutableState<String>,onClicked: () -> Unit){
+
+    val dateFormat = SimpleDateFormat("yyyy-MM-HH")
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = Color("#FBFAF7".toColorInt())),
+            topBar = {
+                TopAppBar(
+                    actions = {
+
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    title = {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Spacer(modifier = Modifier.width(20.dp))
+
+                            androidx.compose.material.Text(
+                                modifier = Modifier
+                                    .clickable {
+                                    },
+                                text = "취소",
+                                fontFamily = FontMoment.obangFont,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                color = Color.Black
+                            )
+                            Spacer(Modifier.weight(1f))
+                            androidx.compose.material.Text(
+                                modifier = Modifier
+                                    .clickable {
+                                        if(tripName.value.isNotEmpty() && startDate.value!="츨발 날짜" && endDate.value!="도착 날짜"){
+                                            onClicked()
+                                        }
+                                    },
+                                text = "완료",
+                                fontFamily = FontMoment.obangFont,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                color = if(tripName.value.isNotEmpty() && startDate.value!="츨발 날짜" && endDate.value!="도착 날짜") Color.Black else Color("#938F8F".toColorInt())
+                            )
+                            Spacer(modifier = Modifier.width(40.dp))
+                        }
+
+                    }
+
+                )
+            }
+        ){ innerPadding ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(horizontal = 26.dp)
+            ) {
+                val currentCalendarFocus = remember{
+                    mutableStateOf(-1)
+                }
+
+
+
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Divider(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = Color("#706969".toColorInt()),
+                        thickness = 2.dp
+                    )
+                    Spacer(modifier = Modifier.height(60.dp))
+                    TextField(
+                        textStyle = LocalTextStyle.current.copy(
+                            textAlign = TextAlign.Center,
+                            fontSize = 16.sp,
+                            color = Color.Black
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        value = tripName.value, onValueChange = {
+                            tripName.value = it
+                            Log.d("awegwagwea",it.toString())
+                                                                },
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Black,
+                            cursorColor = Color.Black
+                        ),
+                        placeholder = {
+                            androidx.compose.material.Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                text = "여행 파일의 이름은 13글자까지 가능해요",
+                                color = Color("#E7E6E6".toColorInt()),
+                                fontSize = 16.sp
+                            )
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Row {
+                        Column(
+                            modifier = Modifier
+                                .weight(0.5f)
+                                .background(color = if (currentCalendarFocus.value == 0) Color.White else Color.Transparent)
+                                .clickable {
+                                    currentCalendarFocus.value = 0
+                                }
+                            ,
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            androidx.compose.material.Text(
+                                text = startDate.value,
+                                fontSize = 16.sp,
+                                color = if(currentCalendarFocus.value==0) Color.Black else Color("#E7E6E6".toColorInt())
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Divider(
+                                thickness = 1.dp,
+                                color = if(currentCalendarFocus.value==0) Color.White else Color.Black
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(
+                            modifier = Modifier
+                                .weight(0.5f)
+                                .background(color = if (currentCalendarFocus.value == 0) Color.White else Color.Transparent)
+                                .clickable {
+                                    currentCalendarFocus.value = 1
+                                }
+                            ,
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            androidx.compose.material.Text(
+                                text = endDate.value,
+                                fontSize = 16.sp,
+                                color = if(currentCalendarFocus.value==1) Color.Black else Color("#E7E6E6".toColorInt())
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Divider(
+                                thickness = 1.dp,
+                                color = if(currentCalendarFocus.value==1) Color.White else Color.Black
+                            )
+                        }
+                    }
+
+                    AndroidView(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = Color.White),
+                        factory = { CalendarView(it) },
+                        update = {
+//                            if(startDate.value!="출발 날짜"){
+//                                val strDate: String = startDate.value
+//
+//                                val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+//                                val currentDay: Date = dateFormat.parse(strDate, ParsePosition(0))
+//                                val currentLong: Long = currentDay.getTime()
+//                                it.date = currentLong
+//                            }
+
+
+                            it.setOnDateChangeListener{calendarView,year,month,day->
+                                if(currentCalendarFocus.value == 0){
+                                    startDate.value = convertDateFormat(year=year,month=month+1,day=day)
+                                    it.minDate
+                                }else{
+                                    endDate.value = convertDateFormat(year=year,month=month+1,day=day)
+                                }
+                            }
+                        }
+                    )
+
+                }
+            }
+
+        }
+}
+
+fun convertDateFormat(year:Int , month:Int,day:Int):String{
+    var dateMonth = ""
+    var dateDay = ""
+    if(month<10){
+        dateMonth="0${month}"
+    }else{
+        dateMonth="${month}"
+    }
+
+    if(day<10){
+        dateDay="0${day}"
+    }else{
+        dateDay="${day}"
+    }
+
+    return "${year}-${dateMonth}-${dateDay}"
+}
 
 
 @Composable

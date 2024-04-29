@@ -31,7 +31,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -42,19 +41,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -63,6 +58,11 @@ import androidx.navigation.compose.rememberNavController
 import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
 import com.capstone.android.application.app.composable.MomentTextField
+import com.capstone.android.application.data.remote.auth.auth_code.request.PostAuthAuthCodeRequest
+import com.capstone.android.application.data.remote.auth.auth_code_confirm.request.PatchAuthAuthCodeConfirmRequest
+import com.capstone.android.application.data.remote.auth.change_password.request.PatchAuthChangePasswordRequest
+import com.capstone.android.application.data.remote.auth.login.request.PostAuthLoginRequest
+import com.capstone.android.application.presentation.AuthViewModel
 import com.capstone.android.application.presentation.CountViewModel
 import com.capstone.android.application.ui.theme.BigButton
 import com.capstone.android.application.ui.theme.CheckButton
@@ -73,7 +73,6 @@ import com.capstone.android.application.ui.theme.P_ExtraBold16
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
 import com.capstone.android.application.ui.theme.P_Medium18
-import com.capstone.android.application.ui.theme.P_SemiBold18
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
 import com.capstone.android.application.ui.theme.negative_600
@@ -81,10 +80,8 @@ import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.primary_500
 import com.capstone.android.application.ui.theme.tertiary_500
 import com.capstone.android.application.ui.theme.white
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 enum class OnboardingScreen(){
     Login,
@@ -98,13 +95,42 @@ enum class OnboardingScreen(){
     SignupComplete,
     AgreeDetail
 }
+
+@AndroidEntryPoint
 class OnboardingActivity:ComponentActivity() {
     lateinit var navController: NavHostController
-    @OptIn(ExperimentalMaterial3Api::class)
+    private val authViewModel : AuthViewModel by viewModels()
+    private var userId:Int=0
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initApi()
+
 
         setContent{
+            val authCode = remember {
+                mutableStateOf("")
+            }
+
+
+            val isLoginActivity = remember{
+                mutableStateOf(false)
+            }
+
+
+            val isEmaliWrite = remember{
+                mutableStateOf(false)
+            }
+
+            val isAuthCodeWrite = remember{
+                mutableStateOf(false)
+            }
+
+            val isFindPasswordWrite = remember {
+                mutableListOf(false)
+            }
+
             navController = rememberNavController()
 
             Scaffold(
@@ -120,16 +146,76 @@ class OnboardingActivity:ComponentActivity() {
                     composable(route=OnboardingScreen.Login.name){ Login() }
                     composable(route=OnboardingScreen.LoginComplete.name){ LoginComplete()}
                     composable(route=OnboardingScreen.Signup_email.name){ Signup_email() }
-                    composable(route=OnboardingScreen.Signup_number.name){ Signup_number() }
+                    composable(route=OnboardingScreen.Signup_number.name){
+                        Signup_number()
+                    }
                     composable(route=OnboardingScreen.Signup.name){ Signup() }
                     composable(route=OnboardingScreen.FindPassword.name){ FindPassword() }
-                    composable(route=OnboardingScreen.FindPassword_number.name){ FindPassword_number() }
-                    composable(route=OnboardingScreen.FindPassword_Signup.name){ FindPassword_Signup() }
+                    composable(route=OnboardingScreen.FindPassword_number.name){
+                        FindPassword_number(authCode)
+                    }
+                    composable(route=OnboardingScreen.FindPassword_Signup.name){
+                        FindPassword_Signup(code = authCode.value)
+                    }
                     composable(route=OnboardingScreen.SignupComplete.name){ SignupComplete() }
                     composable(route=OnboardingScreen.AgreeDetail.name){ AgreeDetail() }
                 }
             }
         }
+
+    }
+
+    private fun initApi(){
+        // 로그인 성공
+        authViewModel.postAuthLoginSuccess.observe(this@OnboardingActivity){ response->
+            Log.d("weaggawegew",response.toString())
+        }
+
+        // 로그인 실패
+        authViewModel.postAuthLoginFailure.observe(this@OnboardingActivity){ response->
+            Log.d("waegwgwae",response.toString())
+        }
+
+        // 인증코드 요청
+        authViewModel.postAuthAuthCodeSuccess.observe(this@OnboardingActivity){ response->
+            if(navController.currentDestination?.route == OnboardingScreen.Signup_email.name){
+                navController.navigate(OnboardingScreen.Signup_number.name)
+            }
+
+            if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
+                navController.navigate(OnboardingScreen.FindPassword_number.name)
+            }
+            userId=response.data.userId
+        }
+
+        // 인증코드 요청 실패
+        authViewModel.postAuthAuthCodeFailure.observe(this@OnboardingActivity){ response->
+
+        }
+
+        // 인증코드 확인
+        authViewModel.patchAuthAuthCodeConfirmSuccess.observe(this@OnboardingActivity){ response ->
+            navController.navigate(OnboardingScreen.Signup.name)
+        }
+
+        // 인증코드 확인 실패
+        authViewModel.patchAuthAuthCodeConfirmFailure.observe(this@OnboardingActivity){ response->
+
+        }
+
+        // 비밀번호 변경
+        authViewModel.patchAuthChangePasswordSuccess.observe(this@OnboardingActivity){ response->
+            navController.navigate(OnboardingScreen.Login.name)
+        }
+
+        // 비밀번호 변경 실패
+        authViewModel.patchAuthChangePasswordFailure.observe(this@OnboardingActivity){ response->
+
+        }
+
+
+
+
     }
 
     @SuppressLint("UnrememberedMutableState")
@@ -257,7 +343,19 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(bottom = 72.dp)
             ) {
                 if (id.value.isNotEmpty() && password.value.isNotEmpty()){
-                    BigButton("로그인하기", true, onClick = {navController.navigate(OnboardingScreen.LoginComplete.name)})
+
+                    BigButton("로그인하기", true,
+                        onClick = {
+                            authViewModel.postAuthLogin(
+                                body = PostAuthLoginRequest(
+                                    email = id.value,
+                                    password = password.value
+                                )
+                            )
+//                            navController.navigate(OnboardingScreen.LoginComplete.name)
+                        }
+                    )
+
                 }else{
                     BigButton("로그인하기", false, onClick = {startActivity(Intent(this@OnboardingActivity, MainActivity::class.java))})
                 }
@@ -313,7 +411,7 @@ class OnboardingActivity:ComponentActivity() {
 
         //bottomsheet
         val sheetState = rememberModalBottomSheetState()
-        var recordOpen = remember { mutableStateOf(false)}
+        val recordOpen = remember { mutableStateOf(false)}
 
         val agree1 = remember { mutableStateOf(false) }
         val agree2 = remember { mutableStateOf(false) }
@@ -422,7 +520,17 @@ class OnboardingActivity:ComponentActivity() {
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 72.dp),
             ) {if (email.value.isNotEmpty() && agree.value){
-                BigButton("다음", true) { navController.navigate(OnboardingScreen.Signup_number.name) }
+                BigButton(
+                    "다음", true
+                ) {
+                    authViewModel.postAuthAuthCode(
+                        body = PostAuthAuthCodeRequest(
+                            email = email.value,
+                            isSignUp = "true"
+                        )
+                    )
+
+                }
             }else{
                 BigButton("다음", false) { navController.navigate(OnboardingScreen.Signup_number.name) }            }
             }
@@ -540,7 +648,7 @@ class OnboardingActivity:ComponentActivity() {
 
         val timeLeft by countViewModel.timeLeft.collectAsState()
         val number = remember{mutableStateOf("")}
-        var signnumState = remember {mutableStateOf(true)}
+        val signnumState = remember {mutableStateOf(true)}
         val focusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
 
@@ -683,7 +791,15 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(bottom = 72.dp)
             ) {
                 if ( number.value.isNotEmpty()){
-                    BigButton("다음", true) { navController.navigate(OnboardingScreen.Signup.name) }
+                    BigButton("다음", true) {
+                        authViewModel.patchAuthAuthCodeConfirm(
+                            body = PatchAuthAuthCodeConfirmRequest(
+                                userId = userId.toString(),
+                                code = number.value
+                            )
+                        )
+
+                    }
                 }else{
                     BigButton("다음", false) { navController.navigate(OnboardingScreen.Signup.name) }
                 }
@@ -703,7 +819,7 @@ class OnboardingActivity:ComponentActivity() {
         val passwordcheck = remember{
             mutableStateOf("")
         }
-        var pwequel = remember{ mutableStateOf(true) }
+        val pwequel = remember{ mutableStateOf(true) }
         val focusManager = LocalFocusManager.current
         val focusRequester = remember { FocusRequester() }
 
@@ -916,7 +1032,15 @@ class OnboardingActivity:ComponentActivity() {
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 72.dp),
             ) {if (id.value.isNotEmpty()){
-                BigButton("다음", true) { navController.navigate(OnboardingScreen.FindPassword_number.name) }
+                BigButton("다음", true) {
+                    authViewModel.postAuthAuthCode(
+                        body = PostAuthAuthCodeRequest(
+                            email = id.value,
+                            isSignUp = "false"
+                        )
+                    )
+
+                }
             }else{
                 BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPassword_number.name) }            }
             }
@@ -924,10 +1048,8 @@ class OnboardingActivity:ComponentActivity() {
     }
 
     @Composable
-    fun FindPassword_number(){
-        val number = remember{
-            mutableStateOf("")
-        }
+    fun FindPassword_number(authCode:MutableState<String>){
+
         val findpwnumState = remember{
             mutableStateOf(true)
         }
@@ -988,9 +1110,9 @@ class OnboardingActivity:ComponentActivity() {
                 Spacer(modifier = Modifier.height(4.dp))
                 MomentTextField(
                     hint = "복구코드 6자리를 입력해주세요",
-                    onValueChanged = { number.value = it },
+                    onValueChanged = { authCode.value = it },
                     onClicked = {},
-                    text = number,
+                    text = authCode,
                     keyboardType = KeyboardType.Text,
                     changecolor = black,
                     focusRequester = focusRequester,
@@ -1062,8 +1184,11 @@ class OnboardingActivity:ComponentActivity() {
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 72.dp)
             ) {
-                if ( number.value.isNotEmpty()){
-                    BigButton("다음", true) { navController.navigate(OnboardingScreen.FindPassword_Signup.name) }
+                if ( authCode.value.isNotEmpty()){
+                    BigButton("다음", true) {
+
+                        navController.navigate(OnboardingScreen.FindPassword_Signup.name)
+                    }
                 }else{
                     BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPassword_Signup.name) }
                 }
@@ -1073,7 +1198,7 @@ class OnboardingActivity:ComponentActivity() {
     }
 
     @Composable
-    fun  FindPassword_Signup() {
+    fun  FindPassword_Signup(code:String) {
 
         val password = remember {
             mutableStateOf("")
@@ -1174,8 +1299,14 @@ class OnboardingActivity:ComponentActivity() {
                 if (password.value.isNotEmpty() && passwordcheck.value.isNotEmpty()) {
                     BigButton("로그인하기", true) {
                         if (password.value == passwordcheck.value) {
+                            authViewModel.patchAuthChangePassword(
+                                body = PatchAuthChangePasswordRequest(
+                                    code = code,
+                                    newPassword = password.value
+                                )
+                            )
                             pwequel.value = true
-                            navController.navigate(OnboardingScreen.Login.name)
+
                         } else {
                             pwequel.value = false
                         }

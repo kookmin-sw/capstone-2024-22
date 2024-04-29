@@ -2,8 +2,11 @@ package com.capstone.android.application.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,8 +25,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,15 +42,71 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import com.capstone.android.application.domain.Trip
+import com.capstone.android.application.domain.TripFile
+import com.capstone.android.application.presentation.TripFileViewModel
 import com.capstone.android.application.ui.theme.FontMoment
+import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
+import java.lang.Exception
 
+@AndroidEntryPoint
 class TripFileActivity:ComponentActivity() {
+    private val tripFileViewModel:TripFileViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val mainIntent = intent
+
+
+
 
         setContent {
+            val tripId = remember {
+                mutableStateOf(0)
+            }
+            val tripFileList = remember {
+                mutableStateListOf<TripFile>()
+            }
+            try {
+                mainIntent?.let {
+                    tripId.value = it.getIntExtra("tripId",0)
+                }
+            }catch (e: Exception){
+                Toast.makeText(this@TripFileActivity,"server error", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+
+            tripFileViewModel.getTripFileAll(
+                tripId = tripId.value
+            )
+            tripFileViewModel.getTripFileSuccess.observe(this@TripFileActivity){ response ->
+                Timber.i(response.toString())
+                response.data.tripFiles.mapNotNull { tripFile-> runCatching {
+                    TripFile(
+                        id = tripFile.id , tripId = tripFile.tripId,
+                        yearDate = tripFile.yearDate, analyzingCount = tripFile.analyzingCount
+                    )
+                    }.onSuccess {
+                        tripFileList.clear()
+                    }
+                    .onFailure {
+
+                    }
+                    .getOrNull()
+                }.forEach {
+                    tripFileList.add(it)
+                    Log.d("wegwaegaew",it.analyzingCount.toString())
+                }
+            }
+
+            tripFileViewModel.getTripFileFailure.observe(this@TripFileActivity){ error ->
+
+
+            }
+
+
             Scaffold(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -86,7 +149,7 @@ class TripFileActivity:ComponentActivity() {
                         .fillMaxSize()
                         .padding(paddingValues = innerPadding)
                 ) {
-                    Main()
+                    Main(tripFileList = tripFileList)
                 }
 
             }
@@ -94,7 +157,7 @@ class TripFileActivity:ComponentActivity() {
     }
 
     @Composable
-    fun Main(){
+    fun Main(tripFileList:MutableList<TripFile>){
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -131,11 +194,13 @@ class TripFileActivity:ComponentActivity() {
                     .padding(start = 16.dp, end = 4.dp)
             ){
                 items(
-                    count = 8,
+                    count = tripFileList.size,
                     itemContent = {index->
                         Column(
                             modifier = Modifier.clickable {
-                                startActivity(Intent(this@TripFileActivity,CardActivity::class.java))
+                                val intent = Intent(this@TripFileActivity,CardActivity::class.java)
+                                intent.putExtra("tripFileId",tripFileList[index].tripId)
+                                startActivity(intent)
                             } ,
                         ) {
                             Box(
@@ -163,7 +228,7 @@ class TripFileActivity:ComponentActivity() {
                                         Spacer(modifier = Modifier.height(4.dp))
 
                                         Text(
-                                            text = "2024.03.05",
+                                            text = tripFileList[index].yearDate,
                                             fontSize = 11.sp,
                                             fontFamily = FontMoment.preStandardFont,
                                             fontWeight = FontWeight.Medium,
@@ -183,7 +248,7 @@ class TripFileActivity:ComponentActivity() {
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "4개의 파일이 있어요",
+                                        text = "${tripFileList[index].analyzingCount}개의 파일이 있어요",
                                         fontSize = 11.sp,
                                         color = Color("#706969".toColorInt())
                                     )
@@ -215,6 +280,6 @@ class TripFileActivity:ComponentActivity() {
     @Preview
     @Composable
     fun TripFileActivityPreview(){
-        Main()
+//        Main()
     }
 }

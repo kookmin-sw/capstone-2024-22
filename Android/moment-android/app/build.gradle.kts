@@ -26,6 +26,14 @@ android {
     }
 
     buildTypes {
+
+//        배포 준비 할 때 디버그 모드와 릴리즈 모드 나누기
+//        debug {
+//            applicationIdSuffix = ".debug"
+//            isDebuggable = true
+//
+//        }
+
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -99,7 +107,7 @@ dependencies {
 
     val room_version = "2.5.0"
     implementation("androidx.room:room-runtime:$room_version")
-    annotationProcessor("androidx.room:room-compiler:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
 
     val hilt_version = "2.44"
     implementation("com.google.dagger:hilt-android:$hilt_version")
@@ -118,4 +126,7 @@ dependencies {
 
     // AsyncImage
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // Timber
+    implementation("com.jakewharton.timber:timber:5.0.1")
 }
