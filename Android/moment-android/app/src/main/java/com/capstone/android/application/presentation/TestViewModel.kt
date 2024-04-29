@@ -2,15 +2,18 @@ package com.capstone.android.application.presentation
 
 
 import android.util.Log
-import androidx.compose.runtime.State
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.math.max
 
 
@@ -64,4 +67,8 @@ class CountViewModel : ViewModel(){
         countdownJob?.cancel() // ViewModel이 제거될 때 카운트다운을 중지
     }
 }
+
+
+
+
 

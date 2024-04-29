@@ -27,6 +27,7 @@ import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,6 +41,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,6 +64,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,16 +73,19 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -88,8 +94,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.capstone.android.application.app.composable.CustomTitleCheckDialog
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.screen.BottomNavItem
+import com.capstone.android.application.data.local.Emotion
+import com.capstone.android.application.domain.CustomTitleCheckViewModel
+import com.capstone.android.application.ui.CardActivity
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.utile.AndroidAudioPlayer
 import com.capstone.android.application.app.utile.MomentAudioRecorder
@@ -106,13 +116,20 @@ import com.capstone.android.application.ui.TripFileActivity
 import com.capstone.android.application.ui.theme.ApplicationTheme
 import com.capstone.android.application.ui.theme.BigButton
 import com.capstone.android.application.ui.theme.FontMoment
+import com.capstone.android.application.ui.theme.P_ExtraBold
+import com.capstone.android.application.ui.theme.P_Medium
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
 import com.capstone.android.application.ui.theme.P_Medium18
+import com.capstone.android.application.ui.theme.P_Medium_Oneline
+import com.capstone.android.application.ui.theme.YJ_Bold
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
+import com.capstone.android.application.ui.theme.neutral_200
+import com.capstone.android.application.ui.theme.neutral_400
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
+import com.capstone.android.application.ui.theme.primary_200
 import com.capstone.android.application.ui.theme.primary_500
 import com.capstone.android.application.ui.theme.secondary_50
 import com.capstone.android.application.ui.theme.tertiary_500
@@ -286,18 +303,26 @@ class MainActivity : ComponentActivity() {
         val currentSelectedBottomRoute = remember{
             mutableStateOf("홈")
         }
-        //bottomsheet
+        //Record Bottomsheet
         val sheetState = rememberModalBottomSheetState(/*
             initialValue = ModalBottomSheetValue.Hidden,
             confirmStateChange = {false}*/
         )
-        var recordOpen = remember { mutableStateOf(false)}
+
+        val recordOpen = remember { mutableStateOf(false)}
+        var EditCheckState = remember { mutableStateOf(false) }
+        var ReceiptCheckState = remember { mutableStateOf(true) }
+
+        val viewModel: CustomTitleCheckViewModel = viewModel()
+        val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
 
         if(recordOpen.value) {
             RecordNavigatesheet(recordOpen,
                 sheetState = sheetState,
                 closeSheet = { recordOpen.value = false })
         }
+
+        val movenav = intent.getStringExtra("MoveScreen")
 
         Scaffold(
             modifier = Modifier
@@ -437,19 +462,72 @@ class MainActivity : ComponentActivity() {
 
 
                             navController.currentDestination.let {
-                                if(it==null || it.route=="Home"){
+                                when(it?.route){
+                                    null ->  " "
+                                    "Home" ->  " "
+                                    "Receipt" ->  " "
+                                    "ReceiptPost" ->
+                                        if(!EditCheckState.value){
+                                            Column(Modifier.clickable { navController.navigate(BottomNavItem.Receipt.screenRoute) }) {
+                                                Text(
+                                                    text = "뒤로",
+                                                    fontFamily = FontMoment.obangFont,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 15.sp)
+                                            }
+                                        }else{
+                                            Column(
+                                                Modifier
+                                                    .wrapContentSize()
+                                                    .clickable { EditCheckState.value = false }) {
+                                                YJ_Bold15(content = "완료", color = black)
+                                            }
+                                        }
+                                    "Favorite" -> " "
+                                    "Setting" ->  " "
+                                    else -> null
+                                }
+                            }
 
-                                }else{
-                                    Log.d("wegewag",it.route.toString())
-
-                                    Text(
-                                        text = "뒤로",
-                                        fontFamily = FontMoment.obangFont,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 15.sp
+                            Spacer(Modifier.weight(1f))
+                            Column() {
+                                Text(
+                                    modifier = Modifier
+                                        .clickable(enabled = if(title.value == "삭제" && !ReceiptCheckState.value) false else true) {
+                                            when(title.value){
+                                                "추가" -> {startActivity(Intent(this@MainActivity,PostTripActivity::class.java))}
+                                                "영수증 모아보기" -> {
+                                                    startActivity(Intent(this@MainActivity,MainActivity::class.java).putExtra("MoveScreen", "ReceiptPost"))
+                                                    /*navController.navigate(MainScreen.ReceiptPost.rootRoute)*/}
+                                                "작게보기" -> {}
+                                                "편집" -> { EditCheckState.value = true }
+                                                "삭제" ->
+                                                    viewModel.showCustomTitleCheckDialog()
+                                            }
+                                        },
+                                    text = title.value,
+                                    fontFamily = FontMoment.obangFont,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 15.sp,
+                                    color = if(title.value == "삭제"){
+                                        if(ReceiptCheckState.value) primary_500 else neutral_500
+                                    }  else black
+                                )
+                                if (CustomTitleCheckDialogState.title.isNotBlank()) {
+                                    CustomTitleCheckDialog(
+                                        title = CustomTitleCheckDialogState.title,
+                                        description = CustomTitleCheckDialogState.description,
+                                        checkleft = CustomTitleCheckDialogState.checkleft,
+                                        checkright = CustomTitleCheckDialogState.checkright,
+                                        onClickleft = {
+                                            CustomTitleCheckDialogState.onClickleft()
+                                            EditCheckState.value = false },
+                                        onClickright = { CustomTitleCheckDialogState.onClickright() },
+                                        onClickCancel = { CustomTitleCheckDialogState.onClickCancel() },
                                     )
                                 }
                             }
+
 
                             Spacer(Modifier.weight(1f))
                             Text(
@@ -469,6 +547,7 @@ class MainActivity : ComponentActivity() {
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp
                             )
+
                         }
 
                     }
@@ -478,7 +557,12 @@ class MainActivity : ComponentActivity() {
         ) { innerPadding ->
             NavHost(
                 navController,
-                startDestination = BottomNavItem.Home.screenRoute,
+                startDestination =
+                when(movenav){
+                    "Receipt" -> BottomNavItem.Receipt.screenRoute
+                    "ReceiptPost" -> MainScreen.ReceiptPost.screenRoute
+                    else -> BottomNavItem.Home.screenRoute
+                },
                 Modifier.padding(innerPadding)
             ) {
                 composable(BottomNavItem.Home.screenRoute) {
@@ -512,7 +596,8 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(MainScreen.ReceiptPost.screenRoute){
                     currentSelectedBottomRoute.value = MainScreen.ReceiptPost.rootRoute
-                    ReceiptPost()
+                    ReceiptPost(EditCheckState,ReceiptCheckState)
+                    if (EditCheckState.value) title.value = "삭제" else title.value = "편집"
                 }
 
                 composable(MainScreen.HomeTrip.screenRoute){
@@ -1062,24 +1147,125 @@ class MainActivity : ComponentActivity() {
                 painter = painterResource(id = R.drawable.test_image), contentDescription = "test"
             )
             Spacer(modifier = Modifier.height(8.dp))
-            BigButton("만들기", true,  onClick = {startActivity(Intent(this@MainActivity, ReciptActivity::class.java))})
+            BigButton("만들기", true,
+                onClick = {startActivity(Intent(this@MainActivity, ReciptActivity::class.java))})
 
         }
     }
 
     @Composable
-    fun ReceiptPost(){
+    fun ReceiptPost(EditCheckState: MutableState<Boolean>, ReceiptCheckState: MutableState<Boolean>) {
         //영수증 게시
-        Text(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable {
-                    navController.navigate(MainScreen.ReceiptPost.screenRoute)
-                },
-            text = "만들기",
-            textAlign = TextAlign.Center
-        )
+        val testList = mutableListOf<Int>(1,2,3,4,5,6,7,8,9,10,11)
+
+
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)) {
+
+            MyGrid(testList, 2, EditCheckState,ReceiptCheckState)
+        }
     }
+    @Composable
+    fun MyGrid(
+        content: List<Int>,
+        columnSize: Int,
+        EditCheckState: MutableState<Boolean>,
+        ReceiptCheckState: MutableState<Boolean>
+    ){
+        val rowsCount = 1 + (content.size -1)/columnSize // row 개수
+        BoxWithConstraints {
+            val maxWidth = this.maxWidth
+
+            LazyColumn {
+                items(rowsCount) { rowIndex ->
+                    val rangeStart = rowIndex*columnSize
+                    var rangeEnd = rangeStart + columnSize -1
+                    if (rangeEnd > content.lastIndex) rangeEnd = content.lastIndex // row로 표현될 list의 range를 계산, slice하여 row 생성
+                    RowOfGrid(content.slice(rangeStart..rangeEnd), maxWidth/columnSize, EditCheckState, ReceiptCheckState)
+                }
+            }
+
+        }
+    }
+
+    @SuppressLint("UnrememberedMutableState")
+    @Composable
+    fun RowOfGrid(
+        rowList: List<Int>,
+        columnWidth: Dp,
+        EditCheckState: MutableState<Boolean>,
+        ReceiptCheckState: MutableState<Boolean>
+    ) {
+        val interactionSource = remember { MutableInteractionSource() }
+
+        var intent = Intent(this@MainActivity, ReciptActivity::class.java)
+        intent.putExtra("MoveScreen", "ReceiptPost_Big")
+
+        LazyRow {
+            items(rowList.size) { index ->
+
+                val item = rowList[index]
+                Log.d("hihihi", "RowOfGrid: $item")
+                val checkState = rememberSaveable { mutableStateOf(false) }
+
+                Box( modifier = Modifier
+                    .width(columnWidth)
+                    .height(224.dp)
+                    .padding(horizontal = 25.dp, vertical = 8.dp)
+                    .background(Color.Gray)
+                    .clickable {
+                        if (!EditCheckState.value) {
+                            startActivity(intent)
+                        } else checkState.value = !checkState.value
+                    }) {
+
+                    //MiniTheme1()
+                    MiniTheme2()
+
+                    if (EditCheckState.value){
+                        Column(
+                            Modifier
+                                .padding(10.dp)
+                                .align(Alignment.BottomEnd)) {
+                            Column(
+                                Modifier
+                                    .size(32.dp)
+                                    .background(
+                                        if (!checkState.value) neutral_500 else white,
+                                        shape = RoundedCornerShape(3.dp)
+                                    )
+                                    .border(
+                                        0.5.dp, black,
+                                        shape = RoundedCornerShape(3.dp)
+                                    )
+                            ) {
+
+                            }
+                        }
+                        if(checkState.value){
+                            Column(
+                                Modifier
+                                    .padding(10.dp)
+                                    .align(Alignment.BottomEnd)) {
+                                Column(Modifier.size(32.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center) {
+                                    Image(
+                                        painter = painterResource(R.drawable.ic_receipt_check_red),
+                                        contentDescription = "장소",
+                                        Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     @Composable
     fun Record(){
@@ -1885,7 +2071,580 @@ class MainActivity : ComponentActivity() {
             }
     }
 
+    @SuppressLint("UnrememberedMutableState")
+    @Composable
+    fun MiniTheme1(){
+        val emotionList = mutableStateListOf<Emotion>()
 
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_common,
+                text = "평범해요",
+                persent = 60
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_happy,
+                text = "즐거워요",
+                persent = 20
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_angry,
+                text = "화가나요",
+                persent = 15
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_sad,
+                text = "슬퍼요 ",
+                persent = 5
+            )
+        )
+        emotionList.sortedByDescending { it.persent }
+        Box(
+            modifier = Modifier
+                .height(244.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 0.dp)
+                .background(
+                    color = white,
+                    shape = RoundedCornerShape(2.dp)
+                )
+                .border(
+                    BorderStroke((0.2).dp, black),
+                    shape = RoundedCornerShape(2.dp)
+                )
+        ) {
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Row(
+                    modifier = Modifier
+                        .height(17.7.dp)
+                        .fillMaxWidth()
+                        .background(
+                            color = primary_500,
+                            shape = RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp)
+                        )
+                        .padding(start = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    P_Medium("암스테르담 성당 여행", white , 5.sp)
+
+                    Image(
+                        modifier = Modifier
+                            .height(17.dp)
+                            .width(30.dp)
+                            .padding(end = 3.dp),
+                        painter = painterResource(R.drawable.img_logo_white),
+                        contentDescription = "로고 화이트"
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    P_Medium("여행의 기록을 한 줄로 기록하세요:)",neutral_500, 5.sp)
+
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 45.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_location_red),
+                    contentDescription = "장소",
+                    Modifier.size(5.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                P_Medium("북촌한옥마을",primary_500, 4.5.sp)
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 55.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                P_ExtraBold("서울", primary_500, 18.sp)
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 87.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_airplain_red),
+                    contentDescription = "장소",
+                    Modifier.size(19.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 116.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_location_red),
+                    contentDescription = "장소",
+                    Modifier.size(5.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                P_Medium("암스테르담 공항",primary_500, 4.5.sp)
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 123.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                P_ExtraBold("암스테르담", primary_500, 18.sp)
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 150.dp)
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.img_cutline_red),
+                    contentDescription = "가위",
+                    modifier = Modifier
+                        .height(7.dp)
+                        .fillMaxWidth()
+                )
+            }
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 14.dp, top = 160.dp)
+                    .align(Alignment.BottomCenter)
+            ) {
+                Column(
+                    Modifier
+                        .height(50.dp)
+                        .padding(end = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    P_Medium(content = "여행 카드", color = neutral_500, 4.sp)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    YJ_Bold(content = "27", color = primary_500, 5.sp)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    P_Medium(content = "여행 날짜", color = neutral_500, 4.sp)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    P_Medium(content = "2024.02.15", color = primary_500, 4.sp)
+                    P_Medium(content = "2024.02.15", color = primary_500, 4.sp)
+                }
+                Spacer(modifier = Modifier.width(15.dp))
+                Column() {
+                    P_Medium(content = "여행 감정", color = neutral_500, 4.sp)
+                    Spacer(modifier = Modifier.height(3.8.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            emotionList.forEachIndexed { index, item ->
+                                Row(
+                                    modifier = Modifier.height(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(
+                                        modifier = Modifier.width(40.dp)
+                                    )  {
+                                        LinearProgressIndicator(
+                                            progress = { item.persent.toFloat() / 100 },
+                                            modifier = Modifier.height(3.dp),
+                                            color = when (index) {
+                                                0 -> primary_500
+                                                1 -> neutral_600
+                                                2 -> neutral_400
+                                                3 -> neutral_200
+                                                else -> primary_500
+                                            },
+                                            strokeCap = StrokeCap.Round
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(4.2.dp))
+                                    Image(
+                                        modifier = Modifier.size(5.dp),
+                                        painter = painterResource(
+                                            id = Theme1_Emotion(
+                                                item.text,
+                                                index
+                                            )
+                                        ),
+                                        contentDescription = ""
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    P_Medium(
+                                        content = item.persent.toString() + "%",
+                                        color = when (index) {
+                                            0 -> primary_500
+                                            1 -> neutral_600
+                                            2 -> neutral_400
+                                            3 -> neutral_200
+                                            else -> primary_500
+                                        }, 4.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @SuppressLint("UnrememberedMutableState")
+    @Composable
+    fun MiniTheme2(){
+
+        val emotionList = mutableStateListOf<Emotion>()
+
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_common,
+                text = "평범해요",
+                persent = 60
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_happy,
+                text = "즐거워요",
+                persent = 20
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_angry,
+                text = "화가나요",
+                persent = 15
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_sad,
+                text = "슬퍼요 ",
+                persent = 5
+            )
+        )
+        emotionList.sortedByDescending { it.persent }
+        Box(
+            modifier = Modifier
+                .height(244.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 0.dp)
+                .background(
+                    color = white,
+                    shape = RoundedCornerShape(2.dp)
+                )
+                .border(
+                    BorderStroke((0.2).dp, neutral_500),
+                    shape = RoundedCornerShape(2.dp)
+                )
+        )
+        {
+            Column(
+                modifier = Modifier
+                    .width(3.74.dp)
+                    .padding(top = 15.dp)
+                    .fillMaxHeight()
+                    .background(
+                        color = primary_500,
+                        shape = RoundedCornerShape(bottomEnd = 2.dp)
+                    )
+                    .align(Alignment.BottomEnd)
+            ) {}
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 7.dp, start = 10.dp)
+            ) {
+                Column( modifier = Modifier
+                    .padding(start = 4.dp)) {
+                    P_Medium(content = "여행의 기록을 한 줄로 기록하세요:)", color = neutral_500, 5.sp)
+                }
+                Spacer(modifier = Modifier.height(2.dp))
+                Divider(color = primary_500, thickness = 1.dp)
+                P_Medium_Oneline(
+                    " 티켓이 발행된 날짜는 2024 02 15 입니다. " +
+                            "티켓이 발행된 날짜는 2024 02 15 입니다. " +
+                            "티켓이 발행된 날짜는 2024 02 15 입니다. " +
+                            "티켓이 발행된 날짜는 2024 02 15 입니다. ", primary_200, 3.sp
+                )
+                Spacer(modifier = Modifier.height(15.dp))
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_location_grey),
+                            contentDescription = "장소",
+                            Modifier.size(5.dp)
+                        )
+                        Spacer(modifier = Modifier.width(1.dp))
+                        P_Medium(content = "북촌 한옥마을", color =neutral_600, 4.5.sp)
+                    }
+                    Spacer(modifier = Modifier.height(1.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        P_ExtraBold(content = "서울", color = black, size = 18.sp)
+                    }
+                    Spacer(modifier = Modifier.height(1.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_train_grey),
+                            contentDescription = "기차",
+                            modifier = Modifier
+                                .height(34.dp)
+                                .width(15.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(1.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_location_grey),
+                            contentDescription = "장소",
+                            Modifier.size(5.dp)
+                        )
+                        Spacer(modifier = Modifier.width(1.dp))
+                        P_Medium(content = "암스테르담 공항", color = neutral_600, 4.5.sp)
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        P_ExtraBold(content = "군산", color = black, size = 18.sp)
+                    }
+                    Spacer(modifier = Modifier.height(27.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        P_Medium(content = "전라도의 선유도", color = black, 5.sp)
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Row(
+                            Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Column(
+                                Modifier.width(40.dp)
+                            ) {
+                                P_Medium(content = "여행 감정", color = neutral_500, 4.sp)
+                                Spacer(modifier = Modifier.height(3.8.dp))
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                    ) {
+                                        emotionList.forEachIndexed { index, item ->
+                                            Row(
+                                                modifier = Modifier.height(6.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+
+                                                Image(
+                                                    modifier = Modifier.size(5.dp),
+                                                    painter = painterResource(
+                                                        id = Theme2_Emotion(
+                                                            kind = item.text
+                                                        )
+                                                    ),
+                                                    contentDescription = ""
+                                                )
+                                                Spacer(modifier = Modifier.width(3.dp))
+                                                Column(
+                                                    modifier = Modifier.width(32.dp)
+                                                ) {
+                                                    LinearProgressIndicator(
+                                                        progress = { item.persent.toFloat() / 100 },
+                                                        modifier = Modifier.height(1.5.dp),
+                                                        color = when (index) {
+                                                            0 -> primary_500
+                                                            1 -> neutral_600
+                                                            2 -> neutral_400
+                                                            3 -> neutral_200
+                                                            else -> primary_500
+                                                        },
+                                                        strokeCap = StrokeCap.Round
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Column(
+                                Modifier.padding(start = 20.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                P_Medium(content = "카드 갯수", color = neutral_500, 4.sp)
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Column(
+                                    Modifier
+                                        .size(23.dp)
+                                        .background(
+                                            color = white,
+                                            shape = RoundedCornerShape(4.dp)
+                                        )
+                                        .border(
+                                            width = 0.3.dp,
+                                            color = black,
+                                            shape = RoundedCornerShape(4.dp)
+                                        ),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    YJ_Bold(content = "27", color = primary_500, 8.sp)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Row(
+                Modifier
+                    .padding(bottom = 2.dp, end = 7.dp)
+                    .align(Alignment.BottomEnd)
+            ) {
+                P_Medium(content = "2024 . 02 . 15", color = neutral_500, 4.sp)
+                P_Medium(content = " / ", color = neutral_500, 4.sp)
+                P_Medium(content = "2024 . 02 . 15", color = neutral_500, 4.sp)
+            }
+
+            Row() {
+                Column(
+                    modifier = Modifier
+                        .width(10.dp)
+                        .fillMaxHeight()
+                        .background(
+                            color = primary_500,
+                            shape = RoundedCornerShape(topStart = 2.dp, bottomStart = 2.dp)
+                        ),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.img_logo_vertical),
+                        contentDescription = "로고",
+                        Modifier
+                            .width(30.dp)
+                            .fillMaxHeight()
+                    )
+                }
+            }
+            Column(Modifier.padding(top = 140.dp)) {
+                Image(
+                    painter = painterResource(R.drawable.img_cutline_circle),
+                    contentDescription = "로고",
+                    Modifier
+                        .height(4.5.dp)
+                        .fillMaxWidth()
+                )
+            }
+        }
+    }
+
+
+    @Composable
+    fun Theme1_Emotion(kind: String, index: Int): Int {
+
+        when(kind){
+            "평범해요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_common_1
+                1 -> R.drawable.ic_receipt1_emotion_common_2
+                2 -> R.drawable.ic_receipt1_emotion_common_3
+                3 -> R.drawable.ic_receipt1_emotion_common_4
+                else -> R.drawable.ic_receipt1_emotion_common_1
+            }
+            "화가나요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_angry_1
+                1 -> R.drawable.ic_receipt1_emotion_angry_2
+                2 -> R.drawable.ic_receipt1_emotion_angry_3
+                3 -> R.drawable.ic_receipt1_emotion_angry_4
+                else -> R.drawable.ic_receipt1_emotion_angry_1
+            }
+            "즐거워요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_happy_1
+                1 -> R.drawable.ic_receipt1_emotion_happy_2
+                2 -> R.drawable.ic_receipt1_emotion_happy_3
+                3 -> R.drawable.ic_receipt1_emotion_happy_4
+                else -> R.drawable.ic_receipt1_emotion_happy_1
+            }
+            "슬퍼요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_sad_1
+                1 -> R.drawable.ic_receipt1_emotion_sad_2
+                2 -> R.drawable.ic_receipt1_emotion_sad_3
+                3 -> R.drawable.ic_receipt1_emotion_sad_4
+                else -> R.drawable.ic_receipt1_emotion_sad_1
+            }
+            else -> return R.drawable.ic_emotion_angry
+        }
+    }
+    @Composable
+    fun Theme2_Emotion(kind: String): Int {
+
+        return when(kind){
+            "평범해요" -> R.drawable.ic_receipt2_emotion_common
+            "화가나요" -> R.drawable.ic_receipt2_emotion_angry
+            "즐거워요" -> R.drawable.ic_receipt2_emotion_happy
+            "슬퍼요" -> R.drawable.ic_receipt2_emotions_sad
+            else -> R.drawable.ic_receipt2_emotion_common
+        }
+    }
+
+    @SuppressLint("UnrememberedMutableState")
     @Preview(apiLevel = 33)
     @Composable
     fun MainPreview() {
@@ -1898,7 +2657,6 @@ class MainActivity : ComponentActivity() {
 //            ItemTrip()
         }
     }
-
 
 
 @Composable
