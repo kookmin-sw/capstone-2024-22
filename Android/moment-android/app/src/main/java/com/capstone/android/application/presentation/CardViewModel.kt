@@ -40,6 +40,14 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
     val getCardAllFailure : MutableLiveData<ApiResponse.Error<Exception>> by lazy {
         MutableLiveData<ApiResponse.Error<Exception>>()
     }
+
+    val getCardLikedSuccess : MutableLiveData<CardResponse> by lazy {
+        MutableLiveData<CardResponse>()
+    }
+
+    val getCardLikedFailure:MutableLiveData<ApiResponse.Error<Exception>> by lazy {
+        MutableLiveData<ApiResponse.Error<Exception>>()
+    }
     fun postCardUpload(
         cardUploadMultipart:RequestBody,
         recordFile : MultipartBody.Part
@@ -193,7 +201,15 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
     fun getCardLiked(){
         viewModelScope.launch {
             try {
-                val data = cardRepository.getCardLiked()
+                val response = cardRepository.getCardLiked()
+
+                if(response is ApiResponse.Success){
+                    getCardLikedSuccess.postValue(response.data)
+                }else{
+
+                }
+
+
 
             } catch (e: HttpException) {
                 Log.d("awegawegaew","404")
