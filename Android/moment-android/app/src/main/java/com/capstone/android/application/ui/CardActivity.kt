@@ -72,7 +72,7 @@ import com.capstone.android.application.R
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.utile.AndroidAudioPlayer
 import com.capstone.android.application.app.utile.MomentAudioRecorder
-import com.capstone.android.application.domain.response.card.CardView
+import com.capstone.android.application.domain.Card
 import com.capstone.android.application.presentation.CardViewModel
 import com.capstone.android.application.ui.theme.FontMoment
 import dagger.hilt.android.AndroidEntryPoint
@@ -235,12 +235,7 @@ class CardActivity : ComponentActivity() {
         val persent: String
     )
 
-    data class Card(
-        var isDelete: MutableState<Boolean> = mutableStateOf(false),
-        var isFavorite:MutableState<Boolean> = mutableStateOf(false),
-        var isExpand:MutableState<Boolean> = mutableStateOf(false),
-        var cardView: CardView
-    )
+
 
 
     @Composable
