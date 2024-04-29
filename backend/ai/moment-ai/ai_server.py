@@ -36,7 +36,7 @@ def ai_server_run():
     # output["file_path"] = file_path
     # return jsonify(output)
     
-    result = test.main(file_path, file_name)
+    result = test.main(file_name=file_name, file_path=file_path)
     return jsonify(result)
 
 if __name__ == '__main__':
