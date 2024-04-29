@@ -50,4 +50,5 @@ public class CardViewRequestDTO {
             @Schema(description = "STT")
             private final String stt;
     }
+
 }
