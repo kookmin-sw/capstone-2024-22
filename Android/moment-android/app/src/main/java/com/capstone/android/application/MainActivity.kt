@@ -89,11 +89,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.capstone.android.application.app.composable.CustomOnlyTitleCheckDialog
 import com.capstone.android.application.app.composable.CustomTitleCheckDialog
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.screen.BottomNavItem
 import com.capstone.android.application.data.local.Emotion
+import com.capstone.android.application.domain.CustomOnlyTitleCheckViewModel
 import com.capstone.android.application.domain.CustomTitleCheckViewModel
 import com.capstone.android.application.ui.CardActivity
 import com.capstone.android.application.ui.PostTripActivity
@@ -1651,6 +1653,12 @@ class MainActivity : ComponentActivity() {
         val InquirybtnState = remember { mutableStateOf(false) }
         val versionbtnState = remember { mutableStateOf(false) }
 
+        val viewModel_OnlyTitle: CustomOnlyTitleCheckViewModel = viewModel()
+        val CustomOnlyTitleCheckDialogState = viewModel_OnlyTitle.CustomOnlyTitleCheckDialogState.value
+
+        val viewModel_Title: CustomTitleCheckViewModel = viewModel()
+        val CustomTitleCheckDialogState = viewModel_Title.CustomTitleCheckDialogState.value
+
 
         Box(
             Modifier
@@ -1797,12 +1805,38 @@ class MainActivity : ComponentActivity() {
                     Modifier
                         .padding(top = 150.dp)
                 ) {
-                    Column(Modifier.clickable { }) {
+                    Column(Modifier.clickable {
+                        viewModel_OnlyTitle.showCustomOnlyTitleCheckDialog()
+                    }) {
                         P_Medium14("로그아웃", black)
                     }
+
+                    if (CustomOnlyTitleCheckDialogState.title.isNotBlank()) {
+                        CustomOnlyTitleCheckDialog(
+                            title = CustomOnlyTitleCheckDialogState.title,
+                            checkleft = CustomOnlyTitleCheckDialogState.checkleft,
+                            checkright = CustomOnlyTitleCheckDialogState.checkright,
+                            onClickleft = { /*로그아웃 기능*/ },
+                            onClickright = { CustomOnlyTitleCheckDialogState.onClickright() }
+                        )
+                    }
+
                     Spacer(modifier = Modifier.height(28.dp))
-                    Column(Modifier.clickable { }) {
+                    Column(Modifier.clickable { viewModel_Title.showCustomTitleCheckDialog() }) {
                         P_Medium14("탈퇴하기", black)
+                    }
+
+                    if (CustomTitleCheckDialogState.title.isNotBlank()) {
+                        CustomTitleCheckDialog(
+                            title = "정말 탈퇴하시나요 .. ?",
+                            description = "새로운 계정으로 만나는 건 가능하지만\n" +
+                                    "지금까지의 우리 추억은 모두 사라져요",
+                            checkleft = "네",
+                            checkright = "아니요",
+                            onClickleft = { /*탈퇴 기능*/ },
+                            onClickright = { CustomTitleCheckDialogState.onClickright() },
+                            onClickCancel = { CustomTitleCheckDialogState.onClickCancel()}
+                        )
                     }
                 }
             }

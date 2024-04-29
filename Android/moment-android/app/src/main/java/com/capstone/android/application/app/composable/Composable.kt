@@ -82,6 +82,7 @@ import com.capstone.android.application.ui.theme.black
 import com.capstone.android.application.ui.theme.neutral_100
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
+import com.capstone.android.application.ui.theme.primary_500
 import com.capstone.android.application.ui.theme.tertiary_500
 import kotlin.math.roundToInt
 
@@ -453,6 +454,81 @@ fun CustomTitleCheckDialog(
                     P_ExtraBold16(content = title, color = black)
                     Spacer(modifier = Modifier.height(16.dp))
                     P_Medium14_center(content = description, color = neutral_600, TextAlign.Center)
+                }
+
+                Row(
+                    Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically){
+                    Column(
+                        Modifier
+                            .padding(8.dp)
+                            .weight(0.2f)
+                            .clickable { onClickleft() },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center) {
+                        YJ_Bold15(content = checkleft, color = black)
+                    }
+                    Divider(
+                        Modifier
+                            .width(2.dp)
+                            .height(20.dp), neutral_500)
+
+                    Column(
+                        Modifier
+                            .padding(8.dp)
+                            .weight(0.2f)
+                            .clickable { onClickright() },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center) {
+                        YJ_Bold15(content = checkright, color = black)
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+// 제목 다이얼로그
+@Composable
+fun CustomOnlyTitleCheckDialog(
+    title : String,
+    checkleft: String,
+    checkright: String,
+    onClickleft: () -> Unit,
+    onClickright: () -> Unit
+){
+    Dialog(onDismissRequest = { },
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
+    ) {
+        Card(modifier = Modifier
+            .fillMaxSize()
+            .wrapContentHeight()
+            .padding(horizontal = 40.dp)){
+            Column(modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .background(tertiary_500)) {
+
+                Column(
+                    Modifier
+                        .wrapContentSize()
+                        .padding(top = 20.dp, bottom = 16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row {
+                        P_ExtraBold16(content = "정말 ", color = black)
+                        P_ExtraBold16(content = "로그아웃", color = primary_500)
+                        P_ExtraBold16(content = " 하시나요?", color = black)
+                    }
+
                 }
 
                 Row(
