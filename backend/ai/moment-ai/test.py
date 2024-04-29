@@ -44,9 +44,9 @@ def run_model_on_gpu(models:dict, source_file, output):
     try:
       for model_name, model_config in models.items():
         if model_name == "whisper":
-          # for demo
-          output["text"] = "안녕하세요."
-          continue
+          # # for demo
+          # output["text"] = "안녕하세요."
+          # continue
 
           # for real test
           model = model_config[0]
@@ -113,9 +113,9 @@ def run_model_on_cpu(models:dict, source_file, output):
     for model_name, model_config in models.items():
       
       if model_name == "whisper":
-        # for demo
-        output["text"] = "안녕하세요."
-        continue
+        # # for demo
+        # output["text"] = "안녕하세요."
+        # continue
 
         # for real test
         model = model_config[0]
