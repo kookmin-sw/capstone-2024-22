@@ -99,7 +99,6 @@ import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.screen.BottomNavItem
 import com.capstone.android.application.data.local.Emotion
 import com.capstone.android.application.domain.CustomTitleCheckViewModel
-import com.capstone.android.application.ui.CardActivity
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.utile.AndroidAudioPlayer
 import com.capstone.android.application.app.utile.MomentAudioRecorder
@@ -529,24 +528,7 @@ class MainActivity : ComponentActivity() {
                             }
 
 
-                            Spacer(Modifier.weight(1f))
-                            Text(
-                                modifier = Modifier
-                                    .clickable {
-                                        when(title.value){
-                                            "추가" -> {
-                                                val intent = Intent(this@MainActivity,PostTripActivity::class.java)
-                                                postTrip.launch(intent)
-                                            }
-                                            "영수증 모아보기" -> {}
-                                            "작게보기" -> {}
-                                        }
-                                    },
-                                text = title.value,
-                                fontFamily = FontMoment.obangFont,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp
-                            )
+
 
                         }
 
