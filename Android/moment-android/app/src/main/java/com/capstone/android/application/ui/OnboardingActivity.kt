@@ -87,11 +87,11 @@ enum class OnboardingScreen(){
     Login,
     LoginComplete,
     Signup,
-    Signup_email,
-    Signup_number,
+    SignupEmail,
+    SignupNumber,
     FindPassword,
-    FindPassword_number,
-    FindPassword_Signup,
+    FindPasswordNumber,
+    FindPasswordSignup,
     SignupComplete,
     AgreeDetail
 }
@@ -145,17 +145,17 @@ class OnboardingActivity:ComponentActivity() {
                 ){
                     composable(route=OnboardingScreen.Login.name){ Login() }
                     composable(route=OnboardingScreen.LoginComplete.name){ LoginComplete()}
-                    composable(route=OnboardingScreen.Signup_email.name){ Signup_email() }
-                    composable(route=OnboardingScreen.Signup_number.name){
-                        Signup_number()
+                    composable(route=OnboardingScreen.SignupEmail.name){ SignupEmail() }
+                    composable(route=OnboardingScreen.SignupNumber.name){
+                        SignupNumber()
                     }
                     composable(route=OnboardingScreen.Signup.name){ Signup() }
                     composable(route=OnboardingScreen.FindPassword.name){ FindPassword() }
-                    composable(route=OnboardingScreen.FindPassword_number.name){
-                        FindPassword_number(authCode)
+                    composable(route=OnboardingScreen.FindPasswordNumber.name){
+                        FindPasswordNumber(authCode)
                     }
-                    composable(route=OnboardingScreen.FindPassword_Signup.name){
-                        FindPassword_Signup(code = authCode.value)
+                    composable(route=OnboardingScreen.FindPasswordSignup.name){
+                        FindPasswordSignup(code = authCode.value)
                     }
                     composable(route=OnboardingScreen.SignupComplete.name){ SignupComplete() }
                     composable(route=OnboardingScreen.AgreeDetail.name){ AgreeDetail() }
@@ -178,12 +178,12 @@ class OnboardingActivity:ComponentActivity() {
 
         // 인증코드 요청
         authViewModel.postAuthAuthCodeSuccess.observe(this@OnboardingActivity){ response->
-            if(navController.currentDestination?.route == OnboardingScreen.Signup_email.name){
-                navController.navigate(OnboardingScreen.Signup_number.name)
+            if(navController.currentDestination?.route == OnboardingScreen.SignupEmail.name){
+                navController.navigate(OnboardingScreen.SignupNumber.name)
             }
 
             if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
-                navController.navigate(OnboardingScreen.FindPassword_number.name)
+                navController.navigate(OnboardingScreen.FindPasswordNumber.name)
             }
             userId=response.data.userId
         }
@@ -360,7 +360,7 @@ class OnboardingActivity:ComponentActivity() {
                     BigButton("로그인하기", false, onClick = {startActivity(Intent(this@OnboardingActivity, MainActivity::class.java))})
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                BigButton("가입하기", true) { navController.navigate(OnboardingScreen.Signup_email.name) }
+                BigButton("가입하기", true) { navController.navigate(OnboardingScreen.SignupEmail.name) }
             }
         }
     }
@@ -400,7 +400,7 @@ class OnboardingActivity:ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun Signup_email(){
+    fun SignupEmail(){
         val email = remember{mutableStateOf("")}
         //keyboard
         val focusRequester = remember { FocusRequester() }
@@ -532,7 +532,7 @@ class OnboardingActivity:ComponentActivity() {
 
                 }
             }else{
-                BigButton("다음", false) { navController.navigate(OnboardingScreen.Signup_number.name) }            }
+                BigButton("다음", false) { navController.navigate(OnboardingScreen.SignupNumber.name) }            }
             }
         }
     }
@@ -644,7 +644,7 @@ class OnboardingActivity:ComponentActivity() {
 
 
     @Composable
-    fun Signup_number(countViewModel: CountViewModel = viewModel()){
+    fun SignupNumber(countViewModel: CountViewModel = viewModel()){
 
         val timeLeft by countViewModel.timeLeft.collectAsState()
         val number = remember{mutableStateOf("")}
@@ -673,7 +673,7 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Signup_email.name)
+                    navController.navigate(OnboardingScreen.SignupEmail.name)
                 }, "회원가입")
             }
 
@@ -839,7 +839,7 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Signup_number.name)
+                    navController.navigate(OnboardingScreen.SignupNumber.name)
                 }, "회원가입")
             }
 
@@ -1042,13 +1042,13 @@ class OnboardingActivity:ComponentActivity() {
 
                 }
             }else{
-                BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPassword_number.name) }            }
+                BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPasswordNumber.name) }            }
             }
         }
     }
 
     @Composable
-    fun FindPassword_number(authCode:MutableState<String>){
+    fun FindPasswordNumber(authCode:MutableState<String>){
 
         val findpwnumState = remember{
             mutableStateOf(true)
@@ -1070,7 +1070,7 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Signup_email.name)
+                    navController.navigate(OnboardingScreen.SignupEmail.name)
                 }, "비밀번호 찾기")
             }
 
@@ -1187,10 +1187,10 @@ class OnboardingActivity:ComponentActivity() {
                 if ( authCode.value.isNotEmpty()){
                     BigButton("다음", true) {
 
-                        navController.navigate(OnboardingScreen.FindPassword_Signup.name)
+                        navController.navigate(OnboardingScreen.FindPasswordSignup.name)
                     }
                 }else{
-                    BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPassword_Signup.name) }
+                    BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPasswordSignup.name) }
                 }
 
             }
@@ -1198,7 +1198,7 @@ class OnboardingActivity:ComponentActivity() {
     }
 
     @Composable
-    fun  FindPassword_Signup(code:String) {
+    fun  FindPasswordSignup(code:String) {
 
         val password = remember {
             mutableStateOf("")
@@ -1228,7 +1228,7 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Signup_number.name)
+                    navController.navigate(OnboardingScreen.SignupNumber.name)
                 }, "비밀번호 찾기")
             }
 
@@ -1344,7 +1344,7 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(bottom = 50.dp),
             ) { Column(modifier = Modifier
                 .padding(horizontal = 14.dp, vertical = 10.dp)
-                .clickable { navController.navigate(OnboardingScreen.Signup_email.name) }) {
+                .clickable { navController.navigate(OnboardingScreen.SignupEmail.name) }) {
                 YJ_Bold15("확인",black)
             }  }
         }
@@ -1369,6 +1369,6 @@ class OnboardingActivity:ComponentActivity() {
     @Preview
     @Composable
     fun OnboardingPreView(){
-        Signup_email()
+        SignupEmail()
     }
 }
