@@ -26,6 +26,14 @@ android {
     }
 
     buildTypes {
+
+//        배포 준비 할 때 디버그 모드와 릴리즈 모드 나누기
+//        debug {
+//            applicationIdSuffix = ".debug"
+//            isDebuggable = true
+//
+//        }
+
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -118,4 +126,7 @@ dependencies {
 
     // AsyncImage
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // Timber
+    implementation("com.jakewharton.timber:timber:5.0.1")
 }

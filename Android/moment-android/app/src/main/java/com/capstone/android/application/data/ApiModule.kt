@@ -4,6 +4,7 @@ import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.data.remote.auth.AuthRetrofitInterface
 import com.capstone.android.application.data.remote.card.CardRetrofitInterface
 import com.capstone.android.application.data.remote.trip.TripRetrofitInterface
+import com.capstone.android.application.data.remote.tripfile.TripFileRetrofitInterface
 import com.capstone.android.application.domain.response.ApiResponseCallAdapterFactory
 import dagger.Module
 import dagger.Provides
@@ -41,7 +42,7 @@ object ApiModule {
     @BaseRetrofit
     @Singleton
     @Provides
-    fun provideTripRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideBaseRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .addCallAdapterFactory(ApiResponseCallAdapterFactory())
             .client(okHttpClient)
@@ -66,6 +67,12 @@ object ApiModule {
     @Provides
     fun provideCardService(@BaseRetrofit retrofit:Retrofit) : CardRetrofitInterface{
         return retrofit.create(CardRetrofitInterface::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTripFileService(@BaseRetrofit retrofit:Retrofit) : TripFileRetrofitInterface{
+        return retrofit.create(TripFileRetrofitInterface::class.java)
     }
 
 

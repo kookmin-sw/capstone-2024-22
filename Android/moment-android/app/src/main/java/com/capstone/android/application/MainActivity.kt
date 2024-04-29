@@ -2,6 +2,7 @@ package com.capstone.android.application
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -10,6 +11,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -87,9 +89,14 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.capstone.android.application.app.composable.FancyProgressBar
-import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.screen.BottomNavItem
+import com.capstone.android.application.app.screen.MainScreen
+import com.capstone.android.application.app.utile.AndroidAudioPlayer
+import com.capstone.android.application.app.utile.MomentAudioRecorder
+import com.capstone.android.application.data.remote.card.model.card_post.request.PostCardUploadReqeust
+import com.capstone.android.application.domain.Card
 import com.capstone.android.application.domain.Trip
+import com.capstone.android.application.presentation.CardViewModel
 import com.capstone.android.application.presentation.TripViewModel
 import com.capstone.android.application.ui.CardActivity
 import com.capstone.android.application.ui.PatchTripActivity
@@ -113,23 +120,58 @@ import com.capstone.android.application.ui.theme.white
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
-import java.nio.Buffer
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 import kotlin.math.roundToInt
+import kotlin.time.Duration
 
 @OptIn(ExperimentalMaterial3Api::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     lateinit var navController: NavHostController
     private val tripViewModel : TripViewModel by viewModels()
+    private val cardViewModel : CardViewModel by viewModels()
+    private val recorder by lazy {
+        MomentAudioRecorder(this@MainActivity)
+    }
 
+    private val player by lazy {
+        AndroidAudioPlayer(this@MainActivity)
+    }
+    private var audioFile: File? = null
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var currentDate:String=""
+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("YYYY-MM-DD hh:mm:ss A Z"))
+//            currentDate = current
+//        } else {
+//            val date = Date(System.currentTimeMillis())
+//            val dateFormat = SimpleDateFormat(
+//                "yyyy-MM-dd HH:mm",
+//                Locale.KOREA
+//            )
+//
+//            currentDate=dateFormat.format(date)
+//        }
+
         setContent {
 
             ApplicationTheme {
@@ -160,6 +202,9 @@ class MainActivity : ComponentActivity() {
         val tripList = remember {
             mutableStateListOf<Trip>()
         }
+        val favoriteCardList = remember{
+            mutableStateListOf<Card>()
+        }
         val test:Int = 4
         val colorName: Result<String> = runCatching {
             when (test) {
@@ -179,6 +224,8 @@ class MainActivity : ComponentActivity() {
 
 
         tripViewModel.getTripAll()
+        cardViewModel.getCardLiked()
+
 
         tripViewModel.getTripAllSuccess.observe(this@MainActivity){ response->
 
@@ -204,6 +251,22 @@ class MainActivity : ComponentActivity() {
             }
             tripViewModel.getTripAll()
         }
+
+        cardViewModel.getCardLikedSuccess.observe(this@MainActivity){ response ->
+            response.data.cardViews.mapNotNull { cardView-> kotlin.runCatching {
+                Card(
+                    cardView = cardView
+                )
+            }.onSuccess {
+                favoriteCardList.clear()
+            }.onFailure {
+
+            }.getOrNull()
+            }.forEach {card->
+                favoriteCardList.add(card)
+            }
+        }
+
 
 
         navController = rememberNavController()
@@ -357,8 +420,7 @@ class MainActivity : ComponentActivity() {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(end = 20.dp)
-                            ,
+                                .padding(end = 20.dp),
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
@@ -440,7 +502,7 @@ class MainActivity : ComponentActivity() {
                 composable(BottomNavItem.Favorite.screenRoute) {
                     currentSelectedBottomRoute.value = "Favorite"
 
-                    Favorite()
+                    Favorite(cardItems = favoriteCardList)
                     title.value = "작게보기"
                 }
                 composable(BottomNavItem.Setting.screenRoute) {
@@ -475,8 +537,6 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun Home(tripList:MutableList<Trip>){
 
-
-        Log.d("weagawegawe",tripList.toString())
 
         val density = LocalDensity.current
         val defaultActionSize = 80.dp
@@ -756,7 +816,9 @@ class MainActivity : ComponentActivity() {
 
         Column(
             modifier = Modifier.clickable {
-                startActivity(Intent(this@MainActivity,TripFileActivity::class.java))
+                val intent = Intent(this@MainActivity,TripFileActivity::class.java)
+                intent.putExtra("tripId",id)
+                startActivity(intent)
             } ,
         ) {
             Box(
@@ -1025,10 +1087,46 @@ class MainActivity : ComponentActivity() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun tickerFlow(period: Duration, initialDelay: Duration = Duration.ZERO) = flow {
+        delay(initialDelay)
+        while (true) {
+            emit(Unit)
+            delay(period)
+        }
+    }
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun  RecordNavigatesheet(recordOpen : MutableState<Boolean>, sheetState: SheetState, closeSheet: () -> Unit
     ){
+//        tickerFlow(1.seconds)
+//            .map { LocalDateTime.now() }
+//            .distinctUntilChanged { old, new ->
+//                old.minute == new.minute
+//            }
+//            .onEach {
+//
+//            }
+//            .launchIn(lifecycleScope)
+
+
+        var currentDate:String=""
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-ddTHH:mm:ss"))
+
+            currentDate = "${LocalDateTime.now()}"
+        } else {
+            val date = Date(System.currentTimeMillis())
+            val dateFormat = SimpleDateFormat(
+                "yyyy-MM-dd HH:mm",
+                Locale.KOREA
+            )
+            currentDate=dateFormat.format(date)
+        }
+
+
 
         val coroutineScope = rememberCoroutineScope()
 
@@ -1081,37 +1179,74 @@ class MainActivity : ComponentActivity() {
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.clickable {
-                            coroutineScope
-                                .launch {
-                                    sheetState.hide()
-                                }
-                                .invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        recordOpen.value = false
-                                    }
-                                }
+                            player.playFile(audioFile ?: return@clickable)
+//                            coroutineScope
+//                                .launch {
+//                                    sheetState.hide()
+//                                }
+//                                .invokeOnCompletion {
+//                                    if (!sheetState.isVisible) {
+//                                        recordOpen.value = false
+//                                    }
+//                                }
                         }) {
                             YJ_Bold15("삭제", black)
                         }
                          Spacer(modifier = Modifier.width(46.dp))
-                        Image(modifier = Modifier.size(50.dp),
+                        Image(modifier = Modifier
+                            .size(50.dp)
+                            .clickable {
+                                File(cacheDir, "audio.mp3").also {
+                                    recorder.start(it)
+                                    audioFile = it
+                                }
+                            },
                             painter =  painterResource(R.drawable.ic_record_ing),
                             contentDescription = "record")
                         Spacer(modifier = Modifier.width(46.dp))
 
-                        Column(Modifier.clickable {
-                            coroutineScope
-                                .launch {
-                                    sheetState.hide()
-                                }
-                                .invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        recordOpen.value = false
-                                    }
-                                }
-                        }) {
-                            YJ_Bold15("저장", primary_500)
-                        }
+                        Column(
+                            Modifier.clickable {
+                                recorder.stop()
+
+                                val requestFile = audioFile?.asRequestBody("audio/*".toMediaTypeOrNull())
+
+                                val body = MultipartBody.Part.createFormData("recordFile",audioFile?.name,
+                                    requestFile!!
+                                )
+
+                                val cardUploadDto=Gson().toJson(
+                                    PostCardUploadReqeust(
+                                        location = "서울",
+                                        question = "질문",
+                                        recordedAt = currentDate,
+                                        temperature = "20",
+                                        weather = "ㅈㄴ맑음"
+                                    )
+                                )
+
+                                val JSON: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
+                                val gson = Gson()
+                                val data = gson.toJson(cardUploadDto)
+                                val requestbody = RequestBody.create(JSON, cardUploadDto)
+
+                                cardViewModel.postCardUpload(
+                                    cardUploadMultipart = requestbody,
+                                    recordFile = body
+                                )
+
+//                                coroutineScope
+//                                    .launch {
+//                                        sheetState.hide()
+//                                    }
+//                                    .invokeOnCompletion {
+//                                        if (!sheetState.isVisible) {
+//                                            recordOpen.value = false
+//                                        }
+//                                    }
+                            }) {
+                                YJ_Bold15("저장", primary_500)
+                            }
 
                     }
 
@@ -1122,16 +1257,15 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun Favorite(){
+    fun Favorite(cardItems: MutableList<Card>){
         var expanded = remember { mutableStateOf(true) }
 
         val imageList = mutableStateListOf<File>()
-        val cardItems = mutableStateListOf<CardActivity.Card>()
         val emotionList = mutableStateListOf<CardActivity.Emotion>()
 
-        cardItems.add(CardActivity.Card())
-        cardItems.add(CardActivity.Card())
-        cardItems.add(CardActivity.Card())
+//        cardItems.add(CardActivity.Card())
+//        cardItems.add(CardActivity.Card())
+//        cardItems.add(CardActivity.Card())
 
         emotionList.add(
             CardActivity.Emotion(
