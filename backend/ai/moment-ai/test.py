@@ -279,7 +279,7 @@ def main(file_name, file_path=None):
 if __name__ == "__main__":
   # file_name = "../moment_ai/test.mp4" if args.file_path is None else args.file_path
   file_path = 'users/1/'
-  file_name = '2024-04-27T18:40:57.272754.mp4.mp4'
+  file_name = '2024-04-29T05:17:30.415789166.mp4.mp4'
   print(file_path, file_name)
   result = main(file_path=file_path, file_name=file_name)
   print('results :', result)
