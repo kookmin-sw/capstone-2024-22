@@ -1844,7 +1844,7 @@ class ReciptActivity : ComponentActivity() {
     @Composable
     fun ReciptPreview() {
         ApplicationTheme {
-            SaveRecipt("theme1")
+//            SaveRecipt("theme1")
         }
     }}
 
