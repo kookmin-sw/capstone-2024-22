@@ -49,7 +49,7 @@ class CardRepository @Inject constructor(private val cardRetrofitInterface: Card
         )
     }
 
-    override suspend fun getCardLiked(): Response<CardResponse> {
+    override suspend fun getCardLiked(): ApiResponse<CardResponse> {
         return cardRetrofitInterface.getCardLiked()
     }
 }

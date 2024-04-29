@@ -32,5 +32,5 @@ interface CardRepositoryInterface {
         cardViewId:Int
     ):Response<MomentResponse>
 
-    suspend fun getCardLiked():Response<CardResponse>
+    suspend fun getCardLiked():ApiResponse<CardResponse>
 }

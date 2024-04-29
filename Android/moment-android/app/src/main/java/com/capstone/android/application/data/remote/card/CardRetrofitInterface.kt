@@ -48,6 +48,6 @@ interface CardRetrofitInterface {
     ):Response<MomentResponse>
 
     @GET("/core/cardView/like")
-    suspend fun getCardLiked() : Response<CardResponse>
+    suspend fun getCardLiked() : ApiResponse<CardResponse>
 
 }
