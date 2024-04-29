@@ -3,7 +3,7 @@ package com.capstone.android.application.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -57,6 +57,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
+import com.capstone.android.application.app.ApplicationClass.Companion.tokenSharedPreferences
 import com.capstone.android.application.app.composable.MomentTextField
 import com.capstone.android.application.data.remote.auth.auth_code.request.PostAuthAuthCodeRequest
 import com.capstone.android.application.data.remote.auth.auth_code_confirm.request.PatchAuthAuthCodeConfirmRequest
@@ -109,7 +110,12 @@ class OnboardingActivity:ComponentActivity() {
 
 
         setContent{
-            val authCode = remember {
+
+            val authCodeInFindPassword = remember {
+                mutableStateOf("")
+            }
+
+            val authCodeInSignup = remember {
                 mutableStateOf("")
             }
 
@@ -147,15 +153,15 @@ class OnboardingActivity:ComponentActivity() {
                     composable(route=OnboardingScreen.LoginComplete.name){ LoginComplete()}
                     composable(route=OnboardingScreen.SignupEmail.name){ SignupEmail() }
                     composable(route=OnboardingScreen.SignupNumber.name){
-                        SignupNumber()
+                        SignupNumber(authCode=authCodeInSignup)
                     }
-                    composable(route=OnboardingScreen.Signup.name){ Signup() }
+                    composable(route=OnboardingScreen.Signup.name){ Signup(authCodeInSignup) }
                     composable(route=OnboardingScreen.FindPassword.name){ FindPassword() }
                     composable(route=OnboardingScreen.FindPasswordNumber.name){
-                        FindPasswordNumber(authCode)
+                        FindPasswordNumber(authCodeInFindPassword)
                     }
                     composable(route=OnboardingScreen.FindPasswordSignup.name){
-                        FindPasswordSignup(code = authCode.value)
+                        FindPasswordSignup(code = authCodeInFindPassword.value)
                     }
                     composable(route=OnboardingScreen.SignupComplete.name){ SignupComplete() }
                     composable(route=OnboardingScreen.AgreeDetail.name){ AgreeDetail() }
@@ -168,16 +174,19 @@ class OnboardingActivity:ComponentActivity() {
     private fun initApi(){
         // 로그인 성공
         authViewModel.postAuthLoginSuccess.observe(this@OnboardingActivity){ response->
-            Log.d("weaggawegew",response.toString())
+            tokenSharedPreferences.edit().putString("accessToken",response.data.accessToken).apply()
+            startActivity(Intent(this@OnboardingActivity,MainActivity::class.java))
+            finish()
         }
 
         // 로그인 실패
         authViewModel.postAuthLoginFailure.observe(this@OnboardingActivity){ response->
-            Log.d("waegwgwae",response.toString())
+            Toast.makeText(this@OnboardingActivity,"로그인에 실패",Toast.LENGTH_SHORT).show()
         }
 
         // 인증코드 요청
         authViewModel.postAuthAuthCodeSuccess.observe(this@OnboardingActivity){ response->
+            tokenSharedPreferences.edit().putString("accessToken",response.data.accessToken).apply()
             if(navController.currentDestination?.route == OnboardingScreen.SignupEmail.name){
                 navController.navigate(OnboardingScreen.SignupNumber.name)
             }
@@ -185,21 +194,31 @@ class OnboardingActivity:ComponentActivity() {
             if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
                 navController.navigate(OnboardingScreen.FindPasswordNumber.name)
             }
+
             userId=response.data.userId
         }
 
         // 인증코드 요청 실패
         authViewModel.postAuthAuthCodeFailure.observe(this@OnboardingActivity){ response->
+            Toast.makeText(this@OnboardingActivity,"인증코드요청에 실패했습니다.",Toast.LENGTH_SHORT).show()
 
         }
 
         // 인증코드 확인
         authViewModel.patchAuthAuthCodeConfirmSuccess.observe(this@OnboardingActivity){ response ->
-            navController.navigate(OnboardingScreen.Signup.name)
+            tokenSharedPreferences.edit().putString("accessToken",response.data.accessToken).apply()
+            if(navController.currentDestination?.route == OnboardingScreen.SignupNumber.name){
+                navController.navigate(OnboardingScreen.Signup.name)
+            }
+
+            if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
+                navController.navigate(OnboardingScreen.Login.name)
+            }
         }
 
         // 인증코드 확인 실패
         authViewModel.patchAuthAuthCodeConfirmFailure.observe(this@OnboardingActivity){ response->
+            Toast.makeText(this@OnboardingActivity,"인증번호가 틀렸습니다.",Toast.LENGTH_SHORT).show()
 
         }
 
@@ -210,7 +229,7 @@ class OnboardingActivity:ComponentActivity() {
 
         // 비밀번호 변경 실패
         authViewModel.patchAuthChangePasswordFailure.observe(this@OnboardingActivity){ response->
-
+            Toast.makeText(this@OnboardingActivity,"서버오류.",Toast.LENGTH_SHORT).show()
         }
 
 
@@ -644,7 +663,7 @@ class OnboardingActivity:ComponentActivity() {
 
 
     @Composable
-    fun SignupNumber(countViewModel: CountViewModel = viewModel()){
+    fun SignupNumber(countViewModel: CountViewModel = viewModel(),authCode:MutableState<String>){
 
         val timeLeft by countViewModel.timeLeft.collectAsState()
         val number = remember{mutableStateOf("")}
@@ -809,7 +828,7 @@ class OnboardingActivity:ComponentActivity() {
     }
 
     @Composable
-    fun Signup(){
+    fun Signup(emailAuthCode:MutableState<String>){
         val id = remember{
             mutableStateOf("")
         }
@@ -921,6 +940,12 @@ class OnboardingActivity:ComponentActivity() {
                 if (id.value.isNotEmpty() && password.value.isNotEmpty() && passwordcheck.value.isNotEmpty()){
                     BigButton("가입하기", true) {
                         if (password.value == passwordcheck.value) {
+                            authViewModel.patchAuthChangePassword(
+                                body = PatchAuthChangePasswordRequest(
+                                    code = emailAuthCode.value,
+                                    newPassword = password.value
+                                )
+                            )
                             pwequel.value = true
                             navController.navigate(OnboardingScreen.Login.name)
                         } else {
@@ -959,6 +984,8 @@ class OnboardingActivity:ComponentActivity() {
         }
     }
 
+
+    // 비밀번호 찾기
     @Composable
     fun FindPassword(){
 
@@ -1047,6 +1074,7 @@ class OnboardingActivity:ComponentActivity() {
         }
     }
 
+    // 비밀번호 찾기에서 인증코드 확인
     @Composable
     fun FindPasswordNumber(authCode:MutableState<String>){
 
@@ -1186,7 +1214,12 @@ class OnboardingActivity:ComponentActivity() {
             ) {
                 if ( authCode.value.isNotEmpty()){
                     BigButton("다음", true) {
-
+                        authViewModel.patchAuthAuthCodeConfirm(
+                            body = PatchAuthAuthCodeConfirmRequest(
+                                userId = userId.toString(),
+                                code = authCode.value
+                            )
+                        )
                         navController.navigate(OnboardingScreen.FindPasswordSignup.name)
                     }
                 }else{
