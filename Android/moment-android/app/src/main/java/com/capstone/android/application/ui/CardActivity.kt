@@ -21,28 +21,25 @@ import android.Manifest
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,10 +50,7 @@ import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,23 +58,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.times
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.ConstraintSet
-import androidx.constraintlayout.compose.Dimension
 
 import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
@@ -89,18 +72,20 @@ import com.capstone.android.application.R
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.utile.AndroidAudioPlayer
 import com.capstone.android.application.app.utile.MomentAudioRecorder
+import com.capstone.android.application.domain.response.card.CardView
+import com.capstone.android.application.presentation.CardViewModel
 import com.capstone.android.application.ui.theme.FontMoment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
-import kotlin.math.roundToInt
+import java.lang.Exception
 import androidx.compose.ui.Alignment.Companion as Alignment1
 
+@AndroidEntryPoint
 class CardActivity : ComponentActivity() {
     lateinit var navController: NavHostController
+
+    private val cardViewModel:CardViewModel by viewModels()
 
     private val recorder by lazy {
         MomentAudioRecorder(applicationContext)
@@ -121,8 +106,57 @@ class CardActivity : ComponentActivity() {
             arrayOf(Manifest.permission.RECORD_AUDIO),
             0
         )
+        val mainIntent = intent
+
+
+
+
+
         setContent {
+            val cardItems = remember {
+                mutableStateListOf<Card>()
+            }
+
+            val tripFileId = remember {
+                mutableStateOf(0)
+            }
+            try {
+                mainIntent?.let {
+                    tripFileId.value = it.getIntExtra("tripFileId",0)
+                }
+            }catch (e: Exception){
+                Toast.makeText(this@CardActivity,"server error", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+
             var isEdit = remember { mutableStateOf(false) }
+
+            cardViewModel.getCardAll(
+                tripFileId = tripFileId.value
+            )
+            cardViewModel.getCardAllSuccess.observe(this@CardActivity){ response ->
+                response.data.cardViews.mapNotNull { card-> runCatching {
+                    Card(
+                        cardView = card
+                    )
+
+                }.onSuccess {
+                    cardItems.clear()
+                }
+                    .onFailure {
+
+                    }
+                    .getOrNull()
+                }.forEach {
+                    cardItems.add(it)
+                }
+            }
+
+            cardViewModel.getCardAllFailure.observe(this@CardActivity){ error ->
+
+            }
+
+
             Scaffold(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -177,7 +211,7 @@ class CardActivity : ComponentActivity() {
                         .fillMaxSize()
                         .padding(paddingValues = innerPadding)
                 ) {
-                    Main(isEdit = isEdit)
+                    Main(isEdit = isEdit,cardItems = cardItems)
                 }
 
             }
@@ -204,21 +238,17 @@ class CardActivity : ComponentActivity() {
     data class Card(
         var isDelete: MutableState<Boolean> = mutableStateOf(false),
         var isFavorite:MutableState<Boolean> = mutableStateOf(false),
-        var isExpand:MutableState<Boolean> = mutableStateOf(false)
+        var isExpand:MutableState<Boolean> = mutableStateOf(false),
+        var cardView: CardView
     )
 
 
     @Composable
-    fun Main(isEdit:MutableState<Boolean>) {
+    fun Main(isEdit:MutableState<Boolean> , cardItems: MutableList<Card>) {
         var expanded = remember { mutableStateOf(true) }
 
         val imageList = mutableStateListOf<File>()
-        val cardItems = mutableStateListOf<Card>()
         val emotionList = mutableStateListOf<Emotion>()
-
-        cardItems.add(Card())
-        cardItems.add(Card())
-        cardItems.add(Card())
 
         emotionList.add(
             Emotion(
@@ -336,7 +366,8 @@ class CardActivity : ComponentActivity() {
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null
                                 ) {
-                                    cardItems[index].isExpand.value = !cardItems[index].isExpand.value
+                                    cardItems[index].isExpand.value =
+                                        !cardItems[index].isExpand.value
                                 }
 
                         ) {
@@ -349,7 +380,8 @@ class CardActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .size(26.dp)
                                             .clickable {
-                                                  cardItems[index].isFavorite.value = !cardItems[index].isFavorite.value
+                                                cardItems[index].isFavorite.value =
+                                                    !cardItems[index].isFavorite.value
                                             }
                                         ,
                                         painter = painterResource(id = if(cardItems[index].isFavorite.value) R.drawable.ic_heart_red else R.drawable.ic_heart_white),
