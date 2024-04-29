@@ -29,6 +29,14 @@ data class CustomTitleCheckDialogState(
     val onClickCancel: () -> Unit = {},
 )
 
+data class CustomOnlyTitleCheckDialogState(
+    val title: String = "",
+    val checkleft: String = "",
+    val checkright: String = "",
+    val onClickleft: () -> Unit = {},
+    val onClickright: () -> Unit = {}
+)
+
 
 //제목없는 선택형 다이얼로그
 @HiltViewModel
@@ -54,7 +62,7 @@ class CustomNoTitleCheckViewModel @Inject constructor() : ViewModel(){
     }
 }
 
-//제목 선택형 다이얼로그
+//제목 소제목 선택형 다이얼로그
 @HiltViewModel
 class CustomTitleCheckViewModel @Inject constructor() : ViewModel(){
     val CustomTitleCheckDialogState : MutableState<CustomTitleCheckDialogState> =
@@ -75,5 +83,27 @@ class CustomTitleCheckViewModel @Inject constructor() : ViewModel(){
 
     fun resetDialogState() {
         CustomTitleCheckDialogState.value = CustomTitleCheckDialogState()
+    }
+}
+
+//제목만 선택형 다이얼로그
+@HiltViewModel
+class CustomOnlyTitleCheckViewModel @Inject constructor() : ViewModel(){
+    val CustomOnlyTitleCheckDialogState : MutableState<CustomOnlyTitleCheckDialogState> =
+        mutableStateOf<CustomOnlyTitleCheckDialogState>(
+            CustomOnlyTitleCheckDialogState()
+        )
+    fun showCustomOnlyTitleCheckDialog(){
+        CustomOnlyTitleCheckDialogState.value = CustomOnlyTitleCheckDialogState(
+            title = "정말 로그아웃 하시나요?",
+            checkleft = "네",
+            checkright = "아니요",
+            onClickleft = {  },
+            onClickright = { resetDialogState() },
+        )
+    }
+
+    fun resetDialogState() {
+        CustomOnlyTitleCheckDialogState.value = CustomOnlyTitleCheckDialogState()
     }
 }

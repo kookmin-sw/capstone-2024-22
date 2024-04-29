@@ -42,6 +42,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -94,10 +95,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.capstone.android.application.app.composable.CustomOnlyTitleCheckDialog
 import com.capstone.android.application.app.composable.CustomTitleCheckDialog
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.screen.BottomNavItem
 import com.capstone.android.application.data.local.Emotion
+import com.capstone.android.application.domain.CustomOnlyTitleCheckViewModel
 import com.capstone.android.application.domain.CustomTitleCheckViewModel
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.utile.AndroidAudioPlayer
@@ -1873,141 +1876,206 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Setting(){
+    fun Setting() {
 
-        val alarmbtnState = remember{ mutableStateOf(false) }
-        val databtnState = remember{ mutableStateOf(false) }
-        val InquirybtnState = remember{ mutableStateOf(false) }
-        val versionbtnState = remember{ mutableStateOf(false) }
+        val alarmbtnState = remember { mutableStateOf(false) }
+        val databtnState = remember { mutableStateOf(false) }
+        val version : String = "V 1.1"
+        val versionState = remember { mutableStateOf(true)}
+        val LatestVersion : String = "가장 최신버전이에요"
+        val NotLatestVersion : String = "앗 ! 최신버전이 아니에요. 업데이트가 필요해요"
+        val InquirybtnState = remember { mutableStateOf(false) }
+        val versionbtnState = remember { mutableStateOf(false) }
+
+        val viewModel_OnlyTitle: CustomOnlyTitleCheckViewModel = viewModel()
+        val CustomOnlyTitleCheckDialogState = viewModel_OnlyTitle.CustomOnlyTitleCheckDialogState.value
+
+        val viewModel_Title: CustomTitleCheckViewModel = viewModel()
+        val CustomTitleCheckDialogState = viewModel_Title.CustomTitleCheckDialogState.value
 
 
         Box(
             Modifier
                 .background(tertiary_500)
                 .fillMaxSize()
-                .padding(horizontal = 30.dp)) {
+                .padding(horizontal = 30.dp)
+        ) {
             Column(
                 Modifier
-                    .padding(top = 40.dp)) {
+                    .padding(top = 40.dp)
+            ) {
 
                 Column(modifier = Modifier
-                    .width(83.dp)
-                    .clickable { alarmbtnState.value = !alarmbtnState.value }){
-                        Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-                            P_Medium18(
-                                content = "알림 설정",
-                                color = if(alarmbtnState.value) primary_500 else black
-                            )
-                        }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Divider(color = if(alarmbtnState.value) primary_500 else black)
+                    .wrapContentWidth()
+                    .clickable {
+                        alarmbtnState.value = !alarmbtnState.value
+                        databtnState.value = false
+                        InquirybtnState.value = false
+                        versionbtnState.value = false
+                    }) {
+                    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+                        P_Medium(
+                            content = "알림 설정",
+                            color = if (alarmbtnState.value) primary_500 else black,
+                            size = if (alarmbtnState.value) 18.sp else 14.sp
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                    Divider(color = if (alarmbtnState.value) primary_500 else black,
+                        modifier = if (alarmbtnState.value) Modifier.width(83.dp) else  Modifier.width(68.dp))
+
                 }
-                if (alarmbtnState.value){
+                if (alarmbtnState.value) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Toggle()
                     Spacer(modifier = Modifier.height(16.dp))
-                }
-                else{
+                } else {
                     Spacer(modifier = Modifier.height(40.dp))
                 }
 
                 Column(modifier = Modifier
-                    .width(134.dp)
-                    .clickable { }){
+                    .wrapContentWidth()
+                    .clickable {
+                        databtnState.value = !databtnState.value
+                        alarmbtnState.value = false
+                        InquirybtnState.value = false
+                        versionbtnState.value = false
+                    }) {
                     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-                        P_Medium18(
-                            content = "계정 이메일 변경",
-                            color = black
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Divider(color = black)
-                }
-                Spacer(modifier = Modifier.height(40.dp))
-
-
-                Column(modifier = Modifier
-                    .width(99.dp)
-                    .clickable { databtnState.value = !databtnState.value }){
-                    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-                        P_Medium18(
+                        P_Medium(
                             content = "데이터 허용",
-                            color = if(databtnState.value) primary_500 else black
+                            color = if (databtnState.value) primary_500 else black,
+                            size = if (databtnState.value) 18.sp else 14.sp
                         )
                     }
                     Spacer(modifier = Modifier.height(4.dp))
-                    Divider(color = if(databtnState.value) primary_500 else black)
+                    Divider(color = if (databtnState.value) primary_500 else black,
+                        modifier = if (databtnState.value) Modifier.width(99.dp) else Modifier.width(80.dp))
                 }
-                if (databtnState.value){
+                if (databtnState.value) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Toggle()
                     Spacer(modifier = Modifier.height(8.dp))
-                    P_Medium11(content = "셀룰러 데이터를 허용하면, 데이터 환경에서도 녹음카드 분석 가능해요\n" +
-                            "허용하지 않으면, Wi-Fi가 연결된 환경에서만 분석돼요", color = neutral_600)
+                    P_Medium11(
+                        content = "셀룰러 데이터를 허용하면, 데이터 환경에서도 녹음카드 분석 가능해요\n" +
+                                "허용하지 않으면, Wi-Fi가 연결된 환경에서만 분석해요", color = neutral_600
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
-                }
-                else{
+                } else {
                     Spacer(modifier = Modifier.height(40.dp))
                 }
 
 
                 Column(modifier = Modifier
-                    .width(79.dp)
-                    .clickable { InquirybtnState.value = !InquirybtnState.value }){
+                    .wrapContentWidth()
+                    .clickable {
+                        versionbtnState.value = !versionbtnState.value
+                        alarmbtnState.value = false
+                        databtnState.value = false
+                        InquirybtnState.value = false
+                    }) {
                     Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-                        P_Medium18(
-                            content = "문의하기",
-                            color = if(InquirybtnState.value) primary_500 else black
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Divider(color = if(InquirybtnState.value) primary_500 else black)
-                }
-                if (InquirybtnState.value){
-                    Spacer(modifier = Modifier.height(8.dp))
-                    P_Medium14(content = "kookminmoment@gmail.com", color = black)
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-                else{
-                    Spacer(modifier = Modifier.height(40.dp))
-                }
-
-
-                Column(modifier = Modifier
-                    .width(79.dp)
-                    .clickable { versionbtnState.value = !versionbtnState.value }){
-                    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-                        P_Medium18(
+                        P_Medium(
                             content = "버전안내",
-                            color =  if (versionbtnState.value) primary_500 else black
+                            color = if (versionbtnState.value) primary_500 else black,
+                            size = if (versionbtnState.value) 18.sp else 14.sp
                         )
                     }
                     Spacer(modifier = Modifier.height(4.dp))
-                    Divider(color = if (versionbtnState.value) primary_500 else black)
+                    Divider(color = if (versionbtnState.value) primary_500 else black,
+                        modifier = if (versionbtnState.value) Modifier.width(79.dp) else Modifier.width(65.dp))
                 }
-                if (versionbtnState.value){
+                if (versionbtnState.value) {
                     Spacer(modifier = Modifier.height(8.dp))
-                    P_Medium14(content = "v1.1", color = black)
+                    Row {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        P_Medium14(content = version, color = black)
+                        Spacer(modifier = Modifier.width(40.dp))
+                        P_Medium11(content = if(versionState.value) LatestVersion else NotLatestVersion, color = neutral_500)
+                    }
+
                     Spacer(modifier = Modifier.height(16.dp))
+                } else {
+                    Spacer(modifier = Modifier.height(40.dp))
                 }
-                else{
+
+
+                Column(modifier = Modifier
+                    .wrapContentWidth()
+                    .clickable {
+                        InquirybtnState.value = !InquirybtnState.value
+                        alarmbtnState.value = false
+                        databtnState.value = false
+                        versionbtnState.value = false
+                    }) {
+                    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+                        P_Medium(
+                            content = "문의하기",
+                            color = if (InquirybtnState.value) primary_500 else black,
+                            size = if (InquirybtnState.value) 18.sp else 14.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Divider(color = if (InquirybtnState.value) primary_500 else black,
+                        modifier = if (InquirybtnState.value) Modifier.width(79.dp) else  Modifier.width(65.dp))
+                }
+                if (InquirybtnState.value) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column {
+                            P_Medium14(content = "kookminmoment@gmail.com", color = black)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            P_Medium11(content = "앗 ! 사용하시면서 불편한 점이 있으시다고요?\n" +
+                                    "이메일로 보내주시면 친절히 답변해드릴게요", color = neutral_500)
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                } else {
                     Spacer(modifier = Modifier.height(40.dp))
                 }
 
                 Column(
                     Modifier
-                        .padding(top = 150.dp)) {
-                    Column(Modifier.clickable {  }) {
+                        .padding(top = 150.dp)
+                ) {
+                    Column(Modifier.clickable {
+                        viewModel_OnlyTitle.showCustomOnlyTitleCheckDialog()
+                    }) {
                         P_Medium14("로그아웃", black)
                     }
+
+                    if (CustomOnlyTitleCheckDialogState.title.isNotBlank()) {
+                        CustomOnlyTitleCheckDialog(
+                            title = CustomOnlyTitleCheckDialogState.title,
+                            checkleft = CustomOnlyTitleCheckDialogState.checkleft,
+                            checkright = CustomOnlyTitleCheckDialogState.checkright,
+                            onClickleft = { /*로그아웃 기능*/ },
+                            onClickright = { CustomOnlyTitleCheckDialogState.onClickright() }
+                        )
+                    }
+
                     Spacer(modifier = Modifier.height(28.dp))
-                    Column(Modifier.clickable {  }) {
+                    Column(Modifier.clickable { viewModel_Title.showCustomTitleCheckDialog() }) {
                         P_Medium14("탈퇴하기", black)
                     }
+
+                    if (CustomTitleCheckDialogState.title.isNotBlank()) {
+                        CustomTitleCheckDialog(
+                            title = "정말 탈퇴하시나요 .. ?",
+                            description = "새로운 계정으로 만나는 건 가능하지만\n" +
+                                    "지금까지의 우리 추억은 모두 사라져요",
+                            checkleft = "네",
+                            checkright = "아니요",
+                            onClickleft = { /*탈퇴 기능*/ },
+                            onClickright = { CustomTitleCheckDialogState.onClickright() },
+                            onClickCancel = { CustomTitleCheckDialogState.onClickCancel()}
+                        )
+                    }
                 }
+            }
         }
     }
-}
 
     @Composable
     fun Toggle() {
