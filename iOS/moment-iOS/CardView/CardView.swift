@@ -418,6 +418,7 @@ struct DynamicGradientImagePicker: View {
                                     .resizable()
                                     .frame(width: 66, height: 77)
                                     .cornerRadius(3)
+                                    .aspectRatio(contentMode: .fill)
                             } else {
                                 addButton(index: index)
                             }

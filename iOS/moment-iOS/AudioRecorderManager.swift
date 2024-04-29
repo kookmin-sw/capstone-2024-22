@@ -37,7 +37,9 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
         }
     func startRecording() {
         locationManager.startUpdatingLocation()
-        let fileURL = getDocumentsDirectory().appendingPathComponent("recording-\(Date().timeIntervalSince1970).m4a")
+        
+        let fileURL = getDocumentsDirectory().appendingPathComponent("recording-\(Date().timeIntervalSince1970).m4a")// 녹음 파일 저장 경로 설정
+        //녹음설정하기
         let settings = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
             AVSampleRateKey: 12000,
@@ -46,6 +48,7 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
         ]
         
         do {
+            // AVAudioRecorder 인스턴스 생성 및 녹음 시작
             audioRecorder = try AVAudioRecorder(url: fileURL, settings: settings)
             audioRecorder?.record()
             self.isRecording = true
@@ -56,10 +59,14 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
     
     func stopRecording() {
         locationManager.stopUpdatingLocation()
+        // 위치 정보 업데이트 중지
         audioRecorder?.stop()
+        //녹음중지
         
-        if let url = audioRecorder?.url, let location = currentLocation {
+        if let url = audioRecorder?.url, let location = currentLocation {  // 녹음 파일이 존재하고, 위치 정보가 있을 경우 처리
+            // 녹음 파일 배열에 추가
             self.recordedFiles.append(url)
+            // 녹음 상태 업데이트
             self.isRecording = false
             
             // 파일을 적절한 디렉토리로 이동
@@ -67,14 +74,14 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
             let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
             let recordingsDirectory = documentsDirectory.appendingPathComponent("Recordings")
             
-            do {
+            do {  // 디렉토리 생성
                 // "Recordings" 폴더가 없으면 생성
                 try fileManager.createDirectory(at: recordingsDirectory, withIntermediateDirectories: true, attributes: nil)
             } catch {
                 print("Failed to create directory: \(error)")
             }
             
-            let newFileURL = recordingsDirectory.appendingPathComponent(url.lastPathComponent)
+            let newFileURL = recordingsDirectory.appendingPathComponent(url.lastPathComponent)  // 녹음 파일 이동
             do {
                 if fileManager.fileExists(atPath: newFileURL.path) {
                     // 동일한 이름의 파일이 이미 있으면 삭제
@@ -88,26 +95,28 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
             }
 
             // 날씨 데이터 가져오기
-            fetchWeatherData(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { temperature, weather in
+//            fetchWeatherData(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude) { temperature, weather in
+                // 날씨 데이터와 주소 정보 가져오기
                 // 주소 가져오기
-                self.geocodeLocation(location: location) { address in
+//                self.geocodeLocation(location: location) { address in
                     let formattedDate = DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .short)
                     
-                    print("Temperature: \(temperature)")
-                                   print("Weather: \(weather)")
-                                   print("Address: \(address ?? "No address found")")
-                                   print("Recorded At: \(formattedDate)")
+//                    print("Temperature: \(temperature)")
+//                    print("Weather: \(weather)")
+//                    print("Address: \(address ?? "No address found")")
+                    print("Recorded At: \(formattedDate)")
                     // 서버에 업로드
                     DispatchQueue.main.async {
-                        if let address = address {
-                            self.uploadRecordedData(recordFileURL: newFileURL, location: address, recordedAt: formattedDate, temperature: temperature, weather: weather, question: "오늘 날씨는 어때요?")
-                        } else {
-                            print("주소 정보가 없어서 데이터를 전송할 수 없습니다.")
-                        }
+//                        if let address = address {
+                            self.uploadRecordedData(recordFileURL: newFileURL, location: "address", recordedAt: "2024-02-08T14:30:00", temperature: "temperature", weather: "weather", question: "오늘 날씨는 어때요?")
+                            print("여기까지 흘러옴")
+//                        } else {
+//                            print("주소 정보가 없어서 데이터를 전송할 수 없습니다.")
+//                        }
                    
-                    }
+//                    }
                     
-                }
+//                }
                 
             }
         }
@@ -216,7 +225,7 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
 
     func uploadRecordedData(recordFileURL: URL, location: String, recordedAt: String, temperature: String, weather: String, question: String) {
         let urlString = "http://wasuphj.synology.me:8000/core/cardView/upload"  // 서버의 URL
-       // let headers: HTTPHeaders = ["userId": "1"]  // 필요한 경우 추가 헤더 설정
+      
 
         let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
         
@@ -224,7 +233,7 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
             // 녹음 파일을 멀티파트 폼 데이터에 추가
             multipartFormData.append(recordFileURL, withName: "recordFile", fileName: recordFileURL.lastPathComponent, mimeType: "audio/mp3")
 
-            // JSON 메타데이터 생성 및 추가
+            // JSON 메타데이터 만들기
             let jsonPart: [String: Any] = [
                 "location": location,
                 "recordedAt": recordedAt,

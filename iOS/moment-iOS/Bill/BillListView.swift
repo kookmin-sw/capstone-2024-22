@@ -396,7 +396,8 @@ struct ReceiptDetailView: View {
     @State private var isDialogActiveBillCom = false
     var topColor: Color = .homeRed
     var textColor: Color = .white // 상단 바에 사용할 텍스트 색상
-    let item : Item
+    //let item : Item
+    @State var item: Item
     @State private var text: String = ""
     @State private var starttrip: String = ""
     @State private var StartLocation : String = ""
@@ -408,6 +409,7 @@ struct ReceiptDetailView: View {
     @State private var EndLocationend : String = ""
     @State private var selectedTab = 0
     @State private var showingGroup = false
+     var snapshotManager: SnapshotManager?
     
     
     
@@ -427,20 +429,30 @@ struct ReceiptDetailView: View {
                                 print("두ㅏㅣ로가기")
                             } else {
                                 // "내보내기" 버튼의 기능을 실행
-                                let image: UIImage
+                               // let image: UIImage
+                                let snapshotManager: SnapshotManager
                                 switch selectedTab {
                                 case 0:
-                                    // 태그 1인 경우 ReceiptBillView1의 스냅샷 캡쳐
                                     
-                                    image = ReceiptBillView1(item: item).snapshot()
+                                   
+                                  //  image = ReceiptBillView1(item: item).snapshot()
+                                    //print("나 여기있어!")
+                                    snapshotManager = SnapshotManager(rootView: AnyView(ReceiptBillView1(item: item)))
                                 case 1:
-                                    // 태그 2인 경우 ReceiptView의 스냅샷 캡쳐
-                                    image = ReceiptView().snapshot()
+                                    
+                                    //image = ReceiptView().snapshot()
+                                    snapshotManager = SnapshotManager(rootView: AnyView(ReceiptView()))
                                 default:
-                                    // 기본값 설정, 필요에 따라 수정 가능
-                                    image = UIImage()
+                                    
+                                  //  image = UIImage()
+                                    return
                                 }
-                                showShareSheet(image)
+                             //   showShareSheet(image)
+                                snapshotManager.captureSnapshot { image in
+                                                                DispatchQueue.main.async {
+                                                                    showShareSheet(image)
+                                                                }
+                                                            }
                                 print("내보내기")
                             }
                         }) {
@@ -545,7 +557,7 @@ struct ReceiptDetailView: View {
         
         
     }
-    
+    // 얘는 문제가 없는거같고 
     private func showShareSheet(_ image: UIImage) {
         
         guard let rootVC = UIApplication.shared.windows.first?.rootViewController else {
@@ -555,7 +567,7 @@ struct ReceiptDetailView: View {
         // UIActivityViewController 인스턴스 생성
         let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
         
-        // iPad에서는 popover로 표시될 위치를 지정해야 할 수 있습니다.
+        
         if let popoverController = activityVC.popoverPresentationController {
             popoverController.sourceView = rootVC.view
             popoverController.sourceRect = CGRect(x: rootVC.view.bounds.midX, y: rootVC.view.bounds.midY, width: 0, height: 0)
@@ -566,18 +578,18 @@ struct ReceiptDetailView: View {
         rootVC.present(activityVC, animated: true, completion: nil)
     }
     
-    func captureSnapshot() {
-        let hostingController = UIHostingController(rootView: ReceiptDetailView(item:item))
-        let targetSize = hostingController.view.intrinsicContentSize
-        hostingController.view.bounds = CGRect(origin: .zero, size: targetSize)
-        hostingController.view.layoutIfNeeded()
-
-        let renderer = UIGraphicsImageRenderer(size: targetSize)
-        let image = renderer.image { _ in
-            hostingController.view.drawHierarchy(in: hostingController.view.bounds, afterScreenUpdates: true)
-        }
-        showShareSheet(image) // 이미지화 한거 캡쳐하기
-    }
+//    func captureSnapshot() {
+//        let hostingController = UIHostingController(rootView: ReceiptDetailView(item:item))
+//        let targetSize = hostingController.view.intrinsicContentSize
+//        hostingController.view.bounds = CGRect(origin: .zero, size: targetSize)
+//        hostingController.view.layoutIfNeeded()
+//
+//        let renderer = UIGraphicsImageRenderer(size: targetSize)
+//        let image = renderer.image { _ in
+//            hostingController.view.drawHierarchy(in: hostingController.view.bounds, afterScreenUpdates: true)
+//        }
+//        showShareSheet(image) // 이미지화 한거 캡쳐하기
+//    }
 
     
 }
@@ -600,6 +612,7 @@ struct CustomTabIndicator: View {
         // 추가적인 스타일링은 여기에...
     }
 }
+
 struct TextFieldDynamicWidth: View {
     let title: String
     @Binding var text: String
@@ -839,6 +852,7 @@ struct ReceiptBillView1 : View {
     @State private var EndLocationend : String = ""
     @State private var selectedTab = 0
     @State private var forceUpdate = ""
+  
     
     var body: some View{
         VStack(spacing: 0) {
@@ -904,9 +918,12 @@ struct ReceiptBillView1 : View {
                                 }, onCommit: {
                                     
                                 })
+                                //Text("didtlrhks")
                                 .font(.pretendardMedium14)
                                 .foregroundColor(.homeRed)
-                            }.frame(maxWidth: .infinity)
+                           
+                            }
+                            .frame(maxWidth: .infinity)
                             
                             
                             HStack{

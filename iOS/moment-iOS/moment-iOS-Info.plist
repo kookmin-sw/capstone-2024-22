@@ -27,5 +27,7 @@
 		<string>Pretendard-Thin.otf</string>
 		<string>YJ_Obang_OTF.otf</string>
 	</array>
+	<key>isSecureTextEntry</key>
+	<false/>
 </dict>
 </plist>

@@ -13,8 +13,10 @@ extension View {
         let controller = UIHostingController(rootView: self)
         let view = controller.view
         
-        let targetSize = controller.view.intrinsicContentSize
+        let targetSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height) // 예시 크기
         view?.bounds = CGRect(origin: .zero, size: targetSize)
+
+       // view?.bounds = CGRect(origin: .zero, size: targetSize)
         view?.backgroundColor = .clear
         
         let renderer = UIGraphicsImageRenderer(size: targetSize)
