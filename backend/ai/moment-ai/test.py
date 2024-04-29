@@ -5,7 +5,8 @@ import pandas as pd
 import sys, os
 # print(os.getcwd())
 print(sys.path)
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__name__), 'whisper')))
+print(os.path.abspath(os.path.join(os.path.dirname(__name__), '.')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__name__), '.')))
 import whisper.whisper as whisper
 import argparse
 import json, torch
