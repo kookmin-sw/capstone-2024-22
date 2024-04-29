@@ -1,6 +1,8 @@
 package com.capstone.android.application.ui
 
 import android.content.Intent
+import com.capstone.android.application.MainActivity
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -40,6 +42,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.capstone.android.application.R
+import com.capstone.android.application.app.ApplicationClass
+import com.capstone.android.application.app.ApplicationClass.Companion.tokenSharedPreferences
 import com.capstone.android.application.ui.theme.BigButton
 import com.capstone.android.application.ui.theme.PretendardFamily
 import com.capstone.android.application.ui.theme.black
@@ -63,6 +67,10 @@ class SplashActivity:ComponentActivity() {
     lateinit var navController: NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if(!tokenSharedPreferences.getString("accessToken","").isNullOrEmpty()){
+            startActivity(Intent(this@SplashActivity,MainActivity::class.java))
+            finish()
+        }
 
         setContent{
             navController = rememberNavController()
