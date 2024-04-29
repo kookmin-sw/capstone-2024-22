@@ -5,6 +5,7 @@ import com.moment.core.common.code.SuccessCode;
 import com.moment.core.dto.request.CardViewRequestDTO;
 import com.moment.core.dto.response.CardViewResponseDTO;
 import com.moment.core.service.CardViewService;
+import com.moment.core.service.ImageFileService;
 import com.moment.core.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 
 @Slf4j
@@ -29,6 +31,7 @@ import java.io.IOException;
 public class CardViewController {
     private final CardViewService cardViewService;
     private final UserService userService;
+    private final ImageFileService imageFileService;
 
     // 녹음본 업로드
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -124,6 +127,18 @@ public class CardViewController {
     ) {
         CardViewResponseDTO.GetAllCardView allCardView = cardViewService.getLikeCardView(userId);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.SELECT_SUCCESS, allCardView));
+    }
+
+    // 카드뷰에 이미지 파일 저장
+    @PostMapping(value = "/image/{cardViewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<APIResponse> uploadImage(
+            @RequestHeader Long userId,
+            @PathVariable Long cardViewId,
+            @RequestPart List<MultipartFile> images
+    ) throws IOException {
+        userService.validateUserWithCardView(userId, cardViewId);
+        imageFileService.uploadAll(images, cardViewId, userId);
+        return ResponseEntity.ok(APIResponse.of(SuccessCode.INSERT_SUCCESS));
     }
 }
 
