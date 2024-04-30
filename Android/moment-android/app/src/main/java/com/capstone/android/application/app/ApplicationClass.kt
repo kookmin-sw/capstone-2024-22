@@ -65,7 +65,7 @@ class ApplicationClass: Application() {
             proceed(
                 request()
                     .newBuilder()
-                    .addHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxMDkzMDMyMCwiZXhwIjoxNzU0MTMwMzIwfQ.mVy33lNv-by6bWXshsT4xFOwZSWGkOW76GWimliqHP4")
+                    .addHeader("Authorization", "Bearer ${tokenSharedPreferences.getString("accessToken","")}")
                     .build()
             )
         }
