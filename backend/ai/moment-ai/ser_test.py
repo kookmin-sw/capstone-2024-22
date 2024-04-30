@@ -1,3 +1,24 @@
+# from funasr import AutoModel
+# from pydub import AudioSegment
+# import librosa
+# import soundfile
+# import numpy as np
+
+# audio_path = './source/test.mp4'
+# audio = AudioSegment.from_file(audio_path)
+# # sampling rates, channel 변경
+# if audio.frame_rate != 16000:
+#     print(f"sample rate changed : {audio.frame_rate} -> {16000}")
+#     audio = audio.set_frame_rate(16000)
+    
+# if audio.channels != 1:
+#     print(f"channel changed : {audio.channels} -> {1}")
+#     audio = audio.set_channels(1)
+# audioseg = np.array(audio.get_array_of_samples())
+# libro, sr = librosa.load(audio_path, sr=16000, mono=False)
+# print(audioseg.shape)
+# print(libro.shape)
+
 from funasr import AutoModel
 from pydub import AudioSegment
 
@@ -8,6 +29,7 @@ from pydub import AudioSegment
 # # WAV 파일로 저장
 # audio.export("source/test.wav", format="wav")
 
+from emotion2vec.iemocap_downstream.model import BaseModel
 
 '''
 Using the finetuned emotion recognization model
@@ -27,9 +49,15 @@ rec_result contains {'feats', 'labels', 'scores'}
     8: unknown
 '''
 model = AutoModel(model="iic/emotion2vec_base_finetuned", model_revision="v2.0.4")
-wav_file = f"/Users/taejinpark/Desktop/moment-ai/source/test3.wav"
-rec_result = model.generate(wav_file, output_dir="./outputs", granularity="utterance", extract_embedding=False)
+wav_file = f"/Users/taejinpark/Desktop/capstone-2024-22/backend/ai/moment-ai/emotion2vec/datas/SAVEE/JK_sa15.wav"
+model.model.proj = BaseModel()
+print(model.model)
+rec_result = model.generate(wav_file, output_dir="./outputs", granularity="utterance", extract_embedding=False)[0]
 print(rec_result)
+import numpy as np
+print(rec_result['scores'])
+scores = np.array(rec_result['scores'], dtype=np.float64)
+print(rec_result['labels'][np.argmax(scores)])
 
 
 
