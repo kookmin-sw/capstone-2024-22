@@ -140,5 +140,16 @@ public class CardViewController {
         imageFileService.uploadAll(images, cardViewId, userId);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.INSERT_SUCCESS));
     }
+
+    // 카드뷰에 이미지 삭제
+    @DeleteMapping(value = "/image")
+    public ResponseEntity<APIResponse> deleteImages(
+            @RequestHeader Long userId,
+            @RequestBody List<Long> images
+    ) throws IOException {
+        imageFileService.deleteImages(images, userId);
+        return ResponseEntity.ok(APIResponse.of(SuccessCode.DELETE_SUCCESS));
+    }
+
 }
 
