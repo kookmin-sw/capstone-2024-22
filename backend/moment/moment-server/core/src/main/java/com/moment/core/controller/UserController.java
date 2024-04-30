@@ -36,7 +36,7 @@ public class UserController {
     public ResponseEntity<APIResponse> registerUser(
             @RequestBody UserRequestDTO.registerUser request
             ) {
-        s3Service.createFolder(request.getId().toString());
+//        s3Service.createFolder(request.getId().toString());
         userService.save(request);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.INSERT_SUCCESS));
     }
