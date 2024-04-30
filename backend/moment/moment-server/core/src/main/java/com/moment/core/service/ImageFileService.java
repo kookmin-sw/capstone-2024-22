@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -22,6 +23,7 @@ public class ImageFileService {
     private final ImageFileRepository imageFileRepository;
     private final S3Service s3Service;
     private final CardViewRepository cardViewRepository;
+    private final UserService userService;
 
     @Transactional
     public void deleteAll(CardView cardView) {
@@ -37,7 +39,8 @@ public class ImageFileService {
         for (MultipartFile imageFile : imageFiles) {
             CardView cv = cardViewRepository.findById(cardViewId).orElseThrow(() -> new IllegalArgumentException("해당 카드뷰가 없습니다."));
             String filename = UUID.randomUUID().toString();
-            String url = s3Service.uploadFile(imageFile, userId, filename, false);
+            String extension = Objects.requireNonNull(imageFile.getOriginalFilename()).substring(imageFile.getOriginalFilename().lastIndexOf("."));
+            String url = s3Service.uploadFile(imageFile, userId, filename + extension, false);
             ImageFile image = ImageFile.builder()
                     .fileUrl(url)
                     .fileName(filename)
@@ -48,4 +51,13 @@ public class ImageFileService {
 
     }
 
+    @Transactional
+    public void deleteImages(List<Long> images, Long userId) {
+        for (Long imageId : images) {
+            ImageFile image = imageFileRepository.findById(imageId).orElseThrow(() -> new IllegalArgumentException("해당 이미지가 없습니다."));
+            userService.validateUserWithCardView(userId, image.getCardView().getId());
+            s3Service.deleteFile(image.getFileName());
+            imageFileRepository.delete(image);
+        }
+    }
 }
