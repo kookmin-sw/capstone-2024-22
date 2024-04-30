@@ -23,3 +23,10 @@ eureka:
 logging:
   level:
     com.moment.scheduler: debug
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 500000
+        readTimeout: 500000
