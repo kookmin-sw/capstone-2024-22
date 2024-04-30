@@ -39,16 +39,16 @@ public class S3Service {
     }
     public String uploadToS3(MultipartFile image, Long userId, String fileName, boolean isRecord) throws IOException {
         String s3FileName = s3folderPath + userId.toString() + "/" + fileName; //S3에 저장될 파일 명
-        String extention = Objects.requireNonNull(image.getOriginalFilename()).substring(image.getOriginalFilename().lastIndexOf("."));
+        String extension = Objects.requireNonNull(image.getOriginalFilename()).substring(image.getOriginalFilename().lastIndexOf("."));
 
         InputStream is = image.getInputStream();
         byte[] bytes = IOUtils.toByteArray(is); //image를 byte[]로 변환
 
         ObjectMetadata metadata = new ObjectMetadata(); //metadata 생성
         if (isRecord) {
-            metadata.setContentType("audio/" + extention);
+            metadata.setContentType("audio/" + extension);
         } else {
-            metadata.setContentType("image/" + extention);
+            metadata.setContentType("image/" + extension);
         }
         metadata.setContentLength(bytes.length);
 
