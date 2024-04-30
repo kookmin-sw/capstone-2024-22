@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -37,7 +38,8 @@ public class ImageFileService {
         for (MultipartFile imageFile : imageFiles) {
             CardView cv = cardViewRepository.findById(cardViewId).orElseThrow(() -> new IllegalArgumentException("해당 카드뷰가 없습니다."));
             String filename = UUID.randomUUID().toString();
-            String url = s3Service.uploadFile(imageFile, userId, filename, false);
+            String extension = Objects.requireNonNull(imageFile.getOriginalFilename()).substring(imageFile.getOriginalFilename().lastIndexOf("."));
+            String url = s3Service.uploadFile(imageFile, userId, filename + extension, false);
             ImageFile image = ImageFile.builder()
                     .fileUrl(url)
                     .fileName(filename)
