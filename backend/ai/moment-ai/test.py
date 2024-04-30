@@ -19,9 +19,12 @@ import numpy as np
 import torch.nn.functional as F
 import fairseq
 
+# for SER task
 from funasr import AutoModel
-from pydub import AudioSegment
-print(sys.path)
+import subprocess
+from emotion2vec.iemocap_downstream.model import BaseModel
+
+
 
 @dataclass
 class UserDirModule:
@@ -55,46 +58,32 @@ def run_model_on_gpu(models:dict, source_file, output):
           output["text"] = result["text"]
           
         elif model_name == "emotion2vec":
-          # for demos
-          result = {"sad": 75.3, "happy": 4.7, "angry": 7.1, "neutral": 12.9}
-          output["emotions"] = result
-          continue
+          labels = ["neutral", "happy", "angry", "sad", "disgust"]
+          # # for demos
+          # # labels : neutral : 0, happy : 1, angry : 2, sad : 3, disgust : 4
+          # result = {"sad": 75.3, "happy": 4.7, "angry": 7.1, "neutral": 6.9, "disgust": 6}
+          # output["emotions"] = result
+          # continue
           
           # for real test
-          model, ser_config, ser_task = model_config
-          model.to('cuda')
-          model.eval()
+          model = model_config[0]
+          model.model.to('cuda')
+
+          wav_source_file = None
+          if not source_file.endswith('.wav'):
+            wav_source_file = os.path.splitext(source_file)[0] + '.wav'
+            command = f"ffmpeg -i {source_file} -ab 160k -ac 1 -ar 16000 -vn {wav_source_file}"
+            subprocess.call(command, shell=True)
+            
+          else:
+            wav_source_file = source_file
           
-          if source_file.endswith('.mp4'):
-            audio = AudioSegment.from_file(source_file)
-            source = audio.get_array_of_samples()
-            source = np.array(source, dtype=np.float64)
-            
-            
-          with torch.no_grad():
-              # extract feature
-              source = torch.from_numpy(source).float().cuda()
-
-              if ser_task.cfg.normalize:
-                  source = F.layer_norm(source, source.shape)
-              source = source.view(1, -1)
-              
-              try:
-                  feats = model.extract_features(source, padding_mask=None)
-                  feats = feats['x'].squeeze(0).cpu().numpy()
-                  if args.granularity == 'frame':
-                      feats = feats
-                  elif args.granularity == 'utterance':
-                      feats = np.mean(feats, axis=0)
-                  else:
-                      raise ValueError("Unknown granularity")
-
-              except:
-                  Exception("Error in extracting features from {}".format(source_file))
-                  
-              # classifier
-              
-              output["emotion"]= feats
+          rec_result = model.generate(wav_source_file, output_dir="./outputs", granularity="utterance", extract_embedding=False)[0]
+          scores = rec_result['scores']
+          output["emotions"] = dict(zip(labels, scores))
+          
+          if os.path.exists(wav_source_file):
+            os.remove(wav_source_file)
           
       output['status'] = '200'
       output['error'] = None
@@ -104,6 +93,10 @@ def run_model_on_gpu(models:dict, source_file, output):
       print(f"Failed to run model on GPU: {e}")
       output['status'] = '400'
       output["error"] = f"{e}"
+  
+  else:
+    output['status'] = '400'
+    output["error"] = "model cannot run on gpu"
   
   
   # return output
@@ -124,46 +117,32 @@ def run_model_on_cpu(models:dict, source_file, output):
         output["text"] = result["text"]
         
       elif model_name == "emotion2vec":
-        # for demos
-        result = {"sad": 75.3, "happy": 4.7, "angry": 7.1, "neutral": 12.9}
-        output["emotions"] = result
-        continue
+        labels = ["neutral", "happy", "angry", "sad", "disgust"]
+        # # for demos
+        # # labels = {"neutral" : 0, "happy" : 1, "angry" : 2, "sad" : 3, "disgust" : 4}
+        # result = {"sad": 75.3, "happy": 4.7, "angry": 7.1, "neutral": 6.9, "disgust": 6}
+        # output["emotions"] = result
+        # continue
         
         # for real test
-        model, ser_config, ser_task = model_config
-        model.to('cpu')
-        model.eval()
+        model = model_config[0]
+        model.model.to('cpu')
+
+        wav_source_file = None
+        if not source_file.endswith('.wav'):
+          wav_source_file = os.path.splitext(source_file)[0] + '.wav'
+          command = f"ffmpeg -i {source_file} -ab 160k -ac 1 -ar 16000 -vn {wav_source_file}"
+          subprocess.call(command, shell=True)
+          
+        else:
+          wav_source_file = source_file
         
-        if source_file.endswith('.mp4'):
-          audio = AudioSegment.from_file(source_file)
-          source = audio.get_array_of_samples()
-          source = np.array(source, dtype=np.float64)
-          
-          
-        with torch.no_grad():
-            # extract feature
-            source = torch.from_numpy(source).float()
-
-            if ser_task.cfg.normalize:
-                source = F.layer_norm(source, source.shape)
-            source = source.view(1, -1)
-            
-            try:
-                feats = model.extract_features(source, padding_mask=None)
-                feats = feats['x'].squeeze(0).cpu().numpy()
-                if args.granularity == 'frame':
-                    feats = feats
-                elif args.granularity == 'utterance':
-                    feats = np.mean(feats, axis=0)
-                else:
-                    raise ValueError("Unknown granularity")
-
-            except:
-                Exception("Error in extracting features from {}".format(source_file))
-                
-            # classifier
-            
-            output["emotion"]= feats
+        rec_result = model.generate(wav_source_file, output_dir="./outputs", granularity="utterance", extract_embedding=False)[0]
+        scores = rec_result['scores']
+        output["emotions"] = dict(zip(labels, scores))
+        
+        if os.path.exists(wav_source_file):
+          os.remove(wav_source_file)
         
     output['status'] = '200'
     output['error'] = None
@@ -180,6 +159,7 @@ def run_model_on_cpu(models:dict, source_file, output):
 
 def main(file_name, file_path=None):  
   # config model
+  print("\n\nconfiguration of datas ------------------------------------------------------------------------------")
   output = dict()
   
   output["text"] = None
@@ -190,6 +170,7 @@ def main(file_name, file_path=None):
   output["file_path"] = file_path
   
   # connect s3
+  print("\n\nconnect s3 and download file ------------------------------------------------------------------------------")
   key_csv = pd.read_csv('s3_key.csv')
   ACCESS_KEY = key_csv['Access key ID'].to_list()[0]
   SECRET_KEY = key_csv['Secret access key'].to_list()[0]
@@ -212,28 +193,24 @@ def main(file_name, file_path=None):
     
 
   # load model
-  # print("\n\nload model ------------------------------------------------------------------------------")
-  # stt_model = None
+  print("\n\nload model ------------------------------------------------------------------------------")
   stt_model = whisper.load_model(args.whisper_version)
-  
-  ser_model_dir = "./emotion2vec/upstream"
-  ser_checkpoint_dir = "./emotion2vec/emotion2vec_base/emotion2vec_base.pt"
+
+  # ser_classifer_dir = None
   ser_classifer_dir = "./emotion2vec/emotion2vec_base/emotion2vec_classifier.pt"
-
-  # for demos
-  ser_model, ser_cfg, ser_task = None, None, None
-
-  ## for real test
-  # ser_model_path = UserDirModule(ser_model_dir)
-  # fairseq.utils.import_user_module(ser_model_path)
-  # ser_model, ser_cfg, ser_task = fairseq.checkpoint_utils.load_model_ensemble_and_task([ser_checkpoint_dir])
-  # ser_model = ser_model[0]
+  ser_model =  AutoModel(model="iic/emotion2vec_base_finetuned", model_revision="v2.0.4")
   
-  models_dict = {'whisper' : [stt_model], 'emotion2vec' : [ser_model, ser_cfg, ser_task]}
+  if ser_classifer_dir:
+    ser_classifer = BaseModel()
+    # ser_classifer.load_state_dict(torch.load(ser_classifer_dir))
+    ser_model.model.proj = ser_classifer
+
+  
+  models_dict = {'whisper': [stt_model], 'emotion2vec': [ser_model]}
 
   
   # run model
-  # print("\n\nrun model ------------------------------------------------------------------------------")
+  print("\n\nrun model ------------------------------------------------------------------------------")
   
   # models in GPU
   # output = run_model_on_gpu(models_dict, source_file, output)
@@ -258,6 +235,7 @@ def main(file_name, file_path=None):
     
   if os.path.exists(source_file):
     os.remove(source_file)
+    
 
   
   # save outout
@@ -268,19 +246,13 @@ def main(file_name, file_path=None):
     with open(output_name, "wt") as fp:
       fp.write(json.dumps(output))
       fp.close()
-  
-  # print result
-  # print("\n\nresult ------------------------------------------------------------------------------")
-  # print(output)
 
-  
-  # return json.dumps(output)
   return output
 
 if __name__ == "__main__":
   # file_name = "../moment_ai/test.mp4" if args.file_path is None else args.file_path
   file_path = 'users/1/'
-  file_name = '2024-04-29T05:17:30.415789166.mp4.mp4'
+  file_name = '2024-04-30T10:27:06.293422421.mp4'
   print(file_path, file_name)
   result = main(file_path=file_path, file_name=file_name)
   print('results :', result)
