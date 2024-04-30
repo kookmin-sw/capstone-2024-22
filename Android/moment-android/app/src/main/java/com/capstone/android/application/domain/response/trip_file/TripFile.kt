@@ -1,4 +1,4 @@
-package com.capstone.android.application.data.remote.tripfile.tripfile_all.response
+package com.capstone.android.application.domain.response.trip_file
 
 data class TripFile(
     val analyzingCount: Int,
