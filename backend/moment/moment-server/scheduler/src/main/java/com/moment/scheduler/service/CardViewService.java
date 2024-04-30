@@ -44,7 +44,7 @@ public class CardViewService {
             log.info("sleep");
             sleep(9000);
         }
-        sleep(20000);
+        sleep(31000);
         // 경과 시간 체크를 위한 시작 시간
         long startTime = System.currentTimeMillis();
         List<CardView> cards = cardViewRepository.findAllByRecordFileStatusIn(List.of("WAIT", "FAIL"));
