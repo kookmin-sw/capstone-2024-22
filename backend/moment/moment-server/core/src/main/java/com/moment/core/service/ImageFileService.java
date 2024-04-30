@@ -60,4 +60,9 @@ public class ImageFileService {
             imageFileRepository.delete(image);
         }
     }
+
+    public List<String> getImageUrls(CardView cardView) {
+        List<ImageFile> imageFiles = imageFileRepository.findAllByCardView(cardView);
+        return imageFiles.stream().map(ImageFile::getFileUrl).toList();
+    }
 }

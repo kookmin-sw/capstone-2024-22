@@ -60,6 +60,7 @@ public class CardView extends BaseEntity {
 
     // STT
     @Column(name = "stt")
+    @Lob
     private String stt;
 
     // happy

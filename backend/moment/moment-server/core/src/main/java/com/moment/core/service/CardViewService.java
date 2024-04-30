@@ -97,8 +97,8 @@ public class CardViewService {
         // tripFile, trip의 analyzingCount 증가
         tripFileService.increaseAnalyzingCount(tripFile);
         tripService.increaseAnalyzingCount(tripFile.getTrip());
-
-        return CardViewResponseDTO.GetCardView.fromEntity(cardViewRepository.save(cardView));
+        List<String> imageUrls = new ArrayList<>();
+        return CardViewResponseDTO.GetCardView.fromEntity(cardViewRepository.save(cardView), imageUrls);
     }
 
     private String createFileName(String originalFilename) {
@@ -122,7 +122,8 @@ public class CardViewService {
         List<CardViewResponseDTO.GetCardView> rtnList = new ArrayList<>();
         List<CardView> cardViews = cardViewRepository.findAllByTripFile_IdOrderByRecordedAt(tripFileId);
         for (CardView cardView : cardViews) {
-            rtnList.add(CardViewResponseDTO.GetCardView.fromEntity(cardView));
+            List<String> imageUrls = imageFileService.getImageUrls(cardView);
+            rtnList.add(CardViewResponseDTO.GetCardView.fromEntity(cardView, imageUrls));
         }
         return CardViewResponseDTO.GetAllCardView.builder().cardViews(rtnList).build();
     }
@@ -185,7 +186,8 @@ public class CardViewService {
         List<CardViewResponseDTO.GetCardView> rtnList = new ArrayList<>();
         List<CardView> cardViews = cardViewRepository.findByTripFile_User_IdAndIsLovedOrderByRecordedAt(userId, true);
         for (CardView cardView : cardViews) {
-            rtnList.add(CardViewResponseDTO.GetCardView.fromEntity(cardView));
+            List<String> imageUrls = imageFileService.getImageUrls(cardView);
+            rtnList.add(CardViewResponseDTO.GetCardView.fromEntity(cardView, imageUrls));
         }
         return CardViewResponseDTO.GetAllCardView.builder().cardViews(rtnList).build();
     }
