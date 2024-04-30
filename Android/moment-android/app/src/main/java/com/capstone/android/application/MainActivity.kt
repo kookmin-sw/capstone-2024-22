@@ -85,6 +85,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -105,7 +107,9 @@ import com.capstone.android.application.app.utile.MomentAudioRecorder
 import com.capstone.android.application.data.remote.card.model.card_post.request.PostCardUploadReqeust
 import com.capstone.android.application.domain.Card
 import com.capstone.android.application.domain.Trip
+import com.capstone.android.application.domain.TripFile
 import com.capstone.android.application.presentation.CardViewModel
+import com.capstone.android.application.presentation.TripFileViewModel
 import com.capstone.android.application.presentation.TripViewModel
 import com.capstone.android.application.ui.CardActivity
 import com.capstone.android.application.ui.PatchTripActivity
@@ -138,8 +142,15 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -151,6 +162,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 
@@ -160,6 +172,7 @@ class MainActivity : ComponentActivity() {
     lateinit var navController: NavHostController
     private val tripViewModel : TripViewModel by viewModels()
     private val cardViewModel : CardViewModel by viewModels()
+    private val tripFileViweModel : TripFileViewModel by viewModels()
     private val recorder by lazy {
         MomentAudioRecorder(this@MainActivity)
     }
@@ -218,6 +231,10 @@ class MainActivity : ComponentActivity() {
         val tripList = remember {
             mutableStateListOf<Trip>()
         }
+        val tripFileUntitledList = remember {
+            mutableStateListOf<TripFile>()
+        }
+
         val favoriteCardList = remember{
             mutableStateListOf<Card>()
         }
@@ -237,10 +254,42 @@ class MainActivity : ComponentActivity() {
         }
 
 
+        val bottomItems = listOf<BottomNavItem>(
+            BottomNavItem.Home,
+            BottomNavItem.Receipt,
+            BottomNavItem.Record,
+            BottomNavItem.Favorite,
+            BottomNavItem.Setting,
+        )
+
+        val scope = rememberCoroutineScope()
+        val title = remember{
+            mutableStateOf("추가")
+        }
+
+        val currentSelectedBottomRoute = remember{
+            mutableStateOf("홈")
+        }
+        //Record Bottomsheet
+        val sheetState = rememberModalBottomSheetState(/*
+            initialValue = ModalBottomSheetValue.Hidden,
+            confirmStateChange = {false}*/
+        )
+
+        val recordOpen = remember { mutableStateOf(false)}
+        var EditCheckState = remember { mutableStateOf(false) }
+        var ReceiptCheckState = remember { mutableStateOf(true) }
+
+        val viewModel: CustomTitleCheckViewModel = viewModel()
+        val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
+        val coroutineScope = rememberCoroutineScope()
 
 
         tripViewModel.getTripAll()
         cardViewModel.getCardLiked()
+        tripFileViweModel.getTripFileUntitled()
+
+
 
 
         tripViewModel.getTripAllSuccess.observe(this@MainActivity){ response->
@@ -283,37 +332,31 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        cardViewModel.postCardUploadSuccess.observe(this@MainActivity){ response->
+            coroutineScope
+                .launch {
+                    sheetState.hide()
+                    recordOpen.value = false
+                }
+        }
+
+        tripFileViweModel.getTripFileUntitledSuccess.observe(this@MainActivity){ response->
+            response.data.tripFiles.mapNotNull { tripFile-> kotlin.runCatching { TripFile(
+                id = tripFile.id,
+                tripId = tripFile.tripId,
+                yearDate = tripFile.yearDate,
+                analyzingCount = tripFile.analyzingCount
+            ) }.onSuccess {
+                tripFileUntitledList.clear()
+            }.onFailure {  }.getOrNull()
+            }.forEach { it->
+                tripFileUntitledList.add(it)
+            }
+        }
 
 
         navController = rememberNavController()
-        val bottomItems = listOf<BottomNavItem>(
-            BottomNavItem.Home,
-            BottomNavItem.Receipt,
-            BottomNavItem.Record,
-            BottomNavItem.Favorite,
-            BottomNavItem.Setting,
-        )
 
-        val scope = rememberCoroutineScope()
-        val title = remember{
-            mutableStateOf("추가")
-        }
-
-        val currentSelectedBottomRoute = remember{
-            mutableStateOf("홈")
-        }
-        //Record Bottomsheet
-        val sheetState = rememberModalBottomSheetState(/*
-            initialValue = ModalBottomSheetValue.Hidden,
-            confirmStateChange = {false}*/
-        )
-
-        val recordOpen = remember { mutableStateOf(false)}
-        var EditCheckState = remember { mutableStateOf(false) }
-        var ReceiptCheckState = remember { mutableStateOf(true) }
-
-        val viewModel: CustomTitleCheckViewModel = viewModel()
-        val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
 
         if(recordOpen.value) {
             RecordNavigatesheet(recordOpen,
@@ -589,7 +632,7 @@ class MainActivity : ComponentActivity() {
                 composable(MainScreen.RecordDaily.screenRoute){
                     currentSelectedBottomRoute.value = MainScreen.RecordDaily.rootRoute
 
-                    RecordDaily()
+                    RecordDaily(tripFileUntitledList = tripFileUntitledList)
                 }
             }
         }
@@ -751,7 +794,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun RecordDaily(){
+    fun RecordDaily(tripFileUntitledList:MutableList<TripFile>){
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -786,11 +829,13 @@ class MainActivity : ComponentActivity() {
                     .padding(start = 16.dp, end = 4.dp)
             ){
                 items(
-                    count = 8,
-                    itemContent = {
+                    count = tripFileUntitledList.size,
+                    itemContent = { index->
                         Column(
                             modifier = Modifier.clickable {
-                                startActivity(Intent(this@MainActivity,TripFileActivity::class.java))
+                                val intent = Intent(this@MainActivity,CardActivity::class.java)
+                                intent.putExtra("tripFileId",tripFileUntitledList[index].tripId)
+                                startActivity(intent)
                             } ,
                         ) {
                             Box(
@@ -807,7 +852,7 @@ class MainActivity : ComponentActivity() {
                                 ){
 
                                     Text(
-                                        text = "2024.03.05",
+                                        text = tripFileUntitledList[index].yearDate,
                                         fontSize = 11.sp,
                                         color = Color.Black
                                     )
@@ -823,7 +868,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "4개의 파일이 있어요",
+                                        text = "${tripFileUntitledList[index].analyzingCount}개의 파일이 있어요",
                                         fontSize = 11.sp,
                                         color = Color("#706969".toColorInt())
                                     )
@@ -1255,27 +1300,54 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun tickerFlow(period: Duration, initialDelay: Duration = Duration.ZERO) = flow {
-        delay(initialDelay)
-        while (true) {
-            emit(Unit)
-            delay(period)
-        }
-    }
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun  RecordNavigatesheet(recordOpen : MutableState<Boolean>, sheetState: SheetState, closeSheet: () -> Unit
     ){
-//        tickerFlow(1.seconds)
-//            .map { LocalDateTime.now() }
-//            .distinctUntilChanged { old, new ->
-//                old.minute == new.minute
-//            }
-//            .onEach {
-//
-//            }
-//            .launchIn(lifecycleScope)
+        val minute = remember {
+            mutableStateOf(0)
+        }
+        val time = remember {
+            mutableStateOf("00")
+        }
+
+        val customTimerDuration = remember {
+            mutableStateOf(0)
+        }
+
+
+        val isPasused = remember {
+            mutableStateOf(false)
+        }
+
+
+        val timerJob: Job = CoroutineScope(Dispatchers.Main).launch(start = CoroutineStart.LAZY) {
+            withContext(Dispatchers.IO) {
+
+                while (customTimerDuration.value >= 0) {
+
+                    if(!isPasused.value){
+                        delay(1000L)
+                        customTimerDuration.value+=1
+                        if(customTimerDuration.value==60){
+                            customTimerDuration.value = 0
+                            time.value = "0${customTimerDuration.value}"
+                            minute.value+=1
+                        }else if(customTimerDuration.value <10){
+                            time.value = "0${customTimerDuration.value}"
+                        }else{
+                            time.value = "${customTimerDuration.value}"
+                        }
+
+                    }
+                }
+            }
+        }
+
+
+
+
+
 
 
         var currentDate:String=""
@@ -1296,7 +1368,6 @@ class MainActivity : ComponentActivity() {
 
 
 
-        val coroutineScope = rememberCoroutineScope()
 
         ModalBottomSheet(
             onDismissRequest = closeSheet,
@@ -1334,7 +1405,7 @@ class MainActivity : ComponentActivity() {
                         .padding(top = 63.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    P_Medium18(content = "0:03", color = black)
+                    P_Medium18(content = "${minute.value}:${time.value}", color = black)
                     Column(modifier = Modifier.width(45.dp)) {
                         Divider(color = black)
                     }
@@ -1364,10 +1435,18 @@ class MainActivity : ComponentActivity() {
                         Image(modifier = Modifier
                             .size(50.dp)
                             .clickable {
-                                File(cacheDir, "audio.mp3").also {
-                                    recorder.start(it)
-                                    audioFile = it
+                                if(timerJob.isActive){
+                                    isPasused.value = !isPasused.value
+
+                                }else{
+                                    File(cacheDir, "audio.mp3").also {
+                                        recorder.start(it)
+                                        audioFile = it
+                                    }
+                                    timerJob.start()
                                 }
+
+
                             },
                             painter =  painterResource(R.drawable.ic_record_ing),
                             contentDescription = "record")
@@ -1376,6 +1455,7 @@ class MainActivity : ComponentActivity() {
                         Column(
                             Modifier.clickable {
                                 recorder.stop()
+                                timerJob.cancel()
 
                                 val requestFile = audioFile?.asRequestBody("audio/*".toMediaTypeOrNull())
 
@@ -1403,15 +1483,7 @@ class MainActivity : ComponentActivity() {
                                     recordFile = body
                                 )
 
-//                                coroutineScope
-//                                    .launch {
-//                                        sheetState.hide()
-//                                    }
-//                                    .invokeOnCompletion {
-//                                        if (!sheetState.isVisible) {
-//                                            recordOpen.value = false
-//                                        }
-//                                    }
+
                             }) {
                                 YJ_Bold15("저장", primary_500)
                             }
@@ -2454,7 +2526,9 @@ class MainActivity : ComponentActivity() {
                         Spacer(modifier = Modifier.height(4.dp))
 
                         Row(
-                            Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Column(
