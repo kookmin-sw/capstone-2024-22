@@ -77,6 +77,11 @@ def run_model_on_gpu(models:dict, source_file, output):
             
           else:
             wav_source_file = source_file
+            
+          if not os.path.exists(wav_source_file):
+            output['status'] = '400'
+            output['error'] = f'no such file : {wav_source_file}. failed to make .wav from ffmpeg'
+            continue
           
           rec_result = model.generate(wav_source_file, output_dir="./outputs", granularity="utterance", extract_embedding=False)[0]
           scores = rec_result['scores']
@@ -136,6 +141,11 @@ def run_model_on_cpu(models:dict, source_file, output):
           
         else:
           wav_source_file = source_file
+          
+        if not os.path.exists(wav_source_file):
+            output['status'] = '400'
+            output['error'] = f'no such file : {wav_source_file}. failed to make .wav from ffmpeg'
+            continue
         
         rec_result = model.generate(wav_source_file, output_dir="./outputs", granularity="utterance", extract_embedding=False)[0]
         scores = rec_result['scores']
