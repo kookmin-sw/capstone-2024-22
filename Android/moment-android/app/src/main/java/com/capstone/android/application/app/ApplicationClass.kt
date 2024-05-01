@@ -54,7 +54,7 @@ class ApplicationClass: Application() {
             proceed(
                 request()
                     .newBuilder()
-                    .addHeader("Authorization", "KakaoAK d1f4a1d0fde030076b6e307bd925ac90")
+                    .addHeader("Authorization", "KakaoAK 53abda48bb969b1264e59f56d17e1bb0")
                     .build()
             )
         }
