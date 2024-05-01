@@ -57,10 +57,10 @@ struct CardItem1: Identifiable {
 class CardViewModel: ObservableObject {
     @Published var cardItems: [CardItem1] = []
     
-    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxMDkzMDMyMCwiZXhwIjoxNzU0MTMwMzIwfQ.mVy33lNv-by6bWXshsT4xFOwZSWGkOW76GWimliqHP4"
+    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjMsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNDQ3MDczNCwiZXhwIjoxNzU3NjcwNzM0fQ.pddeumunqT4tiE2yGI9aWXkn0Kxo7XeB9kFfpwQftbM"
     
     func fetchAllCardViews() {
-        let urlString = "http://wasuphj.synology.me:8000/core/cardView/all/1"
+        let urlString = "http://wasuphj.synology.me:8000/core/cardView/all/32"//여행 파일 아이디를 넣어야함
         let headers: HTTPHeaders = [
             "Authorization": authToken,
             "Content-Type": "application/json"
@@ -104,4 +104,33 @@ class CardViewModel: ObservableObject {
             }
         }
     }
+    
+    func updateCardViewLikeStatus(cardViewId: Int) {
+           let urlString = "http://wasuphj.synology.me:8000/core/cardView/like/\(cardViewId)"
+           let headers: HTTPHeaders = [
+               "Authorization": authToken,
+               "Content-Type": "application/json"
+           ]
+           
+           AF.request(urlString, method: .put, headers: headers).responseJSON { response in
+               switch response.result {
+               case .success(let value):
+                   if let json = value as? [String: Any], let status = json["status"] as? Int, status == 200 {
+                       print("Update successful:", json)
+                       self.updateLocalCardViewLovedStatus(cardViewId: cardViewId)
+                   }
+               case .failure(let error):
+                   print("Error updating like status: \(error.localizedDescription)")
+               }
+           }
+       }
+
+       // 로컬 데이터를 업데이트하는 함수
+       private func updateLocalCardViewLovedStatus(cardViewId: Int) {
+           if let index = cardItems.firstIndex(where: { $0.id == cardViewId }) {
+               DispatchQueue.main.async {
+                   self.cardItems[index].loved.toggle()
+               }
+           }
+       }
 }

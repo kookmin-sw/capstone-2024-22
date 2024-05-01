@@ -14,6 +14,9 @@ struct AuthNumView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
     @State private var tempCodeColor: Color = .white
     
+    
+  
+    
     var body: some View {
         VStack{
             Button(action: {
@@ -116,12 +119,15 @@ struct AuthNumView: View {
                     authViewModel.verifyCode { isValid in
                         if isValid {
                             pathModel.paths.append(.AddUser) // 인증 성공, 다음 화면으로
-                        } else {
+                        }
+                        else {
                             tempCodeColor = .red  // 인증 실패, 색상 변경
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                 self.tempCodeColor = .white  // 1.5초 후 색상 원래대로
                             }
                         }
+                        
+                        
                     }
                 }
                 .font(.pretendardSemiBold18)

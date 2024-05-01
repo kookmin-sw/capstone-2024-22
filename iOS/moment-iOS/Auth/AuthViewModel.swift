@@ -17,6 +17,9 @@ class AuthViewModel: ObservableObject {
     @Published var isCodeValid: Bool? = nil
     @Published var isLoggedIn: Bool = false
     @Published var loginError: Bool = false
+    @Published var pathword: String = ""
+    
+    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjMsInJvbGUiOiJST0xFX1RFTVBfVVNFUiIsImlhdCI6MTcxNDU1NTM4NSwiZXhwIjoxNzU3NzU1Mzg1fQ.bDkPxyxN0jkIOHiwY6dDP3BYfIJ51qvaouxS6bXVG0Y"
     
     func requestAuthCode() {
         let parameters: [String: Any] = [
@@ -44,28 +47,70 @@ class AuthViewModel: ObservableObject {
         }
     }
     
+    
+    
     func verifyCode(completion: @escaping (Bool) -> Void) {
+        // 인증 토큰을 포함하는 헤더
+        let headers: HTTPHeaders = [
+            "Authorization": authToken,  // 토큰을 사용할 때는 'Bearer' 접두어를 붙여야 합니다.
+            "Accept": "application/json"
+        ]
+
+        // 인증 코드를 파라미터로 사용
         let parameters: [String: String] = [
             "code": verificationCode
         ]
         
-        AF.request("http://wasuphj.synology.me:8000/auth/verify", method: .patch, parameters: parameters, encoding: JSONEncoding.default)
-            .validate()
+        // Alamofire를 사용한 네트워크 요청
+        AF.request("http://wasuphj.synology.me:8000/auth/verify", method: .patch, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+            .validate()  // 상태 코드가 200-299인지 자동으로 검증
             .responseJSON { response in
+                print("Response: \(response)")
                 switch response.result {
                 case .success:
                     DispatchQueue.main.async {
                         self.isCodeValid = true
                         completion(true)
+                        print("인증 성공")
                     }
-                case .failure:
+                case .failure(let error):
+                    print("실패 응답: \(error)")
                     DispatchQueue.main.async {
                         self.isCodeValid = false
                         completion(false)
+                        print("인증 실패")
                     }
                 }
             }
     }
+    
+    func changePassword() {
+            let url = "http://wasuphj.synology.me:8000/auth/password"
+            let parameters: [String: String] = [
+                "code": verificationCode,
+                "newPassword": pathword
+            ]
+            let headers: HTTPHeaders = [
+                "Authorization": authToken,
+                "Content-Type": "application/json;charset=UTF-8"
+            ]
+
+            AF.request(url, method: .patch, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+                .validate()
+                .responseJSON { response in
+                    switch response.result {
+                    case .success:
+                        print("비밀번호 변경 성공: \(response)")
+                       // completion(true)
+                    case .failure(let error):
+                        print("비밀번호 변경 실패: \(error)")
+                        //completion(false)
+                    }
+                }
+        }
+    
+    
+
     
     func loginUser() {
         let parameters = [

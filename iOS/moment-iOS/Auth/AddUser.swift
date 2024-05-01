@@ -12,6 +12,7 @@ struct AddUser: View {
     @State private var pathword: String = ""
     @State private var checkpathword: String = ""
     @EnvironmentObject private var pathModel: PathModel
+    @EnvironmentObject var authViewModel: AuthViewModel
     var body: some View {
         VStack{
             Button(action: {
@@ -60,7 +61,7 @@ struct AddUser: View {
                 Spacer()
             }
             
-            TextField("비밀번호를 입력해주세요", text: $pathword)
+            TextField("비밀번호를 입력해주세요", text: $authViewModel.pathword)
                 .padding()
                 .frame(height: 44)
                 .overlay(Rectangle().frame(height: 1), alignment: .bottom)
@@ -88,6 +89,10 @@ struct AddUser: View {
             Button(action: {
                 // 가입하기 버튼 동작 구현
                 pathModel.paths.append(.AuthComplete)
+                //로그인 유저 함수 호출해서 서버에다가 내가 텍스트필드에 입력한 아이디 비밀번호 올리기 
+                authViewModel.changePassword()
+                    
+                
             }, label: {
                 Text("가입하기")
                     .font(.pretendardSemiBold18)
