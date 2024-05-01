@@ -135,18 +135,13 @@ class CardActivity : ComponentActivity() {
                 tripFileId = tripFileId.value
             )
             cardViewModel.getCardAllSuccess.observe(this@CardActivity){ response ->
+                cardItems.clear()
                 response.data.cardViews.mapNotNull { card-> runCatching {
                     Card(
                         cardView = card
                     )
 
-                }.onSuccess {
-                    cardItems.clear()
-                }
-                    .onFailure {
-
-                    }
-                    .getOrNull()
+                }.onSuccess {}.onFailure {}.getOrNull()
                 }.forEach {
                     cardItems.add(it)
                 }
