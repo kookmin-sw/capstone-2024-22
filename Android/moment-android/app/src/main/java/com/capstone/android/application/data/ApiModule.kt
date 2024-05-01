@@ -3,6 +3,7 @@ package com.capstone.android.application.data
 import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.data.remote.auth.AuthRetrofitInterface
 import com.capstone.android.application.data.remote.card.CardRetrofitInterface
+import com.capstone.android.application.data.remote.kakao.KakaoRetrofitInterface
 import com.capstone.android.application.data.remote.trip.TripRetrofitInterface
 import com.capstone.android.application.data.remote.tripfile.TripFileRetrofitInterface
 import com.capstone.android.application.domain.response.ApiResponseCallAdapterFactory
@@ -26,8 +27,35 @@ object ApiModule {
     @Retention(AnnotationRetention.BINARY)
     annotation class BaseRetrofit
 
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class BaseOkHttpClient
 
 
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class KakaoOkHttpClient
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class KakaoRetrofit
+
+
+
+    @KakaoOkHttpClient
+    @Singleton
+    @Provides
+    fun provideKakaoOkHttpClient() =
+        OkHttpClient.Builder()
+            .readTimeout(10000, TimeUnit.MILLISECONDS)
+            .connectTimeout(10000, TimeUnit.MILLISECONDS)
+            // 로그캣에 okhttp.OkHttpClient로 검색하면 http 통신 내용을 보여줍니다.
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .addNetworkInterceptor(ApplicationClass.XAccessKakaoInterceptor()) // JWT 자동 헤더 전송
+            .build()
+
+
+    @BaseOkHttpClient
     @Singleton
     @Provides
     fun provideOkHttpClient() =
@@ -42,11 +70,22 @@ object ApiModule {
     @BaseRetrofit
     @Singleton
     @Provides
-    fun provideBaseRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideBaseRetrofit(@BaseOkHttpClient okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .addCallAdapterFactory(ApiResponseCallAdapterFactory())
             .client(okHttpClient)
             .baseUrl(ApplicationClass.API_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @KakaoRetrofit
+    @Singleton
+    @Provides
+    fun provideKakaoRetrofit(@KakaoOkHttpClient okHttpClient : OkHttpClient):Retrofit{
+        return Retrofit.Builder()
+            .baseUrl(ApplicationClass.KAKAO_LOCAL_API_URL)
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -74,6 +113,14 @@ object ApiModule {
     fun provideTripFileService(@BaseRetrofit retrofit:Retrofit) : TripFileRetrofitInterface{
         return retrofit.create(TripFileRetrofitInterface::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun provideKakaoService(@KakaoRetrofit retrofit:Retrofit) : KakaoRetrofitInterface {
+        return retrofit.create(KakaoRetrofitInterface::class.java)
+    }
+
+
 
 
 
