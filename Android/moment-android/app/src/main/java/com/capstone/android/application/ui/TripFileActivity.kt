@@ -199,7 +199,7 @@ class TripFileActivity:ComponentActivity() {
                         Column(
                             modifier = Modifier.clickable {
                                 val intent = Intent(this@TripFileActivity,CardActivity::class.java)
-                                intent.putExtra("tripFileId",tripFileList[index].tripId)
+                                intent.putExtra("tripFileId",tripFileList[index].id)
                                 startActivity(intent)
                             } ,
                         ) {
