@@ -61,6 +61,7 @@ public class CardViewService {
             log.info("ret.sad : " + ret.getEmotions().getSad());
             log.info("ret.angry : " + ret.getEmotions().getAngry());
             log.info("ret.neutral : " + ret.getEmotions().getNeutral());
+            log.info("ret.disgust : " + ret.getEmotions().getDisgust());
             log.info("ret.error : " + ret.getError());
             log.info("ret.file_name : " + ret.getFile_name());
             log.info("ret.file_path : " + ret.getFile_path());
@@ -71,6 +72,7 @@ public class CardViewService {
                 card.setSad(ret.getEmotions().getSad());
                 card.setAngry(ret.getEmotions().getAngry());
                 card.setNeutral(ret.getEmotions().getNeutral());
+                card.setDisgust(ret.getEmotions().getDisgust());
 
                 TripFile tripFile = card.getTripFile();
                 tripFile.setAnalyzingCount(tripFile.getAnalyzingCount() - 1);

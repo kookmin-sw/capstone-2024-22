@@ -16,6 +16,7 @@ public class EmotionResponseDTO {
         private final Float sad;
         private final Float angry;
         private final Float neutral;
+        private final Float disgust;
     }
 
 
