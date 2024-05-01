@@ -79,6 +79,10 @@ public class CardView extends BaseEntity {
     @Column(name = "neutral")
     private Float neutral;
 
+    // disgust
+    @Column(name = "disgust")
+    private Float disgust;
+
     // 질문
     @Column(name = "question", nullable = false)
     private String question;

@@ -80,6 +80,7 @@ public class CardViewService {
                 .angry(null)
                 .sad(null)
                 .neutral(null)
+                .disgust(null)
                 .stt(null)
                 .isLoved(false)
                 .question(uploadRecord.getQuestion())

@@ -60,6 +60,8 @@ public class CardViewResponseDTO {
         @Schema(description = "중립")
         private final Float neutral;
 
+        private final Float disgust;
+
         @Schema(description = "질문")
         private final String question;
 
@@ -89,6 +91,7 @@ public class CardViewResponseDTO {
                     .sad(cardView.getSad())
                     .angry(cardView.getAngry())
                     .neutral(cardView.getNeutral())
+                    .disgust(cardView.getDisgust())
                     .question(cardView.getQuestion())
                     .isLoved(cardView.getIsLoved())
                     .recordFileStatus(cardView.getRecordFileStatus())
