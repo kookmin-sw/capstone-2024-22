@@ -98,6 +98,11 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.capstone.android.application.app.composable.CustomTitleCheckDialog
 import com.capstone.android.application.app.composable.FancyProgressBar
+import com.capstone.android.application.app.composable.TripEmpty
+import com.capstone.android.application.app.composable.TripExist
+import com.capstone.android.application.app.composable.TripIng
+import com.capstone.android.application.app.composable.getCurrentTime
+import com.capstone.android.application.app.composable.getDifferenceInDay
 import com.capstone.android.application.app.screen.BottomNavItem
 import com.capstone.android.application.data.local.Emotion
 import com.capstone.android.application.domain.CustomTitleCheckViewModel
@@ -129,6 +134,7 @@ import com.capstone.android.application.ui.theme.YJ_Bold
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
 import com.capstone.android.application.ui.theme.neutral_200
+import com.capstone.android.application.ui.theme.neutral_300
 import com.capstone.android.application.ui.theme.neutral_400
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
@@ -157,14 +163,26 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
+import java.text.DateFormat.getDateInstance
+import java.text.DateFormat.getDateTimeInstance
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.time.Duration
+
+enum class TripState{
+    EMPTY,EXISTS,ING
+}
+data class MainTrip(
+    var state:TripState = TripState.EMPTY,
+    var tripName:String="",
+    var period:Int=0
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @AndroidEntryPoint
@@ -210,7 +228,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun MainRoot(){
         val postTrip =
@@ -239,18 +256,9 @@ class MainActivity : ComponentActivity() {
             mutableStateListOf<Card>()
         }
         val test:Int = 4
-        val colorName: Result<String> = runCatching {
-            when (test) {
-                1 -> "파란색"
-                2 -> "빨간색"
-                3 -> "노란색"
-                else -> throw Error("처음 들어보는 색")
-            }
-        }.onSuccess { it:String ->
-            Log.d("awegweagewag",it)
-        }.onFailure { it:Throwable ->
-            //실패시만 실행 (try - catch문의 catch와 유사)
-            Log.d("awegweagewag",it.message.toString())
+
+        var mainTrip = remember {
+            mutableStateOf(MainTrip())
         }
 
 
@@ -289,19 +297,55 @@ class MainActivity : ComponentActivity() {
         cardViewModel.getCardLiked()
         tripFileViweModel.getTripFileUntitled()
 
-
-
+        getCurrentTime()
 
         tripViewModel.getTripAllSuccess.observe(this@MainActivity){ response->
-
+            tripList.clear()
             response.data.trips.mapNotNull { trip -> runCatching { Trip(id=trip.id,tripName = trip.tripName, startDate = trip.startDate, endDate = trip.endDate) }
                 .onSuccess {
-                    tripList.clear()
                 }.onFailure {
-                }.getOrNull()
+                }
+                .getOrNull()
             }.forEach {
                 tripList.add(it)
             }
+
+
+
+
+
+
+            if(tripList.isNotEmpty()){
+                tripList.sortedBy { it.startDate }
+                val format:SimpleDateFormat  =SimpleDateFormat("yyyy-MM-dd")
+                val currentDate = format.parse(getCurrentTime())
+                val compareDate = format.parse(tripList.first().startDate)
+
+                val different=getDifferenceInDay(startDate = currentDate , endDate = compareDate)
+
+                if(currentDate.compareTo(compareDate)<0){
+                    mainTrip.value=MainTrip(
+                        state = TripState.EXISTS,
+                        tripName=tripList.first().tripName,
+                        period=abs(different)
+                    )
+                }else{
+                    mainTrip.value=MainTrip(
+                        state = TripState.ING,
+                        tripName=tripList.first().tripName,
+                        period=abs(different)+1
+                    )
+                }
+            }else{
+                mainTrip.value = MainTrip(
+                    state = TripState.EMPTY
+                )
+                Log.d("awegwgwae","wawegewa")
+                tripList.clear()
+            }
+
+
+
         }
 
         tripViewModel.getTripAllFailure.observe(this@MainActivity){ response->
@@ -358,11 +402,7 @@ class MainActivity : ComponentActivity() {
         navController = rememberNavController()
 
 
-        if(recordOpen.value) {
-            RecordNavigatesheet(recordOpen,
-                sheetState = sheetState,
-                closeSheet = { recordOpen.value = false })
-        }
+
 
         val movenav = intent.getStringExtra("MoveScreen")
 
@@ -468,6 +508,7 @@ class MainActivity : ComponentActivity() {
                             .height(90.dp)
                             .clickable {
                                 recordOpen.value = true
+
                             }
                     ) {
                         Image(
@@ -537,7 +578,9 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier
                                         .clickable(enabled = if(title.value == "삭제" && !ReceiptCheckState.value) false else true) {
                                             when(title.value){
-                                                "추가" -> {startActivity(Intent(this@MainActivity,PostTripActivity::class.java))}
+                                                "추가" -> {
+                                                    postTrip.launch(Intent(this@MainActivity,PostTripActivity::class.java))
+                                                }
                                                 "영수증 모아보기" -> {
                                                     startActivity(Intent(this@MainActivity,MainActivity::class.java).putExtra("MoveScreen", "ReceiptPost"))
                                                     /*navController.navigate(MainScreen.ReceiptPost.rootRoute)*/}
@@ -593,7 +636,7 @@ class MainActivity : ComponentActivity() {
                 composable(BottomNavItem.Home.screenRoute) {
                     currentSelectedBottomRoute.value = "Home"
                     Log.d("waegwagewa",tripList.toString())
-                    Home(tripList)
+                    Home(tripList,mainTrip)
                     title.value = "추가"
                 }
                 composable(BottomNavItem.Receipt.screenRoute) {
@@ -635,6 +678,11 @@ class MainActivity : ComponentActivity() {
                     RecordDaily(tripFileUntitledList = tripFileUntitledList)
                 }
             }
+            if(recordOpen.value) {
+                RecordNavigatesheet(
+                    sheetState = sheetState,
+                    closeSheet = { recordOpen.value = false })
+            }
         }
     }
 
@@ -645,7 +693,7 @@ class MainActivity : ComponentActivity() {
     }
     @OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
     @Composable
-    fun Home(tripList:MutableList<Trip>){
+    fun Home(tripList:MutableList<Trip>,mainTrip:MutableState<MainTrip>){
 
 
         val density = LocalDensity.current
@@ -694,34 +742,15 @@ class MainActivity : ComponentActivity() {
                     count = 2
                 ){index ->
                     if(index == 0){
-                        Column {
-                            Text(
-                                text = "전라도의 선유도",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                            Row {
-                                Text(
-                                    text = "출발까지",
-                                    color = Color("#706969".toColorInt()),
-                                    fontSize = 16.sp
-                                )
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Text(
-                                    text = "6",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 45.sp,
-                                    color = Color("#99342E".toColorInt())
-                                )
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Text(
-                                    modifier = Modifier.align(Alignment.Bottom),
-                                    text = "일 남았아요",
-                                    color = Color("#706969".toColorInt()),
-                                    fontSize = 16.sp
-                                )
-
+                        when(mainTrip.value.state){
+                            TripState.EMPTY -> {
+                                TripEmpty(text = "어디로 떠나면 좋을까요?")
+                            }
+                            TripState.ING -> {
+                                TripIng(tripName = mainTrip.value.tripName, remainPeriod = mainTrip.value.period)
+                            }
+                            TripState.EXISTS -> {
+                                TripExist(tripName = mainTrip.value.tripName, remainPeriod = mainTrip.value.period)
                             }
                         }
                     }else{
@@ -766,15 +795,28 @@ class MainActivity : ComponentActivity() {
                 color = Color.Black,
                 thickness = 2.dp
             )
-
-            LazyColumn(
-                modifier = Modifier
-                    .padding(start = 16.dp, end = 4.dp)
-            ){
-                items(
-                    count = tripList.size,
-                    itemContent = {index->
-                        ItemTrip(type = 0,id=tripList[index].id, tripName = tripList[index].tripName,startDate=tripList[index].startDate, endDate = tripList[index].endDate)
+            
+            if(mainTrip.value.state == TripState.EMPTY){
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "아직 계획된 여행이 없나요?\n화면 상단에서 일정 추가가 가능해요",
+                    color = neutral_300,
+                    fontFamily = FontMoment.preStandardFont,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.weight(1f))
+            }else{
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 4.dp)
+                ){
+                    items(
+                        count = tripList.size,
+                        itemContent = {index->
+                            ItemTrip(type = 0,id=tripList[index].id, tripName = tripList[index].tripName,startDate=tripList[index].startDate, endDate = tripList[index].endDate)
 
 //                        if(it==1){
 //                            // '현재 여행중이에요' 알람
@@ -787,11 +829,16 @@ class MainActivity : ComponentActivity() {
 //
 //                        }
 
-                    }
-                )
+                        }
+                    )
+                }
             }
+
+
         }
     }
+
+
 
     @Composable
     fun RecordDaily(tripFileUntitledList:MutableList<TripFile>){
@@ -834,7 +881,7 @@ class MainActivity : ComponentActivity() {
                         Column(
                             modifier = Modifier.clickable {
                                 val intent = Intent(this@MainActivity,CardActivity::class.java)
-                                intent.putExtra("tripFileId",tripFileUntitledList[index].tripId)
+                                intent.putExtra("tripFileId",tripFileUntitledList[index].id)
                                 startActivity(intent)
                             } ,
                         ) {
@@ -1036,7 +1083,6 @@ class MainActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(26.dp))
                     Text(
                         modifier = Modifier.clickable {
-                            Toast.makeText(this@MainActivity,"삭제",Toast.LENGTH_SHORT).show()
                             tripViewModel.deleteTrip(
                                 tripId = id
                             )
@@ -1302,7 +1348,7 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun  RecordNavigatesheet(recordOpen : MutableState<Boolean>, sheetState: SheetState, closeSheet: () -> Unit
+    fun  RecordNavigatesheet(sheetState: SheetState, closeSheet: () -> Unit
     ){
         val minute = remember {
             mutableStateOf(0)
@@ -1435,10 +1481,10 @@ class MainActivity : ComponentActivity() {
                         Image(modifier = Modifier
                             .size(50.dp)
                             .clickable {
-                                if(timerJob.isActive){
+                                if (timerJob.isActive) {
                                     isPasused.value = !isPasused.value
 
-                                }else{
+                                } else {
                                     File(cacheDir, "audio.mp3").also {
                                         recorder.start(it)
                                         audioFile = it
