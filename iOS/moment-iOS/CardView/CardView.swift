@@ -10,7 +10,7 @@ import SwiftUI
 struct CardView: View {
     var day: Date
     var item: Item
-   
+
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @State private var isDeleteMode = false // 삭제 모드 상태
@@ -96,6 +96,7 @@ struct CardView: View {
                                 
                             }
                         }
+                       
                         //첫번째 주석 넣기
                         
                     }
@@ -103,7 +104,7 @@ struct CardView: View {
                     
                     
                 }.background(Color.homeBack)
-                   
+                
             }
             if showConfirmationDialog {
                 CustomConfirmationDialog(
@@ -126,92 +127,9 @@ struct CardView: View {
         }
         .navigationBarBackButtonHidden(true)
         
-        .onAppear {
-            print("뷰 나타남 ")
-            cardViewModel.fetchAllCardViews()
-            // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
-        }
+        
         
     }
-}
-
-struct CustomConfirmationDialog: View {
-    @Binding var isActive: Bool
-    var title: String
-    var message: String
-    var yesAction: () -> Void
-    var noAction: () -> Void
-    @State private var offset: CGFloat = 1000
-    
-    var body: some View {
-        ZStack {
-            // 어두운 배경
-            Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
-            
-            VStack {
-                Text(title)
-                    .font(.pretendardExtrabold16)
-                
-                    .padding()
-                
-                Text(message)
-                    .font(.pretendardMedium14)
-                    .foregroundColor(Color.gray500)
-                    .padding(.bottom)
-                
-                HStack { // 버튼 사이 간격을 0으로 조정
-                    Button {
-                        yesAction()
-                        close()
-                    } label: {
-                        ZStack {
-                            
-                            Text("네")
-                                .font(.yjObangBold15)
-                                .foregroundColor(Color.black)
-                            
-                        }
-                        .frame(width: 116, height: 36) // 버튼의 크기 조절
-                    }
-                    
-                    Rectangle() // 빨간색 세로줄 추가
-                        .fill(Color.gray500)
-                        .frame(width: 2, height: 20)
-                    
-                    Button {
-                        noAction()
-                        close()
-                    } label: {
-                        ZStack {
-                            
-                            Text("아니요")
-                                .font(.yjObangBold15)
-                                .foregroundColor(Color.black)
-                            
-                        }
-                        .frame(width: 116, height: 36) // 버튼의 크기 조절
-                    }
-                }.padding(.bottom,10)
-                
-            }
-            .frame(width: 280, height: 158) // 다이얼로그의 크기 조절
-            
-            .background(.homeBack)
-            .clipShape(RoundedRectangle(cornerRadius: 0))
-        }
-        .onTapGesture {
-            // 배경 탭시 다이얼로그 닫기 (선택적)
-        }
-        
-    }
-    
-    func close() {
-        withAnimation(.spring()) {
-            offset = 1000
-            isActive = false
-        }
-    }
-    
 }
 
 struct AccordionView: View {
@@ -265,9 +183,7 @@ struct AccordionView: View {
         }
         
         .animation(.default, value: isEditing) // 편집 모드 변화에 따른 애니메이션
-        .onAppear {
-            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
-                    }
+        
     }
     
     
@@ -286,9 +202,7 @@ struct AccordionView: View {
             Spacer().frame(height: 30)
             EmotionView(cardViewModel: cardViewModel)
         }
-        .onAppear {
-            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
-                    }
+        
     }
     
     // 위치 및 시간 정보를 보여주는 HStack을 별도의 ViewBuilder로 추출
@@ -311,9 +225,7 @@ struct AccordionView: View {
             CustomCarbarDivider()
             Text(cardItem.recordedAt).font(.pretendardMedium11) // 시간부만 들어가야함
         }
-        .onAppear {
-            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
-                    }
+        
     }
 }
 
@@ -368,9 +280,7 @@ struct HeaderView: View {
                 }
             }
         }
-        .onAppear {
-            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
-                    }
+        
     }
 }
 
@@ -398,9 +308,7 @@ struct DynamicGradientRectangleView: View {
         // .padding(.horizontal,3)
         .frame(width: 340)
         //}
-        .onAppear {
-            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
-                    }
+        
     }
     
 }
@@ -513,9 +421,7 @@ struct EmotionView: View {
             emotionRow(imageName: "sad", emotionText: "슬퍼요", progressValue: 0.05, percentage: "5%")
         }
         .padding(.horizontal, 1) // HStack에 패딩을 적용하여 내용이 화면 가장자리에 붙지 않도록 합니다.
-        .onAppear {
-            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
-                    }
+        
     }
     
     @ViewBuilder
@@ -545,9 +451,7 @@ struct EmotionView: View {
             
             // Spacer() // 오른쪽에 Spacer를 추가하여 모든 요소를 왼쪽으로 정렬합니다.
         }
-        .onAppear {
-            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
-                    }
+        
     }
     private func getColorForEmotion(emotionText: String) -> Color {
         switch emotionText {
@@ -588,12 +492,12 @@ struct AudioPlayerControls: View {
                 }
             }
             Spacer()
-        }.onAppear {
-            cardViewModel.fetchAllCardViews()  // 뷰가 나타날 때 카드 뷰 데이터를 가져옵니다.
-                    }
-        
+        }
     }
 }
+
+
+
 
 
 struct CustomDialogRecordCard: View {
@@ -679,3 +583,82 @@ struct CustomDialogRecordCard: View {
     }
 }
 
+
+struct CustomConfirmationDialog: View {
+    @Binding var isActive: Bool
+    var title: String
+    var message: String
+    var yesAction: () -> Void
+    var noAction: () -> Void
+    @State private var offset: CGFloat = 1000
+    
+    var body: some View {
+        ZStack {
+            // 어두운 배경
+            Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
+            
+            VStack {
+                Text(title)
+                    .font(.pretendardExtrabold16)
+                
+                    .padding()
+                
+                Text(message)
+                    .font(.pretendardMedium14)
+                    .foregroundColor(Color.gray500)
+                    .padding(.bottom)
+                
+                HStack { // 버튼 사이 간격을 0으로 조정
+                    Button {
+                        yesAction()
+                        close()
+                    } label: {
+                        ZStack {
+                            
+                            Text("네")
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
+                        }
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
+                    }
+                    
+                    Rectangle() // 빨간색 세로줄 추가
+                        .fill(Color.gray500)
+                        .frame(width: 2, height: 20)
+                    
+                    Button {
+                        noAction()
+                        close()
+                    } label: {
+                        ZStack {
+                            
+                            Text("아니요")
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
+                        }
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
+                    }
+                }.padding(.bottom,10)
+                
+            }
+            .frame(width: 280, height: 158) // 다이얼로그의 크기 조절
+            
+            .background(.homeBack)
+            .clipShape(RoundedRectangle(cornerRadius: 0))
+        }
+        .onTapGesture {
+            // 배경 탭시 다이얼로그 닫기 (선택적)
+        }
+        
+    }
+    
+    func close() {
+        withAnimation(.spring()) {
+            offset = 1000
+            isActive = false
+        }
+    }
+    
+}

@@ -6,17 +6,7 @@
 //
 
 import SwiftUI
-//
-//struct Item: Identifiable {
-//    let id = UUID().uuidString
-//    let tripName: String
-//    let startdate: String
-//    let enddate : String
-//    var offset: CGFloat = 0
-//    var isSwiped: Bool = false
-//   
-//   
-//}
+
 
 struct Item: Identifiable {
     let id: String

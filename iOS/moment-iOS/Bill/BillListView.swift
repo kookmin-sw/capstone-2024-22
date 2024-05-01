@@ -273,51 +273,7 @@ struct StatsCardView: View {
     }
 }
 
-struct ReceiptsView: View {
-    @EnvironmentObject var homeViewModel: HomeViewModel // HomeViewModel 인스턴스
-    @Environment(\.presentationMode) var presentationMode
-    var body: some View {
-        ZStack{
-            VStack{
-                Button(action: {
-                    // "뒤로" 버튼의 액션: 현재 뷰를 종료
-                    self.presentationMode.wrappedValue.dismiss()
-                    
-                }) {
-                    HStack {
-                        
-                        
-                        Text("뒤로")
-                            .padding(.horizontal,20)
-                            .padding()
-                            .font(.yjObangBold15)
-                            .tint(Color.black)
-                        Spacer()
-                    }
-                }
-                ScrollView{
-                    LazyVStack(spacing:5){
-                        ForEach(homeViewModel.items) { item in
-                            NavigationLink(destination: ReceiptDetailView(item: item)) {
-                                ReceiptCell(item: item)
-                            }
-                            .padding(.vertical, 10)
-                            .environmentObject(HomeViewModel())
-                            CustomHomeSubDivider()
-                            
-                        }
-                    }
-                }
-                
-            }.onAppear {
-                homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
-            }
-            
-            
-        }
-        .navigationBarBackButtonHidden()
-    }
-}
+
 
 struct ReceiptCell: View {
     let item: Item
@@ -391,6 +347,7 @@ struct ReceiptCell: View {
 // ReceiptDetailView 정의
 struct ReceiptDetailView: View {
     @EnvironmentObject var homeViewModel: HomeViewModel
+    @EnvironmentObject var billListViewModel: BillListViewModel
     @Environment(\.presentationMode) var presentationMode
     @State private var isDialogActive = false
     @State private var isDialogActiveBillCom = false
@@ -409,6 +366,7 @@ struct ReceiptDetailView: View {
     @State private var EndLocationend : String = ""
     @State private var selectedTab = 0
     @State private var showingGroup = false
+    
      var snapshotManager: SnapshotManager?
     
     
@@ -555,7 +513,14 @@ struct ReceiptDetailView: View {
             .background(.homeBack)
             .navigationBarBackButtonHidden()
         
-        
+            .onAppear {
+                       // Item의 id를 Int로 변환하여 createReceipt에 전달
+                       if let tripId = Int(item.id) {
+                           billListViewModel.createReceipt(for: tripId)
+                       } else {
+                           print("Invalid tripId: \(item.id)")
+                       }
+                   }
     }
     // 얘는 문제가 없는거같고 
     private func showShareSheet(_ image: UIImage) {
@@ -577,21 +542,58 @@ struct ReceiptDetailView: View {
         // activityVC를 present합니다.
         rootVC.present(activityVC, animated: true, completion: nil)
     }
-    
-//    func captureSnapshot() {
-//        let hostingController = UIHostingController(rootView: ReceiptDetailView(item:item))
-//        let targetSize = hostingController.view.intrinsicContentSize
-//        hostingController.view.bounds = CGRect(origin: .zero, size: targetSize)
-//        hostingController.view.layoutIfNeeded()
-//
-//        let renderer = UIGraphicsImageRenderer(size: targetSize)
-//        let image = renderer.image { _ in
-//            hostingController.view.drawHierarchy(in: hostingController.view.bounds, afterScreenUpdates: true)
-//        }
-//        showShareSheet(image) // 이미지화 한거 캡쳐하기
-//    }
 
-    
+}
+
+struct ReceiptsView: View {
+    @EnvironmentObject var homeViewModel: HomeViewModel // HomeViewModel 인스턴스
+   // @EnvironmentObject var billListViewModel: BillListViewModel
+    @StateObject var billListViewModel = BillListViewModel()
+    @Environment(\.presentationMode) var presentationMode
+    var body: some View {
+        ZStack{
+            VStack{
+                Button(action: {
+                    // "뒤로" 버튼의 액션: 현재 뷰를 종료
+                    self.presentationMode.wrappedValue.dismiss()
+                    
+                }) {
+                    HStack {
+                        
+                        
+                        Text("뒤로")
+                            .padding(.horizontal,20)
+                            .padding()
+                            .font(.yjObangBold15)
+                            .tint(Color.black)
+                        Spacer()
+                    }
+                }
+                ScrollView{
+                    LazyVStack(spacing:5){
+                        ForEach(homeViewModel.items) { item in
+                            NavigationLink(destination: ReceiptDetailView(item: item)
+                                .environmentObject(billListViewModel)) {
+                                ReceiptCell(item: item)
+                            }
+                            .padding(.vertical, 10)
+                            .environmentObject(HomeViewModel())
+                            CustomHomeSubDivider()
+                            
+                        }
+                    }
+                }
+                
+            }.onAppear {
+                homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
+            }
+            
+            
+        }
+        .navigationBarBackButtonHidden()
+        .environmentObject(billListViewModel)
+        //.environmentObject(billListViewModel)
+    }
 }
 
 struct CustomTabIndicator: View {

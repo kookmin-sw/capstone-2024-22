@@ -61,24 +61,29 @@ class CardViewModel: ObservableObject {
     
     var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjMsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNDQ3MDczNCwiZXhwIjoxNzU3NjcwNzM0fQ.pddeumunqT4tiE2yGI9aWXkn0Kxo7XeB9kFfpwQftbM"
     
-    func fetchAllCardViews() {
-        let urlString = "http://wasuphj.synology.me:8000/core/cardView/all/32"//여행 파일 아이디를 넣어야함
-        let headers: HTTPHeaders = [
-            "Authorization": authToken,
-            "Content-Type": "application/json"
-        ]
-        
-        AF.request(urlString, headers: headers).responseJSON { response in
-            switch response.result {
-            case .success(let value):
-                if let json = value as? [String: Any], let data = json["data"] as? [String: Any], let cardViews = data["cardViews"] as? [[String: Any]] {
-                    self.parseCardViews(cardViews)
+    
+    func fetchAllCardViews(tripFileIds: [Int]) {
+        for tripFileId in tripFileIds {
+            let urlString = "http://wasuphj.synology.me:8000/core/cardView/all/\(tripFileId)"
+            let headers: HTTPHeaders = [
+                "Authorization": authToken,
+                "Content-Type": "application/json"
+            ]
+            
+            AF.request(urlString, headers: headers).responseJSON { response in
+                switch response.result {
+                case .success(let value):
+                    if let json = value as? [String: Any], let data = json["data"] as? [String: Any], let cardViews = data["cardViews"] as? [[String: Any]] {
+                        self.parseCardViews(cardViews)//서버통신은 완료된듯함
+                    }
+                case .failure(let error):
+                    print("Error while fetching card views for tripFileId \(tripFileId): \(error.localizedDescription)")
                 }
-            case .failure(let error):
-                print("Error while fetching card views: \(error.localizedDescription)")
             }
         }
     }
+
+
     
     private func parseCardViews(_ cardViews: [[String: Any]]) {
         for cardView in cardViews {
@@ -96,7 +101,7 @@ class CardViewModel: ObservableObject {
                let sad = cardView["sad"] as? Double,
                let angry = cardView["angry"] as? Double,
                let neutral = cardView["neutral"] as? Double,
-               let disgust = cardView["disgust"] as? Double, // 새 필드
+               let disgust = cardView["disgust"] as? Double,
                let question = cardView["question"] as? String,
                let loved = cardView["loved"] as? Bool,
                let recordFileStatus = cardView["recordFileStatus"] as? String,
@@ -104,6 +109,7 @@ class CardViewModel: ObservableObject {
                 let newItem = CardItem1(id: id, tripFileId: tripFileId, recordedAt: recordedAt, recordFileName: recordFileName, recordFileUrl: recordFileUrl, location: location, recordFileLength: recordFileLength, weather: weather, temperature: temperature, stt: stt, happy: happy, sad: sad, angry: angry, neutral: neutral, disgust: disgust, question: question, loved: loved, recordFileStatus: recordFileStatus, imageUrls: imageUrls)
                 DispatchQueue.main.async {
                     self.cardItems.append(newItem)
+                    print("Added new item: \(newItem)") // 로그 출력
                 }
             }
         }
