@@ -68,6 +68,7 @@ def run_model_on_gpu(models:dict, source_file, output):
           # for real test
           model = model_config[0]
           model.model.to('cuda')
+          model.kwargs['device'] = 'cuda'
 
           wav_source_file = None
           if not source_file.endswith('.wav'):
@@ -84,7 +85,7 @@ def run_model_on_gpu(models:dict, source_file, output):
             continue
           
           rec_result = model.generate(wav_source_file, output_dir="./outputs", granularity="utterance", extract_embedding=False)[0]
-          scores = rec_result['scores']
+          scores = [round(i * 100, 2) for i in rec_result['scores']]
           output["emotions"] = dict(zip(labels, scores))
           
           if os.path.exists(wav_source_file):
@@ -132,6 +133,7 @@ def run_model_on_cpu(models:dict, source_file, output):
         # for real test
         model = model_config[0]
         model.model.to('cpu')
+        model.kwargs['device'] = 'cpu'
 
         wav_source_file = None
         if not source_file.endswith('.wav'):
@@ -148,7 +150,7 @@ def run_model_on_cpu(models:dict, source_file, output):
             continue
         
         rec_result = model.generate(wav_source_file, output_dir="./outputs", granularity="utterance", extract_embedding=False)[0]
-        scores = rec_result['scores']
+        scores = [round(i * 100, 2) for i in rec_result['scores']]
         output["emotions"] = dict(zip(labels, scores))
         
         if os.path.exists(wav_source_file):
