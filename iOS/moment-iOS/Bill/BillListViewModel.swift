@@ -12,6 +12,7 @@ import Alamofire
 
 class BillListViewModel: ObservableObject {
     @Published var items: [Item] = []
+    @Published var totalReceiptCount = 0
    
     
     var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjMsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNDQ3MDczNCwiZXhwIjoxNzU3NjcwNzM0fQ.pddeumunqT4tiE2yGI9aWXkn0Kxo7XeB9kFfpwQftbM"
@@ -44,6 +45,37 @@ class BillListViewModel: ObservableObject {
             }
         }
     }
+    
+    func fetchReceiptCount() {
+            let url = "http://localhost:8080/core/receipt/count"
+            let headers: HTTPHeaders = [
+                .authorization(bearerToken: "yourBearerTokenHere"),  // 적절한 토큰으로 교체하세요.
+                .accept("application/json")
+            ]
+
+            AF.request(url, method: .get, headers: headers).responseDecodable(of: ReceiptCountResponse.self) { response in
+                switch response.result {
+                case .success(let countResponse):
+                    DispatchQueue.main.async {
+                        self.totalReceiptCount = countResponse.data.count
+                    }
+                case .failure(let error):
+                    print("Error fetching receipt count: \(error)")
+                }
+            }
+        }
 
     // 기존에 항목을 로드하는 등의 다른 함수들...
+}
+
+
+struct ReceiptCountResponse: Codable {
+    struct Data: Codable {
+        let count: Int
+    }
+    let status: Int
+    let code: String
+    let msg: String
+    let detailMsg: String
+    let data: Data
 }
