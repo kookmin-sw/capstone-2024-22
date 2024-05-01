@@ -1,4 +1,4 @@
-package com.capstone.android.application.app.utile
+package com.capstone.android.application.app.utile.recorder
 
 import android.content.Context
 import android.media.MediaRecorder
@@ -8,7 +8,7 @@ import java.io.FileOutputStream
 
 class MomentAudioRecorder(
     private val context : Context
-):AudioRecorder {
+): AudioRecorder {
     private var recorder:MediaRecorder?=null
 
     private fun createRecorder() :MediaRecorder{
