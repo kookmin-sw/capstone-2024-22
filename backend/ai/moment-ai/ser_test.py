@@ -51,6 +51,7 @@ rec_result contains {'feats', 'labels', 'scores'}
 model = AutoModel(model="iic/emotion2vec_base_finetuned", model_revision="v2.0.4")
 wav_file = f"./source/JK_sa15.wav"
 model.model.proj = BaseModel()
+model.model.to(model.kwargs['device'])
 print(model.model)
 rec_result = model.generate(wav_file, output_dir="./outputs", granularity="utterance", extract_embedding=False)[0]
 print(rec_result)
