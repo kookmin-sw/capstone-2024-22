@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,7 +24,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
@@ -58,7 +56,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -70,9 +67,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
@@ -81,16 +78,15 @@ import com.capstone.android.application.ui.theme.ApplicationTheme
 import com.capstone.android.application.ui.theme.FontMoment
 import com.capstone.android.application.ui.theme.HintText
 import com.capstone.android.application.ui.theme.P_ExtraBold16
-import com.capstone.android.application.ui.theme.P_Medium14
 import com.capstone.android.application.ui.theme.P_Medium14_center
 import com.capstone.android.application.ui.theme.PretendardFamily
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
-import com.capstone.android.application.ui.theme.neutral_100
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.tertiary_500
 import java.text.SimpleDateFormat
+import java.util.Date
 import kotlin.math.roundToInt
 
 
@@ -136,7 +132,7 @@ fun MomentTextField(
     BasicTextField(
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         maxLines = 1,
-        value = if(text.value.length>20) text.value.removeRange(10,text.value.length) else text.value,
+        value = if(text.value.length>30) text.value.removeRange(10,text.value.length) else text.value,
         onValueChange = onValueChanged,
         singleLine = true,
         textStyle = TextStyle(
@@ -357,7 +353,6 @@ fun FancyProgressBar(
 @Composable
 fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String>,endDate:MutableState<String>,onClicked: () -> Unit){
 
-    val dateFormat = SimpleDateFormat("yyyy-MM-HH")
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
@@ -556,6 +551,42 @@ fun convertDateFormat(year:Int , month:Int,day:Int):String{
     return "${year}-${dateMonth}-${dateDay}"
 }
 
+fun getCurrentTime():String{
+    val now = System.currentTimeMillis()
+    var reDate = Date(now);
+
+
+    val Format = SimpleDateFormat("yyyy-MM-dd")
+    val formatDate = Format.format(reDate)
+    Log.d("awegewagw",formatDate.toString())
+    return formatDate
+}
+
+fun getDifferenceInDay(startDate:Date ,endDate:Date ):Int{
+    var different = endDate.time - startDate.time
+
+    System.out.println("startDate : $startDate")
+    System.out.println("endDate : $endDate")
+    println("different : $different")
+
+    val secondsInMilli: Long = 1000
+    val minutesInMilli = secondsInMilli * 60
+    val hoursInMilli = minutesInMilli * 60
+    val daysInMilli = hoursInMilli * 24
+
+    val elapsedDays = different / daysInMilli
+    different = different % daysInMilli
+
+//    val elapsedHours = different / hoursInMilli
+//    different = different % hoursInMilli
+//
+//    val elapsedMinutes = different / minutesInMilli
+//    different = different % minutesInMilli
+//
+//    val elapsedSeconds = different / secondsInMilli
+
+    return elapsedDays.toInt()
+}
 
 @Composable
 fun CustomNoTitleCheckDialog(
