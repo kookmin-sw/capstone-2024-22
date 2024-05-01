@@ -24,33 +24,35 @@ struct CardItem1: Identifiable {
     var sad: Double
     var angry: Double
     var neutral: Double
+    var disgust: Double  // 추가된 필드
     var question: String
     var loved: Bool
     var recordFileStatus: String
+    var imageUrls: [String]  // 추가된 필드
     
-    
-    
-     init(id: Int, tripFileId: Int, recordedAt: String, recordFileName: String, recordFileUrl: String, location: String, recordFileLength: Int, weather: String, temperature: String, stt: String, happy: Double, sad: Double, angry: Double, neutral: Double, question: String, loved: Bool, recordFileStatus: String) {
-         self.id = id
-         self.tripFileId = tripFileId
-         self.recordedAt = recordedAt
-         self.recordFileName = recordFileName
-         self.recordFileUrl = recordFileUrl
-         self.location = location
-         self.recordFileLength = recordFileLength
-         self.weather = weather
-         self.temperature = temperature
-         self.stt = stt
-         self.happy = happy
-         self.sad = sad
-         self.angry = angry
-         self.neutral = neutral
-         self.question = question
-         self.loved = loved
-         self.recordFileStatus = recordFileStatus
-     }
- 
+    init(id: Int, tripFileId: Int, recordedAt: String, recordFileName: String, recordFileUrl: String, location: String, recordFileLength: Int, weather: String, temperature: String, stt: String, happy: Double, sad: Double, angry: Double, neutral: Double, disgust: Double, question: String, loved: Bool, recordFileStatus: String, imageUrls: [String]) {
+        self.id = id
+        self.tripFileId = tripFileId
+        self.recordedAt = recordedAt
+        self.recordFileName = recordFileName
+        self.recordFileUrl = recordFileUrl
+        self.location = location
+        self.recordFileLength = recordFileLength
+        self.weather = weather
+        self.temperature = temperature
+        self.stt = stt
+        self.happy = happy
+        self.sad = sad
+        self.angry = angry
+        self.neutral = neutral
+        self.disgust = disgust
+        self.question = question
+        self.loved = loved
+        self.recordFileStatus = recordFileStatus
+        self.imageUrls = imageUrls
+    }
 }
+
 
 
 
@@ -94,16 +96,19 @@ class CardViewModel: ObservableObject {
                let sad = cardView["sad"] as? Double,
                let angry = cardView["angry"] as? Double,
                let neutral = cardView["neutral"] as? Double,
+               let disgust = cardView["disgust"] as? Double, // 새 필드
                let question = cardView["question"] as? String,
                let loved = cardView["loved"] as? Bool,
-               let recordFileStatus = cardView["recordFileStatus"] as? String {
-                let newItem = CardItem1(id: id, tripFileId: tripFileId, recordedAt: recordedAt, recordFileName: recordFileName, recordFileUrl: recordFileUrl, location: location, recordFileLength: recordFileLength, weather: weather, temperature: temperature, stt: stt, happy: happy, sad: sad, angry: angry, neutral: neutral, question: question, loved: loved, recordFileStatus: recordFileStatus)
+               let recordFileStatus = cardView["recordFileStatus"] as? String,
+               let imageUrls = cardView["imageUrls"] as? [String] { // 새 필드
+                let newItem = CardItem1(id: id, tripFileId: tripFileId, recordedAt: recordedAt, recordFileName: recordFileName, recordFileUrl: recordFileUrl, location: location, recordFileLength: recordFileLength, weather: weather, temperature: temperature, stt: stt, happy: happy, sad: sad, angry: angry, neutral: neutral, disgust: disgust, question: question, loved: loved, recordFileStatus: recordFileStatus, imageUrls: imageUrls)
                 DispatchQueue.main.async {
                     self.cardItems.append(newItem)
                 }
             }
         }
     }
+
     
     func updateCardViewLikeStatus(cardViewId: Int) {
            let urlString = "http://wasuphj.synology.me:8000/core/cardView/like/\(cardViewId)"
