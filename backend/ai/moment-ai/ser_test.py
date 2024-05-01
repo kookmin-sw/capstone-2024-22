@@ -49,7 +49,7 @@ rec_result contains {'feats', 'labels', 'scores'}
     8: unknown
 '''
 model = AutoModel(model="iic/emotion2vec_base_finetuned", model_revision="v2.0.4")
-wav_file = f"/Users/taejinpark/Desktop/capstone-2024-22/backend/ai/moment-ai/emotion2vec/datas/SAVEE/JK_sa15.wav"
+wav_file = f"./emotion2vec/datas/SAVEE/JK_sa15.wav"
 model.model.proj = BaseModel()
 print(model.model)
 rec_result = model.generate(wav_file, output_dir="./outputs", granularity="utterance", extract_embedding=False)[0]
