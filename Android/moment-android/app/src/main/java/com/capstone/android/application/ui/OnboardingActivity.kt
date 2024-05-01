@@ -670,6 +670,7 @@ class OnboardingActivity:ComponentActivity() {
         val signnumState = remember {mutableStateOf(true)}
         val focusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
+        authCode.value = number.value
 
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
