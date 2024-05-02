@@ -70,8 +70,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.capstone.android.application.R
 import com.capstone.android.application.app.composable.FancyProgressBar
-import com.capstone.android.application.app.utile.AndroidAudioPlayer
-import com.capstone.android.application.app.utile.MomentAudioRecorder
+import com.capstone.android.application.app.utile.recorder.AndroidAudioPlayer
+import com.capstone.android.application.app.utile.recorder.MomentAudioRecorder
 import com.capstone.android.application.domain.Card
 import com.capstone.android.application.presentation.CardViewModel
 import com.capstone.android.application.ui.theme.FontMoment
