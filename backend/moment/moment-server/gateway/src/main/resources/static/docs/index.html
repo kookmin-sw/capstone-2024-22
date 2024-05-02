@@ -757,7 +757,7 @@ Content-Length: 211
   "detailMsg" : "",
   "data" : {
     "cardViews" : [ {
-      "bookedDate" : "2024-05-01"
+      "bookedDate" : "2024-05-02"
     }, {
       "bookedDate" : "2023-10-10"
     } ]
@@ -2814,8 +2814,8 @@ Content-Length: 83
 Host: localhost:8080
 
 {
-  "startDate" : "2024-05-01",
-  "endDate" : "2024-05-02",
+  "startDate" : "2024-05-02",
+  "endDate" : "2024-05-03",
   "tripName" : "test"
 }</code></pre>
 </div>
@@ -2847,8 +2847,8 @@ Host: localhost:8080
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{
-  "startDate" : "2024-05-01",
-  "endDate" : "2024-05-02",
+  "startDate" : "2024-05-02",
+  "endDate" : "2024-05-03",
   "tripName" : "test"
 }</code></pre>
 </div>
@@ -3013,22 +3013,22 @@ Content-Length: 628
     "trips" : [ {
       "id" : 1,
       "email" : "test",
-      "startDate" : "2024-05-01",
-      "endDate" : "2024-05-02",
+      "startDate" : "2024-05-02",
+      "endDate" : "2024-05-03",
       "analyzingCount" : 0,
       "tripName" : "test"
     }, {
       "id" : 2,
       "email" : "test",
-      "startDate" : "2024-05-01",
-      "endDate" : "2024-05-02",
+      "startDate" : "2024-05-02",
+      "endDate" : "2024-05-03",
       "analyzingCount" : 1,
       "tripName" : "test"
     }, {
       "id" : 3,
       "email" : "test",
-      "startDate" : "2024-05-01",
-      "endDate" : "2024-05-02",
+      "startDate" : "2024-05-02",
+      "endDate" : "2024-05-03",
       "analyzingCount" : 2,
       "tripName" : "test"
     } ]
@@ -3122,8 +3122,8 @@ Host: localhost:8080
 
 {
   "tripId" : 1,
-  "startDate" : "2024-05-01",
-  "endDate" : "2024-05-02",
+  "startDate" : "2024-05-02",
+  "endDate" : "2024-05-03",
   "tripName" : "test"
 }</code></pre>
 </div>
@@ -3156,8 +3156,8 @@ Host: localhost:8080
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{
   "tripId" : 1,
-  "startDate" : "2024-05-01",
-  "endDate" : "2024-05-02",
+  "startDate" : "2024-05-02",
+  "endDate" : "2024-05-03",
   "tripName" : "test"
 }</code></pre>
 </div>
@@ -3823,7 +3823,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 1724
+Content-Length: 1793
 
 {
   "status" : 200,
@@ -3847,6 +3847,7 @@ Content-Length: 1724
       "sad" : 20.0,
       "angry" : 20.95,
       "neutral" : 19.05,
+      "disgust" : 0.0,
       "receiptThemeType" : "A"
     }, {
       "id" : 2,
@@ -3864,6 +3865,7 @@ Content-Length: 1724
       "sad" : 20.0,
       "angry" : 20.95,
       "neutral" : 19.05,
+      "disgust" : 0.0,
       "receiptThemeType" : "B"
     }, {
       "id" : 3,
@@ -3881,6 +3883,7 @@ Content-Length: 1724
       "sad" : 20.0,
       "angry" : 20.95,
       "neutral" : 19.05,
+      "disgust" : 0.0,
       "receiptThemeType" : "A"
     } ],
     "pagination" : {
@@ -4009,6 +4012,11 @@ Content-Length: 1724
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.receiptList[].neutral</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">중립적인 감정 비율</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.receiptList[].disgust</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">역겨운 감정 비율</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.receiptList[].receiptThemeType</code></p></td>
@@ -4189,19 +4197,19 @@ Content-Length: 512
       "id" : 1,
       "tripId" : 1,
       "email" : "test",
-      "yearDate" : "2024-05-01",
+      "yearDate" : "2024-05-02",
       "analyzingCount" : 1
     }, {
       "id" : 2,
       "tripId" : 2,
       "email" : "test",
-      "yearDate" : "2024-05-02",
+      "yearDate" : "2024-05-03",
       "analyzingCount" : 2
     }, {
       "id" : 3,
       "tripId" : 3,
       "email" : "test",
-      "yearDate" : "2024-05-03",
+      "yearDate" : "2024-05-04",
       "analyzingCount" : 1
     } ]
   }
@@ -4284,19 +4292,19 @@ Content-Length: 512
       "id" : 1,
       "tripId" : 1,
       "email" : "test",
-      "yearDate" : "2024-05-01",
+      "yearDate" : "2024-05-02",
       "analyzingCount" : 1
     }, {
       "id" : 2,
       "tripId" : 2,
       "email" : "test",
-      "yearDate" : "2024-05-02",
+      "yearDate" : "2024-05-03",
       "analyzingCount" : 2
     }, {
       "id" : 3,
       "tripId" : 3,
       "email" : "test",
-      "yearDate" : "2024-05-03",
+      "yearDate" : "2024-05-04",
       "analyzingCount" : 1
     } ]
   }
@@ -4410,19 +4418,19 @@ Content-Length: 512
       "id" : 1,
       "tripId" : 1,
       "email" : "test",
-      "yearDate" : "2024-05-01",
+      "yearDate" : "2024-05-02",
       "analyzingCount" : 1
     }, {
       "id" : 2,
       "tripId" : 2,
       "email" : "test",
-      "yearDate" : "2024-05-02",
+      "yearDate" : "2024-05-03",
       "analyzingCount" : 2
     }, {
       "id" : 3,
       "tripId" : 3,
       "email" : "test",
-      "yearDate" : "2024-05-03",
+      "yearDate" : "2024-05-04",
       "analyzingCount" : 1
     } ]
   }
@@ -4483,19 +4491,19 @@ Content-Length: 512
       "id" : 1,
       "tripId" : 1,
       "email" : "test",
-      "yearDate" : "2024-05-01",
+      "yearDate" : "2024-05-02",
       "analyzingCount" : 1
     }, {
       "id" : 2,
       "tripId" : 2,
       "email" : "test",
-      "yearDate" : "2024-05-02",
+      "yearDate" : "2024-05-03",
       "analyzingCount" : 2
     }, {
       "id" : 3,
       "tripId" : 3,
       "email" : "test",
-      "yearDate" : "2024-05-03",
+      "yearDate" : "2024-05-04",
       "analyzingCount" : 1
     } ]
   }

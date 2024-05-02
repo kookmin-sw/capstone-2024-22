@@ -74,6 +74,7 @@ public class ReceiptService {
                 .sad(receipt.getSad())
                 .angry(receipt.getAngry())
                 .neutral(receipt.getNeutral())
+                .disgust(receipt.getDisgust())
                 .receiptThemeType(receipt.getReceiptThemeType())
                 .build();
     }
@@ -98,10 +99,12 @@ public class ReceiptService {
         Float sad = 0f;
         Float angry = 0f;
         Float neutral = 0f;
+        Float disgust = 0f;
         emotionMap.put("happy", 0f);
         emotionMap.put("sad", 0f);
         emotionMap.put("angry", 0f);
         emotionMap.put("neutral", 0f);
+        emotionMap.put("disgust", 0f);
         emotionMap.put("total", 0f);
         int cardViewCount = 0;
         for (TripFile tripFile : tripFiles) {
@@ -111,6 +114,7 @@ public class ReceiptService {
                 happy += cardView.getHappy();
                 sad += cardView.getSad();
                 angry += cardView.getAngry();
+                disgust += cardView.getDisgust();
                 neutral += cardView.getNeutral();
             }
         }
@@ -142,7 +146,8 @@ public class ReceiptService {
         float sad = map.get("sad");
         float angry = map.get("angry");
         float neutral = map.get("neutral");
-        float total = happy + sad + angry + neutral;
+        float disgust = map.get("disgust");
+        float total = happy + sad + angry + neutral + disgust;
 
         // 영수증 생성
         Receipt receipt = Receipt.builder()
@@ -159,6 +164,7 @@ public class ReceiptService {
                 .sad(sad / total)
                 .angry(angry / total)
                 .neutral(neutral / total)
+                .disgust(disgust / total)
                 .receiptThemeType(createReceipt.getReceiptThemeType())
                 .build();
 
