@@ -3,7 +3,6 @@ package com.capstone.android.application.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -42,7 +41,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
@@ -51,7 +49,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.toColorInt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -985,6 +982,7 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
+    @SuppressLint("UnrememberedMutableState")
     @Composable
     fun SaveRecipt(theme: Int){
 
@@ -1529,6 +1527,8 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
+
+    @SuppressLint("UnrememberedMutableState")
     @Composable
     fun ReceiptPost_Big(){
         //모아보기에서 영수증 하나 선택해서 크게 보는 화면 (수정, 내보내기 가능)
@@ -1844,7 +1844,6 @@ class ReciptActivity : ComponentActivity() {
     @Composable
     fun ReciptPreview() {
         ApplicationTheme {
-            SaveRecipt("theme1")
         }
     }}
 

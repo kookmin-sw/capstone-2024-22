@@ -98,6 +98,7 @@ import com.capstone.android.application.data.local.Emotion
 import com.capstone.android.application.domain.CustomOnlyTitleCheckViewModel
 import com.capstone.android.application.domain.CustomTitleCheckViewModel
 import com.capstone.android.application.ui.CardActivity
+import com.capstone.android.application.ui.OnboardingScreen
 import com.capstone.android.application.ui.PostTripActivity
 import com.capstone.android.application.ui.ReciptActivity
 import com.capstone.android.application.ui.ReciptScreen
@@ -461,9 +462,10 @@ class MainActivity : ComponentActivity() {
         Center,
         End,
     }
+
     @OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
     @Composable
-    fun Home(){
+    fun Home() {
 
         val density = LocalDensity.current
         val defaultActionSize = 80.dp
@@ -541,7 +543,7 @@ class MainActivity : ComponentActivity() {
 
                             }
                         }
-                    }else{
+                    } else {
                         Text(
                             modifier = Modifier.clickable { navController.navigate(MainScreen.RecordDaily.screenRoute) },
                             text = "일상기록",
@@ -552,7 +554,7 @@ class MainActivity : ComponentActivity() {
 
                 }
                 LazyRow {
-                    items(2){index->
+                    items(2) { index ->
 
                         Box(
                             modifier = Modifier
@@ -587,15 +589,15 @@ class MainActivity : ComponentActivity() {
             LazyColumn(
                 modifier = Modifier
                     .padding(start = 16.dp, end = 4.dp)
-            ){
+            ) {
                 items(
                     count = 8,
                     itemContent = {
-                        if(it==1){
+                        if (it == 1) {
                             ItemTrip(type = 1)
-                        }else if(it==2){
+                        } else if (it == 2) {
                             ItemTrip(type = 2)
-                        }else{
+                        } else {
                             ItemTrip(type = 0)
 
                         }
@@ -608,7 +610,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun RecordDaily(){
+    fun RecordDaily() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -641,14 +643,19 @@ class MainActivity : ComponentActivity() {
             LazyColumn(
                 modifier = Modifier
                     .padding(start = 16.dp, end = 4.dp)
-            ){
+            ) {
                 items(
                     count = 8,
                     itemContent = {
                         Column(
                             modifier = Modifier.clickable {
-                                startActivity(Intent(this@MainActivity,TripFileActivity::class.java))
-                            } ,
+                                startActivity(
+                                    Intent(
+                                        this@MainActivity,
+                                        TripFileActivity::class.java
+                                    )
+                                )
+                            },
                         ) {
                             Box(
                                 modifier = Modifier.clip(RectangleShape),
@@ -661,7 +668,7 @@ class MainActivity : ComponentActivity() {
                                         .fillMaxSize()
                                         .background(color = Color.White),
                                     verticalAlignment = Alignment.CenterVertically
-                                ){
+                                ) {
 
                                     Text(
                                         text = "2024.03.05",
@@ -673,8 +680,7 @@ class MainActivity : ComponentActivity() {
                                     Divider(
                                         modifier = Modifier
                                             .height(50.dp)
-                                            .width(1.dp)
-                                        ,
+                                            .width(1.dp),
                                         color = Color("#99342E".toColorInt()),
                                         thickness = 2.dp
                                     )
@@ -695,8 +701,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(1.dp)
-                                    .padding(end = 8.dp)
-                                ,
+                                    .padding(end = 8.dp),
                                 color = Color("#C3C1C1".toColorInt()),
                                 thickness = 2.dp
                             )
@@ -711,7 +716,7 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun ItemTrip(type:Int){
+    fun ItemTrip(type: Int) {
         val density = LocalDensity.current
         val defaultActionSize = 80.dp
         val endActionSizePx = with(density) { (defaultActionSize * 2).toPx() }
@@ -740,8 +745,8 @@ class MainActivity : ComponentActivity() {
 
         Column(
             modifier = Modifier.clickable {
-                startActivity(Intent(this@MainActivity,TripFileActivity::class.java))
-            } ,
+                startActivity(Intent(this@MainActivity, TripFileActivity::class.java))
+            },
         ) {
             Box(
                 modifier = Modifier.clip(RectangleShape),
@@ -767,7 +772,7 @@ class MainActivity : ComponentActivity() {
                             reverseDirection = true
                         ),
                     verticalAlignment = Alignment.CenterVertically
-                ){
+                ) {
 
                     Column {
                         Text(
@@ -785,8 +790,7 @@ class MainActivity : ComponentActivity() {
                     Divider(
                         modifier = Modifier
                             .height(50.dp)
-                            .width(1.dp)
-                        ,
+                            .width(1.dp),
                         color = Color("#99342E".toColorInt()),
                         thickness = 2.dp
                     )
@@ -817,7 +821,7 @@ class MainActivity : ComponentActivity() {
                                     .requireOffset() + endActionSizePx)
                                     .roundToInt(), 0
                             )
-                        } ,
+                        },
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -863,17 +867,18 @@ class MainActivity : ComponentActivity() {
                             reverseDirection = true
                         )
                 ) {
-                    if(type==1){
+                    if (type == 1) {
                         Box(
                             contentAlignment = Alignment.TopCenter
-                        ){
+                        ) {
                             Spacer(modifier = Modifier.width(18.dp))
 
                             Image(
                                 modifier = Modifier
                                     .width(76.dp)
                                     .height(32.dp),
-                                painter = painterResource(id = R.drawable.img_alarm_red), contentDescription = ""
+                                painter = painterResource(id = R.drawable.img_alarm_red),
+                                contentDescription = ""
                             )
                             Text(
                                 text = "현재 여행중이에요",
@@ -884,15 +889,16 @@ class MainActivity : ComponentActivity() {
                     }
                     Spacer(modifier = Modifier.weight(1f))
 
-                    if(type==2){
+                    if (type == 2) {
                         Box(
                             contentAlignment = Alignment.TopCenter
-                        ){
+                        ) {
                             Image(
                                 modifier = Modifier
                                     .width(76.dp)
                                     .height(32.dp),
-                                painter = painterResource(id = R.drawable.img_alarm_green), contentDescription = ""
+                                painter = painterResource(id = R.drawable.img_alarm_green),
+                                contentDescription = ""
                             )
                             Text(
                                 text = "카드 분석중이에요",
@@ -904,9 +910,7 @@ class MainActivity : ComponentActivity() {
                     }
 
 
-
                 }
-
 
 
             }
@@ -916,8 +920,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .padding(end = 8.dp)
-                ,
+                    .padding(end = 8.dp),
                 color = Color("#C3C1C1".toColorInt()),
                 thickness = 2.dp
             )
@@ -926,7 +929,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun HomeTrip(){
+    fun HomeTrip() {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -942,8 +945,8 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     .padding(horizontal = 4.dp)
-            ){
-                items(3){
+            ) {
+                items(3) {
                     Column {
                         Spacer(modifier = Modifier.height(8.dp))
                         Box(
@@ -959,54 +962,65 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Receipt(){
+    fun Receipt() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(20.dp)
-            ) {
+        ) {
             Image(
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.test_image), contentDescription = "test"
             )
             Spacer(modifier = Modifier.height(8.dp))
             BigButton("만들기", true,
-                onClick = {startActivity(Intent(this@MainActivity, ReciptActivity::class.java))})
+                onClick = { startActivity(Intent(this@MainActivity, ReciptActivity::class.java)) })
 
         }
     }
 
     @Composable
-    fun ReceiptPost(EditCheckState: MutableState<Boolean>, ReceiptCheckState: MutableState<Boolean>) {
+    fun ReceiptPost(
+        EditCheckState: MutableState<Boolean>,
+        ReceiptCheckState: MutableState<Boolean>
+    ) {
         //영수증 게시
-        val testList = mutableListOf<Int>(1,2,3,4,5,6,7,8,9,10,11)
+        val testList = mutableListOf<Int>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
 
 
         Column(
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp)) {
+                .padding(horizontal = 12.dp)
+        ) {
 
-            MyGrid(testList, 2, EditCheckState,ReceiptCheckState)
+            MyGrid(testList, 2, EditCheckState, ReceiptCheckState)
         }
     }
+
     @Composable
     fun MyGrid(
         content: List<Int>,
         columnSize: Int,
         EditCheckState: MutableState<Boolean>,
         ReceiptCheckState: MutableState<Boolean>
-    ){
-        val rowsCount = 1 + (content.size -1)/columnSize // row 개수
+    ) {
+        val rowsCount = 1 + (content.size - 1) / columnSize // row 개수
         BoxWithConstraints {
             val maxWidth = this.maxWidth
 
             LazyColumn {
                 items(rowsCount) { rowIndex ->
-                    val rangeStart = rowIndex*columnSize
-                    var rangeEnd = rangeStart + columnSize -1
-                    if (rangeEnd > content.lastIndex) rangeEnd = content.lastIndex // row로 표현될 list의 range를 계산, slice하여 row 생성
-                    RowOfGrid(content.slice(rangeStart..rangeEnd), maxWidth/columnSize, EditCheckState, ReceiptCheckState)
+                    val rangeStart = rowIndex * columnSize
+                    var rangeEnd = rangeStart + columnSize - 1
+                    if (rangeEnd > content.lastIndex) rangeEnd =
+                        content.lastIndex // row로 표현될 list의 range를 계산, slice하여 row 생성
+                    RowOfGrid(
+                        content.slice(rangeStart..rangeEnd),
+                        maxWidth / columnSize,
+                        EditCheckState,
+                        ReceiptCheckState
+                    )
                 }
             }
 
@@ -1021,7 +1035,7 @@ class MainActivity : ComponentActivity() {
         EditCheckState: MutableState<Boolean>,
         ReceiptCheckState: MutableState<Boolean>
     ) {
-        val interactionSource = remember { MutableInteractionSource() }
+
 
         var intent = Intent(this@MainActivity, ReciptActivity::class.java)
         intent.putExtra("MoveScreen", "ReceiptPost_Big")
@@ -1033,7 +1047,7 @@ class MainActivity : ComponentActivity() {
                 Log.d("hihihi", "RowOfGrid: $item")
                 val checkState = rememberSaveable { mutableStateOf(false) }
 
-                Box( modifier = Modifier
+                Box(modifier = Modifier
                     .width(columnWidth)
                     .height(224.dp)
                     .padding(horizontal = 25.dp, vertical = 8.dp)
@@ -1047,11 +1061,12 @@ class MainActivity : ComponentActivity() {
                     //MiniTheme1()
                     MiniTheme2()
 
-                    if (EditCheckState.value){
+                    if (EditCheckState.value) {
                         Column(
                             Modifier
                                 .padding(10.dp)
-                                .align(Alignment.BottomEnd)) {
+                                .align(Alignment.BottomEnd)
+                        ) {
                             Column(
                                 Modifier
                                     .size(32.dp)
@@ -1067,14 +1082,17 @@ class MainActivity : ComponentActivity() {
 
                             }
                         }
-                        if(checkState.value){
+                        if (checkState.value) {
                             Column(
                                 Modifier
                                     .padding(10.dp)
-                                    .align(Alignment.BottomEnd)) {
-                                Column(Modifier.size(32.dp),
+                                    .align(Alignment.BottomEnd)
+                            ) {
+                                Column(
+                                    Modifier.size(32.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center) {
+                                    verticalArrangement = Arrangement.Center
+                                ) {
                                     Image(
                                         painter = painterResource(R.drawable.ic_receipt_check_red),
                                         contentDescription = "장소",
@@ -1091,15 +1109,16 @@ class MainActivity : ComponentActivity() {
 
 
     @Composable
-    fun Record(){
+    fun Record() {
 
 
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun  RecordNavigatesheet(recordOpen : MutableState<Boolean>, sheetState: SheetState, closeSheet: () -> Unit
-    ){
+    fun RecordNavigatesheet(
+        recordOpen: MutableState<Boolean>, sheetState: SheetState, closeSheet: () -> Unit
+    ) {
 
         val coroutineScope = rememberCoroutineScope()
 
@@ -1109,27 +1128,33 @@ class MainActivity : ComponentActivity() {
             shape = RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp),
             containerColor = tertiary_500,
             dragHandle = null
-        ){
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(tertiary_500)
                     .height(248.dp),
             ) {
-                Column(modifier = Modifier
-                    .padding(top = 17.dp)
-                    .align(Alignment.TopCenter)) {
+                Column(
+                    modifier = Modifier
+                        .padding(top = 17.dp)
+                        .align(Alignment.TopCenter)
+                ) {
                     Box(
                         modifier = Modifier.width(213.dp),
                         contentAlignment = Alignment.Center
-                    ){
-                        Image(modifier = Modifier
-                            .height(42.dp)
-                            .width(213.dp),
-                            painter =  painterResource(R.drawable.img_alarm_center_grey),
-                            contentDescription = "record")
-                        P_Medium11(content = "녹음은 한번에 최대 10분까지 가능해요\n" +
-                                "최대 시간을 넘어가면 자동 종료 후 저장됩니다", color = white )
+                    ) {
+                        Image(
+                            modifier = Modifier
+                                .height(42.dp)
+                                .width(213.dp),
+                            painter = painterResource(R.drawable.img_alarm_center_grey),
+                            contentDescription = "record"
+                        )
+                        P_Medium11(
+                            content = "녹음은 한번에 최대 10분까지 가능해요\n" +
+                                    "최대 시간을 넘어가면 자동 종료 후 저장됩니다", color = white
+                        )
                     }
                 }
 
@@ -1164,10 +1189,12 @@ class MainActivity : ComponentActivity() {
                         }) {
                             YJ_Bold15("삭제", black)
                         }
-                         Spacer(modifier = Modifier.width(46.dp))
-                        Image(modifier = Modifier.size(50.dp),
-                            painter =  painterResource(R.drawable.ic_record_ing),
-                            contentDescription = "record")
+                        Spacer(modifier = Modifier.width(46.dp))
+                        Image(
+                            modifier = Modifier.size(50.dp),
+                            painter = painterResource(R.drawable.ic_record_ing),
+                            contentDescription = "record"
+                        )
                         Spacer(modifier = Modifier.width(46.dp))
 
                         Column(Modifier.clickable {
@@ -1193,7 +1220,7 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun Favorite(){
+    fun Favorite() {
         var expanded = remember { mutableStateOf(true) }
 
         val imageList = mutableStateListOf<File>()
@@ -1312,9 +1339,8 @@ class MainActivity : ComponentActivity() {
                                             .clickable {
                                                 cardItems[index].isFavorite.value =
                                                     !cardItems[index].isFavorite.value
-                                            }
-                                        ,
-                                        painter = painterResource(id = if(cardItems[index].isFavorite.value) R.drawable.ic_heart_red else R.drawable.ic_heart_white),
+                                            },
+                                        painter = painterResource(id = if (cardItems[index].isFavorite.value) R.drawable.ic_heart_red else R.drawable.ic_heart_white),
                                         contentDescription = ""
                                     )
                                     Spacer(modifier = Modifier.width(16.dp))
@@ -1843,6 +1869,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
+
     @Composable
     fun Toggle() {
 
@@ -1850,46 +1878,49 @@ class MainActivity : ComponentActivity() {
             "켜기",
             "끄기"
         )
-        var selectedOption by remember { mutableStateOf(states[0])}
+        var selectedOption by remember { mutableStateOf(states[0]) }
         val onSelectionChange = { text: String ->
             selectedOption = text
         }
 
-        Row(modifier = Modifier
-            .width(120.dp)
-            .height(40.dp)
-            .clip(shape = RoundedCornerShape(3.dp))
-            .background(secondary_50)
-            ) {
-                states.forEach { text ->
-                    Column(  modifier = Modifier
-                        .width(60.dp)
-                        .height(40.dp)
-                        .clip(shape = RoundedCornerShape(3.dp))
-                        .clickable {
-                            onSelectionChange(text)
-                        }
-                        .background(
-                            if (text == selectedOption) {
-                                primary_500
-                            } else {
-                                secondary_50
-                            }
-                        ),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        P_Medium14(content = text,
-                            color = if (text == selectedOption) white else neutral_500 )
+        Row(
+            modifier = Modifier
+                .width(120.dp)
+                .height(40.dp)
+                .clip(shape = RoundedCornerShape(3.dp))
+                .background(secondary_50)
+        ) {
+            states.forEach { text ->
+                Column(modifier = Modifier
+                    .width(60.dp)
+                    .height(40.dp)
+                    .clip(shape = RoundedCornerShape(3.dp))
+                    .clickable {
+                        onSelectionChange(text)
                     }
-
+                    .background(
+                        if (text == selectedOption) {
+                            primary_500
+                        } else {
+                            secondary_50
+                        }
+                    ),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    P_Medium14(
+                        content = text,
+                        color = if (text == selectedOption) white else neutral_500
+                    )
                 }
+
             }
+        }
     }
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun MiniTheme1(){
+    fun MiniTheme1() {
         val emotionList = mutableStateListOf<Emotion>()
 
         emotionList.add(
@@ -1949,7 +1980,7 @@ class MainActivity : ComponentActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    P_Medium("암스테르담 성당 여행", white , 5.sp)
+                    P_Medium("암스테르담 성당 여행", white, 5.sp)
 
                     Image(
                         modifier = Modifier
@@ -1966,7 +1997,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    P_Medium("여행의 기록을 한 줄로 기록하세요:)",neutral_500, 5.sp)
+                    P_Medium("여행의 기록을 한 줄로 기록하세요:)", neutral_500, 5.sp)
 
                 }
             }
@@ -1984,7 +2015,7 @@ class MainActivity : ComponentActivity() {
                     Modifier.size(5.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium("북촌한옥마을",primary_500, 4.5.sp)
+                P_Medium("북촌한옥마을", primary_500, 4.5.sp)
             }
 
             Column(
@@ -2024,7 +2055,7 @@ class MainActivity : ComponentActivity() {
                     Modifier.size(5.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium("암스테르담 공항",primary_500, 4.5.sp)
+                P_Medium("암스테르담 공항", primary_500, 4.5.sp)
             }
 
             Column(
@@ -2090,7 +2121,7 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     Column(
                                         modifier = Modifier.width(40.dp)
-                                    )  {
+                                    ) {
                                         LinearProgressIndicator(
                                             progress = { item.persent.toFloat() / 100 },
                                             modifier = Modifier.height(3.dp),
@@ -2137,7 +2168,7 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun MiniTheme2(){
+    fun MiniTheme2() {
 
         val emotionList = mutableStateListOf<Emotion>()
 
@@ -2288,7 +2319,9 @@ class MainActivity : ComponentActivity() {
                         Spacer(modifier = Modifier.height(4.dp))
 
                         Row(
-                            Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Column(
@@ -2460,7 +2493,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @SuppressLint("UnrememberedMutableState")
     @Preview(apiLevel = 33)
     @Composable
     fun MainPreview() {
