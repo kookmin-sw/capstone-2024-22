@@ -2,6 +2,8 @@ package com.capstone.android.application.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -29,7 +31,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -88,28 +89,24 @@ class SplashActivity:ComponentActivity() {
     }
 
     @Composable
-    fun Splash(){
-        Surface {
-            Box(modifier = Modifier.fillMaxSize()
-                .background(tertiary_500)){
+    fun Splash() {
+        LogoScreen()
+        Handler(Looper.getMainLooper()).postDelayed({
+            navController.navigate(SplashScreen.Intro.name)
+        }, 1000)
+    }
 
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .background(tertiary_500),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center) {
-                    Image(
-                        painter = painterResource(id =R.drawable.img_logo),
-                        contentDescription = ""
-                    )
-                    Text(
-                        modifier = Modifier.clickable { navController.navigate(SplashScreen.Intro.name) },
-                        text = "로고"
-                    )
-                }
-
-            }
-
+    @Composable
+    fun LogoScreen(){
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .background(tertiary_500),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
+            Image(
+                painter = painterResource(id =R.drawable.img_logo),
+                contentDescription = ""
+            )
         }
     }
 
@@ -203,13 +200,13 @@ class SplashActivity:ComponentActivity() {
             if(location == "left"){
             Column(modifier = Modifier
                 .fillMaxWidth()
-                .padding(top=476.dp, start = 60.dp)) {
+                .padding(top = 476.dp, start = 60.dp)) {
                 P_Bold(ment, black, 22.sp, TextAlign.Start)
             }}
             else{
                 Column(modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top=476.dp, end = 60.dp),
+                    .padding(top = 476.dp, end = 60.dp),
                     horizontalAlignment = Alignment.End) {
                     P_Bold(ment, black, 22.sp, TextAlign.End)
                 }
@@ -288,6 +285,6 @@ class SplashActivity:ComponentActivity() {
     @Preview
     @Composable
     fun SplashPreview(){
-        Intro()
+        Splash()
     }
 }
