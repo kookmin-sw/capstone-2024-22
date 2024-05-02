@@ -84,10 +84,26 @@ class SplashActivity:ComponentActivity() {
     @Composable
     fun Splash(){
         Surface {
-            Text(
-                modifier = Modifier.clickable { navController.navigate(SplashScreen.Intro.name) },
-                text = "로고"
-            )
+            Box(modifier = Modifier.fillMaxSize()
+                .background(tertiary_500)){
+
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .background(tertiary_500),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center) {
+                    Image(
+                        painter = painterResource(id =R.drawable.img_logo),
+                        contentDescription = ""
+                    )
+                    Text(
+                        modifier = Modifier.clickable { navController.navigate(SplashScreen.Intro.name) },
+                        text = "로고"
+                    )
+                }
+
+            }
+
         }
     }
 
