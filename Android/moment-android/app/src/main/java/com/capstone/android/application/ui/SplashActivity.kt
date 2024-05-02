@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,9 +30,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +44,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.capstone.android.application.R
 import com.capstone.android.application.ui.theme.BigButton
+import com.capstone.android.application.ui.theme.P_Bold
 import com.capstone.android.application.ui.theme.PretendardFamily
 import com.capstone.android.application.ui.theme.black
 import com.capstone.android.application.ui.theme.neutral_100
@@ -92,6 +96,21 @@ class SplashActivity:ComponentActivity() {
     fun Intro() {
 
         val state = rememberPagerState()
+        val image1 = painterResource(R.drawable.img_splash_1)
+        val image2 = painterResource(R.drawable.img_splash_2)
+        val image3 = painterResource(R.drawable.img_splash_3)
+        val image4 = painterResource(R.drawable.img_splash_4)
+
+        val ment1 = "언제 어디서든\n" +
+                "빠르고 간편하게 연동!"
+        val ment2 = "혼자하는 여행도\n" +
+                "적적하지 않아"
+        val ment3 = "가득한 여행 기록도\n" +
+                "깔끔하게 정리"
+        val ment4 = "소중한 추억들\n" +
+                "예쁘게 간직하기"
+
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -99,59 +118,46 @@ class SplashActivity:ComponentActivity() {
             HorizontalPager(
                 verticalAlignment = Alignment.Top,
                 modifier = Modifier
-                    .padding(top = 87.dp)
-                    .height(600.dp)
+                    .padding(top = 75.dp)
+                    .height(587.dp)
                     .fillMaxWidth(),
                 count = 4,
                 state = state
             ) { page ->
                 if (page == 0) {
-                    Column(
-                        Modifier.padding(horizontal = 20.dp),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        Intro_Screen(state)
-
+                    Column{
+                        Intro_Screen(state,image1,"right",ment1)
                     }
                 }
                 if (page == 1) {
-                    Column(
-                        Modifier.padding(horizontal = 20.dp),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        Intro_Screen(state)
+                    Column() {
+                        Intro_Screen(state, image2,"left",ment2)
                     }
                 }
                 if (page == 2) {
-                    Column(
-                        Modifier.padding(horizontal = 20.dp),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        Intro_Screen(state)
-
+                    Column() {
+                        Intro_Screen(state, image3,"right",ment3)
                     }
                 }
                 if (page == 3) {
-                    Column(
-                        Modifier.padding(horizontal = 20.dp),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        Intro_Screen(state)
-
+                    Column() {
+                        Intro_Screen(state, image4,"left",ment4)
                     }
                 }
             }
             if(state.currentPage == 3){
                 Column(Modifier.padding(horizontal = 20.dp)){
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(28.dp))
                     BigButton("시작하기", true,
                         onClick = {startActivity(Intent(this@SplashActivity, OnboardingActivity::class.java))}
                     )
                 }
             }else{
-                Column(Modifier.padding(horizontal = 20.dp)
-                    .align(Alignment.End)) {
-                    Spacer(modifier = Modifier.height(12.dp))
+                Column(
+                    Modifier
+                        .padding(horizontal = 20.dp)
+                        .align(Alignment.End)) {
+                    Spacer(modifier = Modifier.height(28.dp))
                     SmallStartBtn()
                 }
             }
@@ -160,24 +166,36 @@ class SplashActivity:ComponentActivity() {
 
     @OptIn(ExperimentalPagerApi::class)
     @Composable
-    fun Intro_Screen(state: PagerState){
-        Column(){
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color.Gray)
-            ) {
-                Image(painter = painterResource(R.drawable.img_intro_picture),
+    fun Intro_Screen(state: PagerState, image: Painter, location: String, ment :String){
+        Box( ) {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .height(574.dp)
+                .background(color = tertiary_500)) {
+                Image(painter = image,
                     contentDescription = "둘러보기 자료",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(592.dp))
-
-                Column {
-                    Spacer(modifier = Modifier.height(569.dp))
-                    DotsIndicator(totalDots = 4, selectedIndex = state.currentPage)
+                        .fillMaxHeight())
+            }
+            if(location == "left"){
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(top=476.dp, start = 60.dp)) {
+                P_Bold(ment, black, 22.sp, TextAlign.Start)
+            }}
+            else{
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top=476.dp, end = 60.dp),
+                    horizontalAlignment = Alignment.End) {
+                    P_Bold(ment, black, 22.sp, TextAlign.End)
                 }
             }
+        }
+        Column {
+            Spacer(modifier = Modifier.height(10.dp))
+            DotsIndicator(totalDots = 4, selectedIndex = state.currentPage)
         }
     }
 
