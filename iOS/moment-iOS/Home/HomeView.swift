@@ -21,108 +21,111 @@ struct HomeView: View {
     @State private var itemToDelete: Item? // 삭제할 아이템을 저장하기 위한 상태변수
     @State private var selectedItemName: String?
     @ObservedObject var audioRecorderManager: AudioRecorderManager
- 
+    
     @ObservedObject var cardViewModel : CardViewModel
     @State private var showSlideOverCard = false
     @State private var selectedItemId: Int?
-      
+    
     
     
     var body: some View {
-       // NavigationView {
-            ZStack {
-                
-                
-                VStack {
-                    Spacer().frame(height: 50)
-                    // '추가' 버튼
-                    HStack {
-                        Spacer()
-                        NavigationLink(destination: SelectDayView(calendarViewModel: calendarViewModel)) {
-                            Text("추가")
-                                .padding(.horizontal,30)
-                                .padding(.bottom,15)
-                                .font(.yjObangBold15)
-                                .foregroundColor(.black)
-                        }
-                    }
-                    
-                    CustomHomeVDivider()
-                    TabView(selection: $selectedSlideIndex) {
-                        
-                                   // "여행 종료"의 경우
-                                   Text("어디로 떠나면 좋을까요")
-                                       .font(.pretendardMedium14)
-                                       .foregroundColor(.gray600)
-                                       .tag(0)
-                               
-                           
-                        NavigationLink(destination: DailyView()) {
-                            Text("일상기록")
-                                .font(.pretendardMedium14)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        }
-                        .tag(1)
-                        .buttonStyle(PlainButtonStyle())
-                    }
-                    .frame(height: 100)
-                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                    CustomPageIndicator(numberOfPages: 2, currentPage: $selectedSlideIndex)
-                    CustomHomeVDivider().padding()
-                    CustomHomeMainDividerthick()
-                        .padding()
-                    // 항목 리스트
-                   // CustomHomeSubDivider()
-                    ScrollView(.vertical, showsIndicators: false) {
-                        LazyVStack(spacing: 5) {
-                            ForEach(homeviewModel.items) { item in
-                                ItemViewCell(item: $homeviewModel.items[homeviewModel.getIndex(item: item)], deleteAction: {
-                                    self.itemToDelete = item // 사용자가 삭제할 항목을 설정합니다.
-                                    self.selectedItemName = item.tripName
-                                  //  self.selectedItemId = item.id
-                                    self.showingCustomAlert = true // 삭제 확인 다이얼로그를 표시합니다.
-                                },onSelectItem: { id in
-                                    self.selectedItemId = id  // 아이템 선택 시 ID 업데이트
-                                    print(selectedItemId ?? 0)  // 현재 선택된 아이템 ID 출력
-                                }, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, selectedItemId: selectedItemId ?? 1)
-                                
-                                CustomHomeSubDivider()
-                            }
-                        }
-                    }
+        // NavigationView {
+        ZStack {
+            
+            
+            VStack {
+                Spacer().frame(height: 50)
+                // '추가' 버튼
+                HStack {
                     Spacer()
-                }  .background(Color.homeBack)
-                    .onAppear {
-                        homeviewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
-                               }
-                
-                if showingCustomAlert ,let itemToDelete = itemToDelete{
-                    
-                    CustomDialog(
-                        isActive: $showingCustomAlert,
-                        title: "\(selectedItemName ?? "이 여행")\n 정말 삭제하시겠습니까?",
-                        message: "해당 파일에 기록되어있는 녹음카드는\n '일상 기록'으로 이동합니다",
-                        yesAction: {
-                            homeviewModel.deleteItem(itemToDelete: itemToDelete) { success, message in
-                                           if success {
-                                               print("Item successfully deleted.")
-                                           } else {
-                                               print("Failed to delete item: \(message)")
-                                           }
-                                           showingCustomAlert = false
-                                           self.itemToDelete = nil
-                                       }
-                        },
-                        noAction: {
-                            showingCustomAlert = false // 다이얼로그 닫기
-                            self.itemToDelete = nil // 삭제할 아이템 초기화
-                        }
-                    )
-                    .transition(.opacity) // 다이얼로그 등장과 사라짐에 투명도 변화 적용
-                    .zIndex(1) // 다이얼로그가 다른 요소들 위에 오도록 설정
+                    NavigationLink(destination: SelectDayView(calendarViewModel: calendarViewModel)) {
+                        Text("추가")
+                            .padding(.horizontal,30)
+                            .padding(.bottom,15)
+                            .font(.yjObangBold15)
+                            .foregroundColor(.black)
+                    }
                 }
+                
+                CustomHomeVDivider()
+                TabView(selection: $selectedSlideIndex) {
+                    
+                    // "여행 종료"의 경우
+                    Text("어디로 떠나면 좋을까요")
+                        .font(.pretendardMedium14)
+                        .foregroundColor(.gray600)
+                        .tag(0)
+                    
+                    
+                    NavigationLink(destination: DailyView()) {
+                        Text("일상기록")
+                            .font(.pretendardMedium14)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                    .tag(1)
+                    .buttonStyle(PlainButtonStyle())
+                }
+                .frame(height: 100)
+                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                CustomPageIndicator(numberOfPages: 2, currentPage: $selectedSlideIndex)
+                CustomHomeVDivider().padding()
+                CustomHomeMainDividerthick()
+                    .padding()
+                // 항목 리스트
+                // CustomHomeSubDivider()
+                ScrollView(.vertical, showsIndicators: false) {
+                    LazyVStack(spacing: 5) {
+                        ForEach(homeviewModel.items) { item in
+                            ItemViewCell(item: $homeviewModel.items[homeviewModel.getIndex(item: item)], deleteAction: {
+                                self.itemToDelete = item // 사용자가 삭제할 항목을 설정합니다.
+                                self.selectedItemName = item.tripName
+                                //  self.selectedItemId = item.id
+                                self.showingCustomAlert = true // 삭제 확인 다이얼로그를 표시합니다.
+                            },onSelectItem: { id in
+                                self.selectedItemId = id  // 아이템 선택 시 ID 업데이트
+                                print(selectedItemId ?? 0)  // 현재 선택된 아이템 ID 출력
+                            }, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, selectedItemId: selectedItemId ?? 1)
+                            
+                            CustomHomeSubDivider()
+                        }
+                    }
+                }
+                Spacer()
+            }  .background(Color.homeBack)
+                .onAppear {
+                    homeviewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
+                       
+                            
+                        
+                }
+            
+            if showingCustomAlert ,let itemToDelete = itemToDelete{
+                
+                CustomDialog(
+                    isActive: $showingCustomAlert,
+                    title: "\(selectedItemName ?? "이 여행")\n 정말 삭제하시겠습니까?",
+                    message: "해당 파일에 기록되어있는 녹음카드는\n '일상 기록'으로 이동합니다",
+                    yesAction: {
+                        homeviewModel.deleteItem(itemToDelete: itemToDelete) { success, message in
+                            if success {
+                                print("Item successfully deleted.")
+                            } else {
+                                print("Failed to delete item: \(message)")
+                            }
+                            showingCustomAlert = false
+                            self.itemToDelete = nil
+                        }
+                    },
+                    noAction: {
+                        showingCustomAlert = false // 다이얼로그 닫기
+                        self.itemToDelete = nil // 삭제할 아이템 초기화
+                    }
+                )
+                .transition(.opacity) // 다이얼로그 등장과 사라짐에 투명도 변화 적용
+                .zIndex(1) // 다이얼로그가 다른 요소들 위에 오도록 설정
             }
-       // }
+        }
+        // }
     }
 }
 
@@ -144,7 +147,7 @@ struct ItemViewCell: View {
         
         
         ZStack {
-
+            
             if item.offset != 0 {
                 Rectangle()
                     .fill(Color.gray2.opacity(0.3)) // 여기서 색상과 투명도를 조정합니다.
@@ -159,7 +162,7 @@ struct ItemViewCell: View {
             NavigationLink(destination:  DateRangeView1(item: item, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel), isActive: $isLinkActive) {
                 EmptyView()
             }
-        
+            
             
             HStack(spacing: 15) {
                 
@@ -188,28 +191,28 @@ struct ItemViewCell: View {
                     }
                 }.padding(.bottom,10)
                 
-               
-                  
-                    VStack{
-                        HStack(spacing: 10) {
-                            
-                            Spacer()
-                            
-                            
-                           
-                                Text(item.tripName)
-                                    .font(.pretendardExtrabold14)
-                                    .foregroundColor(.black)
-                                    .zIndex(2)
-                            
-                            Rectangle()
-                                .fill(Color.homeRed)
-                                .frame(width: 1, height: 42)
-                                .padding(.leading, 3)
-                                .padding(.trailing, 0)
-                            
-                        }
+                
+                
+                VStack{
+                    HStack(spacing: 10) {
+                        
+                        Spacer()
+                        
+                        
+                        
+                        Text(item.tripName)
+                            .font(.pretendardExtrabold14)
+                            .foregroundColor(.black)
+                            .zIndex(2)
+                        
+                        Rectangle()
+                            .fill(Color.homeRed)
+                            .frame(width: 1, height: 42)
+                            .padding(.leading, 3)
+                            .padding(.trailing, 0)
+                        
                     }
+                }
                 
                 
                 
@@ -217,12 +220,12 @@ struct ItemViewCell: View {
             }
             .onTapGesture {
                 self.isLinkActive = true // 사용자가 셀을 탭하면 네비게이션 링크 활성화
-               
+                
                 onSelectItem(item.id)
                 print(item.id)
-                homeviewModel.fetchTripFiles(for: item.id)
-               
-                                       
+             //   homeviewModel.fetchTripFiles(for: item.id)
+                
+                
             }
             .padding()
             .background(Color.homeBack)
@@ -231,6 +234,8 @@ struct ItemViewCell: View {
             
             .offset(x: item.offset)
             .gesture(DragGesture().onChanged(onChanged(value:)).onEnded(onEnd(value:)))
+        }.onAppear {
+            homeviewModel.fetchTripFiles(for: item.id)  // 아이템 ID 사용하여 파일 데이터 로드
         }
     }
     
@@ -298,7 +303,7 @@ extension ItemViewCell {
                 .padding(.trailing, 0)
             
             Button {
-              //TODO: - 삭제메서드 호출
+                //TODO: - 삭제메서드 호출
                 self.deleteAction()
                 
                 withAnimation {
@@ -345,9 +350,9 @@ struct CustomDialog: View {
                     .padding()
                 
                 Text(message)
-                    
+                
                     .font(.pretendardMedium14)
-                    .multilineTextAlignment(.center) 
+                    .multilineTextAlignment(.center)
                     .foregroundColor(.gray500)
                     .padding(.bottom)
                 
@@ -411,70 +416,70 @@ struct DateRangeView1: View {
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @ObservedObject var cardViewModel : CardViewModel
     @Environment(\.presentationMode) var presentationMode
-    @StateObject var homeviewModel = HomeViewModel()
-   
+    @ObservedObject var homeviewModel = HomeViewModel()
+    
     var body: some View {
         ZStack{
-        VStack {
-            Button(action: {
-                // "뒤로" 버튼의 액션: 현재 뷰를 종료
-                self.presentationMode.wrappedValue.dismiss()
-            }) {
-                HStack {
-                    Spacer().frame(width: 20)
-                    Text("뒤로")
-                        .padding()
-                        .font(.yjObangBold15)
-                        .tint(Color.black)
-                    Spacer()
+            VStack {
+                Button(action: {
+                    // "뒤로" 버튼의 액션: 현재 뷰를 종료
+                    self.presentationMode.wrappedValue.dismiss()
+                }) {
+                    HStack {
+                        Spacer().frame(width: 20)
+                        Text("뒤로")
+                            .padding()
+                            .font(.yjObangBold15)
+                            .tint(Color.black)
+                        Spacer()
+                    }
                 }
-            }
-            
-            CustomHomeMainDividerthick()
-                .padding(.bottom, -10)
-            HStack {
-                Spacer() // 좌측 공간을 만들어줌으로써 Text를 우측으로 밀어냄
-                Text(item.tripName)
-                    .font(.pretendardBold22)
-                    .padding(.horizontal,10)
-                   
-                Spacer().frame(width: 20) // 우측에 조금 더 공간을 추가하여 Text를 중앙으로 조금 이동시킴
-            }
-            
-            CustomHomeMainDividerthick()
-                .padding(.top, -7)
-            
-            ScrollView{
-                VStack {
+                
+                CustomHomeMainDividerthick()
+                    .padding(.bottom, -10)
+                HStack {
+                    Spacer() // 좌측 공간을 만들어줌으로써 Text를 우측으로 밀어냄
+                    Text(item.tripName)
+                        .font(.pretendardBold22)
+                        .padding(.horizontal,10)
                     
-                    if let startDate = convertToDate(dateString: item.startdate),
-                       let endDate = convertToDate(dateString: item.enddate) {
-                        let days = generateDateRange(from: startDate, to: endDate)
+                    Spacer().frame(width: 20) // 우측에 조금 더 공간을 추가하여 Text를 중앙으로 조금 이동시킴
+                }
+                
+                CustomHomeMainDividerthick()
+                    .padding(.top, -7)
+                
+                ScrollView{
+                    VStack {
                         
-                        ForEach(Array(days.enumerated()), id: \.element) { index, day in
-                            NavigationLink(destination: CardView(day: day, item: item, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) 
-                            {
-                                DayView(day: day, dayIndex: index, item: item) // 'dayIndex' 인자를 전달합니다.
-                            }
+                        if let startDate = convertToDate(dateString: item.startdate),
+                           let endDate = convertToDate(dateString: item.enddate) {
+                            let days = generateDateRange(from: startDate, to: endDate)
+                            
+                            ForEach(Array(homeviewModel.tripFiles.enumerated()), id: \.element.id) { index, tripFile in
+                                                        NavigationLink(destination: CardView(item: item, tripFile: tripFile, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) {
+                                                            DayView(dayIndex: index, item: item, tripFile: tripFile)
+                                                        }
+                                                    }.padding(.vertical, 4)
+                                
+                            
+                            
+                            
                         }
-                        .padding(.vertical, 4)
-                        
-                        
                         
                     }
-                    
+                              
                 }
             }
-        }
-    }.background(Color.homeBack)
+        }.background(Color.homeBack)
             .navigationBarBackButtonHidden(true)
-//            .onAppear {
-//                      homeviewModel.fetchTripFiles(for: selectedItemId)
-//                  }
-    
-    
-            }
+
+            .onAppear {
+                        homeviewModel.fetchTripFiles(for: item.id)  // 아이템 ID 사용하여 파일 데이터 로드
+                    }
         
+    }
+    
     
     
     // 날짜 문자열을 Date로 변환
@@ -509,48 +514,72 @@ let monthDayFormatter: DateFormatter = {
 
 
 struct DayView: View {
-    var day: Date
+    //var day: Date
     var dayIndex: Int
-    var item: Item
+     var item: Item
+    var tripFile: TripFile
+    @ObservedObject var homeviewModel = HomeViewModel()
     
     var body: some View {
         
-            VStack {
-                
-                
-                HStack{
-                    VStack{
-                        Text("\(dayIndex + 1) 일차")
-                            .font(.pretendardExtrabold14)
-                            .foregroundColor(.black)
-                            .padding(.bottom, 5)
-                        
-                        Text("\(day, formatter: monthDayFormatter)")
-                            .font(.pretendardMedium11)
-                            .foregroundColor(.black)
-                            .padding(.bottom, 5)
-                    }
+        VStack {
+            
+            
+            HStack{
+                VStack{
+                    Text("\(dayIndex + 1) 일차")
+                        .font(.pretendardExtrabold14)
+                        .foregroundColor(.black)
+                        .padding(.bottom, 5)
                     
-                    
-                    Rectangle()
-                        .fill(Color.homeRed)
-                        .frame(width: 1, height: 42)
-                        .padding(.leading, 3)
-                        .padding(.trailing, 0)
-                    
-                    
-                    Text("몇개의 파일이 있어요.")
+                    Text("\(tripFile.yearDate/*, formatter: monthDayFormatter*/)")
                         .font(.pretendardMedium11)
-                        .foregroundColor(.gray600)
-                        
-                    
-                    Spacer()
+                        .foregroundColor(.black)
+                        .padding(.bottom, 5)
                 }
-                .padding()
-                CustomHomeSubDivider()
-                    .padding(.vertical, 4)
+                
+                
+                Rectangle()
+                    .fill(Color.homeRed)
+                    .frame(width: 1, height: 42)
+                    .padding(.leading, 3)
+                    .padding(.trailing, 0)
+                
+                
+                Text("\(tripFile.analyzingCount)개의 파일이 있어요.")
+                    .font(.pretendardMedium11)
+                    .foregroundColor(.gray600)
+                
+                
+                Spacer()
             }
+            .padding()
+            CustomHomeSubDivider()
+                .padding(.vertical, 4)
+        }
         
         
     }
 }
+
+struct TripFileResponse: Codable {
+    var status: Int
+    var code: String
+    var msg: String
+    var detailMsg: String
+    var data: TripFileData
+}
+
+struct TripFileData: Codable {
+    var tripFiles: [TripFile]
+}
+
+struct TripFile: Codable {
+    var id: Int
+    var tripId: Int
+    var email: String
+    var yearDate : String
+    var analyzingCount: Int
+    
+}
+//

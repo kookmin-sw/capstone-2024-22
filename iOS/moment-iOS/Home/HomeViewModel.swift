@@ -22,6 +22,8 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
     @Published var tripEndDate: Date?
     @Published var showingDeleteAlert: Bool = false
     @Published var indexToDelete: Int? = nil
+    private var dayIndexMapping: [String: Int] = [:]
+
     
     @Published var items: [Item] = []
     var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjMsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNDQ3MDczNCwiZXhwIjoxNzU3NjcwNzM0fQ.pddeumunqT4tiE2yGI9aWXkn0Kxo7XeB9kFfpwQftbM"
@@ -43,7 +45,18 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
             self.tripName = ""
             
         }
+    func calculateDayIndexes() {
+           var uniqueDates = Set<String>()
+           for file in tripFiles {
+               uniqueDates.insert(file.yearDate)
+           }
+           let sortedDates = uniqueDates.sorted()
+           dayIndexMapping = Dictionary(uniqueKeysWithValues: sortedDates.enumerated().map { ($1, $0) })
+       }
     
+    func dayIndex(for date: String) -> Int {
+            return dayIndexMapping[date] ?? 0
+        }
     
     func getIndex(item: Item) -> Int {
         return items.firstIndex { item1 -> Bool in
@@ -146,27 +159,6 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
         }
     }
 
-
-}
-
-struct TripFileResponse: Codable {
-    var status: Int
-    var code: String
-    var msg: String
-    var detailMsg: String
-    var data: TripFileData
-}
-
-struct TripFileData: Codable {
-    var tripFiles: [TripFile]  // 'tripFiles' 대신 'trips'로 변경
-}
-
-struct TripFile: Codable {
-    var id: Int
-    var tripId: Int
-    var email: String
-    var yearDate : String
-    var analyzingCount: Int
 
 }
 

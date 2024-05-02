@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct CardView: View {
-    var day: Date
+    //var day: Date
     var item: Item
-
+    var tripFile: TripFile
+    
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @State private var isDeleteMode = false // 삭제 모드 상태
