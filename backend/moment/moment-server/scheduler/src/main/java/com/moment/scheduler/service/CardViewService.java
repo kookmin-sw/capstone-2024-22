@@ -55,17 +55,17 @@ public class CardViewService {
         log.info("cards.size : " + cards.size());
         for (CardView card : cards) {
             AiModelRunResponseDTO.RunModel ret = aiService.runAi(card.getRecordFileName(), card.getTripFile().getTrip().getUser().getId());
-            log.info("ret.status : " + ret.getStatus());
-            log.info("ret.text : " + ret.getText());
-            log.info("ret.happy : " + ret.getEmotions().getHappy());
-            log.info("ret.sad : " + ret.getEmotions().getSad());
-            log.info("ret.angry : " + ret.getEmotions().getAngry());
-            log.info("ret.neutral : " + ret.getEmotions().getNeutral());
-            log.info("ret.disgust : " + ret.getEmotions().getDisgust());
-            log.info("ret.error : " + ret.getError());
-            log.info("ret.file_name : " + ret.getFile_name());
-            log.info("ret.file_path : " + ret.getFile_path());
             if (Objects.equals(ret.getStatus(), "200")){
+                log.info("ret.status : " + ret.getStatus());
+                log.info("ret.text : " + ret.getText());
+                log.info("ret.happy : " + ret.getEmotions().getHappy());
+                log.info("ret.sad : " + ret.getEmotions().getSad());
+                log.info("ret.angry : " + ret.getEmotions().getAngry());
+                log.info("ret.neutral : " + ret.getEmotions().getNeutral());
+                log.info("ret.disgust : " + ret.getEmotions().getDisgust());
+                log.info("ret.error : " + ret.getError());
+                log.info("ret.file_name : " + ret.getFile_name());
+                log.info("ret.file_path : " + ret.getFile_path());
                 card.setRecordFileStatus("DONE");
                 card.setStt(ret.getText());
                 card.setHappy(ret.getEmotions().getHappy());

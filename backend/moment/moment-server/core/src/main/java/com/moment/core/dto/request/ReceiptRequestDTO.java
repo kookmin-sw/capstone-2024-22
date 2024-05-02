@@ -55,6 +55,8 @@ public class ReceiptRequestDTO {
 
         private Float neutral;
 
+        private Float disgust;
+
         private String receiptThemeType;
     }
 

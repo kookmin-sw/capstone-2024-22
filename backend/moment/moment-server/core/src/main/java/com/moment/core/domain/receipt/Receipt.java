@@ -70,6 +70,10 @@ public class Receipt extends BaseEntity {
     @Column(name = "neutral")
     private Float neutral;
 
+    // disgust
+    @Column(name = "disgust")
+    private Float disgust;
+
     @Column(name = "receipt_theme_type", nullable = false)
     private String receiptThemeType;
 }
