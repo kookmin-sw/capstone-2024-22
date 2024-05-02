@@ -70,10 +70,16 @@ class SplashActivity:ComponentActivity() {
 
         setContent{
             navController = rememberNavController()
+
+            val movenav = intent.getStringExtra("MoveScreen")
+
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                NavHost(navController = navController, startDestination = SplashScreen.Splash.name ){
+                NavHost(navController = navController,
+                    startDestination = when(movenav){
+                        "intro" -> SplashScreen.Intro.name
+                        else -> SplashScreen.Splash.name} ){
                     composable(route=SplashScreen.Splash.name){ Splash() }
                     composable(route=SplashScreen.Intro.name){ Intro() }
                 }

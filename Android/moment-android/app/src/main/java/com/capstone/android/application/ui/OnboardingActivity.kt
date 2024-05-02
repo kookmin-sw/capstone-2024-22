@@ -249,7 +249,7 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(top = 54.dp)
                     .wrapContentSize()
             ) {
-                ImgBackButton(onClick = {startActivity(Intent(this@OnboardingActivity, SplashActivity::class.java))}, "로그인")
+                ImgBackButton(onClick = {startActivity(Intent(this@OnboardingActivity, SplashActivity::class.java).putExtra("MoveScreen","intro"))}, "로그인")
             }
 
             Column(
