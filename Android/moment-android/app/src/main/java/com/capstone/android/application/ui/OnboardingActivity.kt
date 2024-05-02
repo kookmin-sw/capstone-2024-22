@@ -327,13 +327,6 @@ class OnboardingActivity:ComponentActivity() {
                         Spacer(modifier = Modifier.height(4.dp))
                         Divider(color = black)
                     }
-                    Row(modifier = Modifier
-                        .padding(end = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically){
-                        P_Medium11(content = "자동로그인",color = black)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        CheckButton(autologin)
-                    }
                 }
             }
 
