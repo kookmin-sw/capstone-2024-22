@@ -24,7 +24,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 #        print(os.path.join(dirname, filename))
 
 DATA_PATH = "./emotion2vec/datas"
-DATA_PATH = os.path.abspath(DATA_PATH)
+# DATA_PATH = os.path.abspath(DATA_PATH)
 
 TESS =  os.path.join(DATA_PATH, "TESS/TESS Toronto emotional speech set data/")
 RAV =  os.path.join(DATA_PATH, "RAVDESS/audio_speech_actors_01-24/")
@@ -321,7 +321,7 @@ TOTAL_df = pd.concat([TOTAL_df, AIHUB_df])
 
 print(TOTAL_df.labels.value_counts())
 
-TOTAL_df.to_csv(os.path.join(DATA_PATH, "DATASETS.csv"))
+TOTAL_df.to_csv(os.path.join(DATA_PATH, "SER_DATASETS.csv"))
 
 
 # ---------------------------------------------------------------------------------------------------------------------------
