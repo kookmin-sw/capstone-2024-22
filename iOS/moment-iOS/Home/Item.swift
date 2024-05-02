@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct Item: Identifiable {
-    let id: String
+    let id: Int
     let tripName: String
     let startdate: String
     let enddate: String
@@ -18,7 +18,7 @@ struct Item: Identifiable {
 
     // 생성자는 id를 Int로 받고 이를 String으로 변환하여 저장합니다.
     init(id: Int, tripName: String, startdate: String, enddate: String) {
-        self.id = String(id)
+        self.id = id
         self.tripName = tripName
         self.startdate = startdate
         self.enddate = enddate

@@ -12,7 +12,7 @@ import SwiftUI
 
 class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있는녀석 가져와서 뷰모델에서 뷰에 넣기 전에 데이터들을 잘 처리해준다 이렇게 해주는게 MVVM 패턴인거거덩
     
-    
+    @Published var tripFiles: [TripFile] = []
     @Published var todos : [Todo]
     @Published var isEditTodoMode : Bool
     @Published var removeTodos : [Todo]
@@ -111,7 +111,66 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
             }
         }
     }
+    
+    
+   
+    func fetchTripFiles(for tripId: Int) {
+        let urlString = "http://wasuphj.synology.me:8000/core/tripfile/\(tripId)"
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json;charset=UTF-8",
+            "Authorization": authToken  // 여기서 실제 유저 ID 또는 인증 토큰으로 변경해야 할 수 있습니다.
+        ]
+        print("Fetching trip files for Trip ID: \(tripId)")
+
+        AF.request(urlString, headers: headers).responseJSON { response in
+            // HTTP 상태 코드 출력
+            if let statusCode = response.response?.statusCode {
+                print("HTTP Status Code: \(statusCode)")
+            }
+
+            switch response.result {
+            case .success(let value):
+                do {
+                    print("여기오니?")
+                    let data = try JSONSerialization.data(withJSONObject: value, options: [])
+                    print(data)
+                    let decoder = JSONDecoder()
+                    let tripFiles = try decoder.decode(TripFileResponse.self, from: data)
+                    print("Decoded Trip Files: \(tripFiles)")
+                } catch {
+                    print("Decoding error: \(error)")
+                }
+            case .failure(let error):
+                print("Failed to fetch with error: \(error)")
+            }
+        }
+    }
+
+
 }
+
+struct TripFileResponse: Codable {
+    var status: Int
+    var code: String
+    var msg: String
+    var detailMsg: String
+    var data: TripFileData
+}
+
+struct TripFileData: Codable {
+    var tripFiles: [TripFile]  // 'tripFiles' 대신 'trips'로 변경
+}
+
+struct TripFile: Codable {
+    var id: Int
+    var tripId: Int
+    var email: String
+    var yearDate : String
+    var analyzingCount: Int
+
+}
+
+
 
 
 extension HomeViewModel {

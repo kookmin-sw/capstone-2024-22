@@ -19,7 +19,7 @@ class AuthViewModel: ObservableObject {
     @Published var loginError: Bool = false
     @Published var pathword: String = ""
     
-    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjMsInJvbGUiOiJST0xFX1RFTVBfVVNFUiIsImlhdCI6MTcxNDU1NTM4NSwiZXhwIjoxNzU3NzU1Mzg1fQ.bDkPxyxN0jkIOHiwY6dDP3BYfIJ51qvaouxS6bXVG0Y"
+    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjMsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNDQ3MDczNCwiZXhwIjoxNzU3NjcwNzM0fQ.pddeumunqT4tiE2yGI9aWXkn0Kxo7XeB9kFfpwQftbM"
     
     func requestAuthCode() {
         let parameters: [String: Any] = [

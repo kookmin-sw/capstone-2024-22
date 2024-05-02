@@ -126,7 +126,10 @@ struct CardView: View {
             
         }
         .navigationBarBackButtonHidden(true)
-        
+        .onAppear {
+                       // 특정 tripFileId를 사용하여 카드뷰 데이터 로드
+                       //cardViewModel.fetchAllCardViews(tripFileIds: [item.tripFileId])
+                   }
         
         
     }

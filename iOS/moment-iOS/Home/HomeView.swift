@@ -24,6 +24,8 @@ struct HomeView: View {
  
     @ObservedObject var cardViewModel : CardViewModel
     @State private var showSlideOverCard = false
+    @State private var selectedItemId: Int?
+      
     
     
     var body: some View {
@@ -77,8 +79,13 @@ struct HomeView: View {
                                 ItemViewCell(item: $homeviewModel.items[homeviewModel.getIndex(item: item)], deleteAction: {
                                     self.itemToDelete = item // 사용자가 삭제할 항목을 설정합니다.
                                     self.selectedItemName = item.tripName
+                                  //  self.selectedItemId = item.id
                                     self.showingCustomAlert = true // 삭제 확인 다이얼로그를 표시합니다.
-                                }, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
+                                },onSelectItem: { id in
+                                    self.selectedItemId = id  // 아이템 선택 시 ID 업데이트
+                                    print(selectedItemId ?? 0)  // 현재 선택된 아이템 ID 출력
+                                }, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, selectedItemId: selectedItemId ?? 1)
+                                
                                 CustomHomeSubDivider()
                             }
                         }
@@ -125,9 +132,13 @@ struct ItemViewCell: View {
     
     @Binding var item: Item
     var deleteAction: () -> Void
+    var onSelectItem: (Int) -> Void
     @State private var isLinkActive = false
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @ObservedObject var cardViewModel : CardViewModel
+    @StateObject var homeviewModel = HomeViewModel()
+    @State var selectedItemId: Int?
+    
     var body: some View {
         
         
@@ -206,6 +217,12 @@ struct ItemViewCell: View {
             }
             .onTapGesture {
                 self.isLinkActive = true // 사용자가 셀을 탭하면 네비게이션 링크 활성화
+               
+                onSelectItem(item.id)
+                print(item.id)
+                homeviewModel.fetchTripFiles(for: item.id)
+               
+                                       
             }
             .padding()
             .background(Color.homeBack)
@@ -394,6 +411,8 @@ struct DateRangeView1: View {
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @ObservedObject var cardViewModel : CardViewModel
     @Environment(\.presentationMode) var presentationMode
+    @StateObject var homeviewModel = HomeViewModel()
+   
     var body: some View {
         ZStack{
         VStack {
@@ -449,6 +468,9 @@ struct DateRangeView1: View {
         }
     }.background(Color.homeBack)
             .navigationBarBackButtonHidden(true)
+//            .onAppear {
+//                      homeviewModel.fetchTripFiles(for: selectedItemId)
+//                  }
     
     
             }
@@ -483,6 +505,7 @@ let monthDayFormatter: DateFormatter = {
     formatter.dateFormat = "yyyy. MM. dd"
     return formatter
 }()
+
 
 
 struct DayView: View {
@@ -527,6 +550,7 @@ struct DayView: View {
                 CustomHomeSubDivider()
                     .padding(.vertical, 4)
             }
+        
         
     }
 }

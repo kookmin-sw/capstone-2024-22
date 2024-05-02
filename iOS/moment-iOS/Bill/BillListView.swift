@@ -515,11 +515,11 @@ struct ReceiptDetailView: View {
         
             .onAppear {
                        // Item의 id를 Int로 변환하여 createReceipt에 전달
-                       if let tripId = Int(item.id) {
-                           billListViewModel.createReceipt(for: tripId)
-                       } else {
-                           print("Invalid tripId: \(item.id)")
-                       }
+//                       if var tripId = item.id {
+//                           billListViewModel.createReceipt(for: tripId)
+//                       } else {
+//                           print("Invalid tripId: \(item.id)")
+//                       }
                    }
     }
     // 얘는 문제가 없는거같고 
