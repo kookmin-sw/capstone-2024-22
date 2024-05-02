@@ -136,7 +136,7 @@ fun MomentTextField(
     BasicTextField(
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         maxLines = 1,
-        value = if(text.value.length>20) text.value.removeRange(10,text.value.length) else text.value,
+        value = text.value,
         onValueChange = onValueChanged,
         singleLine = true,
         textStyle = TextStyle(
