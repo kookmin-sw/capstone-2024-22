@@ -812,6 +812,9 @@ class OnboardingActivity:ComponentActivity() {
         val passwordcheck = remember{
             mutableStateOf("")
         }
+        val wificheck = remember{
+            mutableStateOf(false)
+        }
         val pwequel = remember{ mutableStateOf(true) }
         val focusManager = LocalFocusManager.current
         val focusRequester = remember { FocusRequester() }
@@ -904,6 +907,18 @@ class OnboardingActivity:ComponentActivity() {
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Divider(color = if(pwequel.value)black else primary_500)
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End){
+                    Column(horizontalAlignment = Alignment.End) {
+                        P_Medium11(content = "와이파이가 없는 환경에서도 녹음 파일 저장하기",color = black)
+                        P_Medium11(content = "나중에 설정에서 바꿀 수 있어요",color = neutral_500)
+                    }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        CheckButton(wificheck)
+                    }
             }
 
             Column(
