@@ -1125,10 +1125,10 @@ class MainActivity : ComponentActivity() {
                 .padding(20.dp)
             ) {
             Image(
-                modifier = Modifier.fillMaxWidth(),
-                painter = painterResource(id = R.drawable.test_image), contentDescription = "test"
+                modifier = Modifier.fillMaxWidth().height(379.dp),
+                painter = painterResource(id = R.drawable.img_receipt_preview), contentDescription = "영수증미리보기"
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(70.dp))
             BigButton("만들기", true,
                 onClick = {startActivity(Intent(this@MainActivity, ReciptActivity::class.java))})
 
@@ -2637,6 +2637,7 @@ class MainActivity : ComponentActivity() {
 //            RecordDaily()
 //            Setting()
 //            ItemTrip()
+            Receipt()
         }
     }
 
