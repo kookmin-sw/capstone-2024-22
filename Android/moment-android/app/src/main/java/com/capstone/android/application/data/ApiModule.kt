@@ -4,6 +4,7 @@ import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.data.remote.auth.AuthRetrofitInterface
 import com.capstone.android.application.data.remote.card.CardRetrofitInterface
 import com.capstone.android.application.data.remote.kakao.KakaoRetrofitInterface
+import com.capstone.android.application.data.remote.open_weather.OpenWeatherRetrofitInterface
 import com.capstone.android.application.data.remote.trip.TripRetrofitInterface
 import com.capstone.android.application.data.remote.tripfile.TripFileRetrofitInterface
 import com.capstone.android.application.domain.response.ApiResponseCallAdapterFactory
@@ -25,20 +26,27 @@ object ApiModule {
 
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
-    annotation class BaseRetrofit
-
-    @Qualifier
-    @Retention(AnnotationRetention.BINARY)
     annotation class BaseOkHttpClient
-
-
-
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
     annotation class KakaoOkHttpClient
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
+    annotation class OpenWeatherOkHttpClient
+
+
+
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class BaseRetrofit
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
     annotation class KakaoRetrofit
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class OpenWeatherRetrofit
+
 
 
 
@@ -55,6 +63,17 @@ object ApiModule {
             .build()
 
 
+    @OpenWeatherOkHttpClient
+    @Singleton
+    @Provides
+    fun provideOpenWeatherOkHttpClient() =
+        OkHttpClient.Builder()
+            .readTimeout(10000, TimeUnit.MILLISECONDS)
+            .connectTimeout(10000, TimeUnit.MILLISECONDS)
+            // 로그캣에 okhttp.OkHttpClient로 검색하면 http 통신 내용을 보여줍니다.
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .build()
+
     @BaseOkHttpClient
     @Singleton
     @Provides
@@ -66,6 +85,7 @@ object ApiModule {
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .addNetworkInterceptor(ApplicationClass.XAccessTokenInterceptor()) // JWT 자동 헤더 전송
             .build()
+
 
     @BaseRetrofit
     @Singleton
@@ -85,6 +105,19 @@ object ApiModule {
     fun provideKakaoRetrofit(@KakaoOkHttpClient okHttpClient : OkHttpClient):Retrofit{
         return Retrofit.Builder()
             .baseUrl(ApplicationClass.KAKAO_LOCAL_API_URL)
+            .addCallAdapterFactory(ApiResponseCallAdapterFactory())
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @OpenWeatherRetrofit
+    @Singleton
+    @Provides
+    fun provideOpenWeatherRetrofit(@OpenWeatherOkHttpClient okHttpClient : OkHttpClient) : Retrofit{
+        return Retrofit.Builder()
+            .baseUrl(ApplicationClass.OPEN_WATHER_API_URL)
+            .addCallAdapterFactory(ApiResponseCallAdapterFactory())
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -118,6 +151,12 @@ object ApiModule {
     @Provides
     fun provideKakaoService(@KakaoRetrofit retrofit:Retrofit) : KakaoRetrofitInterface {
         return retrofit.create(KakaoRetrofitInterface::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideOpenWeatherService(@OpenWeatherRetrofit retrofit:Retrofit) : OpenWeatherRetrofitInterface {
+        return retrofit.create(OpenWeatherRetrofitInterface::class.java)
     }
 
 
