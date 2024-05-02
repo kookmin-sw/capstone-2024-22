@@ -21,6 +21,7 @@
 
 from funasr import AutoModel
 from pydub import AudioSegment
+import subprocess
 
 
 # # MP4 파일 로드
@@ -48,8 +49,13 @@ rec_result contains {'feats', 'labels', 'scores'}
     7: surprised
     8: unknown
 '''
+
 model = AutoModel(model="iic/emotion2vec_base_finetuned", model_revision="v2.0.4")
-wav_file = f"./source/JK_sa15.wav"
+source_file = f"./source/test.m4a"
+wav_file = f"./source/test20.wav"
+command = f"ffmpeg -i {source_file} -ab 160k -ac 1 -ar 16000 -vn {wav_file}"
+subprocess.call(command, shell=True)
+
 model.model.proj = BaseModel()
 model.model.to(model.kwargs['device'])
 print(model.model)
