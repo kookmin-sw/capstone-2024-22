@@ -76,6 +76,7 @@ import com.capstone.android.application.ui.theme.P_Medium18
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
 import com.capstone.android.application.ui.theme.negative_600
+import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.primary_500
 import com.capstone.android.application.ui.theme.tertiary_500
