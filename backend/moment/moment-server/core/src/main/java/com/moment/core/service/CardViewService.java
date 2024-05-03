@@ -151,8 +151,9 @@ public class CardViewService {
     public void deleteRecord(Long cardViewId) {
         CardView cardView = cardViewRepository.findById(cardViewId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카드뷰입니다."));
         // cardView에 엮인 사진들 먼저 삭제
-        imageFileService.deleteAll(cardView);
-        s3Service.deleteFile(cardView.getRecordFileName());
+        String userId = cardView.getTripFile().getUser().getId().toString();
+        imageFileService.deleteAll(cardView, userId);
+        s3Service.deleteFile(cardView.getRecordFileName(), userId);
         boolean isAnalyzed = cardView.getRecordFileStatus().equals("WAIT");
         // 만약 tripfile의 Trip이 untitled일 경우
         //     만약 tripfile의 크기가 1이라면 tripFile과 cardView 전부 삭제, untitledTrip의 analyzingCount 감소

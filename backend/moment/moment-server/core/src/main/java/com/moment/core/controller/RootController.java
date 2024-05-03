@@ -54,7 +54,7 @@ public class RootController {
     ) {
 //        fileName = "users/" + userId.toString() + "/" + fileName;
         fileName = "users/" + userId.toString();
-        s3Service.deleteFile(fileName);
+        s3Service.deleteFile(fileName, userId.toString());
         return ResponseEntity.ok("delete-s3 called");
     }
 }

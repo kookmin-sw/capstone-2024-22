@@ -87,8 +87,9 @@ public class S3Service {
 
     }
 
-    public void deleteFile(String originalFilename)  {
-        amazonS3.deleteObject(bucket, s3folderPath + originalFilename);
+    public void deleteFile(String originalFilename, String userId)  {
+        log.info("deleteFile : " + s3folderPath + userId + "/" + originalFilename);
+        amazonS3.deleteObject(bucket, s3folderPath + userId + "/" + originalFilename);
     }
 
     public void createFolder(String folderName) {
