@@ -29,14 +29,17 @@ public class TripFileResponseDTO {
         @Schema(description = "분석 중 파일 개수")
         private Integer analyzingCount;
 
+        private Integer totalCount;
+
         // fromEntity
-        public static GetTripFile fromEntity(TripFile tripFile) {
+        public static GetTripFile fromEntity(TripFile tripFile, Integer totalCount) {
             return GetTripFile.builder()
                     .id(tripFile.getId())
                     .tripId(tripFile.getTrip().getId())
                     .email(tripFile.getUser().getEmail())
                     .yearDate(tripFile.getYearDate())
                     .analyzingCount(tripFile.getAnalyzingCount())
+                    .totalCount(totalCount)
                     .build();
         }
     }
