@@ -22,6 +22,7 @@ public class TripFileService {
     private final TripFileRepository tripFileRepository;
     private final UserRepository userRepository;
     private final CardViewRepository cardViewRepository;
+    private final TripFileService tripFileService;
 
     // 날짜를 받아서 이미 존재하면 해당 여행으로 업데이트, 없으면 새로 생성
     public Integer findByDateAndUpdate(Trip trip, LocalDate date) {
@@ -63,7 +64,8 @@ public class TripFileService {
         List<TripFileResponseDTO.GetTripFile> rtnList = new ArrayList<>();
         List<TripFile> tripFiles = tripFileRepository.findByTrip_IdOrderByYearDate(tripId);
         for (TripFile tripFile : tripFiles) {
-            rtnList.add(TripFileResponseDTO.GetTripFile.fromEntity(tripFile));
+            Integer totalCount = tripFileService.getCardViewCount(tripFile).intValue();
+            rtnList.add(TripFileResponseDTO.GetTripFile.fromEntity(tripFile, totalCount));
         }
         return TripFileResponseDTO.GetAllTripFile.builder().tripFiles(rtnList).build();
     }
