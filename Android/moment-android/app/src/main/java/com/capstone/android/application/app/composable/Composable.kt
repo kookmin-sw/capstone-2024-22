@@ -87,6 +87,7 @@ import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.tertiary_500
 import java.text.SimpleDateFormat
 import java.util.Date
+import kotlin.math.round
 import kotlin.math.roundToInt
 
 
@@ -188,7 +189,7 @@ fun MomentTextField(
 @Composable
 fun FancyProgressBar(
     modifier: Modifier,
-    progress: Float = 0f.coerceIn(0f, 1f),
+    progress: Float = 0f.coerceIn(0f, 10f),
     leftColor: Color = Color.Black,
     rightColor: Color = Color("#938F8F".toColorInt()),
     indicatorColor: Color = Color("#99342E".toColorInt()),
@@ -200,15 +201,16 @@ fun FancyProgressBar(
 
     var offsetX = remember { mutableFloatStateOf(0f) }
     var progressBarWidthInDp = remember { mutableStateOf(Dp(0f)) }
+    Log.d("weagwegewa",progressBarWidthInDp.value.value.toString())
 
     val guidelinePercentage = remember {
         derivedStateOf {
-            Dp(offsetX.value) / progressBarWidthInDp.value
+            round((Dp(offsetX.value) / progressBarWidthInDp.value)*100) / 100
         }
     }
 
     LaunchedEffect(progress) {
-        offsetX.value = progress.coerceIn(0f, 1f).times(progressBarWidthInDp.value).value
+        offsetX.value = progress.coerceIn(0f, 10f).times(progressBarWidthInDp.value).value
     }
     val isAnimatePercentageUp = remember {
         derivedStateOf {
@@ -328,7 +330,7 @@ fun FancyProgressBar(
 
                 }
             )
-
+            Log.d("ewagwe",guidelinePercentage.value.toString())
             Text(
                 text = "${String.format("%.0f", guidelinePercentage.value * 100)}%",
                 modifier = Modifier
@@ -586,6 +588,10 @@ fun getDifferenceInDay(startDate:Date ,endDate:Date ):Int{
 //    val elapsedSeconds = different / secondsInMilli
 
     return elapsedDays.toInt()
+}
+
+fun convertUrlLinkStringToRcorderNameString(linkString:String):String{
+    return linkString.split("/").last().split(".").first()+".mp3"
 }
 
 @Composable
