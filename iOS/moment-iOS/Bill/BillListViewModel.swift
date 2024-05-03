@@ -18,7 +18,7 @@ class BillListViewModel: ObservableObject {
     var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjMsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNDQ3MDczNCwiZXhwIjoxNzU3NjcwNzM0fQ.pddeumunqT4tiE2yGI9aWXkn0Kxo7XeB9kFfpwQftbM"
     
     func createReceipt(for tripId: Int) {
-        let url = "http://wasuphj.synology.me:8000/core/receipt"
+        let url = "http://211.205.171.117:8000/core/receipt"
         let headers: HTTPHeaders = [
             .contentType("application/json"),
             .accept("application/json"),
@@ -47,7 +47,7 @@ class BillListViewModel: ObservableObject {
     }
     
     func fetchReceiptCount() {
-            let url = "http://wasuphj.synology.me:8000/core/receipt/count"
+            let url = "http://211.205.171.117:8000/core/receipt/count"
             let headers: HTTPHeaders = [
                 .authorization(bearerToken: authToken),// 적절한 토큰으로 교체하세요.
                 .accept("application/json")

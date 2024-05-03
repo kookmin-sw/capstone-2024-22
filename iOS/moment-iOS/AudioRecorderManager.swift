@@ -225,7 +225,7 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
 
 
     func uploadRecordedData(recordFileURL: URL, location: String, recordedAt: String, temperature: String, weather: String, question: String) {
-        let urlString = "http://wasuphj.synology.me:8000/core/cardView/upload"  // 서버의 URL
+        let urlString = "http://211.205.171.117:8000/core/cardView/upload"  // 서버의 URL
       
 
         let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]

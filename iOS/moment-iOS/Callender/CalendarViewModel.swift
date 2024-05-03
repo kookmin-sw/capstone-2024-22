@@ -80,7 +80,7 @@ class CalendarViewModel : ObservableObject {
 
         let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
 
-        AF.request("http://wasuphj.synology.me:8000/core/trip/register", method: .post, parameters: tripData, encoder: JSONParameterEncoder.default, headers: headers)
+        AF.request("http://211.205.171.117:8000/core/trip/register", method: .post, parameters: tripData, encoder: JSONParameterEncoder.default, headers: headers)
             .responseDecodable(of: TripRegistrationResponse.self) { response in
                 switch response.result {
                 case .success(let responseData):

@@ -117,7 +117,7 @@ class CardViewModel: ObservableObject {
 
     
     func updateCardViewLikeStatus(cardViewId: Int) {
-           let urlString = "http://wasuphj.synology.me:8000/core/cardView/like/\(cardViewId)"
+           let urlString = "http://211.205.171.117:8000/core/cardView/like/\(cardViewId)"
            let headers: HTTPHeaders = [
                "Authorization": authToken,
                "Content-Type": "application/json"

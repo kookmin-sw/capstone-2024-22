@@ -455,7 +455,8 @@ struct DateRangeView1: View {
                         if let startDate = convertToDate(dateString: item.startdate),
                            let endDate = convertToDate(dateString: item.enddate) {
                             let days = generateDateRange(from: startDate, to: endDate)
-                            
+                            Text("sdf")
+                          
                             ForEach(Array(homeviewModel.tripFiles.enumerated()), id: \.element.id) { index, tripFile in
                                                         NavigationLink(destination: CardView(item: item, tripFile: tripFile, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) {
                                                             DayView(dayIndex: index, item: item, tripFile: tripFile)
@@ -546,7 +547,7 @@ struct DayView: View {
                     .padding(.trailing, 0)
                 
                 
-                Text("\(tripFile.analyzingCount)개의 파일이 있어요.")
+                Text("\(tripFile.totalCount)개의 파일이 있어요.")
                     .font(.pretendardMedium11)
                     .foregroundColor(.gray600)
                 
@@ -561,25 +562,3 @@ struct DayView: View {
         
     }
 }
-
-struct TripFileResponse: Codable {
-    var status: Int
-    var code: String
-    var msg: String
-    var detailMsg: String
-    var data: TripFileData
-}
-
-struct TripFileData: Codable {
-    var tripFiles: [TripFile]
-}
-
-struct TripFile: Codable {
-    var id: Int
-    var tripId: Int
-    var email: String
-    var yearDate : String
-    var analyzingCount: Int
-    
-}
-//

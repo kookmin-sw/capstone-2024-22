@@ -27,7 +27,7 @@ class AuthViewModel: ObservableObject {
             "isSignUp": "true"
         ]
         
-        AF.request("http://wasuphj.synology.me:8000/auth/code",
+        AF.request("http://211.205.171.117:8000/auth/code",
                    method: .post,
                    parameters: parameters,
                    encoding: JSONEncoding.default)
@@ -62,7 +62,7 @@ class AuthViewModel: ObservableObject {
         ]
         
         // Alamofire를 사용한 네트워크 요청
-        AF.request("http://wasuphj.synology.me:8000/auth/verify", method: .patch, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+        AF.request("http://211.205.171.117:8000/auth/verify", method: .patch, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
             .validate()  // 상태 코드가 200-299인지 자동으로 검증
             .responseJSON { response in
                 print("Response: \(response)")
@@ -85,7 +85,7 @@ class AuthViewModel: ObservableObject {
     }
     
     func changePassword() {
-            let url = "http://wasuphj.synology.me:8000/auth/password"
+            let url = "http://211.205.171.117:8000/auth/password"
             let parameters: [String: String] = [
                 "code": verificationCode,
                 "newPassword": pathword
@@ -120,7 +120,7 @@ class AuthViewModel: ObservableObject {
         //alexj99@naver.com
         //1234
         
-        AF.request("http://wasuphj.synology.me:8000/auth/login", method: .post, parameters: parameters, encoder: JSONParameterEncoder.default)
+        AF.request("http://211.205.171.117:8000/auth/login", method: .post, parameters: parameters, encoder: JSONParameterEncoder.default)
             .validate(statusCode: 200..<300)
             .responseJSON { response in
                 switch response.result {

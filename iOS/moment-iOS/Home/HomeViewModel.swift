@@ -99,7 +99,7 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
  
     func deleteItem(itemToDelete: Item, completion: @escaping (Bool, String) -> Void) {
         let itemId = itemToDelete.id
-        let url = "http://wasuphj.synology.me:8000/core/trip/\(itemId)"
+        let url = "http://211.205.171.117:8000/core/trip/\(itemId)"
         let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
 
         AF.request(url, method: .delete, headers: headers)
@@ -128,14 +128,14 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
     
    
     func fetchTripFiles(for tripId: Int) {
-        let urlString = "http://wasuphj.synology.me:8000/core/tripfile/\(tripId)"
+        let urlString = "http://211.205.171.117:8000/core/tripfile/\(tripId)"
         let headers: HTTPHeaders = [
             "Content-Type": "application/json;charset=UTF-8",
             "Authorization": authToken  // 여기서 실제 유저 ID 또는 인증 토큰으로 변경해야 할 수 있습니다.
         ]
         print("Fetching trip files for Trip ID: \(tripId)")
 
-        AF.request(urlString, headers: headers).responseJSON { response in
+        AF.request(urlString, method: .get, headers: headers).responseJSON { response in
             // HTTP 상태 코드 출력
             if let statusCode = response.response?.statusCode {
                 print("HTTP Status Code: \(statusCode)")
@@ -149,6 +149,8 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
                     print(data)
                     let decoder = JSONDecoder()
                     let tripFiles = try decoder.decode(TripFileResponse.self, from: data)
+                    print("\(TripFileResponse.self)")
+                    //print("\()")
                     print("Decoded Trip Files: \(tripFiles)")
                 } catch {
                     print("Decoding error: \(error)")
@@ -156,6 +158,22 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
             case .failure(let error):
                 print("Failed to fetch with error: \(error)")
             }
+            
+//            switch response.result {
+//                   case .success(let value):
+//                       do {
+//                           let data = try JSONSerialization.data(withJSONObject: value, options: [])
+//                           let decoder = JSONDecoder()
+//                           let tripFileResponse = try decoder.decode(TripFileResponse.self, from: data)
+//                           DispatchQueue.main.async {
+//                               self.tripFiles = tripFileResponse.data.tripFiles
+//                           }
+//                       } catch {
+//                           print("Decoding error: \(error)")
+//                       }
+//                   case .failure(let error):
+//                       print("Failed to fetch with error: \(error)")
+//                   }
         }
     }
 
@@ -190,7 +208,7 @@ extension HomeViewModel {
     
     func fetchTrips() {
            let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
-           AF.request("http://wasuphj.synology.me:8000/core/trip/all", method: .get, headers: headers)
+           AF.request("http://211.205.171.117:8000/core/trip/all", method: .get, headers: headers)
                .responseDecodable(of: TripsResponse.self) { response in
                    switch response.result {
                    case .success(let data):
@@ -203,4 +221,27 @@ extension HomeViewModel {
                }
        }
 }
+
+
+struct TripFileResponse: Codable {
+    var status: Int
+    var code: String
+    var msg: String
+    var detailMsg: String
+    var data: TripFileData
+}
+
+struct TripFileData: Codable {
+    var tripFiles: [TripFile]
+}
+
+struct TripFile: Codable {
+    var id: Int
+    var tripId: Int
+    var email: String
+    var yearDate : String
+    var totalCount: Int
+    
+}
+//
 
