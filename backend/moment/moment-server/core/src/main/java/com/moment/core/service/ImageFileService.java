@@ -26,10 +26,10 @@ public class ImageFileService {
     private final UserService userService;
 
     @Transactional
-    public void deleteAll(CardView cardView) {
+    public void deleteAll(CardView cardView, String userId) {
         List<ImageFile> imageFiles = imageFileRepository.findAllByCardView(cardView);
         for (ImageFile imageFile : imageFiles) {
-            s3Service.deleteFile(imageFile.getFileName());
+            s3Service.deleteFile(imageFile.getFileName(), userId);
         }
         imageFiles.forEach(imageFileRepository::delete);
     }
@@ -56,7 +56,7 @@ public class ImageFileService {
         for (Long imageId : images) {
             ImageFile image = imageFileRepository.findById(imageId).orElseThrow(() -> new IllegalArgumentException("해당 이미지가 없습니다."));
             userService.validateUserWithCardView(userId, image.getCardView().getId());
-            s3Service.deleteFile(image.getFileName());
+            s3Service.deleteFile(image.getFileName(), userId.toString());
             imageFileRepository.delete(image);
         }
     }
