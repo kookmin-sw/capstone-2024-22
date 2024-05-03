@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,7 +24,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -42,13 +40,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
-import com.capstone.android.application.domain.Trip
+import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.domain.TripFile
 import com.capstone.android.application.presentation.TripFileViewModel
 import com.capstone.android.application.ui.theme.FontMoment
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
-import java.lang.Exception
 
 @AndroidEntryPoint
 class TripFileActivity:ComponentActivity() {
@@ -86,7 +83,7 @@ class TripFileActivity:ComponentActivity() {
                 response.data.tripFiles.mapNotNull { tripFile-> runCatching {
                     TripFile(
                         id = tripFile.id , tripId = tripFile.tripId,
-                        yearDate = tripFile.yearDate, analyzingCount = tripFile.analyzingCount
+                        yearDate = tripFile.yearDate, analyzingCount = tripFile.totalCount
                     )
                     }.onSuccess {
                         tripFileList.clear()
@@ -97,7 +94,6 @@ class TripFileActivity:ComponentActivity() {
                     .getOrNull()
                 }.forEach {
                     tripFileList.add(it)
-                    Log.d("wegwaegaew",it.analyzingCount.toString())
                 }
             }
 
@@ -175,7 +171,7 @@ class TripFileActivity:ComponentActivity() {
                     .fillMaxWidth()
                     .padding(end = 16.dp)
                 ,
-                text = "전라도의 선유도",
+                text = ApplicationClass.tripName,
                 textAlign = TextAlign.End,
                 fontSize = 22.sp,
                 fontFamily = FontMoment.preStandardFont,
@@ -211,8 +207,7 @@ class TripFileActivity:ComponentActivity() {
                                 Row(
                                     modifier = Modifier
                                         .padding(top = 24.dp)
-                                        .fillMaxSize()
-                                        .background(color = Color.White),
+                                        .fillMaxSize(),
                                     verticalAlignment = Alignment.CenterVertically
                                 ){
                                     Column(
