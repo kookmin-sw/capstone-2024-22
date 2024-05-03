@@ -3,6 +3,7 @@ package com.capstone.android.application.data
 import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.data.remote.auth.AuthRetrofitInterface
 import com.capstone.android.application.data.remote.card.CardRetrofitInterface
+import com.capstone.android.application.data.remote.download_link.DownloadLinkRetrofitInterface
 import com.capstone.android.application.data.remote.kakao.KakaoRetrofitInterface
 import com.capstone.android.application.data.remote.open_weather.OpenWeatherRetrofitInterface
 import com.capstone.android.application.data.remote.trip.TripRetrofitInterface
@@ -34,6 +35,10 @@ object ApiModule {
     @Retention(AnnotationRetention.BINARY)
     annotation class OpenWeatherOkHttpClient
 
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class NoHeaderInterceptorOkHttpClient
+
 
 
 
@@ -46,6 +51,10 @@ object ApiModule {
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
     annotation class OpenWeatherRetrofit
+
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class DownloadLinkRetrofit
 
 
 
@@ -86,6 +95,17 @@ object ApiModule {
             .addNetworkInterceptor(ApplicationClass.XAccessTokenInterceptor()) // JWT 자동 헤더 전송
             .build()
 
+    @NoHeaderInterceptorOkHttpClient
+    @Singleton
+    @Provides
+    fun provideDownloadLinkOkHttpClient() =
+        OkHttpClient.Builder()
+            .readTimeout(10000, TimeUnit.MILLISECONDS)
+            .connectTimeout(10000, TimeUnit.MILLISECONDS)
+            // 로그캣에 okhttp.OkHttpClient로 검색하면 http 통신 내용을 보여줍니다.
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .build()
+
 
     @BaseRetrofit
     @Singleton
@@ -123,6 +143,20 @@ object ApiModule {
             .build()
     }
 
+    @DownloadLinkRetrofit
+    @Singleton
+    @Provides
+    fun provideDownloadLinkRetrofit(@NoHeaderInterceptorOkHttpClient okHttpClient : OkHttpClient) : Retrofit{
+        return Retrofit.Builder()
+            .baseUrl(ApplicationClass.API_URL)
+            .addCallAdapterFactory(ApiResponseCallAdapterFactory())
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+
+
     @Singleton
     @Provides
     fun provideTripService(@BaseRetrofit retrofit: Retrofit): TripRetrofitInterface {
@@ -157,6 +191,13 @@ object ApiModule {
     @Provides
     fun provideOpenWeatherService(@OpenWeatherRetrofit retrofit:Retrofit) : OpenWeatherRetrofitInterface {
         return retrofit.create(OpenWeatherRetrofitInterface::class.java)
+    }
+
+
+    @Singleton
+    @Provides
+    fun provideDownloadLinkService(@DownloadLinkRetrofit retrofit:Retrofit) : DownloadLinkRetrofitInterface {
+        return retrofit.create(DownloadLinkRetrofitInterface::class.java)
     }
 
 
