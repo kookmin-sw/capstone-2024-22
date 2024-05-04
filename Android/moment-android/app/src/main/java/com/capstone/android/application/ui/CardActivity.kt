@@ -1,6 +1,7 @@
 package com.capstone.android.application.ui
 
 import android.Manifest
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.PickVisualMediaRequest
@@ -72,9 +74,12 @@ import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.composable.convertUrlLinkStringToRcorderNameString
 import com.capstone.android.application.app.utile.MomentPath
-import com.capstone.android.application.app.utile.recorder.AndroidAudioPlayer
+import com.capstone.android.application.app.utile.loading.GlobalLoadingDialog
+import com.capstone.android.application.app.utile.loading.LoadingState
+import com.capstone.android.application.app.utile.recorder.MomentAudioPlayer
 import com.capstone.android.application.app.utile.recorder.MomentAudioRecorder
 import com.capstone.android.application.domain.Card
+import com.capstone.android.application.domain.Emotion
 import com.capstone.android.application.domain.response.card.CardView
 import com.capstone.android.application.presentation.CardViewModel
 import com.capstone.android.application.presentation.DownloadLinkViewModel
@@ -93,22 +98,32 @@ class CardActivity : ComponentActivity() {
     private val cardViewModel: CardViewModel by viewModels()
     private val openWeatherViewModel: OpenWeatherViewModel by viewModels()
     private val downloadLinkViewModel : DownloadLinkViewModel by viewModels()
-    @Inject lateinit var momentAudioPlayer:AndroidAudioPlayer
+    @Inject lateinit var momentAudioPlayer:MomentAudioPlayer
 
     private val recorder by lazy {
         MomentAudioRecorder(applicationContext)
     }
 
     private val player by lazy {
-        AndroidAudioPlayer(applicationContext)
+        MomentAudioPlayer(applicationContext)
     }
 
     private var audioFile: File? = null
+
+    private lateinit var mainIntent : Intent
+    private var tripFileListIndex:Int = -1
+    private var totalCount:Int = 0
+
+
+
 
     override fun onStop() {
         super.onStop()
         momentAudioPlayer.stop()
     }
+
+
+
     @OptIn(ExperimentalMaterial3Api::class)
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,17 +133,20 @@ class CardActivity : ComponentActivity() {
             arrayOf(Manifest.permission.RECORD_AUDIO),
             0
         )
-
-
-        val mainIntent = intent
-
-
-
-
-
+        this.onBackPressedDispatcher.addCallback{
+            mainIntent.putExtra("tripFileListIndex",tripFileListIndex)
+            mainIntent.putExtra("totalCount",totalCount)
+            setResult(1,mainIntent)
+            finish()
+        }
+        mainIntent = intent
         setContent {
             val cardItems = remember {
                 mutableStateListOf<Card>()
+            }
+
+            val deleteCardIdList = remember {
+                mutableStateListOf<Int>()
             }
 
             val emotionList = remember {
@@ -162,7 +180,7 @@ class CardActivity : ComponentActivity() {
             emotionList.add(
                 Emotion(
                     icon = R.drawable.ic_emotion_sad,
-                    text = "슬퍼요 ",
+                    text = "우울해요",
                     persent = 0f,
                     color = "#1F9854"
                 )
@@ -173,8 +191,13 @@ class CardActivity : ComponentActivity() {
                 mutableStateOf(0)
             }
             try {
-                mainIntent?.let {
-                    tripFileId.value = it.getIntExtra("tripFileId", 0)
+                mainIntent.let {
+                    tripFileId.value = it.getIntExtra("tripFileId", -1)
+                    tripFileListIndex = it.getIntExtra("tripFileListIndex",-1)
+
+                    if(tripFileId.value == -1 || tripFileListIndex == -1){
+                        throw java.lang.Exception()
+                    }
                 }
             } catch (e: Exception) {
                 Toast.makeText(this@CardActivity, "server error", Toast.LENGTH_SHORT).show()
@@ -189,6 +212,17 @@ class CardActivity : ComponentActivity() {
                 )
 
 
+                cardViewModel.deleteCardSuccess.observe(this@CardActivity){ response->
+                    deleteCardIdList.removeFirst()
+                    if(deleteCardIdList.isEmpty()){
+                        LoadingState.hide()
+                        cardViewModel.getCardAll(
+                            tripFileId = tripFileId.value
+                        )
+                    }
+
+
+                }
 
                 cardViewModel.getCardAllSuccess.observe(this@CardActivity) { response ->
                     cardItems.clear()
@@ -213,12 +247,15 @@ class CardActivity : ComponentActivity() {
 
                         cardItems.add(it)
                     }
-                    cardItems.let {
-                        emotionList[0].persent = it.first().cardView.disgust.toFloat()*(0.01f)
-                        emotionList[1].persent = it.first().cardView.happy.toFloat()*(0.01f)
-                        emotionList[2].persent = it.first().cardView.angry.toFloat()*(0.01f)
-                        emotionList[3].persent = it.first().cardView.sad.toFloat()*(0.01f)
+                    if(!cardItems.isNullOrEmpty()){
+                        cardItems.let {
+                            emotionList[0].persent = it.first().cardView.neutral.toFloat()*(0.01f)
+                            emotionList[1].persent = it.first().cardView.happy.toFloat()*(0.01f)
+                            emotionList[2].persent = it.first().cardView.angry.toFloat()*(0.01f)
+                            emotionList[3].persent = it.first().cardView.sad.toFloat()*(0.01f)
+                        }
                     }
+                    totalCount = cardItems.size
 
                 }
 
@@ -227,10 +264,13 @@ class CardActivity : ComponentActivity() {
                 }
 
 
+
+
                 Scaffold(
                     modifier = Modifier
                         .fillMaxWidth(),
                     topBar = {
+                        GlobalLoadingDialog()
                         TopAppBar(
                             actions = {
 
@@ -248,6 +288,9 @@ class CardActivity : ComponentActivity() {
                                     Text(
                                         modifier = Modifier
                                             .clickable {
+                                                mainIntent.putExtra("tripFileListIndex",tripFileListIndex)
+                                                mainIntent.putExtra("totalCount",totalCount)
+                                                setResult(1,mainIntent)
                                                 finish()
                                             },
                                         text = "뒤로",
@@ -261,12 +304,27 @@ class CardActivity : ComponentActivity() {
                                     Text(
                                         modifier = Modifier
                                             .clickable {
+                                                cardItems.filter { it.isDelete.value }.forEach {
+                                                    deleteCardIdList.add(it.cardView.id)
+                                                }
+                                                if(isEdit.value && deleteCardIdList.isNotEmpty()){
+                                                    LoadingState.show()
+                                                    deleteCardIdList.forEach {
+                                                        cardViewModel.deleteCard(
+                                                            cardViewId = it
+                                                        )
+                                                    }
+                                                }else{
+                                                    cardItems.map { it.isDelete.value = false }
+                                                }
                                                 isEdit.value = !isEdit.value
+
                                             },
-                                        text = "삭제",
+                                        text = if(isEdit.value) "삭제" else "편집",
                                         fontFamily = FontMoment.obangFont,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 15.sp
+                                        fontSize = 15.sp,
+                                        color = if(isEdit.value) Color("#99342E".toColorInt()) else Color.Black
                                     )
                                     Spacer(modifier = Modifier.width(14.dp))
                                 }
@@ -299,12 +357,8 @@ class CardActivity : ComponentActivity() {
             return s
         }
 
-        data class Emotion(
-            val icon: Int,
-            var text: String,
-            var persent: Float,
-            val color:String
-        )
+
+
 
 
         @Composable
@@ -341,9 +395,6 @@ class CardActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clickable {
-                        isEdit.value = !isEdit.value
-                    }
             ) {
                 Column(
                     modifier = Modifier
@@ -709,7 +760,12 @@ class CardActivity : ComponentActivity() {
                                                 .padding(horizontal = 24.dp)
                                         ) {
                                             Text(
-                                                text = "꽤나 즐거운 대화였네요",
+                                                text = when(index){
+                                                    0 -> {"꽤나 즐거운 대화였네요"}
+                                                    1 -> {"오늘도 고생했어요"}
+                                                    2 -> {"좋은 하루 보내세요"}
+                                                    else -> {"푹 쉬세요"}
+                                                },
                                                 fontFamily = FontMoment.preStandardFont,
                                                 fontWeight = FontWeight.Medium,
                                                 fontSize = 11.sp
@@ -759,7 +815,35 @@ class CardActivity : ComponentActivity() {
 
                                                     LinearProgressIndicator(
                                                         color = Color(item.color.toColorInt()),
-                                                        progress = { item.persent }
+                                                        progress = {
+                                                            when(item.text){
+                                                                "평범해요" -> {
+                                                                    cardItems[index].cardView.neutral.let {
+                                                                        it.toFloat()*(0.01f)
+                                                                    }
+                                                                }
+                                                                "즐거워요" -> {
+                                                                    cardItems[index].cardView.happy.let {
+                                                                        it.toFloat()*(0.01f)
+                                                                    }
+                                                                }
+                                                                "화가나요" -> {
+                                                                    cardItems[index].cardView.angry.let {
+                                                                        it.toFloat()*(0.01f)
+                                                                    }
+                                                                }
+                                                                "슬퍼요 ." -> {
+                                                                    cardItems[index].cardView.sad.let {
+                                                                        it.toFloat()*(0.01f)
+                                                                    }
+                                                                }
+                                                                else -> {
+                                                                    cardItems[index].cardView.disgust.let {
+                                                                        it.toFloat()*(0.01f)
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
                                                     )
                                                     Spacer(modifier = Modifier.width(36.dp))
                                                     Text(
