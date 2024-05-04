@@ -7,7 +7,6 @@ import com.capstone.android.application.domain.response.MomentResponse
 import com.capstone.android.application.domain.response.card.CardResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.Response
 
 interface CardRepositoryInterface {
     suspend fun postCardUpload(
@@ -17,7 +16,7 @@ interface CardRepositoryInterface {
 
     suspend fun deleteCard(
         cardViewId:Int
-    ):Response<MomentResponse>
+    ):ApiResponse<MomentResponse>
 
     suspend fun getCardAll(
         tripFileId:Int
@@ -26,11 +25,11 @@ interface CardRepositoryInterface {
     suspend fun putCardModify(
         cardViewId:Int,
         body : PutCardModifyRequest
-    ):Response<MomentResponse>
+    ):ApiResponse<MomentResponse>
 
     suspend fun putCardLike(
         cardViewId:Int
-    ):Response<MomentResponse>
+    ):ApiResponse<MomentResponse>
 
     suspend fun getCardLiked():ApiResponse<CardResponse>
 }

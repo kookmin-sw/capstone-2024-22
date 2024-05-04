@@ -7,7 +7,6 @@ import com.capstone.android.application.domain.response.MomentResponse
 import com.capstone.android.application.domain.response.card.CardResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.Response
 import javax.inject.Inject
 
 class CardRepository @Inject constructor(private val cardRetrofitInterface: CardRetrofitInterface):CardRepositoryInterface {
@@ -21,7 +20,7 @@ class CardRepository @Inject constructor(private val cardRetrofitInterface: Card
         )
     }
 
-    override suspend fun deleteCard(cardViewId: Int): Response<MomentResponse> {
+    override suspend fun deleteCard(cardViewId: Int): ApiResponse<MomentResponse> {
         return cardRetrofitInterface.deleteCard(
             cardViewId = cardViewId
         )
@@ -36,14 +35,14 @@ class CardRepository @Inject constructor(private val cardRetrofitInterface: Card
     override suspend fun putCardModify(
         cardViewId:Int,
         body : PutCardModifyRequest
-    ): Response<MomentResponse> {
+    ): ApiResponse<MomentResponse> {
         return cardRetrofitInterface.putCardModify(
             cardViewId = cardViewId,
             body = body
         )
     }
 
-    override suspend fun putCardLike(cardViewId: Int): Response<MomentResponse> {
+    override suspend fun putCardLike(cardViewId: Int): ApiResponse<MomentResponse> {
         return cardRetrofitInterface.putCardLike(
             cardViewId = cardViewId
         )

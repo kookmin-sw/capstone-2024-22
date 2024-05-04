@@ -7,7 +7,6 @@ import com.capstone.android.application.domain.response.MomentResponse
 import com.capstone.android.application.domain.response.card.CardResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -29,7 +28,7 @@ interface CardRetrofitInterface {
     @DELETE("/core/cardView/{cardViewId}")
     suspend fun deleteCard(
         @Path(value = "cardViewId") cardViewId:Int
-    ) : Response<MomentResponse>
+    ) : ApiResponse<MomentResponse>
 
     @GET("/core/cardView/all/{tripFileId}")
     suspend fun getCardAll(
@@ -40,12 +39,12 @@ interface CardRetrofitInterface {
     suspend fun putCardModify(
         @Path(value="cardViewId") cardViewId:Int,
         @Body body : PutCardModifyRequest
-    ):Response<MomentResponse>
+    ):ApiResponse<MomentResponse>
 
     @PUT("/core/cardView/like/{cardViewId}")
     suspend fun putCardLike(
         @Path(value = "cardViewId") cardViewId:Int
-    ):Response<MomentResponse>
+    ):ApiResponse<MomentResponse>
 
     @GET("/core/cardView/like")
     suspend fun getCardLiked() : ApiResponse<CardResponse>
