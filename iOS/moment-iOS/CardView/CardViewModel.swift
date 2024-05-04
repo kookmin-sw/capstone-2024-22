@@ -60,7 +60,7 @@ class CardViewModel: ObservableObject {
     @Published var cardItems: [CardItem1] = []
     
     var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjMsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNDQ3MDczNCwiZXhwIjoxNzU3NjcwNzM0fQ.pddeumunqT4tiE2yGI9aWXkn0Kxo7XeB9kFfpwQftbM"
-//    
+    
 //
 //    func fetchAllCardViews(tripFileIds: Int) {
 //      //  for tripFileId in tripFileIds {

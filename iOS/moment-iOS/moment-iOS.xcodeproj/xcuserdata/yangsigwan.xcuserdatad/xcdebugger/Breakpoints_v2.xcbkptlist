@@ -238,8 +238,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "74"
             endingLineNumber = "74"
-            landmarkName = "CardViewModel"
-            landmarkType = "3">
+            landmarkName = "fetchAllCardViews(tripFileIds:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -254,8 +254,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "77"
             endingLineNumber = "77"
-            landmarkName = "CardViewModel"
-            landmarkType = "3">
+            landmarkName = "fetchAllCardViews(tripFileIds:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -270,8 +270,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "79"
             endingLineNumber = "79"
-            landmarkName = "CardViewModel"
-            landmarkType = "3">
+            landmarkName = "fetchAllCardViews(tripFileIds:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -382,8 +382,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "76"
             endingLineNumber = "76"
-            landmarkName = "CardViewModel"
-            landmarkType = "3">
+            landmarkName = "fetchAllCardViews(tripFileIds:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -508,8 +508,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "477"
-            endingLineNumber = "477"
+            startingLineNumber = "481"
+            endingLineNumber = "481"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -524,8 +524,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "560"
-            endingLineNumber = "560"
+            startingLineNumber = "564"
+            endingLineNumber = "564"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -540,8 +540,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "472"
-            endingLineNumber = "472"
+            startingLineNumber = "476"
+            endingLineNumber = "476"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -556,8 +556,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "478"
-            endingLineNumber = "478"
+            startingLineNumber = "482"
+            endingLineNumber = "482"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -572,8 +572,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "550"
-            endingLineNumber = "550"
+            startingLineNumber = "554"
+            endingLineNumber = "554"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>

@@ -158,22 +158,7 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
             case .failure(let error):
                 print("Failed to fetch with error: \(error)")
             }
-            
-//            switch response.result {
-//                   case .success(let value):
-//                       do {
-//                           let data = try JSONSerialization.data(withJSONObject: value, options: [])
-//                           let decoder = JSONDecoder()
-//                           let tripFileResponse = try decoder.decode(TripFileResponse.self, from: data)
-//                           DispatchQueue.main.async {
-//                               self.tripFiles = tripFileResponse.data.tripFiles
-//                           }
-//                       } catch {
-//                           print("Decoding error: \(error)")
-//                       }
-//                   case .failure(let error):
-//                       print("Failed to fetch with error: \(error)")
-//                   }
+ 
         }
     }
 
@@ -236,7 +221,7 @@ struct TripFileData: Codable {
 }
 
 struct TripFile: Codable {
-    var id: Int
+    var id: Int // 얘로 카드뷰를 조회함
     var tripId: Int
     var email: String
     var yearDate : String

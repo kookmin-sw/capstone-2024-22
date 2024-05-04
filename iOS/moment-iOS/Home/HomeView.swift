@@ -455,12 +455,16 @@ struct DateRangeView1: View {
                         if let startDate = convertToDate(dateString: item.startdate),
                            let endDate = convertToDate(dateString: item.enddate) {
                             let days = generateDateRange(from: startDate, to: endDate)
-                            Text("sdf")
+                     
                           
                             ForEach(Array(homeviewModel.tripFiles.enumerated()), id: \.element.id) { index, tripFile in
-                                                        NavigationLink(destination: CardView(item: item, tripFile: tripFile, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) {
+                            NavigationLink(destination: CardView(item: item, tripFile: tripFile, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) {
+                                                            
+                                                            
                                                             DayView(dayIndex: index, item: item, tripFile: tripFile)
                                                         }
+                                
+                                
                                                     }.padding(.vertical, 4)
                                 
                             
