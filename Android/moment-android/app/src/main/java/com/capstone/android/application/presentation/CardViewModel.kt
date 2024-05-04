@@ -8,6 +8,7 @@ import com.capstone.android.application.data.remote.card.CardRepository
 import com.capstone.android.application.data.remote.card.model.card_modify.request.PutCardModifyRequest
 import com.capstone.android.application.data.remote.card.model.card_post.response.PostCardUploadResponse
 import com.capstone.android.application.domain.response.ApiResponse
+import com.capstone.android.application.domain.response.MomentResponse
 import com.capstone.android.application.domain.response.card.CardResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -48,6 +49,19 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
     val getCardLikedFailure:MutableLiveData<ApiResponse.Error<Exception>> by lazy {
         MutableLiveData<ApiResponse.Error<Exception>>()
     }
+
+    val putCardLikeSuccess:MutableLiveData<MomentResponse> by lazy {
+        MutableLiveData<MomentResponse>()
+    }
+
+    val deleteCardSuccess:MutableLiveData<MomentResponse> by lazy {
+        MutableLiveData<MomentResponse>()
+    }
+
+    val deleteCardFailure:MutableLiveData<ApiResponse.Error<Exception>> by lazy {
+        MutableLiveData<ApiResponse.Error<Exception>>()
+    }
+
     fun postCardUpload(
         cardUploadMultipart:RequestBody,
         recordFile : MultipartBody.Part
@@ -83,9 +97,15 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
     ){
         viewModelScope.launch {
             try {
-                val data = cardRepository.deleteCard(
+
+                val response = cardRepository.deleteCard(
                     cardViewId = cardViewId
                 )
+
+                if(response is ApiResponse.Success){
+                    deleteCardSuccess.value=response.data
+                    Log.d("awegwgewag","weagewa")
+                }
 
             } catch (e: HttpException) {
                 Log.d("awegawegaew","404")
