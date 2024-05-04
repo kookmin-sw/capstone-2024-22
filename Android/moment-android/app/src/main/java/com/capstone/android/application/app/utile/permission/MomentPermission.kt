@@ -59,11 +59,8 @@ class MomentPermission @Inject constructor(@ActivityContext private val context 
                 || ActivityCompat.checkSelfPermission(
                     context,
                     permissionsLocationUpApi29Impl[1]
-                ) != PackageManager.PERMISSION_GRANTED ||
-                ActivityCompat.checkSelfPermission(
-                    context,
-                    permissionsLocationUpApi29Impl[2]
                 ) != PackageManager.PERMISSION_GRANTED
+
             ) {
                 ActivityCompat.requestPermissions(
                     context as Activity,
