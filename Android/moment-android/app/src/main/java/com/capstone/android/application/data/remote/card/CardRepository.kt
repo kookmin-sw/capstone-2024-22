@@ -51,4 +51,11 @@ class CardRepository @Inject constructor(private val cardRetrofitInterface: Card
     override suspend fun getCardLiked(): ApiResponse<CardResponse> {
         return cardRetrofitInterface.getCardLiked()
     }
+
+    override suspend fun postCardImageUpload(cardViewId: Int,uploadImageList:ArrayList<MultipartBody.Part>): ApiResponse<MomentResponse> {
+        return cardRetrofitInterface.postCardImageUpload(
+            cardViewId = cardViewId,
+            uploadImageList = uploadImageList
+        )
+    }
 }

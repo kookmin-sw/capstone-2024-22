@@ -32,4 +32,9 @@ interface CardRepositoryInterface {
     ):ApiResponse<MomentResponse>
 
     suspend fun getCardLiked():ApiResponse<CardResponse>
+
+    suspend fun postCardImageUpload(
+        cardViewId : Int,
+        uploadImageList:ArrayList<MultipartBody.Part>
+    ):ApiResponse<MomentResponse>
 }

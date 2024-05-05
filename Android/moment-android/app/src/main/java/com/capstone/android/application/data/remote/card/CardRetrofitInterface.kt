@@ -49,4 +49,11 @@ interface CardRetrofitInterface {
     @GET("/core/cardView/like")
     suspend fun getCardLiked() : ApiResponse<CardResponse>
 
+    @Multipart
+    @POST("/core/cardView/image/{cardViewId}")
+    suspend fun postCardImageUpload(
+        @Path("cardViewId") cardViewId:Int,
+        @Part uploadImageList:ArrayList<MultipartBody.Part>
+    ):ApiResponse<MomentResponse>
+
 }
