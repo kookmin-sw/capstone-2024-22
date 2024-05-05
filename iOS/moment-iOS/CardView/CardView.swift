@@ -11,6 +11,7 @@ struct CardView: View {
     //var day: Date
     var item: Item
     var tripFile: TripFile
+   // var tripFileId: Int
     
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioRecorderManager: AudioRecorderManager
@@ -91,6 +92,8 @@ struct CardView: View {
                         
                         ScrollView {
                             // ForEach를 사용하여 cardViewModel의 cardItems 배열을 반복 처리
+                            
+//                            Text("Card View for Trip File ID: \(tripFileId)")
                             ForEach(cardViewModel.cardItems) { cardItem in
                                 // 각 cardItem에 대한 AccordionView 인스턴스를 생성
                                 AccordionView(audioRecorderManager: audioRecorderManager, isEditing: $isEditing, selectedCardIDs: $selectedCardIDs, cardViewModel: cardViewModel, cardItem: cardItem)
