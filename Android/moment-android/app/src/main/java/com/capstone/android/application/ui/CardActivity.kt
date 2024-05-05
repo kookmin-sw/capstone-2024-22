@@ -26,6 +26,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,17 +48,20 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -66,9 +70,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.capstone.android.application.R
 import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.app.composable.FancyProgressBar
@@ -80,13 +89,14 @@ import com.capstone.android.application.app.utile.recorder.MomentAudioPlayer
 import com.capstone.android.application.app.utile.recorder.MomentAudioRecorder
 import com.capstone.android.application.domain.Card
 import com.capstone.android.application.domain.Emotion
-import com.capstone.android.application.domain.response.card.CardView
 import com.capstone.android.application.presentation.CardViewModel
 import com.capstone.android.application.presentation.DownloadLinkViewModel
-import com.capstone.android.application.presentation.OpenWeatherViewModel
 import com.capstone.android.application.ui.theme.FontMoment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import javax.inject.Inject
 import androidx.compose.ui.Alignment.Companion as Alignment1
@@ -96,7 +106,6 @@ class CardActivity : ComponentActivity() {
     lateinit var navController: NavHostController
 
     private val cardViewModel: CardViewModel by viewModels()
-    private val openWeatherViewModel: OpenWeatherViewModel by viewModels()
     private val downloadLinkViewModel : DownloadLinkViewModel by viewModels()
     @Inject lateinit var momentAudioPlayer:MomentAudioPlayer
 
@@ -120,9 +129,26 @@ class CardActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
         momentAudioPlayer.stop()
+
     }
 
+    @Composable
+    fun OnLifecycleEvent(onEvent: (owner: LifecycleOwner, event: Lifecycle.Event) -> Unit) {
+        val eventHandler = rememberUpdatedState(onEvent)
+        val lifecycleOwner = rememberUpdatedState(LocalLifecycleOwner.current)
 
+        DisposableEffect(lifecycleOwner.value) {
+            val lifecycle = lifecycleOwner.value.lifecycle
+            val observer = LifecycleEventObserver { owner, event ->
+                eventHandler.value(owner, event)
+            }
+
+            lifecycle.addObserver(observer)
+            onDispose {
+                lifecycle.removeObserver(observer)
+            }
+        }
+    }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @RequiresApi(Build.VERSION_CODES.S)
@@ -152,6 +178,37 @@ class CardActivity : ComponentActivity() {
             val emotionList = remember {
                 mutableStateListOf<Emotion>()
             }
+
+
+            val lifecycleOwner = LocalLifecycleOwner.current
+            OnLifecycleEvent{ lifecycleOwner,event->
+                when(event){
+                    Lifecycle.Event.ON_CREATE -> {}
+                    Lifecycle.Event.ON_START -> {}
+                    Lifecycle.Event.ON_RESUME -> {}
+                    Lifecycle.Event.ON_PAUSE -> {}
+                    Lifecycle.Event.ON_STOP -> {
+                        Log.d("awegwaegwe","start")
+//                        cardItems.filter { it.uploadImage.isNotEmpty() }.forEach {card->
+//
+//                            cardViewModel.postCardImageUpload(
+//                                cardViewId = card.cardView.id,
+//                                uploadImageList = card.uploadImage.map{ file->
+//                                    MultipartBody.Part.createFormData(
+//                                        name = "images",
+//                                        filename = file.name,
+//                                        body = file.asRequestBody("image/*".toMediaType())
+//                                    )
+//                                } as ArrayList<MultipartBody.Part>
+//                            )
+//                        }
+                    }
+                    Lifecycle.Event.ON_DESTROY -> {}
+                    Lifecycle.Event.ON_ANY -> {}
+                }
+            }
+
+
 
             emotionList.add(
                 Emotion(
@@ -228,8 +285,11 @@ class CardActivity : ComponentActivity() {
                     cardItems.clear()
                     response.data.cardViews.mapNotNull { cardView ->
                         runCatching {
+
                             Card(
-                                cardView = cardView
+                                cardView = cardView,
+                                uploadImage = ArrayList<File>(),
+                                imageNum = mutableStateOf(0)
                             ).apply {
                                 this.isFavorite.value = cardView.loved
                             }
@@ -261,6 +321,9 @@ class CardActivity : ComponentActivity() {
 
                 cardViewModel.getCardAllFailure.observe(this@CardActivity) { error ->
 
+                }
+                cardViewModel.postCardImageUploadSuccess.observe(this@CardActivity){response->
+                    LoadingState.hide()
                 }
 
 
@@ -361,16 +424,31 @@ class CardActivity : ComponentActivity() {
 
 
 
+        @OptIn(ExperimentalGlideComposeApi::class)
         @Composable
         fun Main(isEdit: MutableState<Boolean>, cardItems: MutableList<Card>, emotionList:MutableList<Emotion>) {
             var expanded = remember { mutableStateOf(true) }
 
             val imageList = mutableStateListOf<File>()
+            val cardImages=ArrayList<MultipartBody.Part>()
+            val focusedCardIndex = remember {
+                mutableStateOf(0)
+            }
 
+            val focusedCardImageNum = remember {
+                mutableStateOf(0)
+            }
+            val maxUploadImages = remember {
+                mutableStateOf(2)
+            }
+            focusedCardImageNum.value = if(cardItems.isNullOrEmpty()) 0 else cardItems[focusedCardIndex.value].let { it.uploadImage.size+it.cardView.imageUrls.size }
+
+
+            maxUploadImages.value = if(10-focusedCardImageNum.value==0) 2 else 10-focusedCardImageNum.value
 
 
             val pickMultipleMedia = rememberLauncherForActivityResult(
-                ActivityResultContracts.PickMultipleVisualMedia(10)
+                ActivityResultContracts.PickMultipleVisualMedia(maxUploadImages.value)
             ) { uris ->
 
                 if (uris.isNotEmpty()) {
@@ -378,17 +456,34 @@ class CardActivity : ComponentActivity() {
                         Log.d("awegwaeg", it.path.toString())
 
                         val file = File(getPath(it))
-                        imageList.add(file)
+                        val body: MultipartBody.Part = MultipartBody.Part.createFormData(
+                            name = "roomImages",
+                            filename = file.name,
+                            body = file.asRequestBody("image/*".toMediaType())
+                        )
+
+                        cardItems[focusedCardIndex.value].uploadImage.add(file)
                     }
-
-
-//                val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-//
-//                val body = MultipartBody.Part.createFormData("mainImage", file.name, requestFile)
-
+                    cardItems[focusedCardIndex.value].imageNum.value = cardItems[focusedCardIndex.value].uploadImage.size
 
                 } else {
                     Log.d("PhotoPicker", "No media selected")
+                }
+
+
+                cardItems.filter { it.uploadImage.isNotEmpty() }.forEach { card->
+                    if(!LoadingState.isLoading.value) LoadingState.show()
+
+                    cardViewModel.postCardImageUpload(
+                        cardViewId = card.cardView.id,
+                        uploadImageList = card.uploadImage.map{ file->
+                            MultipartBody.Part.createFormData(
+                                name = "images",
+                                filename = file.name,
+                                body = file.asRequestBody("image/*".toMediaType())
+                            )
+                        } as ArrayList<MultipartBody.Part>
+                    )
                 }
             }
 
@@ -684,13 +779,15 @@ class CardActivity : ComponentActivity() {
                                             }
 
                                         }
-                                        if (imageList.isNullOrEmpty()) {
+                                        if(cardItems[index].cardView.imageUrls.isNullOrEmpty() && cardItems[index].imageNum.value==0) {
+
                                             Spacer(modifier = Modifier.height(8.dp))
                                             Row(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .padding(end = 24.dp)
                                                     .clickable {
+                                                        focusedCardIndex.value = index
                                                         pickMultipleMedia.launch(
                                                             PickVisualMediaRequest(
                                                                 ActivityResultContracts.PickVisualMedia.ImageAndVideo
@@ -713,7 +810,6 @@ class CardActivity : ComponentActivity() {
                                             }
                                         } else {
 
-
                                             Spacer(modifier = Modifier.height(8.dp))
                                             Divider(
                                                 modifier = Modifier
@@ -726,27 +822,61 @@ class CardActivity : ComponentActivity() {
                                             LazyRow(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
-                                                    .padding(horizontal = 30.dp),
+                                                    ,
+                                                contentPadding = PaddingValues(horizontal = 32.dp),
                                                 horizontalArrangement = Arrangement.Start,
+                                                verticalAlignment = Alignment.CenterVertically,
                                                 content = {
-                                                    items(imageList.size) { index ->
+                                                    items(cardItems[index].cardView.imageUrls.size) { imageUrlindex ->
                                                         Box(
                                                             modifier = Modifier
                                                                 .size(72.dp)
-                                                                .padding(end = 8.dp)
                                                         ) {
-                                                            AsyncImage(
+
+                                                            GlideImage(
                                                                 contentScale = ContentScale.Crop,
                                                                 modifier = Modifier
-                                                                    .height(70.dp)
-                                                                    .width(66.dp)
+                                                                    .size(70.dp)
+                                                                    .clip(RoundedCornerShape(6.dp)),
+                                                                model = cardItems[index].cardView.imageUrls[imageUrlindex],
+                                                                contentDescription = "Image",
+                                                            )
+
+
+                                                        }
+
+                                                        Spacer(modifier = Modifier.width(8.dp))
+                                                    }
+
+
+                                                    items(cardItems[index].imageNum.value){uploadImageIndex->
+                                                        AsyncImage(
+                                                                contentScale = ContentScale.Crop,
+                                                                modifier = Modifier
+                                                                    .size(70.dp)
                                                                     .clip(RoundedCornerShape(6.dp)),
                                                                 model = ImageRequest.Builder(this@CardActivity)
-                                                                    .data(imageList[index])
+                                                                    .data(cardItems[index].uploadImage[uploadImageIndex])
                                                                     .build(),
                                                                 contentDescription = "image"
                                                             )
+                                                        Spacer(modifier = Modifier.width(8.dp))
+                                                    }
 
+                                                    if(cardItems[index].let { it.cardView.imageUrls.size + it.uploadImage.size } < 10){
+                                                        item {
+                                                            Image(
+                                                                modifier = Modifier.clickable {
+                                                                    focusedCardIndex.value = index
+                                                                    pickMultipleMedia.launch(
+                                                                        PickVisualMediaRequest(
+                                                                            ActivityResultContracts.PickVisualMedia.ImageAndVideo
+                                                                        )
+                                                                    )
+                                                                },
+                                                                painter = painterResource(R.drawable.ic_plus_image),
+                                                                contentDescription = "image plus"
+                                                            )
                                                         }
                                                     }
                                                 })
@@ -1091,19 +1221,19 @@ class CardActivity : ComponentActivity() {
             val cardItems: MutableList<Card> = remember {
                 mutableStateListOf<Card>()
             }
-            for (i in 0 until 3) {
-                cardItems.add(
-                    Card(
-                        cardView = CardView(
-                            angry = 1.0, happy = 1.0, id = 1, location = "", loved = false,
-                            neutral = 1.0, question = "", recordFileLength = 1, recordFileName = "",
-                            recordFileStatus = "", recordFileUrl = "", recordedAt = "",
-                            sad = 1.0, stt = "", temperature = "", tripFileId = 1, weather = "",
-                            disgust = 1.0, imageUrls = listOf("weag")
-                        )
-                    )
-                )
-            }
+//            for (i in 0 until 3) {
+//                cardItems.add(
+//                    Card(
+//                        cardView = CardView(
+//                            angry = 1.0, happy = 1.0, id = 1, location = "", loved = false,
+//                            neutral = 1.0, question = "", recordFileLength = 1, recordFileName = "",
+//                            recordFileStatus = "", recordFileUrl = "", recordedAt = "",
+//                            sad = 1.0, stt = "", temperature = "", tripFileId = 1, weather = "",
+//                            disgust = 1.0, imageUrls = listOf("weag")
+//                        )
+//                    )
+//                )
+//            }
 
 //            Main(isEdit = isEdit, cardItems = cardItems)
         }
