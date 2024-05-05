@@ -62,6 +62,14 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
         MutableLiveData<ApiResponse.Error<Exception>>()
     }
 
+    val postCardImageUploadSuccess:MutableLiveData<MomentResponse> by lazy {
+        MutableLiveData<MomentResponse>()
+    }
+
+    val postCardImageUploadFailure:MutableLiveData<ApiResponse.Error<Exception>> by lazy {
+        MutableLiveData<ApiResponse.Error<Exception>>()
+    }
+
     fun postCardUpload(
         cardUploadMultipart:RequestBody,
         recordFile : MultipartBody.Part
@@ -251,5 +259,49 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
         }
     }
 
+    fun postCardImageUpload(
+        cardViewId : Int,
+        uploadImageList:ArrayList<MultipartBody.Part>
+    ){
+        viewModelScope.launch {
+            try {
+
+                val response = cardRepository.postCardImageUpload(
+                    cardViewId = cardViewId,
+                    uploadImageList = uploadImageList
+                )
+
+
+                if(response is ApiResponse.Success){
+                    postCardImageUploadSuccess.value = response.data
+                }else{
+
+                }
+
+
+
+            } catch (e: HttpException) {
+                Log.d("waegwaegewgwe","HttpException : ${e.message}")
+
+                // Handle specific HTTP error codes
+                when (e.code()) {
+                    404 -> {
+                        // Handle resource not found error
+                    }
+                    // Handle other error codes
+                }
+            } catch (e: IOException) {
+                Log.d("waegwaegewgwe","IOException : ${e.message}")
+
+                // Handle network-related errors
+//                throw NetworkException("Network error occurred", e)
+            } catch (e: Exception) {
+                Log.d("waegwaegewgwe","Exception : ${e.message}")
+
+                // Handle other generic exceptions
+            }
+        }
+
+    }
 
 }
