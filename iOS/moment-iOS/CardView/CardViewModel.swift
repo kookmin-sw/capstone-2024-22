@@ -62,6 +62,8 @@ struct cardViews: Codable,Identifiable {
 
 class CardViewModel: ObservableObject {
     @Published var cardItems: [cardViews] = []
+   
+
 
     var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjMsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNDQ3MDczNCwiZXhwIjoxNzU3NjcwNzM0fQ.pddeumunqT4tiE2yGI9aWXkn0Kxo7XeB9kFfpwQftbM"
     
@@ -90,6 +92,10 @@ class CardViewModel: ObservableObject {
             case .success(let CardViewResponse)://네트워크 통신이 성공을 하면 일로타게되지 근데 여기서 파싱이 안되니까 지금 밑으로 안들어오고 바로 에러처리 쪽으로 넘어가는거자나
                 print("Successfully fetched card views: \(CardViewResponse)")
                 print("카드뷰스에 들어가는 데이터: \(cardViews.self)")
+                print("카드뷰 리스폰스 \(CardViewResponse.self)")
+                DispatchQueue.main.async {
+                                self.cardItems = CardViewResponse.data.cardViews 
+                            }
                 for cardView in CardViewResponse.data.cardViews {
                                 print("Record File Name: \(cardView.recordFileName)")
                                 print("Location: \(cardView.location)")
@@ -97,6 +103,9 @@ class CardViewModel: ObservableObject {
                                 print("Weather: \(cardView.weather)")
                                 // 여기에 더 많은 필드를 추가하여 출력할 수 있습니다.
                             }
+//                DispatchQueue.main.async {
+//                     self.cardViewsData = CardViewResponse.data.cardViews.first // 예제로 첫 번째 카드 뷰 데이터를 저장
+//                 }
             case .failure(let error):
                 print("Error while fetching card views: \(error.localizedDescription)")
                 if let data = response.data, let errorString = String(data: data, encoding: .utf8) {

@@ -109,6 +109,7 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
                     if let temperature = finalTemperature, let weather = finalWeather, let address = finalAddress {
                         print("Date: \(recordedAt), Location: \(address), Temperature: \(temperature), Weather: \(weather)")
                         self.uploadRecordedData(recordFileURL: newFileURL, location: address, recordedAt: recordedAt, temperature: temperature, weather: weather, question: "오늘 날씨는 어때요?")
+                        print(newFileURL)
                     } else {
                         print("Failed to fetch all required data.")
                     }
@@ -227,12 +228,13 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioPlayerDelegate,CL
     func uploadRecordedData(recordFileURL: URL, location: String, recordedAt: String, temperature: String, weather: String, question: String) {
         let urlString = "http://211.205.171.117:8000/core/cardView/upload"  // 서버의 URL
       
-
+        print(recordFileURL)
+        
         let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
         
         AF.upload(multipartFormData: { multipartFormData in
             // 녹음 파일을 멀티파트 폼 데이터에 추가
-            multipartFormData.append(recordFileURL, withName: "recordFile", fileName: recordFileURL.lastPathComponent, mimeType: "audio/mp3")
+            multipartFormData.append(recordFileURL, withName: "recordFile", fileName: recordFileURL.lastPathComponent, mimeType: "audio/*")
 
             // JSON 메타데이터 만들기
             let jsonPart: [String: Any] = [

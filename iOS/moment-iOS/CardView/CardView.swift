@@ -22,7 +22,7 @@ struct CardView: View {
     @ObservedObject var cardViewModel : CardViewModel
     @State private var isEditing = false // 편집 모드 상태
     @State private var selectedCardIDs = Set<Int>() // 선택된 카드의 ID 저장
-    @State private var cardViews : cardViews?
+   // @State private var cardViews : cardViews?
   
     
     
@@ -97,8 +97,11 @@ struct CardView: View {
                             // ForEach를 사용하여 cardViewModel의 cardItems 배열을 반복 처리
                             
                            Text("Card View for Trip File ID: \(tripFileId)")
-                            Text(cardViews?.location ?? "")
                            
+//                            Text(cardViewModel.cardViewsData?.question ?? "nil")
+//                            Text(cardViewModel.cardViewsData?.location ?? "위치 정보 없음")
+//
+//                            
                             ForEach(cardViewModel.cardItems) { cardItem in
                                 // 각 cardItem에 대한 AccordionView 인스턴스를 생성
                                 AccordionView(audioRecorderManager: audioRecorderManager, isEditing: $isEditing, selectedCardIDs: $selectedCardIDs, cardViewModel: cardViewModel, cardItem: cardItem)
