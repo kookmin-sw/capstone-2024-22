@@ -31,13 +31,8 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
         init() {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy. MM. dd"
-//            
-//            items = [
-//                       Item(tripName: "선유도여행", startdate: "2024. 04. 11", enddate: "2024. 04. 13"),
-//                       Item(tripName: "일본여행", startdate: "2024. 05. 15", enddate: "2024. 05. 19"),
-//                       Item(tripName: "뭐하기 여행", startdate: "2024. 06. 05", enddate: "2024. 06. 13"),
-//                       Item(tripName: "좋은여행", startdate: "2024. 07. 05", enddate: "2024. 10. 13")
-//                   ]
+
+            
             self.todos = []
             self.isEditTodoMode = false
             self.removeTodos = []

@@ -11,7 +11,8 @@ struct CardView: View {
     //var day: Date
     var item: Item
     var tripFile: TripFile
-   // var tripFileId: Int
+    var tripFileId: Int
+   // var cardView: CardViews
     
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioRecorderManager: AudioRecorderManager
@@ -21,6 +22,8 @@ struct CardView: View {
     @ObservedObject var cardViewModel : CardViewModel
     @State private var isEditing = false // 편집 모드 상태
     @State private var selectedCardIDs = Set<Int>() // 선택된 카드의 ID 저장
+    @State private var cardViews : cardViews?
+  
     
     
     var body: some View {
@@ -93,7 +96,9 @@ struct CardView: View {
                         ScrollView {
                             // ForEach를 사용하여 cardViewModel의 cardItems 배열을 반복 처리
                             
-//                            Text("Card View for Trip File ID: \(tripFileId)")
+                           Text("Card View for Trip File ID: \(tripFileId)")
+                            Text(cardViews?.location ?? "")
+                           
                             ForEach(cardViewModel.cardItems) { cardItem in
                                 // 각 cardItem에 대한 AccordionView 인스턴스를 생성
                                 AccordionView(audioRecorderManager: audioRecorderManager, isEditing: $isEditing, selectedCardIDs: $selectedCardIDs, cardViewModel: cardViewModel, cardItem: cardItem)
@@ -132,7 +137,7 @@ struct CardView: View {
         .navigationBarBackButtonHidden(true)
         .onAppear {
                        // 특정 tripFileId를 사용하여 카드뷰 데이터 로드
-                       //cardViewModel.fetchAllCardViews(tripFileIds: [item.tripFileId])
+            cardViewModel.fetchAllCardViews(tripFileId: tripFile.id)
                    }
         
         
@@ -145,7 +150,7 @@ struct AccordionView: View {
     @Binding var isEditing: Bool
     @Binding var selectedCardIDs: Set<Int>
     @ObservedObject var cardViewModel: CardViewModel
-    var cardItem: CardItem1
+    var cardItem: cardViews
     
     var body: some View {
         HStack { // 체크박스와 카드 컨텐츠 사이의 간격을 없애기 위해 spacing을 0으로 설정
@@ -191,6 +196,7 @@ struct AccordionView: View {
         
         .animation(.default, value: isEditing) // 편집 모드 변화에 따른 애니메이션
         
+        
     }
     
     
@@ -226,11 +232,14 @@ struct AccordionView: View {
         }
         HStack {
             Image("CardTime")
-            Text(cardItem.recordedAt).font(.pretendardMedium11)
+            Text("시간").font(.pretendardMedium11)
+            //cardItem.recordedAt
             //날짜부가 들어가야함
             Spacer()
             CustomCarbarDivider()
-            Text(cardItem.recordedAt).font(.pretendardMedium11) // 시간부만 들어가야함
+            Text("시간").font(.pretendardMedium11) // 시간부만 들어가야함
+            //cardItem.recordedAt
+
         }
         
     }
@@ -243,7 +252,7 @@ struct AccordionView: View {
 struct HeaderView: View {
     @Binding var isExpanded: Bool
     @State private var isHeartFilled = false // 하트가 채워졌는지 여부
-    var cardItem: CardItem1
+    var cardItem: cardViews
     @ObservedObject var cardViewModel: CardViewModel
     var body: some View {
         VStack{

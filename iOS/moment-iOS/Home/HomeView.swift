@@ -413,6 +413,7 @@ struct CustomDialog: View {
 
 struct DateRangeView1: View {
     var item: Item
+    
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @ObservedObject var cardViewModel : CardViewModel
     @Environment(\.presentationMode) var presentationMode
@@ -459,7 +460,7 @@ struct DateRangeView1: View {
                        
                             
                             ForEach(Array(homeviewModel.tripFiles.enumerated()), id: \.element.id) { index, tripFile in
-                                NavigationLink(destination: CardView(item: item, tripFile: tripFile, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) {
+                                NavigationLink(destination: CardView(item: item, tripFile: tripFile, tripFileId: tripFile.id, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) {
                                                             
                                                             
                                                             DayView(dayIndex: index, item: item, tripFile: tripFile)

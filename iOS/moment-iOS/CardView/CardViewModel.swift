@@ -9,113 +9,103 @@ import Foundation
 import SwiftUI
 import Alamofire
 
-struct CardItem1: Identifiable {
-    var id: Int
-    var tripFileId: Int
-    var recordedAt: String
-    var recordFileName: String
-    var recordFileUrl: String
-    var location: String
-    var recordFileLength: Int
-    var weather: String
-    var temperature: String
-    var stt: String
-    var happy: Double
-    var sad: Double
-    var angry: Double
-    var neutral: Double
-    var disgust: Double  // 추가된 필드
-    var question: String
-    var loved: Bool
-    var recordFileStatus: String
-    var imageUrls: [String]  // 추가된 필드
-    
-    init(id: Int, tripFileId: Int, recordedAt: String, recordFileName: String, recordFileUrl: String, location: String, recordFileLength: Int, weather: String, temperature: String, stt: String, happy: Double, sad: Double, angry: Double, neutral: Double, disgust: Double, question: String, loved: Bool, recordFileStatus: String, imageUrls: [String]) {
-        self.id = id
-        self.tripFileId = tripFileId
-        self.recordedAt = recordedAt
-        self.recordFileName = recordFileName
-        self.recordFileUrl = recordFileUrl
-        self.location = location
-        self.recordFileLength = recordFileLength
-        self.weather = weather
-        self.temperature = temperature
-        self.stt = stt
-        self.happy = happy
-        self.sad = sad
-        self.angry = angry
-        self.neutral = neutral
-        self.disgust = disgust
-        self.question = question
-        self.loved = loved
-        self.recordFileStatus = recordFileStatus
-        self.imageUrls = imageUrls
-    }
+struct CardViewResponse: Codable {
+    let status: Int
+    let code: String
+    let msg: String
+    let detailMsg: String
+    let data: CardViewData
 }
+
+struct CardViewData: Codable {
+    let cardViews: [cardViews]
+}
+
+struct cardViews: Codable,Identifiable {
+    let tripFileId: Int
+    let recordedAt: String//Date
+    let recordFileName: String
+    let recordFileUrl: String//URL
+    let location: String
+    let recordFileLength: Int
+    let weather: String
+    let temperature: String
+    let stt: String?
+    let happy: Double?
+    let sad: Double?
+    let angry: Double?
+    let neutral: Double?
+    let disgust: Double?
+    let question: String
+    let recordFileStatus: String
+    let imageUrls: [String]?
+    let id: Int
+    var loved: Bool
+    
+//    let tripFileID: Int
+//      let recordedAt, recordFileName: String
+//      let recordFileURL: String
+//      let location: String
+//      let recordFileLength: Int
+//      let weather, temperature, stt: String
+//      let happy, sad, angry, neutral: Double
+//      let disgust: Double
+//      let question, recordFileStatus: String
+//      let imageUrls: [String]
+//      let id: Int
+//      let loved: Bool
+}
+//"{"status":200,"code":"200","msg":"SELECT SUCCESS","detailMsg":"","data":{"cardViews":[{"tripFileId":26,"recordedAt":"2024-05-05T07:22:25","recordFileName":"2024-05-05T07:22:26.082673290.m4a","recordFileUrl":"https://kmumoment.s3.ap-northeast-2.amazonaws.com/users/3/2024-05-05T07%3A22%3A26.082673290.m4a","location":"회천남로, 88, 양주시, 경기도, 대한민국","recordFileLength":28,"weather":"moderate rain","temperature":"19.9","stt":null,"happy":null,"sad":null,"angry":null,"neutral":null,"disgust":null,"question":"오늘 날씨는 어때요?","recordFileStatus":"WAIT","imageUrls":[],"id":54,"loved":false}]}}"
 
 
 
 
 class CardViewModel: ObservableObject {
-    @Published var cardItems: [CardItem1] = []
-    
+    @Published var cardItems: [cardViews] = []
+
     var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjMsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNDQ3MDczNCwiZXhwIjoxNzU3NjcwNzM0fQ.pddeumunqT4tiE2yGI9aWXkn0Kxo7XeB9kFfpwQftbM"
     
-//
-//    func fetchAllCardViews(tripFileIds: Int) {
-//      //  for tripFileId in tripFileIds {
-//            let urlString = "http://wasuphj.synology.me:8000/core/cardView/all/\(tripFileId)"
-//            let headers: HTTPHeaders = [
-//                "Authorization": authToken,
-//                "Content-Type": "application/json"
-//            ]
-//            
-//            AF.request(urlString, headers: headers).responseJSON { response in
-//                switch response.result {
-//                case .success(let value):
-//                    if let json = value as? [String: Any], let data = json["data"] as? [String: Any], let cardViews = data["cardViews"] as? [[String: Any]] {
-//                        self.parseCardViews(cardViews)//서버통신은 완료된듯함
-//                    }
-//                case .failure(let error):
-//                    print("Error while fetching card views for tripFileId \(tripFileId): \(error.localizedDescription)")
-//                }
-//            }
-//        }
-    
 
+    func fetchAllCardViews(tripFileId: Int) {
+        
+        print(tripFileId)
+        let urlString = "http://211.205.171.117:8000/core/cardView/all/\(tripFileId)"
+        let headers: HTTPHeaders = [
+            "Authorization": authToken,
+            "Content-Type": "application/json"
+        ]
+        
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601  // ISO8601 포맷으로 날짜를 파싱하도록 설정
+        decoder.keyDecodingStrategy = .convertFromSnakeCase  // snake_case to camelCase 자동 변환
 
-    
-//    private func parseCardViews(_ cardViews: [[String: Any]]) {
-//        for cardView in cardViews {
-//            if let id = cardView["id"] as? Int,
-//               let tripFileId = cardView["tripFileId"] as? Int,
-//               let recordedAt = cardView["recordedAt"] as? String,
-//               let recordFileName = cardView["recordFileName"] as? String,
-//               let recordFileUrl = cardView["recordFileUrl"] as? String,
-//               let location = cardView["location"] as? String,
-//               let recordFileLength = cardView["recordFileLength"] as? Int,
-//               let weather = cardView["weather"] as? String,
-//               let temperature = cardView["temperature"] as? String,
-//               let stt = cardView["stt"] as? String,
-//               let happy = cardView["happy"] as? Double,
-//               let sad = cardView["sad"] as? Double,
-//               let angry = cardView["angry"] as? Double,
-//               let neutral = cardView["neutral"] as? Double,
-//               let disgust = cardView["disgust"] as? Double,
-//               let question = cardView["question"] as? String,
-//               let loved = cardView["loved"] as? Bool,
-//               let recordFileStatus = cardView["recordFileStatus"] as? String,
-//               let imageUrls = cardView["imageUrls"] as? [String] { // 새 필드
-//                let newItem = CardItem1(id: id, tripFileId: tripFileId, recordedAt: recordedAt, recordFileName: recordFileName, recordFileUrl: recordFileUrl, location: location, recordFileLength: recordFileLength, weather: weather, temperature: temperature, stt: stt, happy: happy, sad: sad, angry: angry, neutral: neutral, disgust: disgust, question: question, loved: loved, recordFileStatus: recordFileStatus, imageUrls: imageUrls)
-//                DispatchQueue.main.async {
-//                    self.cardItems.append(newItem)
-//                    print("Added new item: \(newItem)") // 로그 출력
-//                }
-//            }
-//        }
-//    }
+        AF.request(urlString, headers: headers).responseDecodable(of: CardViewResponse.self, decoder: decoder) { response in
+            if let statusCode = response.response?.statusCode{
+                print("카드 상태코드 연결 되었어??: \(statusCode)")
+                
+            }
+            
+            switch response.result {
+                
+            case .success(let CardViewResponse)://네트워크 통신이 성공을 하면 일로타게되지 근데 여기서 파싱이 안되니까 지금 밑으로 안들어오고 바로 에러처리 쪽으로 넘어가는거자나
+                print("Successfully fetched card views: \(CardViewResponse)")
+                print("카드뷰스에 들어가는 데이터: \(cardViews.self)")
+                for cardView in CardViewResponse.data.cardViews {
+                                print("Record File Name: \(cardView.recordFileName)")
+                                print("Location: \(cardView.location)")
+                                print("Recorded At: \(cardView.recordedAt)")
+                                print("Weather: \(cardView.weather)")
+                                // 여기에 더 많은 필드를 추가하여 출력할 수 있습니다.
+                            }
+            case .failure(let error):
+                print("Error while fetching card views: \(error.localizedDescription)")
+                if let data = response.data, let errorString = String(data: data, encoding: .utf8) {
+                              print("Error details: \(errorString)")
+                          }
+            }
+        }
+    }
 
-    
     func updateCardViewLikeStatus(cardViewId: Int) {
            let urlString = "http://211.205.171.117:8000/core/cardView/like/\(cardViewId)"
            let headers: HTTPHeaders = [

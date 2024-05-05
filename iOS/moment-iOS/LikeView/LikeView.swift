@@ -100,7 +100,7 @@ struct AccordionLikeView: View {
     @Binding var isEditing: Bool
     @Binding var selectedCardIDs: Set<Int>
     @ObservedObject var cardViewModel: CardViewModel
-    var cardItem: CardItem1
+    var cardItem: cardViews
     
     var body: some View {
         HStack { // 체크박스와 카드 컨텐츠 사이의 간격을 없애기 위해 spacing을 0으로 설정
@@ -178,10 +178,12 @@ struct AccordionLikeView: View {
         }
         HStack {
             Image("CardTime")
-            Text(cardItem.recordedAt).font(.pretendardMedium11)
+            Text("01:20").font(.pretendardMedium11)
+            //cardItem.recordedAt
             Spacer()
             CustomCarbarDivider()
-            Text(cardItem.recordedAt).font(.pretendardMedium11)
+            Text("01:20").font(.pretendardMedium11)
+            //cardItem.recordedAt
         }
     }
 }
@@ -193,7 +195,7 @@ struct AccordionLikeView: View {
 struct HeaderLikeView: View {
     @Binding var isExpanded: Bool
     @State private var isHeartFilled = true // 하트가 채워졌는지 여부
-    var cardItem: CardItem1
+    var cardItem: cardViews
     var body: some View {
         VStack{
             HStack {
