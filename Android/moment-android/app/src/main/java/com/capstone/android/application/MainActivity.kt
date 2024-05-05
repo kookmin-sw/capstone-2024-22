@@ -48,7 +48,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
@@ -85,8 +84,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -96,24 +93,32 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.app.composable.CustomTitleCheckDialog
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.composable.TripEmpty
 import com.capstone.android.application.app.composable.TripExist
 import com.capstone.android.application.app.composable.TripIng
+import com.capstone.android.application.app.composable.convertUrlLinkStringToRcorderNameString
 import com.capstone.android.application.app.composable.getCurrentTime
 import com.capstone.android.application.app.composable.getDifferenceInDay
 import com.capstone.android.application.app.screen.BottomNavItem
-import com.capstone.android.application.data.local.Emotion
-import com.capstone.android.application.domain.CustomTitleCheckViewModel
 import com.capstone.android.application.app.screen.MainScreen
-import com.capstone.android.application.app.utile.AndroidAudioPlayer
-import com.capstone.android.application.app.utile.MomentAudioRecorder
+import com.capstone.android.application.app.utile.MomentPath
+import com.capstone.android.application.app.utile.common.GetWeatherType
+import com.capstone.android.application.app.utile.location.MomentLocation
+import com.capstone.android.application.app.utile.permission.MomentPermission
+import com.capstone.android.application.app.utile.recorder.MomentAudioPlayer
+import com.capstone.android.application.app.utile.recorder.MomentAudioRecorder
 import com.capstone.android.application.data.remote.card.model.card_post.request.PostCardUploadReqeust
 import com.capstone.android.application.domain.Card
+import com.capstone.android.application.domain.CustomTitleCheckViewModel
+import com.capstone.android.application.domain.Emotion
 import com.capstone.android.application.domain.Trip
 import com.capstone.android.application.domain.TripFile
 import com.capstone.android.application.presentation.CardViewModel
+import com.capstone.android.application.presentation.KakaoViewModel
+import com.capstone.android.application.presentation.OpenWeatherViewModel
 import com.capstone.android.application.presentation.TripFileViewModel
 import com.capstone.android.application.presentation.TripViewModel
 import com.capstone.android.application.ui.CardActivity
@@ -152,9 +157,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType
@@ -162,18 +165,15 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import timber.log.Timber
 import java.io.File
-import java.text.DateFormat.getDateInstance
-import java.text.DateFormat.getDateTimeInstance
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
-import kotlin.coroutines.CoroutineContext
+import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.roundToInt
-import kotlin.time.Duration
 
 enum class TripState{
     EMPTY,EXISTS,ING
@@ -187,17 +187,25 @@ data class MainTrip(
 @OptIn(ExperimentalMaterial3Api::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     lateinit var navController: NavHostController
     private val tripViewModel : TripViewModel by viewModels()
     private val cardViewModel : CardViewModel by viewModels()
     private val tripFileViweModel : TripFileViewModel by viewModels()
-    private val recorder by lazy {
-        MomentAudioRecorder(this@MainActivity)
-    }
+    private val kakaoViewModel : KakaoViewModel by viewModels()
+    private val openWeatherViewModel : OpenWeatherViewModel by viewModels()
+    @Inject lateinit var momentLocation : MomentLocation
+    @Inject lateinit var momentPermission: MomentPermission
+    @Inject lateinit var recorder: MomentAudioRecorder
+    @Inject lateinit var player: MomentAudioPlayer
+    @Inject lateinit var momentAudioPlayer:MomentAudioPlayer
+//    private val recorder by lazy {
+//        MomentAudioRecorder(this@MainActivity)
+//    }
 
-    private val player by lazy {
-        AndroidAudioPlayer(this@MainActivity)
-    }
+//    private val player by lazy {
+//        AndroidAudioPlayer(this@MainActivity)
+//    }
     private var audioFile: File? = null
 
 
@@ -205,6 +213,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var currentDate:String=""
+        momentPermission.requestPermission()
+
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 //            val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("YYYY-MM-DD hh:mm:ss A Z"))
@@ -252,6 +262,25 @@ class MainActivity : ComponentActivity() {
             mutableStateListOf<TripFile>()
         }
 
+        val lat = remember{
+            mutableStateOf("")
+        }
+
+        val lon = remember {
+            mutableStateOf("")
+        }
+
+        val temp = remember {
+            mutableStateOf("")
+        }
+
+        val weather  = remember {
+            mutableStateOf("")
+        }
+        val addressName = remember {
+            mutableStateOf("")
+        }
+
         val favoriteCardList = remember{
             mutableStateListOf<Card>()
         }
@@ -285,17 +314,56 @@ class MainActivity : ComponentActivity() {
         )
 
         val recordOpen = remember { mutableStateOf(false)}
+        val isRecorderIng = remember{ mutableStateOf(false) }
         var EditCheckState = remember { mutableStateOf(false) }
         var ReceiptCheckState = remember { mutableStateOf(true) }
 
         val viewModel: CustomTitleCheckViewModel = viewModel()
         val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
         val coroutineScope = rememberCoroutineScope()
+        val emotionList = remember{
+            mutableStateListOf<Emotion>()
+        }
+
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_common,
+                text = "평범해요",
+                persent = 0f,
+                color = "#99342E"
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_happy,
+                text = "즐거워요",
+                persent = 0f,
+                color = "#030712"
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_angry,
+                text = "화가나요",
+                persent = 0f,
+                color = "#DAD0B4"
+            )
+        )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_emotion_sad,
+                text = "슬퍼요 ",
+                persent = 0f,
+                color = "#1F9854"
+            )
+        )
+
 
 
         tripViewModel.getTripAll()
         cardViewModel.getCardLiked()
         tripFileViweModel.getTripFileUntitled()
+
 
         getCurrentTime()
 
@@ -314,28 +382,45 @@ class MainActivity : ComponentActivity() {
 
 
 
-
             if(tripList.isNotEmpty()){
+                Log.d("awegagwea","waegewa")
                 tripList.sortedBy { it.startDate }
+                ApplicationClass.tripName=tripList.first().tripName
                 val format:SimpleDateFormat  =SimpleDateFormat("yyyy-MM-dd")
                 val currentDate = format.parse(getCurrentTime())
                 val compareDate = format.parse(tripList.first().startDate)
 
                 val different=getDifferenceInDay(startDate = currentDate , endDate = compareDate)
 
-                if(currentDate.compareTo(compareDate)<0){
-                    mainTrip.value=MainTrip(
-                        state = TripState.EXISTS,
-                        tripName=tripList.first().tripName,
-                        period=abs(different)
-                    )
-                }else{
-                    mainTrip.value=MainTrip(
-                        state = TripState.ING,
-                        tripName=tripList.first().tripName,
-                        period=abs(different)+1
-                    )
+                run breaker@ {
+                    tripList.forEach {
+
+                        if(currentDate.compareTo(format.parse(it.startDate))<0){
+                            mainTrip.value=MainTrip(
+                                state = TripState.EXISTS,
+                                tripName=it.tripName,
+                                period=abs(getDifferenceInDay(startDate = currentDate , endDate = format.parse(it.startDate)))
+                            )
+                            ApplicationClass.tripName=it.tripName
+                            return@breaker
+                        }else if(currentDate.compareTo(format.parse(it.endDate))<0){
+                            mainTrip.value=MainTrip(
+                                state = TripState.ING,
+                                tripName=it.tripName,
+                                period=abs(getDifferenceInDay(startDate = currentDate , endDate = format.parse(it.startDate)))+1
+                            )
+                            ApplicationClass.tripName=it.tripName
+                            return@breaker
+                        }else{
+                            mainTrip.value=MainTrip(
+                                state = TripState.EMPTY,
+                                tripName=it.tripName,
+                                period=abs(getDifferenceInDay(startDate = currentDate , endDate = format.parse(it.startDate)))+1
+                            )
+                        }
+                    }
                 }
+
             }else{
                 mainTrip.value = MainTrip(
                     state = TripState.EMPTY
@@ -343,7 +428,6 @@ class MainActivity : ComponentActivity() {
                 Log.d("awegwgwae","wawegewa")
                 tripList.clear()
             }
-
 
 
         }
@@ -362,9 +446,12 @@ class MainActivity : ComponentActivity() {
         }
 
         cardViewModel.getCardLikedSuccess.observe(this@MainActivity){ response ->
+            favoriteCardList.clear()
             response.data.cardViews.mapNotNull { cardView-> kotlin.runCatching {
                 Card(
-                    cardView = cardView
+                    cardView = cardView,
+                    uploadImage = ArrayList<File>(),
+                    imageNum = mutableStateOf(0)
                 )
             }.onSuccess {
                 favoriteCardList.clear()
@@ -384,18 +471,46 @@ class MainActivity : ComponentActivity() {
                 }
         }
 
+        cardViewModel.getCardLikedSuccess.observe(this@MainActivity){
+
+        }
+
         tripFileViweModel.getTripFileUntitledSuccess.observe(this@MainActivity){ response->
             response.data.tripFiles.mapNotNull { tripFile-> kotlin.runCatching { TripFile(
                 id = tripFile.id,
                 tripId = tripFile.tripId,
                 yearDate = tripFile.yearDate,
-                analyzingCount = tripFile.analyzingCount
+                analyzingCount = mutableStateOf(tripFile.totalCount)
             ) }.onSuccess {
                 tripFileUntitledList.clear()
             }.onFailure {  }.getOrNull()
             }.forEach { it->
                 tripFileUntitledList.add(it)
             }
+        }
+
+        kakaoViewModel.getLocalSuccess.observe(this@MainActivity){ response->
+            try {
+                addressName.value = response.documents.first().address_name
+
+
+            } catch (e:Exception){
+                Timber.e(e)
+            }
+        }
+
+        openWeatherViewModel.getWeatherInCurrentLocationlSuccess.observe(this@MainActivity){ response ->
+            try {
+                temp.value = response.main.temp.toFloat().minus(273.15).toInt().toString()
+                weather.value = GetWeatherType(response.weather.first().main)
+
+            } catch (e:Exception){
+                Timber.e(e)
+            }
+        }
+
+        openWeatherViewModel.getWeatherInCurrentLocationFailure.observe(this@MainActivity){ error ->
+
         }
 
 
@@ -508,12 +623,14 @@ class MainActivity : ComponentActivity() {
                             .height(90.dp)
                             .clickable {
                                 recordOpen.value = true
+                                isRecorderIng.value = recorder.isActivity()
 
                             }
                     ) {
                         Image(
                             modifier = Modifier.size(50.dp),
-                            painter = painterResource(id = R.drawable.ic_record), contentDescription = ""
+                            painter = if(isRecorderIng.value) painterResource(id = R.drawable.ic_record_ing) else painterResource(id = R.drawable.ic_record_before),
+                            contentDescription = ""
                         )
                     }
                 }
@@ -653,8 +770,8 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(BottomNavItem.Favorite.screenRoute) {
                     currentSelectedBottomRoute.value = "Favorite"
-
-                    Favorite(cardItems = favoriteCardList)
+                    cardViewModel.getCardLiked()
+                    Favorite(cardItems = favoriteCardList, emotionList = emotionList)
                     title.value = "작게보기"
                 }
                 composable(BottomNavItem.Setting.screenRoute) {
@@ -680,8 +797,9 @@ class MainActivity : ComponentActivity() {
             }
             if(recordOpen.value) {
                 RecordNavigatesheet(
-                    sheetState = sheetState,
-                    closeSheet = { recordOpen.value = false })
+                    sheetState = sheetState, closeSheet = { recordOpen.value = false },
+                    lat = lat , lon = lon , temp = temp, addressName = addressName,weather = weather
+                    )
             }
         }
     }
@@ -695,7 +813,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun Home(tripList:MutableList<Trip>,mainTrip:MutableState<MainTrip>){
 
-
+        Log.d("waegawgaw",tripList.size.toString())
         val density = LocalDensity.current
         val defaultActionSize = 80.dp
         val endActionSizePx = with(density) { (defaultActionSize * 2).toPx() }
@@ -796,7 +914,7 @@ class MainActivity : ComponentActivity() {
                 thickness = 2.dp
             )
             
-            if(mainTrip.value.state == TripState.EMPTY){
+            if(tripList.size == 0){
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     modifier = Modifier.fillMaxWidth(),
@@ -1348,8 +1466,35 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun  RecordNavigatesheet(sheetState: SheetState, closeSheet: () -> Unit
+    fun  RecordNavigatesheet(sheetState: SheetState, closeSheet: () -> Unit,
+                             lat:MutableState<String>,lon:MutableState<String>,
+                             temp:MutableState<String>, addressName:MutableState<String>, weather:MutableState<String>
     ){
+
+        if(!momentPermission.checkPermission()){
+            momentPermission.requestPermission()
+            closeSheet()
+        }else{
+            momentLocation.getLocation().invoke().apply {
+                this.addOnSuccessListener {
+//                    x = "126.924776753718",
+//                    y = "37.5456269289384"
+                    lat.value = it.latitude.toString()
+                    lon.value = it.longitude.toString()
+                    kakaoViewModel.getLocal(
+                        x = lon.value,
+                        y = lat.value
+                    )
+                    openWeatherViewModel.getWeatherInCurrentLocation(
+                        lat = lat.value,
+                        lon = lon.value,
+                        appid = "750af8c3ad235147ce30452e8242d76f"
+                    )
+                }
+            }
+        }
+
+
         val minute = remember {
             mutableStateOf(0)
         }
@@ -1490,6 +1635,7 @@ class MainActivity : ComponentActivity() {
                                         audioFile = it
                                     }
                                     timerJob.start()
+
                                 }
 
 
@@ -1511,11 +1657,11 @@ class MainActivity : ComponentActivity() {
 
                                 val cardUploadDto=Gson().toJson(
                                     PostCardUploadReqeust(
-                                        location = "서울",
-                                        question = "질문",
+                                        location = addressName.value,
+                                        question = "",
                                         recordedAt = currentDate,
-                                        temperature = "20",
-                                        weather = "ㅈㄴ맑음"
+                                        temperature = temp.value,
+                                        weather = weather.value
                                     )
                                 )
 
@@ -1543,50 +1689,19 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun Favorite(cardItems: MutableList<Card>){
+    fun Favorite(cardItems: MutableList<Card>, emotionList:MutableList<Emotion>){
         var expanded = remember { mutableStateOf(true) }
 
         val imageList = mutableStateListOf<File>()
-        val emotionList = mutableStateListOf<CardActivity.Emotion>()
 
 //        cardItems.add(CardActivity.Card())
 //        cardItems.add(CardActivity.Card())
 //        cardItems.add(CardActivity.Card())
 
-        emotionList.add(
-            CardActivity.Emotion(
-                icon = R.drawable.ic_emotion_common,
-                text = "평범해요",
-                persent = "60%"
-            )
-        )
-        emotionList.add(
-            CardActivity.Emotion(
-                icon = R.drawable.ic_emotion_happy,
-                text = "즐거워요",
-                persent = "20%"
-            )
-        )
-        emotionList.add(
-            CardActivity.Emotion(
-                icon = R.drawable.ic_emotion_angry,
-                text = "화가나요",
-                persent = "15%"
-            )
-        )
-        emotionList.add(
-            CardActivity.Emotion(
-                icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요 ",
-                persent = "5%"
-            )
-        )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .clickable {
-                }
         ) {
             Column(
                 modifier = Modifier
@@ -1604,7 +1719,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = 16.dp),
-                    text = "전라도의 선유도",
+                    text = ApplicationClass.tripName,
                     textAlign = TextAlign.End,
                     fontSize = 22.sp,
                     fontFamily = FontMoment.preStandardFont,
@@ -1653,22 +1768,13 @@ class MainActivity : ComponentActivity() {
                             Spacer(modifier = Modifier.height(22.dp))
                             Column() {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 24.dp)
-                                ) {
-                                    Image(
-                                        modifier = Modifier
-                                            .size(26.dp)
-                                            .clickable {
-                                                cardItems[index].isFavorite.value =
-                                                    !cardItems[index].isFavorite.value
-                                            }
-                                        ,
-                                        painter = painterResource(id = if(cardItems[index].isFavorite.value) R.drawable.ic_heart_red else R.drawable.ic_heart_white),
-                                        contentDescription = ""
+                                    modifier = Modifier.padding(
+                                        horizontal = 24.dp,
+                                        vertical = 12.dp
                                     )
-                                    Spacer(modifier = Modifier.width(16.dp))
+                                ) {
                                     Text(
-                                        text = "ss",
+                                        text = cardItems[index].cardView.recordFileName.split('T').first(),
                                         fontFamily = FontMoment.preStandardFont,
                                         fontWeight = FontWeight.ExtraBold,
                                         fontSize = 14.sp
@@ -1716,7 +1822,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
-                                            text = "wegwae",
+                                            text = cardItems[index].cardView.location,
                                             fontFamily = FontMoment.preStandardFont,
                                             fontWeight = FontWeight.Medium
                                         )
@@ -1727,7 +1833,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
-                                            text = "wegwae",
+                                            text = cardItems[index].cardView.weather,
                                             fontFamily = FontMoment.preStandardFont,
                                             fontWeight = FontWeight.Medium
                                         )
@@ -1745,7 +1851,8 @@ class MainActivity : ComponentActivity() {
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
-                                            text = "wegwae",
+                                            text = cardItems[index].cardView.recordedAt.split("T")
+                                                .first(),
                                             fontFamily = FontMoment.preStandardFont,
                                             fontWeight = FontWeight.Medium
                                         )
@@ -1757,7 +1864,8 @@ class MainActivity : ComponentActivity() {
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
-                                            text = "wegwae",
+                                            text = cardItems[index].cardView.recordedAt.split("T")
+                                                .last(),
                                             fontFamily = FontMoment.preStandardFont,
                                             fontWeight = FontWeight.Medium
                                         )
@@ -1768,7 +1876,7 @@ class MainActivity : ComponentActivity() {
                                     Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(horizontal = 12.dp)
+                                            .padding(horizontal = 23.dp)
                                             .background(
                                                 brush = Brush.verticalGradient(
                                                     listOf(
@@ -1784,6 +1892,7 @@ class MainActivity : ComponentActivity() {
                                                 .height(12.dp)
                                                 .fillMaxWidth(),
                                             onDragEnd = { finalProgress ->
+                                                Log.d("aewgawegweag", finalProgress.toString())
                                                 Log.e(
                                                     "finalProgress: ",
                                                     "${
@@ -1796,6 +1905,7 @@ class MainActivity : ComponentActivity() {
 
 
                                             }, onDrag = { progress ->
+                                                Log.d("awegawegaew", progress.toString())
                                                 Log.d(
                                                     "progress: ",
                                                     "${
@@ -1808,10 +1918,21 @@ class MainActivity : ComponentActivity() {
                                             })
                                         Spacer(modifier = Modifier.height(10.dp))
                                         Column(
-                                            modifier = Modifier.padding(horizontal = 8.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 8.dp),
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
                                             Image(
+                                                modifier = Modifier.clickable {
+                                                    val file = File(MomentPath.RECORDER_PATH+ convertUrlLinkStringToRcorderNameString(cardItems[index].cardView.recordFileUrl))
+                                                    if(file.exists()){
+                                                        momentAudioPlayer.playFile(file)
+                                                    }else{
+                                                        Toast.makeText(this@MainActivity,"녹음파일이 없습니다.",
+                                                            Toast.LENGTH_SHORT).show()
+                                                    }
+                                                },
                                                 painter = painterResource(id = R.drawable.ic_record_start),
                                                 contentDescription = "seg"
                                             )
@@ -1825,7 +1946,7 @@ class MainActivity : ComponentActivity() {
                                             )
                                             Spacer(modifier = Modifier.height(8.dp))
                                             Text(
-                                                text = "분석된 글이 쓰여지는 공간입니다. 칸의 가로 넓이는 고정되어있습니다. 칸의 사이즈별 마진은 동일합니다. 즉 모바일 사이즈 마진에 맞춰 칸이 늘어나거나 줄어들며 글자 쓰는 공간도 칸에 따라 유동적으로 변경됩니다. 칸 안의 글자 양 옆 마진은 8이며 칸의 모바일 사이즈 마진은 큰 카드가 왼 20px, 오 20px이며 / 글이 쓰여지는 공간의 마진은 카드마진 기준으로 왼 24px, 오23px입니다. 좌우가 다른이유는 아이폰 미니의 화면비율이 홀수라서 그렇습니다. 은근히 신경쓰이네요 또, 가로글자수 제한은 있지만 세로로는 제한이없습니다. 카드의 길이가 무한정 길어질 수도 있다는 말이지요. 세로에도 제한을 두는 것이 좋을까요?",
+                                                text = cardItems[index].cardView.stt ?: "",
                                                 fontFamily = FontMoment.preStandardFont,
                                                 fontWeight = FontWeight.Medium,
                                                 fontSize = 12.sp
@@ -1839,7 +1960,11 @@ class MainActivity : ComponentActivity() {
                                         }
 
                                     }
-                                    if (imageList.isNotEmpty()) {
+                                    if (imageList.isNullOrEmpty()) {
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    } else {
+
+
                                         Spacer(modifier = Modifier.height(8.dp))
                                         Divider(
                                             modifier = Modifier
@@ -1935,7 +2060,8 @@ class MainActivity : ComponentActivity() {
                                                 Spacer(modifier = Modifier.width(26.dp))
 
                                                 LinearProgressIndicator(
-                                                    progress = { 0.4f }
+                                                    color = Color(item.color.toColorInt()),
+                                                    progress = { item.persent }
                                                 )
                                                 Spacer(modifier = Modifier.width(36.dp))
                                                 Text(
@@ -1967,7 +2093,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                     Spacer(modifier = Modifier.width(64.dp))
                                     Text(
-                                        text = "해가 쨍쨍한 날",
+                                        text = cardItems[index].cardView.weather,
                                         fontSize = 12.sp,
                                         color = Color("#938F8F".toColorInt()),
                                         fontFamily = FontMoment.preStandardFont,
@@ -2180,28 +2306,32 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = 60
+                persent = 0f,
+                color = ""
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
-                persent = 20
+                persent = 0f,
+                color = ""
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = 15
+                persent = 0f,
+                color = ""
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요 ",
-                persent = 5
+                text = "우울해요",
+                persent = 0f,
+                color = ""
             )
         )
         emotionList.sortedByDescending { it.persent }
@@ -2429,28 +2559,32 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = 60
+                persent = 20f*(0.01f),
+                color = ""
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
-                persent = 20
+                persent = 21f*(0.01f),
+                color = ""
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = 15
+                persent = 15f*(0.01f),
+                color = ""
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요 ",
-                persent = 5
+                text = "우울해요",
+                persent = 15f*(0.01f),
+                color = ""
             )
         )
         emotionList.sortedByDescending { it.persent }
