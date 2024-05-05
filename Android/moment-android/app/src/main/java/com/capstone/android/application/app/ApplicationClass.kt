@@ -22,7 +22,7 @@ class ApplicationClass: Application() {
         lateinit var retrofit: Retrofit
         lateinit var retrofitKakao: Retrofit
 
-        val API_URL="http://wasuphj.synology.me:8000/"
+        val API_URL="http://211.205.171.117:8000/"
         val KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/"
         val OPEN_WATHER_API_URL = "https://api.openweathermap.org/"
         var tripName:String = ""
