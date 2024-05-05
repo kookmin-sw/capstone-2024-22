@@ -25,6 +25,7 @@ class ApplicationClass: Application() {
         val API_URL="http://wasuphj.synology.me:8000/"
         val KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/"
         val OPEN_WATHER_API_URL = "https://api.openweathermap.org/"
+        var tripName:String = ""
     }
 
 
