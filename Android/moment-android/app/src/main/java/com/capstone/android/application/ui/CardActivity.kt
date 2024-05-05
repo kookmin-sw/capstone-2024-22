@@ -129,7 +129,7 @@ class CardActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
         momentAudioPlayer.stop()
-
+        recorder.stop()
     }
 
     @Composable
@@ -243,6 +243,17 @@ class CardActivity : ComponentActivity() {
                 )
             )
 
+            emotionList.add(
+                Emotion(
+                    icon = R.drawable.ic_emotion_sad,
+                    text = "역겨워요",
+                    persent = 0f,
+                    color = "#030712"
+                )
+            )
+
+
+
 
             val tripFileId = remember {
                 mutableStateOf(0)
@@ -313,6 +324,7 @@ class CardActivity : ComponentActivity() {
                             emotionList[1].persent = it.first().cardView.happy.toFloat()*(0.01f)
                             emotionList[2].persent = it.first().cardView.angry.toFloat()*(0.01f)
                             emotionList[3].persent = it.first().cardView.sad.toFloat()*(0.01f)
+                            emotionList[4].persent = it.first().cardView.disgust.toFloat()*(0.01f)
                         }
                     }
                     totalCount = cardItems.size
@@ -569,6 +581,7 @@ class CardActivity : ComponentActivity() {
                                     ) {
                                         cardItems[index].isExpand.value =
                                             !cardItems[index].isExpand.value
+                                        momentAudioPlayer.stop()
                                     }
 
                             ) {
@@ -747,7 +760,13 @@ class CardActivity : ComponentActivity() {
                                                     modifier = Modifier.clickable {
                                                         val file = File(MomentPath.RECORDER_PATH+convertUrlLinkStringToRcorderNameString(cardItems[index].cardView.recordFileUrl))
                                                         if(file.exists()){
-                                                            momentAudioPlayer.playFile(file)
+                                                            if(!momentAudioPlayer.checkSameFile(file.name)){
+                                                                momentAudioPlayer.playFile(file)
+                                                            }else if(momentAudioPlayer.isIng()){
+                                                                momentAudioPlayer.pause()
+                                                            }else{
+                                                                momentAudioPlayer.start()
+                                                            }
                                                         }else{
                                                             Toast.makeText(this@CardActivity,"녹음파일이 없습니다.",Toast.LENGTH_SHORT).show()
                                                         }
@@ -902,7 +921,7 @@ class CardActivity : ComponentActivity() {
                                             )
                                             Spacer(modifier = Modifier.weight(1f))
                                             Text(
-                                                text = "꽤나 즐거운 대화였네요",
+                                                text = "감정분석",
                                                 fontFamily = FontMoment.preStandardFont,
                                                 fontWeight = FontWeight.Medium,
                                                 fontSize = 11.sp
@@ -944,6 +963,7 @@ class CardActivity : ComponentActivity() {
                                                     Spacer(modifier = Modifier.width(26.dp))
 
                                                     LinearProgressIndicator(
+                                                        modifier = Modifier.weight(1f),
                                                         color = Color(item.color.toColorInt()),
                                                         progress = {
                                                             when(item.text){
@@ -976,17 +996,18 @@ class CardActivity : ComponentActivity() {
                                                         }
                                                     )
                                                     Spacer(modifier = Modifier.width(36.dp))
+
                                                     Text(
-                                                        text = item.text,
+                                                        modifier = Modifier.weight(0.3f),
+                                                        text = "${(item.persent*100).toInt()}%",
                                                         fontFamily = FontMoment.preStandardFont,
                                                         fontWeight = FontWeight.Medium,
-                                                        fontSize = 11.sp
+                                                        fontSize = 12.sp
                                                     )
                                                 }
                                             }
                                         }
 
-                                        Spacer(modifier = Modifier.height(12.dp))
                                     }
                                 } else {
                                     Spacer(modifier = Modifier.height(4.dp))
