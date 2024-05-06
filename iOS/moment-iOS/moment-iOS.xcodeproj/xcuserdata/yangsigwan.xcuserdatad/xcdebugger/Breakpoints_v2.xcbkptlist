@@ -821,22 +821,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "C6272A22-7180-4B7C-9AFB-9EC9BBD73673"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "AudioRecorderManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "112"
-            endingLineNumber = "112"
-            landmarkName = "stopRecording()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "A8301BC2-008F-4089-862A-2F314DCCA8A8"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
@@ -844,8 +828,8 @@
             filePath = "AudioRecorderManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "231"
-            endingLineNumber = "231"
+            startingLineNumber = "236"
+            endingLineNumber = "236"
             landmarkName = "uploadRecordedData(recordFileURL:location:recordedAt:temperature:weather:question:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -860,8 +844,8 @@
             filePath = "AudioRecorderManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "237"
-            endingLineNumber = "237"
+            startingLineNumber = "242"
+            endingLineNumber = "242"
             landmarkName = "uploadRecordedData(recordFileURL:location:recordedAt:temperature:weather:question:)"
             landmarkType = "7">
          </BreakpointContent>

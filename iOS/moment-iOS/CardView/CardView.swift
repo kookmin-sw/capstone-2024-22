@@ -488,29 +488,58 @@ struct EmotionView: View {
     }
 }
 
-
 struct AudioPlayerControls: View {
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @ObservedObject var cardViewModel: CardViewModel
+
     var body: some View {
-        // 녹음 파일 재생 관련 UI 구성
-        // 예시: 재생, 정지 버튼 등
         VStack {
-            ProgressView(value: audioRecorderManager.playbackProgress)
-                .progressViewStyle(LinearProgressViewStyle())
-                .frame(height: 20)
+            Text("녹음된 파일")
+                .font(.title)
                 .padding()
-            HStack{
-                if let lastRecording = audioRecorderManager.recordedFiles.last {
-                    Button("재생") {
-                        audioRecorderManager.startPlaying(recordingURL: lastRecording)
+
+            // 녹음 파일 리스트와 재생 컨트롤을 표시
+            List(audioRecorderManager.recordedFiles, id: \.self) { recordedFile in
+                HStack {
+                    Text(recordedFile.lastPathComponent)
+                        .foregroundColor(
+                            audioRecorderManager.audioPlayer?.url == recordedFile && audioRecorderManager.isPlaying
+                            ? .red : .black
+                        )
+
+                    Spacer()
+
+                    // 재생/일시정지 버튼
+                    Button(
+                        action: {
+                            if audioRecorderManager.isPlaying && audioRecorderManager.audioPlayer?.url == recordedFile {
+                                audioRecorderManager.isPaused
+                                ? audioRecorderManager.resumePlaying()
+                                : audioRecorderManager.pausePlaying()
+                            } else {
+                                audioRecorderManager.startPlaying(recordingURL: recordedFile)
+                            }
+                        }
+                    ) {
+                        Image(systemName: audioRecorderManager.isPlaying && audioRecorderManager.audioPlayer?.url == recordedFile
+                            ? (audioRecorderManager.isPaused ? "play.circle" : "pause.circle")
+                            : "play.circle")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 24, height: 24)
                     }
                 }
-                Button("정지") {
-                    audioRecorderManager.stopPlaying()
-                }
             }
-            Spacer()
+            
+            // 진행 상태 표시
+            if let playingURL = audioRecorderManager.audioPlayer?.url, audioRecorderManager.isPlaying {
+                ProgressView(value: audioRecorderManager.playbackProgress)
+                    .progressViewStyle(LinearProgressViewStyle())
+                    .frame(height: 20)
+                    .padding()
+                Text("현재 재생: \(playingURL.lastPathComponent)")
+                    .font(.caption)
+            }
         }
     }
 }
