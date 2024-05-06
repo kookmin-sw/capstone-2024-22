@@ -251,8 +251,8 @@ struct DynamicGradientRectangleLikeView: View {
     var body: some View {
         //ScrollView {
         VStack {
-            AudioPlayerControls(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
-                .padding()
+//            AudioPlayerControls(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
+//                .padding()
             
             Text(longText)
                 .font(.pretendardMedium13)

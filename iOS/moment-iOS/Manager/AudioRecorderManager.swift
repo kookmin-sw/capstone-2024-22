@@ -378,6 +378,8 @@ extension AudioRecorderManager {
             self.playbackProgress = player.currentTime / player.duration
         }
     }
+    
+    
 }
 
 

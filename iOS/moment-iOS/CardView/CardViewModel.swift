@@ -67,6 +67,7 @@ class CardViewModel: ObservableObject {
 
     var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjMsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNDQ3MDczNCwiZXhwIjoxNzU3NjcwNzM0fQ.pddeumunqT4tiE2yGI9aWXkn0Kxo7XeB9kFfpwQftbM"
     
+    
 
     func fetchAllCardViews(tripFileId: Int) {
         
@@ -94,7 +95,7 @@ class CardViewModel: ObservableObject {
                 print("카드뷰스에 들어가는 데이터: \(cardViews.self)")
                 print("카드뷰 리스폰스 \(CardViewResponse.self)")
                 DispatchQueue.main.async {
-                                self.cardItems = CardViewResponse.data.cardViews 
+                                self.cardItems = CardViewResponse.data.cardViews
                             }
                 for cardView in CardViewResponse.data.cardViews {
                                 print("Record File Name: \(cardView.recordFileName)")

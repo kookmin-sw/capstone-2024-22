@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct CardView: View {
     //var day: Date
     var item: Item
     var tripFile: TripFile
     var tripFileId: Int
+    var player: AVPlayer?
+
    // var cardView: CardViews
     
     @Environment(\.presentationMode) var presentationMode
@@ -309,12 +312,30 @@ struct DynamicGradientRectangleView: View {
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @ObservedObject var cardViewModel: CardViewModel
     let longText: String
+//    private let videoURL = URL(string: "https://kmumoment.s3.ap-northeast-2.amazonaws.com/users/3/2024-05-06T08%3A20%3A59.991719376.m4a")!
+    var playerItem: AVPlayerItem?
+   // let player = AVPlayer()
+    @State private var player: AVPlayer = AVPlayer()
+       @State private var isPlaying: Bool = false
+        
+   // var playerItem: AVPlayerItem?
     
     var body: some View {
         //ScrollView {
         VStack {
-            AudioPlayerControls(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
-                .padding()
+            
+            VideoPlayerView(url: URL(string: "https://kmumoment.s3.ap-northeast-2.amazonaws.com/users/3/2024-05-06T08%3A20%3A59.991719376.m4a")!, player: $player)
+                           .frame(height: 300)
+                       Button(action: togglePlayPause) {
+                           Image(systemName: isPlaying ? "pause.circle" : "play.circle")
+                               .font(.largeTitle)
+                       }
+                       .onAppear {
+                                 setupPlayer()
+                             }
+            
+           
+            
             
             Text(longText)
                 .font(.pretendardMedium13)
@@ -329,6 +350,21 @@ struct DynamicGradientRectangleView: View {
         //}
         
     }
+    private func setupPlayer() {
+           guard let url = URL(string: "https://example.com/video.mp4") else { return }
+           let playerItem = AVPlayerItem(url: url)
+           player.replaceCurrentItem(with: playerItem)
+       }
+
+       private func togglePlayPause() {
+           if player.timeControlStatus == .paused {
+               player.play()
+               isPlaying = true
+           } else {
+               player.pause()
+               isPlaying = false
+           }
+       }
     
 }
 
@@ -488,61 +524,61 @@ struct EmotionView: View {
     }
 }
 
-struct AudioPlayerControls: View {
-    @ObservedObject var audioRecorderManager: AudioRecorderManager
-    @ObservedObject var cardViewModel: CardViewModel
-
-    var body: some View {
-        VStack {
-            Text("녹음된 파일")
-                .font(.title)
-                .padding()
-
-            // 녹음 파일 리스트와 재생 컨트롤을 표시
-            List(audioRecorderManager.recordedFiles, id: \.self) { recordedFile in
-                HStack {
-                    Text(recordedFile.lastPathComponent)
-                        .foregroundColor(
-                            audioRecorderManager.audioPlayer?.url == recordedFile && audioRecorderManager.isPlaying
-                            ? .red : .black
-                        )
-
-                    Spacer()
-
-                    // 재생/일시정지 버튼
-                    Button(
-                        action: {
-                            if audioRecorderManager.isPlaying && audioRecorderManager.audioPlayer?.url == recordedFile {
-                                audioRecorderManager.isPaused
-                                ? audioRecorderManager.resumePlaying()
-                                : audioRecorderManager.pausePlaying()
-                            } else {
-                                audioRecorderManager.startPlaying(recordingURL: recordedFile)
-                            }
-                        }
-                    ) {
-                        Image(systemName: audioRecorderManager.isPlaying && audioRecorderManager.audioPlayer?.url == recordedFile
-                            ? (audioRecorderManager.isPaused ? "play.circle" : "pause.circle")
-                            : "play.circle")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 24, height: 24)
-                    }
-                }
-            }
-            
-            // 진행 상태 표시
-            if let playingURL = audioRecorderManager.audioPlayer?.url, audioRecorderManager.isPlaying {
-                ProgressView(value: audioRecorderManager.playbackProgress)
-                    .progressViewStyle(LinearProgressViewStyle())
-                    .frame(height: 20)
-                    .padding()
-                Text("현재 재생: \(playingURL.lastPathComponent)")
-                    .font(.caption)
-            }
-        }
-    }
-}
+//struct AudioPlayerControls: View {
+//    @ObservedObject var audioRecorderManager: AudioRecorderManager
+//    @ObservedObject var cardViewModel: CardViewModel
+//
+//    var body: some View {
+//        VStack {
+//            Text("녹음된 파일")
+//                .font(.title)
+//                .padding()
+//
+//            // 녹음 파일 리스트와 재생 컨트롤을 표시
+//            List(audioRecorderManager.recordedFiles, id: \.self) { recordedFile in
+//                HStack {
+//                    Text(recordedFile.lastPathComponent)
+//                        .foregroundColor(
+//                            audioRecorderManager.audioPlayer?.url == recordedFile && audioRecorderManager.isPlaying
+//                            ? .red : .black
+//                        )
+//
+//                    Spacer()
+//
+//                    // 재생/일시정지 버튼
+//                    Button(
+//                        action: {
+//                            if audioRecorderManager.isPlaying && audioRecorderManager.audioPlayer?.url == recordedFile {
+//                                audioRecorderManager.isPaused
+//                                ? audioRecorderManager.resumePlaying()
+//                                : audioRecorderManager.pausePlaying()
+//                            } else {
+//                                audioRecorderManager.startPlaying(recordingURL: recordedFile)
+//                            }
+//                        }
+//                    ) {
+//                        Image(systemName: audioRecorderManager.isPlaying && audioRecorderManager.audioPlayer?.url == recordedFile
+//                            ? (audioRecorderManager.isPaused ? "play.circle" : "pause.circle")
+//                            : "play.circle")
+//                        .resizable()
+//                        .aspectRatio(contentMode: .fit)
+//                        .frame(width: 24, height: 24)
+//                    }
+//                }
+//            }
+//            
+//            // 진행 상태 표시
+//            if let playingURL = audioRecorderManager.audioPlayer?.url, audioRecorderManager.isPlaying {
+//                ProgressView(value: audioRecorderManager.playbackProgress)
+//                    .progressViewStyle(LinearProgressViewStyle())
+//                    .frame(height: 20)
+//                    .padding()
+//                Text("현재 재생: \(playingURL.lastPathComponent)")
+//                    .font(.caption)
+//            }
+//        }
+//    }
+//}
 
 
 
