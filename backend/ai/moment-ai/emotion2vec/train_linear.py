@@ -7,7 +7,7 @@ import wandb
 from funasr import AutoModel
 from pydub import AudioSegment
 
-from utils import extract_features, train_one_epoch, validate_and_test, load_dataloader, NpyDataset
+from .utils import extract_features, train_one_epoch, validate_and_test, load_dataloader, NpyDataset
 from sklearn.model_selection import train_test_split
 from iemocap_downstream.model import BaseModel
 
