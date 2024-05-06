@@ -53,7 +53,7 @@ class NpyDataset(Dataset):
         return feat, label
     
     
-def train_oen_epoch(model, optimizer, criterion, train_loader, device):
+def train_one_epoch(model, optimizer, criterion, train_loader, device):
     model.train()
     train_loss = 0
     for batch in train_loader:
