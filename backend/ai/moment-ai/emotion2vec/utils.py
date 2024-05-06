@@ -28,6 +28,7 @@ def extract_features(csv_file, model):
 
 def load_dataloader(datasets_list):
     # 데이터셋 객체 생성
+    print("load dataloader", "-"*20)
     dataset = NpyDataset(datasets_list)
 
     # 데이터셋 분할
