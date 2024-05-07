@@ -84,6 +84,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -94,6 +95,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.capstone.android.application.app.ApplicationClass
+import com.capstone.android.application.app.ApplicationClass.Companion.tokenSharedPreferences
 import com.capstone.android.application.app.composable.CustomTitleCheckDialog
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.composable.TripEmpty
@@ -125,6 +127,7 @@ import com.capstone.android.application.ui.CardActivity
 import com.capstone.android.application.ui.PatchTripActivity
 import com.capstone.android.application.ui.PostTripActivity
 import com.capstone.android.application.ui.ReciptActivity
+import com.capstone.android.application.ui.SplashActivity
 import com.capstone.android.application.ui.TripFileActivity
 import com.capstone.android.application.ui.theme.ApplicationTheme
 import com.capstone.android.application.ui.theme.BigButton
@@ -158,6 +161,7 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType
@@ -191,7 +195,7 @@ class MainActivity : ComponentActivity() {
     lateinit var navController: NavHostController
     private val tripViewModel : TripViewModel by viewModels()
     private val cardViewModel : CardViewModel by viewModels()
-    private val tripFileViweModel : TripFileViewModel by viewModels()
+    private val tripFileViewModel : TripFileViewModel by viewModels()
     private val kakaoViewModel : KakaoViewModel by viewModels()
     private val openWeatherViewModel : OpenWeatherViewModel by viewModels()
     @Inject lateinit var momentLocation : MomentLocation
@@ -362,10 +366,9 @@ class MainActivity : ComponentActivity() {
 
         tripViewModel.getTripAll()
         cardViewModel.getCardLiked()
-        tripFileViweModel.getTripFileUntitled()
+        tripFileViewModel.getTripFileUntitled()
 
 
-        getCurrentTime()
 
         tripViewModel.getTripAllSuccess.observe(this@MainActivity){ response->
             tripList.clear()
@@ -475,7 +478,7 @@ class MainActivity : ComponentActivity() {
 
         }
 
-        tripFileViweModel.getTripFileUntitledSuccess.observe(this@MainActivity){ response->
+        tripFileViewModel.getTripFileUntitledSuccess.observe(this@MainActivity){ response->
             response.data.tripFiles.mapNotNull { tripFile-> kotlin.runCatching { TripFile(
                 id = tripFile.id,
                 tripId = tripFile.tripId,
@@ -2155,19 +2158,6 @@ class MainActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(40.dp))
                 }
 
-                Column(modifier = Modifier
-                    .width(134.dp)
-                    .clickable { }){
-                    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-                        P_Medium18(
-                            content = "계정 이메일 변경",
-                            color = black
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Divider(color = black)
-                }
-                Spacer(modifier = Modifier.height(40.dp))
 
 
                 Column(modifier = Modifier
@@ -2241,17 +2231,25 @@ class MainActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(top = 150.dp)) {
-                    Column(Modifier.clickable {  }) {
+                    Column(Modifier.clickable {
+                        tokenSharedPreferences.edit().putString("accessToken","").apply()
+                        startActivity(Intent(this@MainActivity,SplashActivity::class.java))
+                        finish()
+                    }) {
                         P_Medium14("로그아웃", black)
                     }
                     Spacer(modifier = Modifier.height(28.dp))
-                    Column(Modifier.clickable {  }) {
+                    Column(Modifier.clickable {
+                        tokenSharedPreferences.edit().putString("accessToken","").apply()
+                        startActivity(Intent(this@MainActivity,SplashActivity::class.java))
+                        finish()
+                    }) {
                         P_Medium14("탈퇴하기", black)
                     }
                 }
         }
     }
-}
+    }
 
     @Composable
     fun Toggle() {
