@@ -1139,23 +1139,17 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
+    @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun SaveRecipt(theme: Int){
+    fun SaveRecipt(theme: String, receiptcontent: ReceiptContent_string){
 
-        val intro = remember { mutableStateOf("") }
-        val depart_small = remember { mutableStateOf("") }
-        val depart = remember { mutableStateOf("") }
-        val arrive_small = remember { mutableStateOf("") }
-        val arrive = remember { mutableStateOf("") }
-        val cardnum = 27
-        val publicationdate = "2024.02.25"
-        val startdate = "2024.02.25"
-        val enddate = "2024.02.27"
+        var Theme = 0
+        Theme = if (theme == "A") 0 else 1
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = neutral_300)
+                .background(color = tertiary_500)
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
@@ -1175,32 +1169,26 @@ class ReciptActivity : ComponentActivity() {
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
                         .clickable {
-                            startActivity(
-                                Intent(
-                                    this@ReciptActivity,
-                                    MainActivity::class.java
-                                )
-                            )
+                            var intent = Intent(this@ReciptActivity, MainActivity::class.java)
+                            intent.putExtra("MoveScreen", "Receipt")
+                            startActivity(intent)
                         }) {
                     YJ_Bold15("완료", primary_500)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (theme == 0) {
-                SaveTheme1(ReceiptContent(intro, depart_small, depart, arrive_small, arrive,
-                    cardnum,publicationdate,startdate,enddate, emotionList))
+            if (Theme == 0) {
+                SaveTheme1(receiptcontent)
             }
-            if(theme == 1){
-                SaveTheme2(ReceiptContent(intro, depart_small, depart, arrive_small, arrive,
-                    cardnum,publicationdate,startdate,enddate, emotionList))
-
+            if(Theme == 1){
+                SaveTheme2(receiptcontent)
             }
         }
     }
 
     @Composable
-    fun SaveTheme1(receiptcontent: ReceiptContent){
+    fun SaveTheme1(receiptcontent: ReceiptContent_string){
         Box(
             modifier = Modifier
                 .height(651.dp)
@@ -1228,7 +1216,8 @@ class ReciptActivity : ComponentActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    P_Medium14(content = "암스테르담 성당 여행", color = white)
+                    receiptcontent.tripName?.let { P_Medium14(content = it, color = white)
+                    }?: P_Medium14(content = "", color = white)
                     Image(
                         painter = painterResource(R.drawable.img_logo_white),
                         contentDescription = "로고 화이트"
@@ -1252,7 +1241,8 @@ class ReciptActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    P_Medium14(content = receiptcontent.intro.value, color = neutral_500)
+                    receiptcontent.intro?.let { P_Medium14(content = it, color = neutral_500)
+                    }?: P_Medium14(content = "", color = white)
                 }
             }
 
@@ -1263,13 +1253,17 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_location_red),
-                    contentDescription = "장소",
-                    Modifier.size(19.dp)
-                )
+                if(receiptcontent.depart_small == " "){
+                    Spacer(modifier = Modifier.size(19.dp))
+                }else{
+                    Image(
+                        painter = painterResource(R.drawable.ic_location_red),
+                        contentDescription = "장소",
+                        Modifier.size(19.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium14(content = receiptcontent.depart_small.value, color = primary_500)
+                receiptcontent.depart_small?.let { P_Medium14(content = it, color = primary_500) }
             }
 
             Column(
@@ -1279,7 +1273,7 @@ class ReciptActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                P_Black50(receiptcontent.depart.value, primary_500)
+                receiptcontent.depart?.let { P_Black50(it, primary_500) }
             }
 
             Column(
@@ -1302,13 +1296,18 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_location_red),
-                    contentDescription = "장소",
-                    Modifier.size(19.dp)
-                )
+                if(receiptcontent.arrive_small == " "){
+                    Spacer(modifier = Modifier.size(19.dp))
+                }else{
+                    Image(
+                        painter = painterResource(R.drawable.ic_location_red),
+                        contentDescription = "장소",
+                        Modifier.size(19.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium14(content = receiptcontent.arrive_small.value, color = primary_500)
+                receiptcontent.arrive_small?.let { P_Medium14(content = it, color = primary_500)
+                }?: P_Medium14(content = "", color = white)
             }
 
             Column(
@@ -1318,7 +1317,8 @@ class ReciptActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                P_Black50(content = receiptcontent.arrive.value, color = primary_500)
+                receiptcontent.arrive?.let { P_Black50(content = it, color = primary_500)
+                }?: P_Medium14(content = "", color = white)
             }
 
             Row(
@@ -1353,9 +1353,11 @@ class ReciptActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(30.dp))
                     P_Medium11(content = "여행 날짜", color = neutral_500)
                     Spacer(modifier = Modifier.height(6.dp))
-                    P_Medium11(content = receiptcontent.startdate, color = primary_500)
+                    receiptcontent.startdate?.let { P_Medium11(content = it, color = primary_500)
+                    }?: P_Medium14(content = "", color = white)
                     Spacer(modifier = Modifier.height(5.dp))
-                    P_Medium11(content = receiptcontent.enddate, color = primary_500)
+                    receiptcontent.enddate?.let { P_Medium11(content = it, color = primary_500)
+                    }?: P_Medium14(content = "", color = white)
                 }
                 Spacer(modifier = Modifier.width(50.dp))
                 Column() {
@@ -1404,7 +1406,7 @@ class ReciptActivity : ComponentActivity() {
     }
 
     @Composable
-    fun SaveTheme2(receiptcontent: ReceiptContent){
+    fun SaveTheme2(receiptcontent: ReceiptContent_string){
         Box(
             modifier = Modifier
                 .height(651.dp)
@@ -1424,7 +1426,8 @@ class ReciptActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(top = 21.dp, start = 36.dp)
             ) {
-                P_Medium14(content = receiptcontent.intro.value, color = neutral_500)
+                receiptcontent.intro?.let { P_Medium14(content = it, color = neutral_500)
+                }?: P_Medium14(content = "", color = white)
             }
 
             Column(Modifier.padding(top = 51.dp)) {
@@ -1434,8 +1437,8 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 54.dp, start = 30.dp)
-
+                    .padding(top = 54.dp, start = 30.dp),
+                verticalArrangement = Arrangement.Center
             ) {
                 P_Medium8(
                     " 티켓이 발행된 날짜는"+receiptcontent.publicationdate+ "입니다. " +
@@ -1451,7 +1454,8 @@ class ReciptActivity : ComponentActivity() {
                     .padding(top = 484.dp, start = 28.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                P_Medium14(content = "전라도의 선유도", color = black)
+                receiptcontent.tripName?.let { P_Medium14(content = it, color = black)
+                }?: P_Medium14(content = "", color = white)
             }
 
             Column(
@@ -1473,13 +1477,18 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_location_grey),
-                    contentDescription = "장소",
-                    Modifier.size(16.dp)
-                )
+                if(receiptcontent.depart_small == " "){
+                    Spacer(modifier = Modifier.size(19.dp))
+                }else{
+                    Image(
+                        painter = painterResource(R.drawable.ic_location_red),
+                        contentDescription = "장소",
+                        Modifier.size(19.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium11(content = receiptcontent.depart_small.value, color =neutral_600)
+                receiptcontent.depart_small?.let { P_Medium11(content = it, color =neutral_600)
+                }?: P_Medium14(content = "", color = white)
             }
 
             Column(
@@ -1489,7 +1498,8 @@ class ReciptActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                P_Black45(content = receiptcontent.depart.value, color = black)
+                receiptcontent.depart?.let { P_Black45(content = it, color = black)
+                }?: P_Medium14(content = "", color = white)
             }
 
             Column(
@@ -1512,13 +1522,18 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_location_grey),
-                    contentDescription = "장소",
-                    Modifier.size(16.dp)
-                )
+                if(receiptcontent.arrive_small == " "){
+                    Spacer(modifier = Modifier.size(19.dp))
+                }else{
+                    Image(
+                        painter = painterResource(R.drawable.ic_location_red),
+                        contentDescription = "장소",
+                        Modifier.size(19.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium11(content = receiptcontent.arrive_small.value, color = neutral_600)
+                receiptcontent.arrive_small?.let { P_Medium11(content = it, color = neutral_600)
+                }?: P_Medium14(content = "", color = white)
             }
 
             Column(
@@ -1528,7 +1543,8 @@ class ReciptActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                P_Black45(content = receiptcontent.arrive.value, color = black)
+                receiptcontent.arrive?.let { P_Black45(content = it, color = black)
+                }?: P_Medium14(content = "", color = white)
             }
 
             Row(
@@ -1608,9 +1624,10 @@ class ReciptActivity : ComponentActivity() {
                     .padding(bottom = 1.dp, end = 18.dp)
                     .align(Alignment.BottomEnd)
             ) {
-                P_Medium11(content = receiptcontent.startdate, color = neutral_500)
-                P_Medium11(content = " / ", color = neutral_500)
-                P_Medium11(content = receiptcontent.enddate, color = neutral_500)
+                receiptcontent.startdate?.let { P_Medium11(content = "$it / ", color = neutral_500)
+                }?: P_Medium14(content = "", color = white)
+                receiptcontent.enddate?.let { P_Medium11(content = it, color = neutral_500)
+                }?: P_Medium14(content = "", color = white)
             }
 
 
