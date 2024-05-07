@@ -41,7 +41,7 @@ def fine_tuning(label_dict, datasets_csv):
     wandb.watch(classifier)
 
     # count_parameters(model)
-    optimizer = optim.RMSprop(model.parameters(), lr=5e-4, momentum=0.9)
+    optimizer = optim.RMSprop(classifier.parameters(), lr=5e-4, momentum=0.9)
     scheduler = optim.lr_scheduler.CyclicLR(optimizer, base_lr=5e-4, max_lr=1e-3, step_size_up=10)
     criterion = nn.CrossEntropyLoss()
     
