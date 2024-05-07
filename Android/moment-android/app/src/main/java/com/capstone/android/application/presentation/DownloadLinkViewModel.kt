@@ -1,6 +1,5 @@
 package com.capstone.android.application.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capstone.android.application.data.remote.download_link.DownloadLinkRepository
@@ -29,7 +28,6 @@ class DownloadLinkViewModel @Inject constructor(private val downloadLinkReposito
                 )
 
             } catch (e: HttpException) {
-                Log.d("awegawegaew","HttpException : ${e.message()}")
                 // Handle specific HTTP error codes
                 when (e.code()) {
                     404 -> {
@@ -38,11 +36,9 @@ class DownloadLinkViewModel @Inject constructor(private val downloadLinkReposito
                     // Handle other error codes
                 }
             } catch (e: IOException) {
-                Log.d("awegawegaew","IOException: ${e.message}")
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
-                Log.d("awegawegaew","Exception: ${e.message}")
                 // Handle other generic exceptions
             }
         }
@@ -70,8 +66,6 @@ class DownloadLinkViewModel @Inject constructor(private val downloadLinkReposito
             }
             return pathWhereYouWantToSaveFile
         }catch (e:Exception){
-            Log.d("waegagewa","${e.message}")
-            Log.e("saveFile",e.toString())
         }
         finally {
             input?.close()

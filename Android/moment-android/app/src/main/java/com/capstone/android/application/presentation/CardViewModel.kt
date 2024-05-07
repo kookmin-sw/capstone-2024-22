@@ -1,6 +1,5 @@
 package com.capstone.android.application.presentation
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -112,11 +111,9 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
 
                 if(response is ApiResponse.Success){
                     deleteCardSuccess.value=response.data
-                    Log.d("awegwgewag","weagewa")
                 }
 
             } catch (e: HttpException) {
-                Log.d("awegawegaew","404")
                 // Handle specific HTTP error codes
                 when (e.code()) {
                     404 -> {
@@ -125,11 +122,9 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                     // Handle other error codes
                 }
             } catch (e: IOException) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle other generic exceptions
             }
         }
@@ -147,7 +142,6 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                 }
 
             } catch (e: HttpException) {
-                Log.d("awegawegaew","404")
                 // Handle specific HTTP error codes
                 when (e.code()) {
                     404 -> {
@@ -156,11 +150,9 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                     // Handle other error codes
                 }
             } catch (e: IOException) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle other generic exceptions
             }
         }
@@ -178,7 +170,6 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                 )
 
             } catch (e: HttpException) {
-                Log.d("awegawegaew","404")
                 // Handle specific HTTP error codes
                 when (e.code()) {
                     404 -> {
@@ -187,11 +178,9 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                     // Handle other error codes
                 }
             } catch (e: IOException) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle other generic exceptions
             }
         }
@@ -207,7 +196,6 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                 )
 
             } catch (e: HttpException) {
-                Log.d("awegawegaew","404")
                 // Handle specific HTTP error codes
                 when (e.code()) {
                     404 -> {
@@ -216,11 +204,9 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                     // Handle other error codes
                 }
             } catch (e: IOException) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle other generic exceptions
             }
         }
@@ -240,7 +226,7 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
 
 
             } catch (e: HttpException) {
-                Log.d("awegawegaew","404")
+
                 // Handle specific HTTP error codes
                 when (e.code()) {
                     404 -> {
@@ -249,11 +235,9 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                     // Handle other error codes
                 }
             } catch (e: IOException) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle other generic exceptions
             }
         }
@@ -281,7 +265,6 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
 
 
             } catch (e: HttpException) {
-                Log.d("waegwaegewgwe","HttpException : ${e.message}")
 
                 // Handle specific HTTP error codes
                 when (e.code()) {
@@ -291,12 +274,10 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                     // Handle other error codes
                 }
             } catch (e: IOException) {
-                Log.d("waegwaegewgwe","IOException : ${e.message}")
 
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
-                Log.d("waegwaegewgwe","Exception : ${e.message}")
 
                 // Handle other generic exceptions
             }

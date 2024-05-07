@@ -2,7 +2,6 @@ package com.capstone.android.application.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -159,7 +158,6 @@ class TripFileActivity:ComponentActivity() {
         val cardActivityContract =
             rememberLauncherForActivityResult(
                 ActivityResultContracts.StartActivityForResult()) { result ->
-                Log.d("waegwegewa","${result.resultCode}")
                 if (result.resultCode == 1) {
 
                     try {

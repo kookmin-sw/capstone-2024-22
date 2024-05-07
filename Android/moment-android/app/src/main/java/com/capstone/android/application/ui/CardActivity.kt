@@ -188,7 +188,6 @@ class CardActivity : ComponentActivity() {
                     Lifecycle.Event.ON_RESUME -> {}
                     Lifecycle.Event.ON_PAUSE -> {}
                     Lifecycle.Event.ON_STOP -> {
-                        Log.d("awegwaegwe","start")
 //                        cardItems.filter { it.uploadImage.isNotEmpty() }.forEach {card->
 //
 //                            cardViewModel.postCardImageUpload(
@@ -465,7 +464,6 @@ class CardActivity : ComponentActivity() {
 
                 if (uris.isNotEmpty()) {
                     uris.forEach {
-                        Log.d("awegwaeg", it.path.toString())
 
                         val file = File(getPath(it))
                         val body: MultipartBody.Part = MultipartBody.Part.createFormData(
@@ -479,7 +477,6 @@ class CardActivity : ComponentActivity() {
                     cardItems[focusedCardIndex.value].imageNum.value = cardItems[focusedCardIndex.value].uploadImage.size
 
                 } else {
-                    Log.d("PhotoPicker", "No media selected")
                 }
 
 
@@ -725,7 +722,6 @@ class CardActivity : ComponentActivity() {
                                                     .height(12.dp)
                                                     .fillMaxWidth(),
                                                 onDragEnd = { finalProgress ->
-                                                    Log.d("aewgawegweag", finalProgress.toString())
                                                     Log.e(
                                                         "finalProgress: ",
                                                         "${
@@ -738,7 +734,6 @@ class CardActivity : ComponentActivity() {
 
 
                                                 }, onDrag = { progress ->
-                                                    Log.d("awegawegaew", progress.toString())
                                                     Log.d(
                                                         "progress: ",
                                                         "${
@@ -1118,7 +1113,6 @@ class CardActivity : ComponentActivity() {
                 }
                 Button(onClick = {
                     recorder.stop()
-                    Log.d("waegwagew", "${audioFile?.path}")
 
                 }) {
                     Text(text = "Stop recording")

@@ -1,6 +1,5 @@
 package com.capstone.android.application.presentation
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,7 +34,6 @@ class OpenWeatherViewModel @Inject constructor(private val openWeatherRepository
                     lon = lon,
                     appid = appid
                 )
-                Log.d("weagaewgwea",response.toString())
 
                 if(response is ApiResponse.Success){
                     getWeatherInCurrentLocationlSuccess.postValue(response.data)

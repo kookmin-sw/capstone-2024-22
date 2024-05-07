@@ -67,10 +67,8 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
 
 
                 if(response is ApiResponse.Success){
-                    Log.d("waegwgwea","HttpException")
                     postAuthLoginSuccess.value = response.data
                 }else{
-                    Log.d("waegwgwea","HttpException")
                     postAuthLoginFailure.postValue(ApiResponse.Error(exception = java.lang.Exception()))
 
 //                    val error = (data.body() as MomentNetworkError)
@@ -81,7 +79,6 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
 
 
             } catch (e: HttpException) {
-                Log.d("waegwgwea","HttpException")
 
                 // Handle specific HTTP error codes
                 when (e.code()) {
@@ -91,7 +88,6 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
                     // Handle other error codes
                 }
             } catch (e: IOException) {
-                Log.d("waegwgwea","IOException")
 
                 postAuthLoginFailure.postValue(ApiResponse.Error(exception = e))
 
@@ -99,7 +95,6 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
-                Log.d("waegwgwea","Exception")
 
                 postAuthLoginFailure.postValue(ApiResponse.Error(exception = e))
 
