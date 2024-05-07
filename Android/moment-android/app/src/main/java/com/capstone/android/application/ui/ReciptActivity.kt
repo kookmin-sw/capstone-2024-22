@@ -251,6 +251,13 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
+    private fun initApi() {
+        // 영수증 생성 실패
+        receiptViewModel.postReceiptCreateFailure.observe(this@ReciptActivity) { response ->
+            Log.d("receiptViewModel_postReceiptCreateFailure", response.toString())
+        }
+    }
+
     data class ReceiptContent(
         val tripName: String,
         val intro: MutableState<String>,
