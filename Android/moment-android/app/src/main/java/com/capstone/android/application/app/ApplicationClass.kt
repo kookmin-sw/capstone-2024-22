@@ -22,7 +22,7 @@ class ApplicationClass: Application() {
         lateinit var retrofit: Retrofit
         lateinit var retrofitKakao: Retrofit
 
-        val API_URL="http://wasuphj.synology.me:8000/"
+        val API_URL="http://211.205.171.117:8000/"
         val KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/"
     }
 
@@ -65,7 +65,7 @@ class ApplicationClass: Application() {
             proceed(
                 request()
                     .newBuilder()
-                    .addHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxMDkzMDMyMCwiZXhwIjoxNzU0MTMwMzIwfQ.mVy33lNv-by6bWXshsT4xFOwZSWGkOW76GWimliqHP4")
+                    .addHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNDk5NjA1NCwiZXhwIjoxNzU4MTk2MDU0fQ.hQwGE6cYN3Y3nhipe93kbIGerm6VfgVAJI4T9K8lAaw")
                     .build()
             )
         }
