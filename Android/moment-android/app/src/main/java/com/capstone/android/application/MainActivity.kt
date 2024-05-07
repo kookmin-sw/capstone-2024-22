@@ -226,7 +226,9 @@ class MainActivity : ComponentActivity() {
         val favoriteCardList = remember{
             mutableStateListOf<Card>()
         }
-        val test:Int = 4
+        val receiptList = remember { mutableStateListOf<ReceiptAll>()}
+        val DeleteReceipt = remember { mutableListOf<ReceiptId>() }
+       val test:Int = 4
         val colorName: Result<String> = runCatching {
             when (test) {
                 1 -> "파란색"
@@ -583,7 +585,52 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(MainScreen.ReceiptPost.screenRoute){
                     currentSelectedBottomRoute.value = MainScreen.ReceiptPost.rootRoute
-                    ReceiptPost(EditCheckState,ReceiptCheckState)
+
+                    val page = remember { mutableStateOf(0)}
+                    page.value = 0
+                    val size = 4
+                    var totalpage = 0
+                    var currentpage = 0
+
+                    receiptViewModel.getReceiptAll(page.value,size)
+                    // 영수증 전체 받기 성공
+                    receiptViewModel.getReceiptAllSuccess.observe(this@MainActivity) { response ->
+                        Log.d("receiptViewModel_getReceiptAllSuccess", response.toString())
+                        totalpage = response.data.pagination.totalPages
+                        currentpage = response.data.pagination.currentPage
+
+                        response.data.receiptList.mapNotNull { receiptAll -> runCatching{
+                            ReceiptAll(
+                                receiptAll.id,
+                                receiptAll.tripId,
+                                receiptAll.tripName,
+                                receiptAll.angry,
+                                receiptAll.disgust,
+                                receiptAll.happy,
+                                receiptAll.sad,
+                                receiptAll.neutral,
+                                receiptAll.stDate,
+                                receiptAll.edDate,
+                                receiptAll.numOfCard,
+                                receiptAll.mainDeparture,
+                                receiptAll.subDeparture,
+                                receiptAll.mainDestination,
+                                receiptAll.subDestination,
+                                receiptAll.oneLineMemo,
+                                receiptAll.receiptThemeType) }
+                            .onSuccess {receiptList.clear()}
+                            .onFailure {}.getOrNull()
+                        }.forEach {
+                            receiptList.add(it)
+                        }
+                    }
+
+                    // 영수증 전체 받기 실패
+                    receiptViewModel.getReceiptAllFailure.observe(this@MainActivity) { response ->
+                        Log.d("receiptViewModel_getReceiptAllFailure", response.toString())
+                    }
+
+                    ReceiptPost(receiptList,EditCheckState,DeleteReceipt)
                     if (EditCheckState.value) title.value = "삭제" else title.value = "편집"
                 }
 
@@ -1141,27 +1188,25 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ReceiptPost(EditCheckState: MutableState<Boolean>, ReceiptCheckState: MutableState<Boolean>) {
+    fun ReceiptPost(receiptList: MutableList<ReceiptAll>,EditCheckState: MutableState<Boolean>, DeleteReceipt :MutableList<ReceiptId> ) {
         //영수증 게시
-        val testList = mutableListOf<Int>(1,2,3,4,5,6,7,8,9,10,11)
-
-
         Column(
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp)) {
+            MyGrid(receiptList, 2, EditCheckState, DeleteReceipt)
 
             MyGrid(testList, 2, EditCheckState,ReceiptCheckState)
         }
     }
     @Composable
     fun MyGrid(
-        content: List<Int>,
+        receiptList: MutableList<ReceiptAll>,
         columnSize: Int,
         EditCheckState: MutableState<Boolean>,
-        ReceiptCheckState: MutableState<Boolean>
+        DeleteReceipt: MutableList<ReceiptId>
     ){
-        val rowsCount = 1 + (content.size -1)/columnSize // row 개수
+        val rowsCount = 1 + (receiptList.size -1)/columnSize // row 개수
         BoxWithConstraints {
             val maxWidth = this.maxWidth
 
@@ -1169,11 +1214,11 @@ class MainActivity : ComponentActivity() {
                 items(rowsCount) { rowIndex ->
                     val rangeStart = rowIndex*columnSize
                     var rangeEnd = rangeStart + columnSize -1
-                    if (rangeEnd > content.lastIndex) rangeEnd = content.lastIndex // row로 표현될 list의 range를 계산, slice하여 row 생성
-                    RowOfGrid(content.slice(rangeStart..rangeEnd), maxWidth/columnSize, EditCheckState, ReceiptCheckState)
+                    if (rangeEnd > receiptList.lastIndex) rangeEnd = receiptList.lastIndex // row로 표현될 list의 range를 계산, slice하여 row 생성
+                    RowOfGrid(receiptList.slice(rangeStart..rangeEnd), maxWidth/columnSize,
+                        EditCheckState, DeleteReceipt)
                 }
             }
-
         }
     }
 
@@ -1183,10 +1228,8 @@ class MainActivity : ComponentActivity() {
         rowList: List<ReceiptAll>,
         columnWidth: Dp,
         EditCheckState: MutableState<Boolean>,
-        ReceiptCheckState: MutableState<Boolean>
+        DeleteReceipt: MutableList<ReceiptId>
     ) {
-        val interactionSource = remember { MutableInteractionSource() }
-
         var intent = Intent(this@MainActivity, ReciptActivity::class.java)
         intent.putExtra("MoveScreen", "ReceiptPost_Big")
 
@@ -1194,7 +1237,6 @@ class MainActivity : ComponentActivity() {
             items(rowList.size) { index ->
 
                 val item = rowList[index]
-                Log.d("hihihi", "RowOfGrid: $item")
                 val checkState = rememberSaveable { mutableStateOf(false) }
 
                 Box( modifier = Modifier
