@@ -107,16 +107,50 @@ enum class ReciptScreen(){
     EditReceipt,
     SaveEditReceipt
 }
-
+@AndroidEntryPoint
 class ReciptActivity : ComponentActivity() {
     lateinit var navController: NavHostController
     private val receiptViewModel : ReceiptViewModel by viewModels()
     private val tripViewModel : TripViewModel by viewModels()
 
+    @SuppressLint("UnrememberedMutableState")
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             navController = rememberNavController()
+            initApi()
+            val emotionList = mutableStateListOf<Emotion>()
+            emotionList.add(
+                Emotion(
+                    icon = R.drawable.ic_emotion_common,
+                    text = "평범해요",
+                    persent = 60
+                )
+            )
+            emotionList.add(
+                Emotion(
+                    icon = R.drawable.ic_emotion_happy,
+                    text = "즐거워요",
+                    persent = 20
+                )
+            )
+            emotionList.add(
+                Emotion(
+                    icon = R.drawable.ic_emotion_angry,
+                    text = "화가나요",
+                    persent = 15
+                )
+            )
+            emotionList.add(
+                Emotion(
+                    icon = R.drawable.ic_emotion_sad,
+                    text = "슬퍼요",
+                    persent = 5
+                )
+            )
+            emotionList.sortByDescending { it.persent }
 
             val movenav = intent.getStringExtra("MoveScreen")
 
