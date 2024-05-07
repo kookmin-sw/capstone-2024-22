@@ -2,8 +2,8 @@ import os, torch
 import pandas as pd
 import numpy as np
 import torchaudio
-from torch.utils.data import Dataset, DataLoader
-from sklearn.model_selection import train_test_split
+from torch.utils.data import Dataset, DataLoader, random_split
+
 
 
 def extract_features(csv_file, model):
@@ -32,9 +32,12 @@ def load_dataloader(datasets_list):
     dataset = NpyDataset(datasets_list)
 
     # 데이터셋 분할
-    train_dataset, test_dataset = train_test_split(dataset, test_size=0.2, random_state=42)
-    train_dataset, val_dataset = train_test_split(test_dataset, test_size=0.1, random_state=42)
+    data_size = len(dataset)
+    train_size = int(data_size * 0.8)
+    validation_size = int(data_size * 0.1)
+    test_size = data_size - train_size - validation_size
     
+    train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, validation_size, test_size])
     train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
@@ -50,10 +53,12 @@ class NpyDataset(Dataset):
         return len(self.data_list)
 
     def __getitem__(self, idx):
-        feat = np.load(self.data_list[idx][0], allow_pickle=True)
+        feats = np.load(self.data_list[idx][0], allow_pickle=True)[0]['feats']
         label = self.data_list[idx][1]
         
-        return feat, label
+        # res = {'feats':feats, 'label':label}
+        
+        return feats, label
     
     
 def train_one_epoch(model, optimizer, criterion, train_loader, device):
