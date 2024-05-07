@@ -232,20 +232,46 @@ class ReciptActivity : ComponentActivity() {
                     composable(route = ReciptScreen.ReceiptPost_Big.name) {
                         //MainAvtivity 영수증모아보기에서 선택한 데이터로 크게 띄움
                         ReceiptPost_Big(/*receiptcontent*/) }
-                    composable(route = ReciptScreen.EditReceipt.name) { EditReceipt () }
-                    composable(route = ReciptScreen.SaveEditReceipt.name) {
+                    composable(route = ReciptScreen.EditReceipt.name) {
+
+                        //앞에서 받아올 데이터들
+                        val tripname = "여행이름"
+                        val intro = remember { mutableStateOf("") }
+                        val depart_small = remember { mutableStateOf("") }
+                        val depart = remember { mutableStateOf("") }
+                        val arrive_small = remember { mutableStateOf("") }
+                        val arrive = remember { mutableStateOf("") }
+                        val cardnum = 27
+                        val publicationdate = "2024.02.25"
+                        val startdate = "2024.02.25"
+                        val enddate = "2024.02.27"
+
+
+                        intro.value = "한줄 소개"
+                        depart_small.value = "소제목"
+                        depart.value = "제목"
+                        arrive_small.value = "소제목2"
+                        arrive.value = "제목2"
+
+
+                        val data = ReceiptContent(
+                            tripname, intro, depart_small, depart, arrive_small, arrive,
+                            cardnum,publicationdate,startdate,enddate, emotionList)
+                        EditReceipt(data)
+                    }
+                    /*composable(route = ReciptScreen.SaveEditReceipt.name) {
                         val theme = remember {
                             navController.previousBackStackEntry?.savedStateHandle?.get<Int>("theme")
                         }
                         val receipt_content = remember {
-                            navController.previousBackStackEntry?.savedStateHandle?.get<ReceiptContent>("receipt_content")
+                            navController.previousBackStackEntry?.savedStateHandle?.get<ReceiptContent_string>("receipt_content")
                         }
                         if (theme != null) {
                             if (receipt_content != null) {
                                 SaveEditReceipt (theme,receipt_content)
                             }
                         }
-                    }
+                    }*/
                 }
             }
         }
@@ -1705,6 +1731,7 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
+    @SuppressLint("UnrememberedMutableState")
     @Composable
     fun ReceiptPost_Big(){
         //모아보기에서 영수증 하나 선택해서 크게 보는 화면 (수정, 내보내기 가능)
@@ -1713,12 +1740,13 @@ class ReciptActivity : ComponentActivity() {
         intent.putExtra("MoveScreen", "ReceiptPost")
 
         val chosenTheme  = "theme1"
-        val intro = remember { mutableStateOf("") }
-        val depart_small = remember { mutableStateOf("") }
-        val depart = remember { mutableStateOf("") }
-        val arrive_small = remember { mutableStateOf("") }
-        val arrive = remember { mutableStateOf("") }
-        val cardnum = 27
+        val tripname = "여행이름"
+        val intro = "한줄 소개"
+        val depart_small = "소제목"
+        val depart = "제목"
+        val arrive_small = "소제목2"
+        val arrive = "제목2"
+        val cardnum = 20
         val publicationdate = "2024.02.25"
         val startdate = "2024.02.25"
         val enddate = "2024.02.27"
@@ -1752,8 +1780,8 @@ class ReciptActivity : ComponentActivity() {
             )
         )
         emotionList.sortByDescending { it.persent }
-        val receiptcontent = ReceiptContent(
-            intro, depart_small, depart, arrive_small, arrive,
+        val receiptcontent = ReceiptContent_string(
+            tripname, intro, depart_small, depart, arrive_small, arrive,
             cardnum, publicationdate, startdate, enddate, emotionList
         )
         Column(
@@ -1789,7 +1817,7 @@ class ReciptActivity : ComponentActivity() {
                                 .padding(vertical = 10.dp, horizontal = 14.dp)
                                 .clickable {
                                     navController.navigate(ReciptScreen.EditReceipt.name)
-                                    }) {
+                                }) {
                             YJ_Bold15("수정", black)
                         }
                     }
@@ -1810,10 +1838,10 @@ class ReciptActivity : ComponentActivity() {
 
     }
 
-    @SuppressLint("UnrememberedMutableState")
     @OptIn(ExperimentalPagerApi::class)
     @Composable
-    fun EditReceipt(){
+    fun EditReceipt(receiptContent: ReceiptContent){
+
         val page = 2
         val state = rememberPagerState()
 
@@ -1823,46 +1851,7 @@ class ReciptActivity : ComponentActivity() {
         val receiptIntent = Intent(this@ReciptActivity, MainActivity::class.java)
         receiptIntent.putExtra("MoveScreen", "ReceiptPost")
 
-        val intro = remember { mutableStateOf("") }
-        val depart_small = remember { mutableStateOf("") }
-        val depart = remember { mutableStateOf("") }
-        val arrive_small = remember { mutableStateOf("") }
-        val arrive = remember { mutableStateOf("") }
-        val cardnum = 27
-        val publicationdate = "2024.02.25"
-        val startdate = "2024.02.25"
-        val enddate = "2024.02.27"
-        val emotionList = mutableStateListOf<Emotion>()
 
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_common,
-                text = "평범해요",
-                persent = 60
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_happy,
-                text = "즐거워요",
-                persent = 20
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_angry,
-                text = "화가나요",
-                persent = 15
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요 ",
-                persent = 5
-            )
-        )
-        emotionList.sortByDescending { it.persent }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -1896,31 +1885,49 @@ class ReciptActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
-                        .clickable {
-                            navController.currentBackStackEntry?.savedStateHandle?.set(
-                                key = "theme",
-                                value = state.currentPage
-                            )
-                            navController.currentBackStackEntry?.savedStateHandle?.set(
-                                key = "receipt_content",
-                                value = ReceiptContent(
-                                    intro, depart_small, depart, arrive_small, arrive,
-                                    cardnum, publicationdate, startdate, enddate, emotionList
+                        .clickable() {
+
+                            if (receiptContent.arrive.value == "" || receiptContent.depart.value == "") {
+                                showToastMessage(
+                                    context = this@ReciptActivity,
+                                    "출발지와 도착지는 꼭 입력해주세요!"
                                 )
-                            )
-                            navController.navigate(ReciptScreen.SaveEditReceipt.name)
+                            } else {
+
+                                if (receiptContent.intro.value == "") receiptContent.intro.value = " "
+                                if (receiptContent.depart_small.value == "") receiptContent.depart_small.value = " "
+                                if (receiptContent.arrive_small.value == "") receiptContent.arrive_small.value = " "
+
+                                val receiptData = receiptContent
+
+                                navController.navigate(
+                                    ReciptScreen.SaveRecipt.name +
+                                            "/${receiptData.tripName}" +
+                                            "/${receiptData.intro.value}" +
+                                            "/${receiptData.depart_small.value}" +
+                                            "/${receiptData.depart.value}" +
+                                            "/${receiptData.arrive_small.value}" +
+                                            "/${receiptData.arrive.value}" +
+                                            "/${receiptData.cardnum}" +
+                                            "/${receiptData.publicationdate}" +
+                                            "/${receiptData.startdate}" +
+                                            "/${receiptData.enddate}" +
+                                            "/${theme}"
+                                )
+                            }
                         }) {
-                    YJ_Bold15("저장", black)
+                    YJ_Bold15("완료", black)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            Horizontal_Theme(page,state,ReceiptContent(intro, depart_small, depart, arrive_small, arrive,
-                cardnum, publicationdate, startdate, enddate,emotionList))
+
+            Horizontal_Theme(page,state,receiptContent)
         }
     }
-    @Composable
-    fun SaveEditReceipt(theme :Int, receiptcontent: ReceiptContent){
+
+    /*@Composable
+    fun SaveEditReceipt(theme :Int, receiptcontent: ReceiptContent_string){
 
         Column(
             modifier = Modifier
@@ -1966,7 +1973,7 @@ class ReciptActivity : ComponentActivity() {
 
             }
         }
-    }
+    }*/
 
     @Composable
     fun Theme1_Emotion(kind: String, index: Int): Int {
