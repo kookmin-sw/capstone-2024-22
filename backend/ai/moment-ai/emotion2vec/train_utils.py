@@ -6,7 +6,7 @@ from torch.utils.data import Dataset, DataLoader, random_split
 
 
 
-def extract_features(csv_file, model):
+def extract_features(csv_file, model, label_dict):
     DATA_PATH = "../"
     datasets_csv = pd.read_csv(csv_file)
     datasets_list = []
@@ -19,7 +19,7 @@ def extract_features(csv_file, model):
             npy_feature = model.generate(os.path.join(DATA_PATH, wav_file), granularity="utterance")
             np.save(npy_file, npy_feature)
         
-        datasets_list.append((npy_file, label))
+        datasets_list.append((npy_file, label_dict[label]))
 
         if os.path.exists(os.path.join(DATA_PATH, wav_file)):
             os.remove(os.path.join(DATA_PATH, wav_file))
@@ -98,7 +98,7 @@ def validate_and_test(model, data_loader, device, num_classes):
     fn = [0] * num_classes
 
     for batch in data_loader:
-        eats, labels = batch
+        feats, labels = batch
 
         feats = feats.to(device)
         labels = labels.to(device)

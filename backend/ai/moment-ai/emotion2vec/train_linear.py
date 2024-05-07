@@ -33,7 +33,7 @@ def fine_tuning(label_dict, datasets_csv):
     model.model.to(device)
     
     # extract features
-    datasets_list = extract_features(datasets_csv, model)
+    datasets_list = extract_features(datasets_csv, model, label_dict)
     
     # change classifier model to train
     classifier = BaseModel(input_dim=768, output_dim=len(label_dict))
@@ -61,7 +61,7 @@ def fine_tuning(label_dict, datasets_csv):
         train_loss = train_one_epoch(classifier, optimizer, criterion, train_loader, device)
         
         # Validation step
-        val_wa, val_ua, val_f1 = validate_and_test(model, val_loader, device, num_classes=len(label_dict))
+        val_wa, val_ua, val_f1 = validate_and_test(classifier, val_loader, device, num_classes=len(label_dict))
 
         if val_wa > best_val_wa:
             best_val_wa = val_wa
@@ -96,7 +96,7 @@ def fine_tuning(label_dict, datasets_csv):
     
     
 if __name__ == "__main__":
-    label_dict={'ang': 0, 'hap': 1, 'neu': 2, 'sad': 3, 'disgust':4}
+    label_dict = labels = {"neutral" : 0, "happy" : 1, "angry" : 2, "sad" : 3, "disgust" : 4}
     datasets_csv = "./datas/SER_DATASETS.csv"
     
     fine_tuning(label_dict, datasets_csv=datasets_csv)
