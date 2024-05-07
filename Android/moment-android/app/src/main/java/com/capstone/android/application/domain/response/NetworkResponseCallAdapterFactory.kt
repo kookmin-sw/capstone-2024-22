@@ -1,5 +1,6 @@
 package com.capstone.android.application.domain.response
 
+import android.util.Log
 import okhttp3.Request
 import okio.Timeout
 import retrofit2.Call
@@ -63,26 +64,32 @@ private class ApiResponseCall<T>(
     )
 
     override fun clone(): Call<ApiResponse<T>> {
+        Log.d("weagwgweag","clone")
         TODO("Not yet implemented")
     }
 
     override fun execute(): Response<ApiResponse<T>> {
+        Log.d("weagwgweag","execute")
+
         TODO("Not yet implemented")
     }
 
     override fun isExecuted(): Boolean {
+        Log.d("weagwgweag","isExecuted")
         TODO("Not yet implemented")
     }
 
     override fun cancel() {
-        TODO("Not yet implemented")
+        delegate.cancel()
     }
 
     override fun isCanceled(): Boolean {
+        Log.d("weagwgweag","isCanceled")
         TODO("Not yet implemented")
     }
 
     override fun request(): Request {
+        Log.d("weagwgweag","request")
         TODO("Not yet implemented")
     }
 

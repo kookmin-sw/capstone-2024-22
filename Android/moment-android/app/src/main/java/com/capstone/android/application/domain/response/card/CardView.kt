@@ -2,8 +2,10 @@ package com.capstone.android.application.domain.response.card
 
 data class CardView(
     val angry: Double,
+    val disgust: Double,
     val happy: Double,
     val id: Int,
+    val imageUrls: List<String>,
     val location: String,
     val loved: Boolean,
     val neutral: Double,
