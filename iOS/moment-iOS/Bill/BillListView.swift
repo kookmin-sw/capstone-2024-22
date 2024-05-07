@@ -366,6 +366,7 @@ struct ReceiptDetailView: View {
     @State private var EndLocationend : String = ""
     @State private var selectedTab = 0
     @State private var showingGroup = false
+    @EnvironmentObject var sharedViewModel: SharedViewModel
     
      var snapshotManager: SnapshotManager?
     
@@ -426,9 +427,16 @@ struct ReceiptDetailView: View {
                         
                         Button(action: {
                             if saveButtonTitle == "저장" {
-                                saveButtonTitle = "완료"
-                                backButtonTitle = "내보내기"
-                                isDialogActiveBillCom = true
+                                sharedViewModel.isSaved.toggle()
+                                if sharedViewModel.isSaved {
+                                    saveButtonTitle = "완료"
+                                    backButtonTitle = "내보내기"
+                                    isDialogActiveBillCom = true
+                                }
+                                else {
+                                                   // 저장 취소 로직 수행
+                                               }
+                                
                             } else {
                                 // 완료 버튼의 기능
                                 
@@ -514,12 +522,7 @@ struct ReceiptDetailView: View {
             .navigationBarBackButtonHidden()
         
             .onAppear {
-                       // Item의 id를 Int로 변환하여 createReceipt에 전달
-//                       if var tripId = item.id {
-//                           billListViewModel.createReceipt(for: tripId)
-//                       } else {
-//                           print("Invalid tripId: \(item.id)")
-//                       }
+                     
                    }
     }
     // 얘는 문제가 없는거같고 
@@ -543,6 +546,202 @@ struct ReceiptDetailView: View {
         rootVC.present(activityVC, animated: true, completion: nil)
     }
 
+}
+
+
+struct ReceiptBillView1 : View {
+    @EnvironmentObject var homeViewModel: HomeViewModel
+    @EnvironmentObject var sharedViewModel: SharedViewModel
+    @Environment(\.presentationMode) var presentationMode
+    @State private var isDialogActive = false
+    @State private var isDialogActiveBillCom = false
+    var topColor: Color = .homeRed
+    var textColor: Color = .white // 상단 바에 사용할 텍스트 색상
+    let item : Item
+    @State private var text: String = ""
+    @State private var starttrip: String = ""
+    @State private var StartLocation : String = ""
+    @State private var EndLocation : String = ""
+    @State private var isEditing: Bool = false
+    @State private var saveButtonTitle = "저장"
+    @State private var backButtonTitle = "뒤로"
+    @State private var inputText: String = ""
+    @State private var EndLocationend : String = ""
+    @State private var selectedTab = 0
+    @State private var forceUpdate = ""
+   
+  
+    
+    var body: some View{
+        VStack(spacing: 0) {
+            
+            
+            Rectangle()
+                .fill(topColor)
+                .frame(height: 50) // 상단 바의 높이를 설정합니다.
+                .overlay(
+                    HStack{
+                        Text("암스테르담 성당 여행") // 여기에 원하는 텍스트를 입력합니다.
+                            .foregroundColor(textColor) // 텍스트 색상 설정
+                        
+                            .font(.pretendardMedium14)
+                            .padding()
+                        Spacer()
+                        Image("Logo")
+                            .padding()
+                    }
+                )
+            
+            // }
+            // 나머지 카드 부분
+            Rectangle()
+                .fill(Color.Secondary50)
+                .frame(height: 603)
+                .border(.gray500)
+                .overlay(
+                    VStack(alignment:.center){
+                        
+                        Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이 ")
+                            .font(.pretendardMedium8)
+                            .foregroundColor(.homeRed)
+                        
+                        
+                        
+                        
+                        Spacer()
+                        
+                        if sharedViewModel.isSaved == true {
+                           Text(text)
+                                .multilineTextAlignment(.center)
+                        }else {
+                       // TODO: - false 인경우엔 다시 textField 로
+                            TextField("여행의 기록을 한줄로 기록하세요", text: $text, prompt: Text("여행의 기록을 한줄로 기록하세요").foregroundColor(.Natural200))
+                                .foregroundColor(.gray500)
+                                .font(.pretendardMedium14)
+                                .padding(.bottom,30)
+                                .multilineTextAlignment(.center)
+                        }
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        VStack(alignment:.center,spacing:0){
+                            HStack(alignment:.center,spacing:1)
+                            {
+                                
+                                Image("Locationred")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 19, height: 19)
+                                
+                                TextFieldDynamicWidth(title: "여행의 시작은 여기부터", text: $inputText, onEditingChanged: { isEditing in
+                                    
+                                }, onCommit: {
+                                    
+                                })
+                                //Text("didtlrhks")
+                                .font(.pretendardMedium14)
+                                .foregroundColor(.homeRed)
+                           
+                            }
+                            .frame(maxWidth: .infinity)
+                            
+                            
+                            HStack{
+                                TextField("출발지",text:$StartLocation,prompt: Text("출발지").foregroundColor(.Natural200))
+                                    .font(.pretendardExtrabold45)
+                                    .foregroundColor(.homeRed)  // 글씨
+                                    .multilineTextAlignment(.center)
+                            }
+                        }
+                        
+                        
+                        Image("airplane")
+                            .padding(.bottom,20)
+                        
+                        VStack(spacing:0){
+                            HStack(alignment: .center,spacing:0)
+                            {
+                                Image("Locationred")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 19, height: 19)
+                                
+                                TextFieldDynamicWidth(title: "기억속에 오래 저장할", text: $EndLocationend, onEditingChanged: { isEditing in
+                                    
+                                }, onCommit: {
+                                    
+                                })
+                                .font(.pretendardMedium14)
+                                .foregroundColor(.homeRed)
+                            }
+                            
+                            
+                            
+                            HStack{
+                                
+                                TextField("출발지",text:$EndLocation,prompt: Text("도착지").foregroundColor(.Natural200))
+                                    .font(.pretendardExtrabold45)
+                                    .foregroundColor(.homeRed)  // 글씨
+                                    .multilineTextAlignment(.center)
+                            }
+                        }
+                        
+                        Spacer()
+                        Image("cut")
+                            .padding(.bottom,10)
+                        
+                        StatsView()
+                        Spacer()
+                    }
+                )
+        }
+        
+        
+        .frame(width: 335, height: 653)
+        
+        .cornerRadius(5) // 모서리를 둥글게 처리합니다.
+        .overlay(
+            RoundedRectangle(cornerRadius: 3)
+                .stroke(Color.Secondary50, lineWidth: 1)
+        )
+        
+    }
+    private func showShareSheet(_ image: UIImage) {
+        
+        guard let rootVC = UIApplication.shared.windows.first?.rootViewController else {
+            return
+        }
+        
+        // UIActivityViewController 인스턴스 생성
+        let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        
+        // iPad에서는 popover로 표시될 위치를 지정해야 할 수 있습니다.
+        if let popoverController = activityVC.popoverPresentationController {
+            popoverController.sourceView = rootVC.view
+            popoverController.sourceRect = CGRect(x: rootVC.view.bounds.midX, y: rootVC.view.bounds.midY, width: 0, height: 0)
+            popoverController.permittedArrowDirections = []
+        }
+        
+        // activityVC를 present합니다.
+        rootVC.present(activityVC, animated: true, completion: nil)
+    }
+    
+    func captureSnapshot() {
+        let hostingController = UIHostingController(rootView: ReceiptBillView1(item:item))
+        let targetSize = hostingController.view.intrinsicContentSize
+        hostingController.view.bounds = CGRect(origin: .zero, size: targetSize)
+        hostingController.view.layoutIfNeeded()
+
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+        let image = renderer.image { _ in
+            hostingController.view.drawHierarchy(in: hostingController.view.bounds, afterScreenUpdates: true)
+        }
+        
+    }
 }
 
 struct ReceiptsView: View {
@@ -835,192 +1034,6 @@ struct CustomDialogBill: View {
     }
 }
 
-struct ReceiptBillView1 : View {
-    @EnvironmentObject var homeViewModel: HomeViewModel
-    @Environment(\.presentationMode) var presentationMode
-    @State private var isDialogActive = false
-    @State private var isDialogActiveBillCom = false
-    var topColor: Color = .homeRed
-    var textColor: Color = .white // 상단 바에 사용할 텍스트 색상
-    let item : Item
-    @State private var text: String = ""
-    @State private var starttrip: String = ""
-    @State private var StartLocation : String = ""
-    @State private var EndLocation : String = ""
-    @State private var isEditing: Bool = false
-    @State private var saveButtonTitle = "저장"
-    @State private var backButtonTitle = "뒤로"
-    @State private var inputText: String = ""
-    @State private var EndLocationend : String = ""
-    @State private var selectedTab = 0
-    @State private var forceUpdate = ""
-  
-    
-    var body: some View{
-        VStack(spacing: 0) {
-            
-            
-            Rectangle()
-                .fill(topColor)
-                .frame(height: 50) // 상단 바의 높이를 설정합니다.
-                .overlay(
-                    HStack{
-                        Text("암스테르담 성당 여행") // 여기에 원하는 텍스트를 입력합니다.
-                            .foregroundColor(textColor) // 텍스트 색상 설정
-                        
-                            .font(.pretendardMedium14)
-                            .padding()
-                        Spacer()
-                        Image("Logo")
-                            .padding()
-                    }
-                )
-            
-            // }
-            // 나머지 카드 부분
-            Rectangle()
-                .fill(Color.Secondary50)
-                .frame(height: 603)
-                .border(.gray500)
-                .overlay(
-                    VStack(alignment:.center){
-                        
-                        Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이 ")
-                            .font(.pretendardMedium8)
-                            .foregroundColor(.homeRed)
-                        
-                        
-                        
-                        
-                        Spacer()
-                        
-                        TextField("여행의 기록을 한줄로 기록하세요", text: $text, prompt: Text("여행의 기록을 한줄로 기록하세요").foregroundColor(.Natural200))
-                            .foregroundColor(.gray500)
-                            .font(.pretendardMedium14)
-                            .padding(.bottom,30)
-                            .multilineTextAlignment(.center)
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        VStack(alignment:.center,spacing:0){
-                            HStack(alignment:.center,spacing:1)
-                            {
-                                
-                                Image("Locationred")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 19, height: 19)
-                                
-                                TextFieldDynamicWidth(title: "여행의 시작은 여기부터", text: $inputText, onEditingChanged: { isEditing in
-                                    
-                                }, onCommit: {
-                                    
-                                })
-                                //Text("didtlrhks")
-                                .font(.pretendardMedium14)
-                                .foregroundColor(.homeRed)
-                           
-                            }
-                            .frame(maxWidth: .infinity)
-                            
-                            
-                            HStack{
-                                TextField("출발지",text:$StartLocation,prompt: Text("출발지").foregroundColor(.Natural200))
-                                    .font(.pretendardExtrabold45)
-                                    .foregroundColor(.homeRed)  // 글씨
-                                    .multilineTextAlignment(.center)
-                            }
-                        }
-                        
-                        
-                        Image("airplane")
-                            .padding(.bottom,20)
-                        
-                        VStack(spacing:0){
-                            HStack(alignment: .center,spacing:0)
-                            {
-                                Image("Locationred")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 19, height: 19)
-                                
-                                TextFieldDynamicWidth(title: "기억속에 오래 저장할", text: $EndLocationend, onEditingChanged: { isEditing in
-                                    
-                                }, onCommit: {
-                                    
-                                })
-                                .font(.pretendardMedium14)
-                                .foregroundColor(.homeRed)
-                            }
-                            
-                            
-                            
-                            HStack{
-                                
-                                TextField("출발지",text:$EndLocation,prompt: Text("도착지").foregroundColor(.Natural200))
-                                    .font(.pretendardExtrabold45)
-                                    .foregroundColor(.homeRed)  // 글씨
-                                    .multilineTextAlignment(.center)
-                            }
-                        }
-                        
-                        Spacer()
-                        Image("cut")
-                            .padding(.bottom,10)
-                        
-                        StatsView()
-                        Spacer()
-                    }
-                )
-        }
-        
-        
-        .frame(width: 335, height: 653)
-        
-        .cornerRadius(5) // 모서리를 둥글게 처리합니다.
-        .overlay(
-            RoundedRectangle(cornerRadius: 3)
-                .stroke(Color.Secondary50, lineWidth: 1)
-        )
-        
-    }
-    private func showShareSheet(_ image: UIImage) {
-        
-        guard let rootVC = UIApplication.shared.windows.first?.rootViewController else {
-            return
-        }
-        
-        // UIActivityViewController 인스턴스 생성
-        let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
-        
-        // iPad에서는 popover로 표시될 위치를 지정해야 할 수 있습니다.
-        if let popoverController = activityVC.popoverPresentationController {
-            popoverController.sourceView = rootVC.view
-            popoverController.sourceRect = CGRect(x: rootVC.view.bounds.midX, y: rootVC.view.bounds.midY, width: 0, height: 0)
-            popoverController.permittedArrowDirections = []
-        }
-        
-        // activityVC를 present합니다.
-        rootVC.present(activityVC, animated: true, completion: nil)
-    }
-    
-    func captureSnapshot() {
-        let hostingController = UIHostingController(rootView: ReceiptBillView1(item:item))
-        let targetSize = hostingController.view.intrinsicContentSize
-        hostingController.view.bounds = CGRect(origin: .zero, size: targetSize)
-        hostingController.view.layoutIfNeeded()
-
-        let renderer = UIGraphicsImageRenderer(size: targetSize)
-        let image = renderer.image { _ in
-            hostingController.view.drawHierarchy(in: hostingController.view.bounds, afterScreenUpdates: true)
-        }
-        
-    }
-}
 
 
 struct CustomDialogBillComplete: View {

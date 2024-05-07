@@ -321,12 +321,13 @@ struct DynamicGradientRectangleView: View {
         VStack {
 
             let url = URL(string: cardItem.recordFileUrl)!
-            
+            // 여기에서 url이 어떤 url 이 들어가있는지 확인하고싶어
             let audioPlayer = AudioPlayer(url: url)
                    
                    CustomAudioPlayerView(audioPlayer: audioPlayer)
+          
 
-            
+            Text("URL: \(cardItem.recordFileUrl)")
             
             Text(longText)
                 .font(.pretendardMedium13)

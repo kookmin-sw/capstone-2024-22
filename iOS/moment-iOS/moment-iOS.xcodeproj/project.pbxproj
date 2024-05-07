@@ -53,6 +53,7 @@
 		8E86C12D2BDA766A00291360 /* SnapshotManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C12C2BDA766A00291360 /* SnapshotManager.swift */; };
 		8E86C1AB2BE819A100291360 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C1AA2BE819A100291360 /* LocationManager.swift */; };
 		8E86C1AD2BE8FAC100291360 /* VideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C1AC2BE8FAC100291360 /* VideoPlayerView.swift */; };
+		8E86C1E92BEA358F00291360 /* SharedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C1E82BEA358F00291360 /* SharedViewModel.swift */; };
 		8E8C17452BA8575000BF1E1C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17442BA8575000BF1E1C /* LoginView.swift */; };
 		8E8C17482BA85AE200BF1E1C /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17472BA85AE200BF1E1C /* AuthView.swift */; };
 		8E8C174F2BA97B4500BF1E1C /* AuthNumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C174E2BA97B4500BF1E1C /* AuthNumView.swift */; };
@@ -178,6 +179,7 @@
 		8E86C12C2BDA766A00291360 /* SnapshotManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotManager.swift; sourceTree = "<group>"; };
 		8E86C1AA2BE819A100291360 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		8E86C1AC2BE8FAC100291360 /* VideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; };
+		8E86C1E82BEA358F00291360 /* SharedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedViewModel.swift; sourceTree = "<group>"; };
 		8E8C17442BA8575000BF1E1C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		8E8C17472BA85AE200BF1E1C /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		8E8C174E2BA97B4500BF1E1C /* AuthNumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthNumView.swift; sourceTree = "<group>"; };
@@ -501,6 +503,7 @@
 				8E5CAE5B2B970E0400A483B4 /* BillListView.swift */,
 				8E86C0672BD0103F00291360 /* ActivityView.swift */,
 				8E86C12C2BDA766A00291360 /* SnapshotManager.swift */,
+				8E86C1E82BEA358F00291360 /* SharedViewModel.swift */,
 			);
 			path = Bill;
 			sourceTree = "<group>";
@@ -745,6 +748,7 @@
 				8E8C17482BA85AE200BF1E1C /* AuthView.swift in Sources */,
 				8E15C8712B6527E3001468C7 /* moment_iOSApp.swift in Sources */,
 				8ECCFA982BAFE3BD00C39125 /* AudioRecorderManager.swift in Sources */,
+				8E86C1E92BEA358F00291360 /* SharedViewModel.swift in Sources */,
 				8E5CAE6A2B970E9900A483B4 /* Int-Extensions.swift in Sources */,
 				8ECCFBD92BB9463700C39125 /* CardViewModel.swift in Sources */,
 				8E5CAE342B970C2C00A483B4 /* Color+Extensions.swift in Sources */,
