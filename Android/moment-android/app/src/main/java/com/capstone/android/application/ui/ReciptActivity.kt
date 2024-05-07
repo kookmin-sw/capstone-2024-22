@@ -2015,6 +2015,23 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
+
+
+    fun showToastMessage(context: Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getCurrentDate(): LocalDate {
+        return LocalDate.now()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun isDatePassed(targetDate: LocalDate): Boolean {
+        val currentDate = getCurrentDate()
+        return currentDate.isAfter(targetDate) || currentDate.isEqual(targetDate)
+    }
+
     @SuppressLint("UnrememberedMutableState")
     @Preview(apiLevel = 33)
     @Composable
