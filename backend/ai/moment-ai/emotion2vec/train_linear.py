@@ -53,12 +53,13 @@ def fine_tuning(label_dict, datasets_csv):
     train_loader, val_loader, test_loader = load_dataloader(datasets_list)
     
     # set save directory
-    save_dir = os.path.join(str(Path.cwd()), f"emotion2vec_finetune.pth")
+    save_dir = os.path.join(str(Path.cwd()), f"emotion2vec_classifier.pth")
     
     # Training loop
     for epoch in range(epochs):
         # train
         train_loss = train_one_epoch(classifier, optimizer, criterion, train_loader, device)
+        scheduler.step()
         
         # Validation step
         val_wa, val_ua, val_f1 = validate_and_test(classifier, val_loader, device, num_classes=len(label_dict))
@@ -66,7 +67,7 @@ def fine_tuning(label_dict, datasets_csv):
         if val_wa > best_val_wa:
             best_val_wa = val_wa
             best_val_wa_epoch = epoch
-            torch.save(model.state_dict(), save_dir)
+            torch.save(classifier.state_dict(), save_dir)
 
         # Print losses for every epoch
         logger.info(f"Epoch {epoch+1}, Training Loss: {train_loss/len(train_loader):.6f}, Validation WA: {val_wa:.2f}%; UA: {val_ua:.2f}%; F1: {val_f1:.2f}%")
