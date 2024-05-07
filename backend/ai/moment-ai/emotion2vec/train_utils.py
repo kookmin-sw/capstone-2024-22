@@ -13,15 +13,19 @@ def extract_features(csv_file, model):
     print(model.model)
     
     for wav_file, label in zip(datasets_csv['path'], datasets_csv['labels']):
-        npy_file = DATA_PATH + os.path.splitext(wav_file)[0] + ".npy"
+        if label is None:
+            continue
+        
+        npy_file = os.path.join(DATA_PATH, os.path.splitext(wav_file)[0] + ".npy")
+        
         if not os.path.exists(npy_file):
-            npy_feature = model.generate(DATA_PATH + wav_file, granularity="utterance")
+            npy_feature = model.generate(os.path.join(DATA_PATH, wav_file), granularity="utterance")
             np.save(npy_file, npy_feature)
         
         datasets_list.append((npy_file, label))
 
-        if os.path.exists(wav_file):
-            os.remove(wav_file)
+        if os.path.exists(os.path.join(DATA_PATH, wav_file)):
+            os.remove(os.path.join(DATA_PATH, wav_file))
         
     return datasets_list
 

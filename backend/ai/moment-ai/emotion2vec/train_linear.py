@@ -7,7 +7,7 @@ import wandb
 from funasr import AutoModel
 from pydub import AudioSegment
 
-from train_utils import extract_features, train_one_epoch, validate_and_test, load_dataloader, NpyDataset
+from train_utils import test_extractor, extract_features, train_one_epoch, validate_and_test, load_dataloader, NpyDataset
 from sklearn.model_selection import train_test_split
 from iemocap_downstream.model import BaseModel
 
@@ -98,5 +98,6 @@ def fine_tuning(label_dict, datasets_csv):
 if __name__ == "__main__":
     label_dict={'ang': 0, 'hap': 1, 'neu': 2, 'sad': 3, 'disgust':4}
     datasets_csv = "./datas/SER_DATASETS.csv"
+    
     fine_tuning(label_dict, datasets_csv=datasets_csv)
     
