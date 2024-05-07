@@ -327,12 +327,9 @@ struct ReceiptCompleteView : View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 19, height: 19)
+
                                 
-//                                TextFieldDynamicWidth(title: "여행의 시작은 여기부터", text: $inputText, onEditingChanged: { isEditing in
-//                                    
-//                                }, onCommit: {
-//                                    
-//                                })
+                                
                                 Text(sharedViewModel.inputText)
                                 .font(.pretendardMedium14)
                                 .foregroundColor(.homeRed)
@@ -346,7 +343,8 @@ struct ReceiptCompleteView : View {
                             
                             
                             HStack{
-                                TextField("출발지",text:$StartLocation,prompt: Text("출발지").foregroundColor(.Natural200))
+                                Text(sharedViewModel.StartLocatio)
+                                    
                                     .font(.pretendardExtrabold45)
                                     .foregroundColor(.homeRed)  // 글씨
                                     .multilineTextAlignment(.center)
@@ -365,11 +363,7 @@ struct ReceiptCompleteView : View {
                                     .scaledToFit()
                                     .frame(width: 19, height: 19)
                                 
-                                TextFieldDynamicWidth(title: "기억속에 오래 저장할", text: $EndLocationend, onEditingChanged: { isEditing in
-                                    
-                                }, onCommit: {
-                                    
-                                })
+                                Text(sharedViewModel.EndLocationend)
                                 .font(.pretendardMedium14)
                                 .foregroundColor(.homeRed)
                             }
@@ -378,7 +372,8 @@ struct ReceiptCompleteView : View {
                             
                             HStack{
                                 
-                                TextField("출발지",text:$EndLocation,prompt: Text("도착지").foregroundColor(.Natural200))
+                                Text(sharedViewModel.EndLocation)
+                               
                                     .font(.pretendardExtrabold45)
                                     .foregroundColor(.homeRed)  // 글씨
                                     .multilineTextAlignment(.center)
