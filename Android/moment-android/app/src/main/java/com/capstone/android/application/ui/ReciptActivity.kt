@@ -110,6 +110,8 @@ enum class ReciptScreen(){
 
 class ReciptActivity : ComponentActivity() {
     lateinit var navController: NavHostController
+    private val receiptViewModel : ReceiptViewModel by viewModels()
+    private val tripViewModel : TripViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,6 +119,25 @@ class ReciptActivity : ComponentActivity() {
             navController = rememberNavController()
 
             val movenav = intent.getStringExtra("MoveScreen")
+
+
+            //여행 부르기
+            tripViewModel.getTripAll()
+            val tripList = remember { mutableStateListOf<ReceiptTrip>()}
+            tripViewModel.getTripAllSuccess.observe(this@ReciptActivity){ response->
+                response.data.trips.mapNotNull { trip -> runCatching {
+                    ReceiptTrip(id=trip.id,tripName = trip.tripName, startDate = trip.startDate, endDate = trip.endDate, analyzingCount = trip.analyzingCount) }
+                    .onSuccess { tripList.clear() }
+                    .onFailure {}.getOrNull()
+                }.forEach {
+                    tripList.add(it)
+                }
+            }
+            tripViewModel.getTripAllFailure.observe(this@ReciptActivity){ response->
+                Log.d("tripListtripList", "fail")
+            }
+
+
 
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
@@ -177,10 +198,9 @@ class ReciptActivity : ComponentActivity() {
     )
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun MakeTripChoice(){
-
-        val scrollState = rememberScrollState()
+    fun MakeTripChoice(tripList:MutableList<ReceiptTrip>) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -201,33 +221,49 @@ class ReciptActivity : ComponentActivity() {
                 ) {
                     ImgBackButton(onClick = {startActivity(Intent(this@ReciptActivity, MainActivity::class.java).putExtra("MoveScreen","Receipt"))}, "여행 선택하기")
                 }
-                Column(
+                LazyColumn(
                     modifier = Modifier
                         .padding(top = 12.dp)
                         .padding(horizontal = 0.dp)
                         .wrapContentSize()
-                        .verticalScroll(scrollState)
                 ) {
-                    for (i in 0..10){
-                        ItemTrip()
-                        Column(Modifier.padding(start = 16.dp, end = 9.dp)) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Divider(color = neutral_300)
-                            Spacer(modifier = Modifier.height(4.dp))
+
+                    items(
+                        count = tripList.size,
+                        itemContent = {index->
+
+                            if(tripList[index].analyzingCount==0 && isDatePassed(LocalDate.parse(tripList[index].endDate))){
+                                ItemTrip(
+                                    Trip(id=tripList[index].id,
+                                        tripName = tripList[index].tripName,
+                                        startDate=tripList[index].startDate,
+                                        endDate = tripList[index].endDate),
+                                    index = index)
+                                Column(Modifier.padding(start = 16.dp, end = 9.dp)) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Divider(color = neutral_300)
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                }
+                            }
                         }
-                    }
+                    )
                 }
             }
         }
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun ItemTrip(){
+    fun ItemTrip(trip: Trip, index : Int) {
         Column(
             modifier = Modifier
                 .background(color = tertiary_500)
-                .clickable { navController.navigate(ReciptScreen.MakeTrip.name) },
+                .clickable {
+                    navController.currentBackStackEntry?.savedStateHandle?.set(
+                        key = "ItemData",
+                        value = index
+                    )
+                    navController.navigate(ReciptScreen.MakeTrip.name)
+                },
         ) {
             Box(
                 modifier = Modifier
@@ -243,9 +279,9 @@ class ReciptActivity : ComponentActivity() {
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     Column {
-                        P_Medium11("2024.03.05", black)
+                        P_Medium11(trip.startDate, black)
                         Spacer(modifier = Modifier.height(6.dp))
-                        P_Medium11("2024.03.05", black)
+                        P_Medium11(trip.endDate, black)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Divider(
@@ -256,7 +292,7 @@ class ReciptActivity : ComponentActivity() {
                         thickness = 2.dp
                     )
                     Spacer(modifier = Modifier.weight(1f))
-                    P_ExtraBold14("전라도의 선유도", black)
+                    P_ExtraBold14(trip.tripName, black)
                     Spacer(modifier = Modifier.width(8.dp))
                     Divider(
                         modifier = Modifier
