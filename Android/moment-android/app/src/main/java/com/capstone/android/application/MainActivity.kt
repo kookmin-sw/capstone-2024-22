@@ -1175,7 +1175,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
     @Composable
     fun RowOfGrid(
-        rowList: List<Int>,
+        rowList: List<ReceiptAll>,
         columnWidth: Dp,
         EditCheckState: MutableState<Boolean>,
         ReceiptCheckState: MutableState<Boolean>
@@ -1203,8 +1203,9 @@ class MainActivity : ComponentActivity() {
                         } else checkState.value = !checkState.value
                     }) {
 
-                    //MiniTheme1()
-                    MiniTheme2()
+                    if(item.receiptThemeType == "A") MiniTheme1(item)
+                    else MiniTheme2(item)
+
 
                     if (EditCheckState.value){
                         Column(
@@ -1236,7 +1237,7 @@ class MainActivity : ComponentActivity() {
                                     verticalArrangement = Arrangement.Center) {
                                     Image(
                                         painter = painterResource(R.drawable.ic_receipt_check_red),
-                                        contentDescription = "장소",
+                                        contentDescription = "체크버튼",
                                         Modifier.size(16.dp)
                                     )
                                 }
@@ -2055,35 +2056,35 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun MiniTheme1(){
+    fun MiniTheme1(receiptAll:ReceiptAll){
         val emotionList = mutableStateListOf<Emotion>()
 
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = 60
+                persent = receiptAll.neutral.toInt()
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
-                persent = 20
+                persent = receiptAll.happy.toInt()
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = 15
+                persent = receiptAll.angry.toInt()
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_sad,
                 text = "슬퍼요 ",
-                persent = 5
+                persent = receiptAll.sad.toInt()
             )
         )
         emotionList.sortedByDescending { it.persent }
@@ -2115,7 +2116,7 @@ class MainActivity : ComponentActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    P_Medium("암스테르담 성당 여행", white , 5.sp)
+                    P_Medium(receiptAll.tripName, white , 5.sp)
 
                     Image(
                         modifier = Modifier
@@ -2132,7 +2133,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    P_Medium("여행의 기록을 한 줄로 기록하세요:)",neutral_500, 5.sp)
+                    P_Medium(receiptAll.oneLineMemo,neutral_500, 5.sp)
 
                 }
             }
@@ -2150,7 +2151,7 @@ class MainActivity : ComponentActivity() {
                     Modifier.size(5.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium("북촌한옥마을",primary_500, 4.5.sp)
+                P_Medium(receiptAll.subDeparture,primary_500, 4.5.sp)
             }
 
             Column(
@@ -2160,7 +2161,7 @@ class MainActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                P_ExtraBold("서울", primary_500, 18.sp)
+                P_ExtraBold(receiptAll.mainDeparture, primary_500, 18.sp)
             }
 
             Column(
@@ -2190,7 +2191,7 @@ class MainActivity : ComponentActivity() {
                     Modifier.size(5.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium("암스테르담 공항",primary_500, 4.5.sp)
+                P_Medium(receiptAll.subDestination,primary_500, 4.5.sp)
             }
 
             Column(
@@ -2200,7 +2201,7 @@ class MainActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                P_ExtraBold("암스테르담", primary_500, 18.sp)
+                P_ExtraBold(receiptAll.mainDestination, primary_500, 18.sp)
             }
 
             Row(
@@ -2230,12 +2231,12 @@ class MainActivity : ComponentActivity() {
                 ) {
                     P_Medium(content = "여행 카드", color = neutral_500, 4.sp)
                     Spacer(modifier = Modifier.height(2.dp))
-                    YJ_Bold(content = "27", color = primary_500, 5.sp)
+                    YJ_Bold(content = receiptAll.numOfCard.toString(), color = primary_500, 5.sp)
                     Spacer(modifier = Modifier.height(10.dp))
                     P_Medium(content = "여행 날짜", color = neutral_500, 4.sp)
                     Spacer(modifier = Modifier.height(2.dp))
-                    P_Medium(content = "2024.02.15", color = primary_500, 4.sp)
-                    P_Medium(content = "2024.02.15", color = primary_500, 4.sp)
+                    P_Medium(content = receiptAll.stDate, color = primary_500, 4.sp)
+                    P_Medium(content = receiptAll.edDate, color = primary_500, 4.sp)
                 }
                 Spacer(modifier = Modifier.width(15.dp))
                 Column() {
@@ -2303,7 +2304,7 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun MiniTheme2(){
+    fun MiniTheme2(receiptAll:ReceiptAll){
 
         val emotionList = mutableStateListOf<Emotion>()
 
@@ -2311,28 +2312,28 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = 60
+                persent = receiptAll.neutral.toInt()
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
-                persent = 20
+                persent = receiptAll.happy.toInt()
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = 15
+                persent = receiptAll.angry.toInt()
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_sad,
                 text = "슬퍼요 ",
-                persent = 5
+                persent = receiptAll.sad.toInt()
             )
         )
         emotionList.sortedByDescending { it.persent }
@@ -2370,7 +2371,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 Column( modifier = Modifier
                     .padding(start = 4.dp)) {
-                    P_Medium(content = "여행의 기록을 한 줄로 기록하세요:)", color = neutral_500, 5.sp)
+                    P_Medium(content = receiptAll.oneLineMemo, color = neutral_500, 5.sp)
                 }
                 Spacer(modifier = Modifier.height(2.dp))
                 Divider(color = primary_500, thickness = 1.dp)
@@ -2394,7 +2395,7 @@ class MainActivity : ComponentActivity() {
                             Modifier.size(5.dp)
                         )
                         Spacer(modifier = Modifier.width(1.dp))
-                        P_Medium(content = "북촌 한옥마을", color =neutral_600, 4.5.sp)
+                        P_Medium(content = receiptAll.subDeparture, color =neutral_600, 4.5.sp)
                     }
                     Spacer(modifier = Modifier.height(1.dp))
                     Column(
@@ -2403,7 +2404,7 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        P_ExtraBold(content = "서울", color = black, size = 18.sp)
+                        P_ExtraBold(content = receiptAll.mainDeparture, color = black, size = 18.sp)
                     }
                     Spacer(modifier = Modifier.height(1.dp))
                     Column(
@@ -2433,7 +2434,7 @@ class MainActivity : ComponentActivity() {
                             Modifier.size(5.dp)
                         )
                         Spacer(modifier = Modifier.width(1.dp))
-                        P_Medium(content = "암스테르담 공항", color = neutral_600, 4.5.sp)
+                        P_Medium(content = receiptAll.subDestination, color = neutral_600, 4.5.sp)
                     }
 
                     Column(
@@ -2442,7 +2443,7 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        P_ExtraBold(content = "군산", color = black, size = 18.sp)
+                        P_ExtraBold(content = receiptAll.mainDestination, color = black, size = 18.sp)
                     }
                     Spacer(modifier = Modifier.height(27.dp))
                     Column(
@@ -2450,11 +2451,13 @@ class MainActivity : ComponentActivity() {
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        P_Medium(content = "전라도의 선유도", color = black, 5.sp)
+                        P_Medium(content = receiptAll.tripName, color = black, 5.sp)
                         Spacer(modifier = Modifier.height(4.dp))
 
                         Row(
-                            Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Column(
@@ -2528,7 +2531,7 @@ class MainActivity : ComponentActivity() {
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.Center
                                 ) {
-                                    YJ_Bold(content = "27", color = primary_500, 8.sp)
+                                    YJ_Bold(content = receiptAll.numOfCard.toString(), color = primary_500, 8.sp)
                                 }
                             }
                         }
@@ -2541,9 +2544,9 @@ class MainActivity : ComponentActivity() {
                     .padding(bottom = 2.dp, end = 7.dp)
                     .align(Alignment.BottomEnd)
             ) {
-                P_Medium(content = "2024 . 02 . 15", color = neutral_500, 4.sp)
+                P_Medium(content = receiptAll.stDate, color = neutral_500, 4.sp)
                 P_Medium(content = " / ", color = neutral_500, 4.sp)
-                P_Medium(content = "2024 . 02 . 15", color = neutral_500, 4.sp)
+                P_Medium(content = receiptAll.edDate, color = neutral_500, 4.sp)
             }
 
             Row() {
