@@ -185,6 +185,7 @@ class ReciptActivity : ComponentActivity() {
     }
 
     data class ReceiptContent(
+        val tripName: String,
         val intro: MutableState<String>,
         val depart_small: MutableState<String>,
         val depart: MutableState<String>,
@@ -197,6 +198,19 @@ class ReciptActivity : ComponentActivity() {
         val emotionList: SnapshotStateList<Emotion>
     )
 
+    data class ReceiptContent_string(
+        val tripName: String?,
+        val intro: String?,
+        val depart_small: String?,
+        val depart: String?,
+        val arrive_small: String?,
+        val arrive: String?,
+        val cardnum: Int?,
+        val publicationdate: String?,
+        val startdate: String?,
+        val enddate: String?,
+        val emotionList: SnapshotStateList<Emotion>
+    )
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
