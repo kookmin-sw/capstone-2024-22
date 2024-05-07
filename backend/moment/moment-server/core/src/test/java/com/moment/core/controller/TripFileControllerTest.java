@@ -62,6 +62,7 @@ class TripFileControllerTest {
                         .email("test")
                         .yearDate(LocalDate.now())
                         .analyzingCount(1)
+                        .totalCount(1)
                         .build(),
                 TripFileResponseDTO.GetTripFile.builder()
                         .id(2L)
@@ -69,6 +70,7 @@ class TripFileControllerTest {
                         .email("test")
                         .yearDate(LocalDate.now().plusDays(1))
                         .analyzingCount(2)
+                        .totalCount(1)
                         .build(),
                 TripFileResponseDTO.GetTripFile.builder()
                         .id(3L)
@@ -76,6 +78,7 @@ class TripFileControllerTest {
                         .email("test")
                         .yearDate(LocalDate.now().plusDays(2))
                         .analyzingCount(1)
+                        .totalCount(1)
                         .build()
         );
         TripFileResponseDTO.GetAllTripFile allTripFile = TripFileResponseDTO.GetAllTripFile.builder()
@@ -108,7 +111,8 @@ class TripFileControllerTest {
                                 fieldWithPath("data.tripFiles[].tripId").type(JsonFieldType.NUMBER).description("여행 ID"),
                                 fieldWithPath("data.tripFiles[].email").type(JsonFieldType.STRING).description("유저 email"),
                                 fieldWithPath("data.tripFiles[].yearDate").type(JsonFieldType.STRING).attributes(getDateFormat()).description("연월일"),
-                                fieldWithPath("data.tripFiles[].analyzingCount").type(JsonFieldType.NUMBER).description("분석 중 파일 개수")
+                                fieldWithPath("data.tripFiles[].analyzingCount").type(JsonFieldType.NUMBER).description("분석 중 파일 개수"),
+                                fieldWithPath("data.tripFiles[].totalCount").type(JsonFieldType.NUMBER).description("전체 파일 개수")
                                 )
                         )
                 )
@@ -124,6 +128,7 @@ class TripFileControllerTest {
                         .email("test")
                         .yearDate(LocalDate.now())
                         .analyzingCount(1)
+                        .totalCount(1)
                         .build(),
                 TripFileResponseDTO.GetTripFile.builder()
                         .id(2L)
@@ -131,6 +136,7 @@ class TripFileControllerTest {
                         .email("test")
                         .yearDate(LocalDate.now().plusDays(1))
                         .analyzingCount(2)
+                        .totalCount(1)
                         .build(),
                 TripFileResponseDTO.GetTripFile.builder()
                         .id(3L)
@@ -138,6 +144,7 @@ class TripFileControllerTest {
                         .email("test")
                         .yearDate(LocalDate.now().plusDays(2))
                         .analyzingCount(1)
+                        .totalCount(1)
                         .build()
         );
         TripFileResponseDTO.GetAllTripFile allTripFile = TripFileResponseDTO.GetAllTripFile.builder()
@@ -166,7 +173,8 @@ class TripFileControllerTest {
                                 fieldWithPath("data.tripFiles[].tripId").type(JsonFieldType.NUMBER).description("여행 ID"),
                                 fieldWithPath("data.tripFiles[].email").type(JsonFieldType.STRING).description("유저 email"),
                                 fieldWithPath("data.tripFiles[].yearDate").type(JsonFieldType.STRING).attributes(getDateFormat()).description("연월일"),
-                                fieldWithPath("data.tripFiles[].analyzingCount").type(JsonFieldType.NUMBER).description("분석 중 파일 개수")
+                                fieldWithPath("data.tripFiles[].analyzingCount").type(JsonFieldType.NUMBER).description("분석 중 파일 개수"),
+                                fieldWithPath("data.tripFiles[].totalCount").type(JsonFieldType.NUMBER).description("전체 파일 개수")
                                 )
                         )
                 )
