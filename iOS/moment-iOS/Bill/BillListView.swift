@@ -1129,12 +1129,13 @@ struct ReceiptView: View {
     @State var currentPage = 0 // 현재 페이지를 나타내는 상태 변수
     var topColor: Color = .homeRed
     var textColor: Color = .white // 상단 바에 사용할 텍스트 색상
-    // @EnvironmentObject var sharedViewModel: SharedViewModel
+     @EnvironmentObject var sharedViewModel: SharedViewModel
     @State private var tripRecord : String = ""
     @State private var tripExplaneStart : String = ""
     @State private var tripnameStart : String = ""
     @State private var tripnameEnd: String = ""
     @State private var tripExplaneEnd : String = ""
+    
     var body: some View {
         
         VStack(spacing: 0) {
@@ -1142,7 +1143,7 @@ struct ReceiptView: View {
             HStack{
                 
                 Spacer().frame(width: 40)
-                TextField("출발지",text:$tripRecord,prompt: Text("여행의 기록을 한줄로 기록하세요 :)").foregroundColor(.gray500))
+                TextField("출발지",text:$sharedViewModel.tripRecord,prompt: Text("여행의 기록을 한줄로 기록하세요 :)").foregroundColor(.gray500))
                     .font(.pretendardMedium14)
                     .foregroundColor(.gray500)  // 글씨
                 
@@ -1161,7 +1162,7 @@ struct ReceiptView: View {
                         .scaledToFit()
                         .frame(width: 19, height: 19)
                     
-                    TextFieldDynamicWidth(title: "여행의 시작은 여기부터", text: $tripExplaneStart, onEditingChanged: { isEditing in
+                    TextFieldDynamicWidth(title: "여행의 시작은 여기부터", text: $sharedViewModel.tripExplaneStart, onEditingChanged: { isEditing in
                         
                     }, onCommit: {
                         
@@ -1173,7 +1174,7 @@ struct ReceiptView: View {
                 
                 
                 HStack{
-                    TextField("출발지",text:$tripnameStart,prompt: Text("출발지").foregroundColor(.Natural200))
+                    TextField("출발지",text:$sharedViewModel.tripnameStart,prompt: Text("출발지").foregroundColor(.Natural200))
                         .font(.pretendardExtrabold45)
                         .foregroundColor(.black)  // 글씨
                         .multilineTextAlignment(.center)
@@ -1199,7 +1200,7 @@ struct ReceiptView: View {
                         .scaledToFit()
                         .frame(width: 19, height: 19)
                     
-                    TextFieldDynamicWidth(title: "기억속에 오래 저장할", text: $tripExplaneEnd, onEditingChanged: { isEditing in
+                    TextFieldDynamicWidth(title: "기억속에 오래 저장할", text: $sharedViewModel.tripExplaneEnd, onEditingChanged: { isEditing in
                         
                     }, onCommit: {
                         
@@ -1212,7 +1213,7 @@ struct ReceiptView: View {
                 
                 HStack{
                     
-                    TextField("도착지",text:$tripnameEnd,prompt: Text("도착지").foregroundColor(.Natural200))
+                    TextField("도착지",text:$sharedViewModel.tripnameEnd,prompt: Text("도착지").foregroundColor(.Natural200))
                         .font(.pretendardExtrabold45)
                         .foregroundColor(.black)  // 글씨
                         .multilineTextAlignment(.center)
@@ -1312,6 +1313,8 @@ struct ReceiptView: View {
     }
     
 }
+
+
 struct SentimentTrackerView: View {
     //@EnvironmentObject var sharedViewModel: SharedViewModel
     var body: some View {
