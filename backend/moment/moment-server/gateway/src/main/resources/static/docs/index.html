@@ -577,39 +577,66 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_여행_등록">여행 등록</a>
 <ul class="sectlevel3">
+<li><a href="#_여행_등록_curl_request">Curl request</a></li>
 <li><a href="#_여행_등록_http_request">HTTP request</a></li>
-<li><a href="#_여행_등록_request_headers">Request headers</a></li>
+<li><a href="#_여행_등록_http_response">HTTP response</a></li>
+<li><a href="#_여행_등록_httpie_request">HTTPie request</a></li>
 <li><a href="#_여행_등록_request_body">Request body</a></li>
 <li><a href="#_여행_등록_request_fields">Request fields</a></li>
-<li><a href="#_여행_등록_http_response">HTTP response</a></li>
+<li><a href="#_여행_등록_request_headers">Request headers</a></li>
+<li><a href="#_여행_등록_response_body">Response body</a></li>
 <li><a href="#_여행_등록_response_fields">Response fields</a></li>
 </ul>
 </li>
 <li><a href="#_여행_목록_조회">여행 목록 조회</a>
 <ul class="sectlevel3">
+<li><a href="#_여행_목록_조회_curl_request">Curl request</a></li>
 <li><a href="#_여행_목록_조회_http_request">HTTP request</a></li>
-<li><a href="#_여행_목록_조회_request_headers">Request headers</a></li>
 <li><a href="#_여행_목록_조회_http_response">HTTP response</a></li>
+<li><a href="#_여행_목록_조회_httpie_request">HTTPie request</a></li>
+<li><a href="#_여행_목록_조회_request_body">Request body</a></li>
+<li><a href="#_여행_목록_조회_request_headers">Request headers</a></li>
+<li><a href="#_여행_목록_조회_response_body">Response body</a></li>
 <li><a href="#_여행_목록_조회_response_fields">Response fields</a></li>
 </ul>
 </li>
 <li><a href="#_여행_수정">여행 수정</a>
 <ul class="sectlevel3">
+<li><a href="#_여행_수정_curl_request">Curl request</a></li>
 <li><a href="#_여행_수정_http_request">HTTP request</a></li>
-<li><a href="#_여행_수정_request_headers">Request headers</a></li>
+<li><a href="#_여행_수정_http_response">HTTP response</a></li>
+<li><a href="#_여행_수정_httpie_request">HTTPie request</a></li>
 <li><a href="#_여행_수정_request_body">Request body</a></li>
 <li><a href="#_여행_수정_request_fields">Request fields</a></li>
-<li><a href="#_여행_수정_http_response">HTTP response</a></li>
+<li><a href="#_여행_수정_request_headers">Request headers</a></li>
+<li><a href="#_여행_수정_response_body">Response body</a></li>
 <li><a href="#_여행_수정_response_fields">Response fields</a></li>
 </ul>
 </li>
 <li><a href="#_여행_삭제">여행 삭제</a>
 <ul class="sectlevel3">
+<li><a href="#_여행_삭제_curl_request">Curl request</a></li>
 <li><a href="#_여행_삭제_http_request">HTTP request</a></li>
-<li><a href="#_여행_삭제_request_headers">Request headers</a></li>
-<li><a href="#_여행_삭제_path_parameters">Path parameters</a></li>
 <li><a href="#_여행_삭제_http_response">HTTP response</a></li>
+<li><a href="#_여행_삭제_httpie_request">HTTPie request</a></li>
+<li><a href="#_여행_삭제_path_parameters">Path parameters</a></li>
+<li><a href="#_여행_삭제_request_body">Request body</a></li>
+<li><a href="#_여행_삭제_request_headers">Request headers</a></li>
+<li><a href="#_여행_삭제_response_body">Response body</a></li>
 <li><a href="#_여행_삭제_response_fields">Response fields</a></li>
+</ul>
+</li>
+<li><a href="#_여행_상세_조회">여행 상세 조회</a>
+<ul class="sectlevel3">
+<li><a href="#_여행_상세_조회_curl_request">Curl request</a></li>
+<li><a href="#_여행_상세_조회_http_request">HTTP request</a></li>
+<li><a href="#_여행_상세_조회_http_response">HTTP response</a></li>
+<li><a href="#_여행_상세_조회_httpie_request">HTTPie request</a></li>
+<li><a href="#_여행_상세_조회_path_parameters">Path parameters</a></li>
+<li><a href="#_여행_상세_조회_request_body">Request body</a></li>
+<li><a href="#_여행_상세_조회_request_headers">Request headers</a></li>
+<li><a href="#_여행_상세_조회_response_body">Response body</a></li>
+<li><a href="#_여행_상세_조회_response_fields">Response fields</a></li>
 </ul>
 </li>
 </ul>
@@ -757,7 +784,7 @@ Content-Length: 211
   "detailMsg" : "",
   "data" : {
     "cardViews" : [ {
-      "bookedDate" : "2024-05-02"
+      "bookedDate" : "2024-05-07"
     }, {
       "bookedDate" : "2023-10-10"
     } ]
@@ -2803,6 +2830,22 @@ Content-Length: 229
 <div class="sect2">
 <h3 id="_여행_등록"><a class="link" href="#_여행_등록">여행 등록</a></h3>
 <div class="sect3">
+<h4 id="_여행_등록_curl_request"><a class="link" href="#_여행_등록_curl_request">Curl request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/core/trip/register' -i -X POST \
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    -H 'userId: 1' \
+    -H 'Accept: application/json' \
+    -d '{
+  "startDate" : "2024-05-07",
+  "endDate" : "2024-05-08",
+  "tripName" : "test"
+}'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_여행_등록_http_request"><a class="link" href="#_여행_등록_http_request">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
@@ -2814,41 +2857,53 @@ Content-Length: 83
 Host: localhost:8080
 
 {
-  "startDate" : "2024-05-02",
-  "endDate" : "2024-05-03",
+  "startDate" : "2024-05-07",
+  "endDate" : "2024-05-08",
   "tripName" : "test"
 }</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_여행_등록_request_headers"><a class="link" href="#_여행_등록_request_headers">Request headers</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Name</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>userId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer Token</p></td>
-</tr>
-</tbody>
-</table>
+<h4 id="_여행_등록_http_response"><a class="link" href="#_여행_등록_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 102
+
+{
+  "status" : 201,
+  "code" : "201",
+  "msg" : "INSERT SUCCESS",
+  "detailMsg" : "",
+  "data" : { }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_등록_httpie_request"><a class="link" href="#_여행_등록_httpie_request">HTTPie request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ echo '{
+  "startDate" : "2024-05-07",
+  "endDate" : "2024-05-08",
+  "tripName" : "test"
+}' | http POST 'http://localhost:8080/core/trip/register' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'userId:1' \
+    'Accept:application/json'</code></pre>
+</div>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_여행_등록_request_body"><a class="link" href="#_여행_등록_request_body">Request body</a></h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{
-  "startDate" : "2024-05-02",
-  "endDate" : "2024-05-03",
+  "startDate" : "2024-05-07",
+  "endDate" : "2024-05-08",
   "tripName" : "test"
 }</code></pre>
 </div>
@@ -2899,14 +2954,31 @@ Host: localhost:8080
 </table>
 </div>
 <div class="sect3">
-<h4 id="_여행_등록_http_response"><a class="link" href="#_여행_등록_http_response">HTTP response</a></h4>
+<h4 id="_여행_등록_request_headers"><a class="link" href="#_여행_등록_request_headers">Request headers</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>userId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer Token</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_여행_등록_response_body"><a class="link" href="#_여행_등록_response_body">Response body</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Content-Type: application/json
-Content-Length: 102
-
-{
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{
   "status" : 201,
   "code" : "201",
   "msg" : "INSERT SUCCESS",
@@ -2964,6 +3036,17 @@ Content-Length: 102
 <div class="sect2">
 <h3 id="_여행_목록_조회"><a class="link" href="#_여행_목록_조회">여행 목록 조회</a></h3>
 <div class="sect3">
+<h4 id="_여행_목록_조회_curl_request"><a class="link" href="#_여행_목록_조회_curl_request">Curl request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/core/trip/all' -i -X GET \
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    -H 'userId: 1' \
+    -H 'Accept: application/json'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_여행_목록_조회_http_request"><a class="link" href="#_여행_목록_조회_http_request">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
@@ -2972,6 +3055,66 @@ Content-Type: application/json;charset=UTF-8
 userId: 1
 Accept: application/json
 Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_목록_조회_http_response"><a class="link" href="#_여행_목록_조회_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 628
+
+{
+  "status" : 200,
+  "code" : "200",
+  "msg" : "SELECT SUCCESS",
+  "detailMsg" : "",
+  "data" : {
+    "trips" : [ {
+      "id" : 1,
+      "email" : "test",
+      "startDate" : "2024-05-07",
+      "endDate" : "2024-05-08",
+      "analyzingCount" : 0,
+      "tripName" : "test"
+    }, {
+      "id" : 2,
+      "email" : "test",
+      "startDate" : "2024-05-07",
+      "endDate" : "2024-05-08",
+      "analyzingCount" : 1,
+      "tripName" : "test"
+    }, {
+      "id" : 3,
+      "email" : "test",
+      "startDate" : "2024-05-07",
+      "endDate" : "2024-05-08",
+      "analyzingCount" : 2,
+      "tripName" : "test"
+    } ]
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_목록_조회_httpie_request"><a class="link" href="#_여행_목록_조회_httpie_request">HTTPie request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ http GET 'http://localhost:8080/core/trip/all' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'userId:1' \
+    'Accept:application/json'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_목록_조회_request_body"><a class="link" href="#_여행_목록_조회_request_body">Request body</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json"></code></pre>
 </div>
 </div>
 </div>
@@ -2997,14 +3140,10 @@ Host: localhost:8080</code></pre>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_여행_목록_조회_http_response"><a class="link" href="#_여행_목록_조회_http_response">HTTP response</a></h4>
+<h4 id="_여행_목록_조회_response_body"><a class="link" href="#_여행_목록_조회_response_body">Response body</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Content-Type: application/json
-Content-Length: 628
-
-{
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{
   "status" : 200,
   "code" : "200",
   "msg" : "SELECT SUCCESS",
@@ -3013,22 +3152,22 @@ Content-Length: 628
     "trips" : [ {
       "id" : 1,
       "email" : "test",
-      "startDate" : "2024-05-02",
-      "endDate" : "2024-05-03",
+      "startDate" : "2024-05-07",
+      "endDate" : "2024-05-08",
       "analyzingCount" : 0,
       "tripName" : "test"
     }, {
       "id" : 2,
       "email" : "test",
-      "startDate" : "2024-05-02",
-      "endDate" : "2024-05-03",
+      "startDate" : "2024-05-07",
+      "endDate" : "2024-05-08",
       "analyzingCount" : 1,
       "tripName" : "test"
     }, {
       "id" : 3,
       "email" : "test",
-      "startDate" : "2024-05-02",
-      "endDate" : "2024-05-03",
+      "startDate" : "2024-05-07",
+      "endDate" : "2024-05-08",
       "analyzingCount" : 2,
       "tripName" : "test"
     } ]
@@ -3110,6 +3249,23 @@ Content-Length: 628
 <div class="sect2">
 <h3 id="_여행_수정"><a class="link" href="#_여행_수정">여행 수정</a></h3>
 <div class="sect3">
+<h4 id="_여행_수정_curl_request"><a class="link" href="#_여행_수정_curl_request">Curl request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/core/trip' -i -X PUT \
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    -H 'userId: 1' \
+    -H 'Accept: application/json' \
+    -d '{
+  "tripId" : 1,
+  "startDate" : "2024-05-07",
+  "endDate" : "2024-05-08",
+  "tripName" : "test"
+}'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_여행_수정_http_request"><a class="link" href="#_여행_수정_http_request">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
@@ -3122,33 +3278,46 @@ Host: localhost:8080
 
 {
   "tripId" : 1,
-  "startDate" : "2024-05-02",
-  "endDate" : "2024-05-03",
+  "startDate" : "2024-05-07",
+  "endDate" : "2024-05-08",
   "tripName" : "test"
 }</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_여행_수정_request_headers"><a class="link" href="#_여행_수정_request_headers">Request headers</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Name</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>userId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer Token</p></td>
-</tr>
-</tbody>
-</table>
+<h4 id="_여행_수정_http_response"><a class="link" href="#_여행_수정_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 102
+
+{
+  "status" : 200,
+  "code" : "200",
+  "msg" : "UPDATE SUCCESS",
+  "detailMsg" : "",
+  "data" : { }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_수정_httpie_request"><a class="link" href="#_여행_수정_httpie_request">HTTPie request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ echo '{
+  "tripId" : 1,
+  "startDate" : "2024-05-07",
+  "endDate" : "2024-05-08",
+  "tripName" : "test"
+}' | http PUT 'http://localhost:8080/core/trip' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'userId:1' \
+    'Accept:application/json'</code></pre>
+</div>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_여행_수정_request_body"><a class="link" href="#_여행_수정_request_body">Request body</a></h4>
@@ -3156,8 +3325,8 @@ Host: localhost:8080
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{
   "tripId" : 1,
-  "startDate" : "2024-05-02",
-  "endDate" : "2024-05-03",
+  "startDate" : "2024-05-07",
+  "endDate" : "2024-05-08",
   "tripName" : "test"
 }</code></pre>
 </div>
@@ -3215,14 +3384,31 @@ Host: localhost:8080
 </table>
 </div>
 <div class="sect3">
-<h4 id="_여행_수정_http_response"><a class="link" href="#_여행_수정_http_response">HTTP response</a></h4>
+<h4 id="_여행_수정_request_headers"><a class="link" href="#_여행_수정_request_headers">Request headers</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>userId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer Token</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_여행_수정_response_body"><a class="link" href="#_여행_수정_response_body">Response body</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Content-Type: application/json
-Content-Length: 102
-
-{
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{
   "status" : 200,
   "code" : "200",
   "msg" : "UPDATE SUCCESS",
@@ -3280,6 +3466,17 @@ Content-Length: 102
 <div class="sect2">
 <h3 id="_여행_삭제"><a class="link" href="#_여행_삭제">여행 삭제</a></h3>
 <div class="sect3">
+<h4 id="_여행_삭제_curl_request"><a class="link" href="#_여행_삭제_curl_request">Curl request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/core/trip/1' -i -X DELETE \
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    -H 'userId: 1' \
+    -H 'Accept: application/json'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="_여행_삭제_http_request"><a class="link" href="#_여행_삭제_http_request">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
@@ -3288,6 +3485,65 @@ Content-Type: application/json;charset=UTF-8
 userId: 1
 Accept: application/json
 Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_삭제_http_response"><a class="link" href="#_여행_삭제_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 102
+
+{
+  "status" : 200,
+  "code" : "200",
+  "msg" : "DELETE SUCCESS",
+  "detailMsg" : "",
+  "data" : { }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_삭제_httpie_request"><a class="link" href="#_여행_삭제_httpie_request">HTTPie request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ http DELETE 'http://localhost:8080/core/trip/1' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'userId:1' \
+    'Accept:application/json'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_삭제_path_parameters"><a class="link" href="#_여행_삭제_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /core/trip/{tripId}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tripId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">삭제할 여행 ID</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_여행_삭제_request_body"><a class="link" href="#_여행_삭제_request_body">Request body</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json"></code></pre>
 </div>
 </div>
 </div>
@@ -3313,36 +3569,10 @@ Host: localhost:8080</code></pre>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_여행_삭제_path_parameters"><a class="link" href="#_여행_삭제_path_parameters">Path parameters</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. /core/trip/{tripId}</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tripId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">삭제할 여행 ID</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_여행_삭제_http_response"><a class="link" href="#_여행_삭제_http_response">HTTP response</a></h4>
+<h4 id="_여행_삭제_response_body"><a class="link" href="#_여행_삭제_response_body">Response body</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Content-Type: application/json
-Content-Length: 102
-
-{
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{
   "status" : 200,
   "code" : "200",
   "msg" : "DELETE SUCCESS",
@@ -3392,6 +3622,251 @@ Content-Length: 102
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">데이터 없음</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_여행_상세_조회"><a class="link" href="#_여행_상세_조회">여행 상세 조회</a></h3>
+<div class="sect3">
+<h4 id="_여행_상세_조회_curl_request"><a class="link" href="#_여행_상세_조회_curl_request">Curl request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ curl 'http://localhost:8080/core/trip/1' -i -X GET \
+    -H 'Content-Type: application/json;charset=UTF-8' \
+    -H 'userId: 1' \
+    -H 'Accept: application/json'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_상세_조회_http_request"><a class="link" href="#_여행_상세_조회_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /core/trip/1 HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+userId: 1
+Accept: application/json
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_상세_조회_http_response"><a class="link" href="#_여행_상세_조회_http_response">HTTP response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 370
+
+{
+  "status" : 200,
+  "code" : "200",
+  "msg" : "SELECT SUCCESS",
+  "detailMsg" : "",
+  "data" : {
+    "id" : 1,
+    "email" : "test",
+    "startDate" : "2024-05-07",
+    "endDate" : "2024-05-08",
+    "analyzingCount" : 0,
+    "tripName" : "test",
+    "numOfCard" : 0,
+    "happy" : 0.0,
+    "sad" : 0.0,
+    "angry" : 0.0,
+    "neutral" : 0.0,
+    "disgust" : 0.0
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_상세_조회_httpie_request"><a class="link" href="#_여행_상세_조회_httpie_request">HTTPie request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">$ http GET 'http://localhost:8080/core/trip/1' \
+    'Content-Type:application/json;charset=UTF-8' \
+    'userId:1' \
+    'Accept:application/json'</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_상세_조회_path_parameters"><a class="link" href="#_여행_상세_조회_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /core/trip/{tripId}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tripId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">조회할 여행 ID</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_여행_상세_조회_request_body"><a class="link" href="#_여행_상세_조회_request_body">Request body</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json"></code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_상세_조회_request_headers"><a class="link" href="#_여행_상세_조회_request_headers">Request headers</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>userId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer Token</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_여행_상세_조회_response_body"><a class="link" href="#_여행_상세_조회_response_body">Response body</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-json hljs" data-lang="json">{
+  "status" : 200,
+  "code" : "200",
+  "msg" : "SELECT SUCCESS",
+  "detailMsg" : "",
+  "data" : {
+    "id" : 1,
+    "email" : "test",
+    "startDate" : "2024-05-07",
+    "endDate" : "2024-05-08",
+    "analyzingCount" : 0,
+    "tripName" : "test",
+    "numOfCard" : 0,
+    "happy" : 0.0,
+    "sad" : 0.0,
+    "angry" : 0.0,
+    "neutral" : 0.0,
+    "disgust" : 0.0
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_여행_상세_조회_response_fields"><a class="link" href="#_여행_상세_조회_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>status</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">응답 상태 코드</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>code</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">응답 코드</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>msg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">응답 메시지</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>detailMsg</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">상세 메시지</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">여행 ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.email</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">유저 email</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.startDate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">출발일</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.endDate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">도착일</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.analyzingCount</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">분석 중 파일 개수</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.tripName</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">여행 이름</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.numOfCard</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">카드뷰 개수</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.happy</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">행복한 감정 비율</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.sad</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">슬픈 감정 비율</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.angry</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">화난 감정 비율</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.neutral</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">중립적인 감정 비율</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.disgust</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">역겨운 감정 비율</p></td>
 </tr>
 </tbody>
 </table>
@@ -4185,7 +4660,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 512
+Content-Length: 584
 
 {
   "status" : 200,
@@ -4197,20 +4672,23 @@ Content-Length: 512
       "id" : 1,
       "tripId" : 1,
       "email" : "test",
-      "yearDate" : "2024-05-02",
-      "analyzingCount" : 1
+      "yearDate" : "2024-05-07",
+      "analyzingCount" : 1,
+      "totalCount" : 1
     }, {
       "id" : 2,
       "tripId" : 2,
       "email" : "test",
-      "yearDate" : "2024-05-03",
-      "analyzingCount" : 2
+      "yearDate" : "2024-05-08",
+      "analyzingCount" : 2,
+      "totalCount" : 1
     }, {
       "id" : 3,
       "tripId" : 3,
       "email" : "test",
-      "yearDate" : "2024-05-04",
-      "analyzingCount" : 1
+      "yearDate" : "2024-05-09",
+      "analyzingCount" : 1,
+      "totalCount" : 1
     } ]
   }
 }</code></pre>
@@ -4292,20 +4770,23 @@ Content-Length: 512
       "id" : 1,
       "tripId" : 1,
       "email" : "test",
-      "yearDate" : "2024-05-02",
-      "analyzingCount" : 1
+      "yearDate" : "2024-05-07",
+      "analyzingCount" : 1,
+      "totalCount" : 1
     }, {
       "id" : 2,
       "tripId" : 2,
       "email" : "test",
-      "yearDate" : "2024-05-03",
-      "analyzingCount" : 2
+      "yearDate" : "2024-05-08",
+      "analyzingCount" : 2,
+      "totalCount" : 1
     }, {
       "id" : 3,
       "tripId" : 3,
       "email" : "test",
-      "yearDate" : "2024-05-04",
-      "analyzingCount" : 1
+      "yearDate" : "2024-05-09",
+      "analyzingCount" : 1,
+      "totalCount" : 1
     } ]
   }
 }</code></pre>
@@ -4373,6 +4854,11 @@ Content-Length: 512
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">분석 중 파일 개수</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.tripFiles[].totalCount</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">전체 파일 개수</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -4406,7 +4892,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 512
+Content-Length: 584
 
 {
   "status" : 200,
@@ -4418,20 +4904,23 @@ Content-Length: 512
       "id" : 1,
       "tripId" : 1,
       "email" : "test",
-      "yearDate" : "2024-05-02",
-      "analyzingCount" : 1
+      "yearDate" : "2024-05-07",
+      "analyzingCount" : 1,
+      "totalCount" : 1
     }, {
       "id" : 2,
       "tripId" : 2,
       "email" : "test",
-      "yearDate" : "2024-05-03",
-      "analyzingCount" : 2
+      "yearDate" : "2024-05-08",
+      "analyzingCount" : 2,
+      "totalCount" : 1
     }, {
       "id" : 3,
       "tripId" : 3,
       "email" : "test",
-      "yearDate" : "2024-05-04",
-      "analyzingCount" : 1
+      "yearDate" : "2024-05-09",
+      "analyzingCount" : 1,
+      "totalCount" : 1
     } ]
   }
 }</code></pre>
@@ -4491,20 +4980,23 @@ Content-Length: 512
       "id" : 1,
       "tripId" : 1,
       "email" : "test",
-      "yearDate" : "2024-05-02",
-      "analyzingCount" : 1
+      "yearDate" : "2024-05-07",
+      "analyzingCount" : 1,
+      "totalCount" : 1
     }, {
       "id" : 2,
       "tripId" : 2,
       "email" : "test",
-      "yearDate" : "2024-05-03",
-      "analyzingCount" : 2
+      "yearDate" : "2024-05-08",
+      "analyzingCount" : 2,
+      "totalCount" : 1
     }, {
       "id" : 3,
       "tripId" : 3,
       "email" : "test",
-      "yearDate" : "2024-05-04",
-      "analyzingCount" : 1
+      "yearDate" : "2024-05-09",
+      "analyzingCount" : 1,
+      "totalCount" : 1
     } ]
   }
 }</code></pre>
@@ -4571,6 +5063,11 @@ Content-Length: 512
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.tripFiles[].analyzingCount</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">분석 중 파일 개수</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.tripFiles[].totalCount</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">전체 파일 개수</p></td>
 </tr>
 </tbody>
 </table>
