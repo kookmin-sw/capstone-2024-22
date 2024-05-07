@@ -157,7 +157,7 @@ struct AccordionLikeView: View {
         VStack {
             Spacer().frame(height: 40)
             locationAndTimeInfo
-            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItem.stt)")
+            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItem.stt)", cardItem: cardItem)
             DynamicGradientImagePicker(cardViewModel: cardViewModel)
             Spacer().frame(height: 30)
             EmotionView(cardViewModel: cardViewModel)
