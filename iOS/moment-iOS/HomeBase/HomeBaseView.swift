@@ -22,7 +22,7 @@ struct HomeBaseView: View {
     @EnvironmentObject private var pathModel: PathModel
     var edges = UIApplication.shared.windows.first?.safeAreaInsets
     @StateObject private var homeBaseViewModel = HomeBaseViewModel()
-    @StateObject var sharedViewModel: SharedViewModel
+   // @ObservedObject var sharedViewModel: SharedViewModel
     @Namespace var animation // 탭 전환 애니메이션을 위한 네임스페이스
     @State private var showPartialSheet = false // 커스텀 시트 표시 여부
     @ObservedObject  var audioRecorderManager: AudioRecorderManager
@@ -47,17 +47,17 @@ struct HomeBaseView: View {
                     switch homeBaseViewModel.selectedTab {
                     case .Home:
                         HomeView(showingCustomAlert: $showingCustomAlertInHome, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
-                            .environmentObject(sharedViewModel)
+                           // .environmentObject(sharedViewModel)
                     case .Bill:
                         BillListView()
                             .environmentObject(homeViewModel)
-                            .environmentObject(sharedViewModel)
+                          //  .environmentObject(sharedViewModel)
                     case .voiceRecorder:
                         VoiceRecorderView()
-                            .environmentObject(sharedViewModel)
+                          //  .environmentObject(sharedViewModel)
                     case .Like:
                         LikeView(day: Date(), item: Item(id: 1, tripName: "선유도", startdate: "0305", enddate: "0315"), audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
-                            .environmentObject(sharedViewModel)
+                           // .environmentObject(sharedViewModel)
 
                     case .setting:
                         SettingView(showDialog : $showingCustomAlertInSetting, showDialogGoodbye: $showDialogGoodbyeAlert)

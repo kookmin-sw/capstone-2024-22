@@ -9,4 +9,6 @@ import Foundation
 
 class SharedViewModel: ObservableObject {
     @Published var isSaved: Bool = false
+    @Published var text : String =  ""
+    @Published var inputText : String = ""
 }

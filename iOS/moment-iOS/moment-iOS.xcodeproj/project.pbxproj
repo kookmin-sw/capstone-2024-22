@@ -100,6 +100,7 @@
 		8ECCFBD72BB93BC100C39125 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFBD52BB93BC100C39125 /* Font+Extensions.swift */; };
 		8ECCFBD92BB9463700C39125 /* CardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFBD82BB9463700C39125 /* CardViewModel.swift */; };
 		8ECCFBDA2BB9463700C39125 /* CardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFBD82BB9463700C39125 /* CardViewModel.swift */; };
+		8EDC94DD2BEA8AE400B646AB /* BillComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94DC2BEA8AE400B646AB /* BillComplete.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -215,6 +216,7 @@
 		8ECCFBD42BB93AEC00C39125 /* moment-iOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "moment-iOS-Info.plist"; sourceTree = "<group>"; };
 		8ECCFBD52BB93BC100C39125 /* Font+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extensions.swift"; sourceTree = "<group>"; };
 		8ECCFBD82BB9463700C39125 /* CardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewModel.swift; sourceTree = "<group>"; };
+		8EDC94DC2BEA8AE400B646AB /* BillComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillComplete.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -274,6 +276,7 @@
 				8ECCFBA82BB59F0C00C39125 /* CardView */,
 				8ECCFBAD2BB5C91D00C39125 /* LikeView */,
 				8ECCFBA92BB5A06500C39125 /* Bill */,
+				8EDC94DB2BEA8AD300B646AB /* BillComplete */,
 				8E86C1A92BE8198C00291360 /* Manager */,
 				8E5CAE312B970BC800A483B4 /* Time.swift */,
 				8E5CAE6F2B970ED700A483B4 /* NotificationService.swift */,
@@ -541,6 +544,14 @@
 			path = Font;
 			sourceTree = "<group>";
 		};
+		8EDC94DB2BEA8AD300B646AB /* BillComplete */ = {
+			isa = PBXGroup;
+			children = (
+				8EDC94DC2BEA8AE400B646AB /* BillComplete.swift */,
+			);
+			path = BillComplete;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -743,6 +754,7 @@
 				8E7FB8FE2BA1E66200F05045 /* CustomDevider.swift in Sources */,
 				8E970E172BC3E070003476C4 /* DailyView.swift in Sources */,
 				8E15C8732B6527E3001468C7 /* ContentView.swift in Sources */,
+				8EDC94DD2BEA8AE400B646AB /* BillComplete.swift in Sources */,
 				8E5CAE522B970DB600A483B4 /* HomeView.swift in Sources */,
 				8E8C17562BAAC8F000BF1E1C /* AuthComplete.swift in Sources */,
 				8E8C17482BA85AE200BF1E1C /* AuthView.swift in Sources */,
