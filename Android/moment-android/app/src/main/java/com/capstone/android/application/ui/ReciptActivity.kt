@@ -152,12 +152,42 @@ class ReciptActivity : ComponentActivity() {
                     if(movenav == "ReceiptPost_Big") ReciptScreen.ReceiptPost_Big.name
                     else ReciptScreen.MakeTripChoice.name
                 ) {
-                    composable(route = ReciptScreen.MakeTripChoice.name) { MakeTripChoice() }
-                    composable(route = ReciptScreen.MakeTrip.name) { MakeTrip() }
-                    composable(route = ReciptScreen.SaveRecipt.name) {
-                        val theme = remember {
-                            navController.previousBackStackEntry?.savedStateHandle?.get<Int>("theme")
-                        }
+                    composable(route = ReciptScreen.MakeTripChoice.name) { MakeTripChoice(tripList) }
+                    composable(route = ReciptScreen.MakeTrip.name) {
+                        val ItemData = remember {
+                            navController.previousBackStackEntry?.savedStateHandle?.get<Int>("ItemData") }
+                        if (ItemData != null) { MakeTrip(tripList[ItemData]) }
+                    }
+
+                    composable(route = ReciptScreen.SaveRecipt.name +
+                            "/{tripName}/{intro.value}/{depart_small.value}/{depart.value}" +
+                            "/{arrive_small.value}/{arrive.value}/{cardnum}" +
+                            "/{publicationdate}/{startdate}/{enddate}/{theme}",
+                        arguments = listOf(
+                            navArgument("tripName"){  defaultValue = "defaultValue" },
+                            navArgument("intro"){  defaultValue = "" },
+                            navArgument("depart_small"){  defaultValue = "" },
+                            navArgument("depart"){  defaultValue = "defaultValue" },
+                            navArgument("arrive_small"){  defaultValue = "" },
+                            navArgument("arrive"){  defaultValue = "defaultValue" },
+                            navArgument("cardnum"){  defaultValue = 1 },
+                            navArgument("publicationdate"){  defaultValue = "defaultValue" },
+                            navArgument("startdate"){  defaultValue = "defaultValue" },
+                            navArgument("enddate"){  defaultValue = "defaultValue" },
+                            navArgument("theme"){  defaultValue = "A" }
+                        )) { navBackStackEntry ->
+                        val tripName = navBackStackEntry.arguments?.getString("tripName")
+                        val intro = navBackStackEntry.arguments?.getString("intro.value")
+                        val depart_small = navBackStackEntry.arguments?.getString("depart_small.value")
+                        val depart = navBackStackEntry.arguments?.getString("depart.value")
+                        val arrive_small = navBackStackEntry.arguments?.getString("arrive_small.value")
+                        val arrive = navBackStackEntry.arguments?.getString("arrive.value")
+                        val cardnum = navBackStackEntry.arguments?.getInt("cardnum")
+                        val publicationdate = navBackStackEntry.arguments?.getString("publicationdate")
+                        val startdate = navBackStackEntry.arguments?.getString("startdate")
+                        val enddate = navBackStackEntry.arguments?.getString("enddate")
+                        val theme = navBackStackEntry.arguments?.getString("theme")
+
                         if (theme != null) {
                             SaveRecipt(theme)
                         }
@@ -320,10 +350,11 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("UnrememberedMutableState")
     @OptIn(ExperimentalPagerApi::class)
     @Composable
-    fun MakeTrip(){
+    fun MakeTrip(trip: ReceiptTrip){
         val page = 2
         val state = rememberPagerState()
 
@@ -334,16 +365,18 @@ class ReciptActivity : ComponentActivity() {
         receiptIntent.putExtra("MoveScreen", "Receipt")
 
         val intro = remember { mutableStateOf("") }
+        val tripName = trip.tripName
         val depart_small = remember { mutableStateOf("") }
         val depart = remember { mutableStateOf("") }
         val arrive_small = remember { mutableStateOf("") }
         val arrive = remember { mutableStateOf("") }
         val cardnum = 27
-        val publicationdate = "2024.02.25"
-        val startdate = "2024.02.25"
-        val enddate = "2024.02.27"
+        val publicationdate = getCurrentDate().year.toString() + " . " + getCurrentDate().monthValue.toString() +" . " + getCurrentDate().dayOfMonth.toString()
+        val startdate = trip.startDate
+        val enddate = trip.endDate
         val emotionList = mutableStateListOf<Emotion>()
-
+        val tripid = trip.id //앞에서 선택한 여행 번호
+        var theme = if (state.currentPage == 0) "A" else "B"
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_common,
@@ -418,7 +451,8 @@ class ReciptActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            Horizontal_Theme(page,state,ReceiptContent(intro, depart_small, depart, arrive_small, arrive,
+
+            Horizontal_Theme(page,state,ReceiptContent(tripName, intro, depart_small, depart, arrive_small, arrive,
                 cardnum,publicationdate,startdate,enddate, emotionList))
         }
     }
@@ -488,7 +522,7 @@ class ReciptActivity : ComponentActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    P_Medium14(content = "암스테르담 성당 여행", color = white)
+                    P_Medium14(content = receiptcontent.tripName, color = white)
                     Image(
                         painter = painterResource(R.drawable.img_logo_white),
                         contentDescription = "로고 화이트"
@@ -512,16 +546,18 @@ class ReciptActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    ReciptTextField(
-                        hint = "여행의 기록을 한 줄로 기록하세요:)",
-                        onValueChanged = { receiptcontent.intro.value = it },
-                        text = receiptcontent.intro,
-                        keyboardType = KeyboardType.Text,
-                        textcolor = neutral_500,
-                        fontweight = FontWeight.Medium,
-                        fontsize = 14.sp,
-                        type = "intro"
-                    )
+                    receiptcontent.intro?.let {
+                        ReciptTextField(
+                            hint = "여행의 기록을 한 줄로 기록하세요:)",
+                            onValueChanged = { receiptcontent.intro.value = it },
+                            text = it,
+                            keyboardType = KeyboardType.Text,
+                            textcolor = neutral_500,
+                            fontweight = FontWeight.Medium,
+                            fontsize = 14.sp,
+                            type = "intro"
+                        )
+                    }
                 }
             }
 
@@ -538,16 +574,18 @@ class ReciptActivity : ComponentActivity() {
                     Modifier.size(19.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                ReciptTextField(
-                    hint = "기억 속에 오래 저장할",
-                    onValueChanged = {receiptcontent.depart_small.value = it },
-                    text = receiptcontent.depart_small,
-                    keyboardType = KeyboardType.Text,
-                    textcolor = primary_500,
-                    fontweight = FontWeight.Medium,
-                    fontsize = 14.sp,
-                    type = "small"
-                )
+                receiptcontent.depart_small?.let {
+                    ReciptTextField(
+                        hint = "기억 속에 오래 저장할",
+                        onValueChanged = {receiptcontent.depart_small.value = it },
+                        text = it,
+                        keyboardType = KeyboardType.Text,
+                        textcolor = primary_500,
+                        fontweight = FontWeight.Medium,
+                        fontsize = 14.sp,
+                        type = "small"
+                    )
+                }
             }
 
             Column(
@@ -595,16 +633,18 @@ class ReciptActivity : ComponentActivity() {
                     Modifier.size(19.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                ReciptTextField(
-                    hint = "기억 속에 오래 저장할",
-                    onValueChanged = { receiptcontent.arrive_small.value = it },
-                    text = receiptcontent.arrive_small,
-                    keyboardType = KeyboardType.Text,
-                    textcolor = primary_500,
-                    fontweight = FontWeight.Medium,
-                    fontsize = 14.sp,
-                    type = "small"
-                )
+                receiptcontent.arrive_small?.let {
+                    ReciptTextField(
+                        hint = "기억 속에 오래 저장할",
+                        onValueChanged = { receiptcontent.arrive_small.value = it },
+                        text = it,
+                        keyboardType = KeyboardType.Text,
+                        textcolor = primary_500,
+                        fontweight = FontWeight.Medium,
+                        fontsize = 14.sp,
+                        type = "small"
+                    )
+                }
             }
 
             Column(
@@ -743,16 +783,18 @@ class ReciptActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(top = 21.dp, start = 36.dp)
             ) {
-                ReciptTextField(
-                    hint = "여행의 기록을 한 줄로 기록하세요:)",
-                    onValueChanged = { receiptcontent.intro.value = it },
-                    text = receiptcontent.intro,
-                    keyboardType = KeyboardType.Text,
-                    textcolor = neutral_500,
-                    fontweight = FontWeight.Medium,
-                    fontsize = 14.sp,
-                    type = "intro"
-                )
+                receiptcontent.intro?.let {
+                    ReciptTextField(
+                        hint = "여행의 기록을 한 줄로 기록하세요:)",
+                        onValueChanged = { receiptcontent.intro.value = it },
+                        text = it,
+                        keyboardType = KeyboardType.Text,
+                        textcolor = neutral_500,
+                        fontweight = FontWeight.Medium,
+                        fontsize = 14.sp,
+                        type = "intro"
+                    )
+                }
             }
 
             Column(Modifier.padding(top = 51.dp)) {
@@ -762,8 +804,8 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 54.dp, start = 30.dp)
-
+                    .padding(top = 54.dp, start = 30.dp),
+                verticalArrangement = Arrangement.Center
             ) {
                 P_Medium8(
                     " 티켓이 발행된 날짜는"+ receiptcontent.publicationdate +"입니다. " +
@@ -779,7 +821,7 @@ class ReciptActivity : ComponentActivity() {
                     .padding(top = 484.dp, start = 28.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                P_Medium14(content = "전라도의 선유도", color = black)
+                P_Medium14(content = receiptcontent.tripName, color = black)
             }
 
             Column(
@@ -807,16 +849,18 @@ class ReciptActivity : ComponentActivity() {
                     Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                ReciptTextField(
-                    hint = "기억 속에 오래 저장할",
-                    onValueChanged = { receiptcontent.depart_small.value = it },
-                    text = receiptcontent.depart_small,
-                    keyboardType = KeyboardType.Text,
-                    textcolor = neutral_600,
-                    fontweight = FontWeight.Medium,
-                    fontsize = 11.sp,
-                    type = "small1"
-                )
+                receiptcontent.depart_small?.let {
+                    ReciptTextField(
+                        hint = "기억 속에 오래 저장할",
+                        onValueChanged = { receiptcontent.depart_small.value = it },
+                        text = it,
+                        keyboardType = KeyboardType.Text,
+                        textcolor = neutral_600,
+                        fontweight = FontWeight.Medium,
+                        fontsize = 11.sp,
+                        type = "small1"
+                    )
+                }
             }
 
             Column(
@@ -864,16 +908,18 @@ class ReciptActivity : ComponentActivity() {
                     Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                ReciptTextField(
-                    hint = "기억 속에 오래 저장할",
-                    onValueChanged = {receiptcontent.arrive_small.value = it },
-                    text = receiptcontent.arrive_small,
-                    keyboardType = KeyboardType.Text,
-                    textcolor = neutral_600,
-                    fontweight = FontWeight.Medium,
-                    fontsize = 11.sp,
-                    type = "small1"
-                )
+                receiptcontent.arrive_small?.let {
+                    ReciptTextField(
+                        hint = "기억 속에 오래 저장할",
+                        onValueChanged = {receiptcontent.arrive_small.value = it },
+                        text = it,
+                        keyboardType = KeyboardType.Text,
+                        textcolor = neutral_600,
+                        fontweight = FontWeight.Medium,
+                        fontsize = 11.sp,
+                        type = "small1"
+                    )
+                }
             }
 
             Column(
