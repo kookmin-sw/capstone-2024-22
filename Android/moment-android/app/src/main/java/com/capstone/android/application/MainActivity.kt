@@ -84,7 +84,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -161,7 +160,6 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType
@@ -760,10 +758,14 @@ class MainActivity : ComponentActivity() {
                     title.value = "추가"
                 }
                 composable(BottomNavItem.Receipt.screenRoute) {
-                    currentSelectedBottomRoute.value = "Receipt"
-
-                    Receipt()
-                    title.value = "영수증 모아보기"
+                    Toast.makeText(this@MainActivity,"추후 공개될 예정입니다.",Toast.LENGTH_SHORT).show()
+                    Log.d("waegwagewa",tripList.toString())
+                    Home(tripList,mainTrip)
+                    title.value = "추가"
+//                    currentSelectedBottomRoute.value = "Receipt"
+//
+//                    Receipt()
+//                    title.value = "영수증 모아보기"
                 }
                 composable(BottomNavItem.Record.screenRoute) {
                     currentSelectedBottomRoute.value = "Record"
