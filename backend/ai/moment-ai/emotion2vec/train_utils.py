@@ -38,9 +38,13 @@ def load_dataloader(datasets_list):
 
     # 데이터셋 분할
     train_dataset, test_dataset = train_test_split(dataset, test_size=0.2, random_state=42)
-    train_dataset, val_dataset = train_test_split(train_dataset, test_size=0.1, random_state=42)
+    train_dataset, val_dataset = train_test_split(test_dataset, test_size=0.1, random_state=42)
     
-    return train_dataset, val_dataset, test_dataset
+    train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
+    
+    return train_loader, val_loader, test_loader
 
 
 class NpyDataset(Dataset):
