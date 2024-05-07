@@ -3,6 +3,7 @@ package com.capstone.android.application.data
 import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.data.remote.auth.AuthRetrofitInterface
 import com.capstone.android.application.data.remote.card.CardRetrofitInterface
+import com.capstone.android.application.data.remote.receipt.ReceiptRetrofitInterface
 import com.capstone.android.application.data.remote.trip.TripRetrofitInterface
 import com.capstone.android.application.data.remote.tripfile.TripFileRetrofitInterface
 import com.capstone.android.application.domain.response.ApiResponseCallAdapterFactory
