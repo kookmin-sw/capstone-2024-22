@@ -60,7 +60,7 @@ public class CardView extends BaseEntity {
     private String temperature;
 
     // STT
-    @Column(name = "stt")
+    @Column(name = "stt", columnDefinition = "TEXT")
     private String stt;
 
     // happy

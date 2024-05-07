@@ -149,8 +149,15 @@ public class ReceiptService {
         float disgust = map.get("disgust");
         float total = happy + sad + angry + neutral + disgust;
 
+        happy = (Float.isNaN(happy / total)) ? (float) 0.0 : happy / total;
+        sad = (Float.isNaN(sad / total)) ? (float) 0.0 : sad / total;
+        angry = (Float.isNaN(angry / total)) ? (float) 0.0 : angry / total;
+        neutral = (Float.isNaN(neutral / total)) ? (float) 0.0 : neutral / total;
+        disgust = (Float.isNaN(disgust / total)) ? (float) 0.0 : disgust / total;
+
         // 영수증 생성
         Receipt receipt = Receipt.builder()
+                .trip(trip)
                 .mainDeparture(createReceipt.getMainDeparture())
                 .subDeparture(createReceipt.getSubDeparture())
                 .mainDestination(createReceipt.getMainDestination())
@@ -160,11 +167,11 @@ public class ReceiptService {
                 .stDate(trip.getStartDate())
                 .edDate(trip.getEndDate())
                 .tripName(trip.getTripName())
-                .happy(happy / total)
-                .sad(sad / total)
-                .angry(angry / total)
-                .neutral(neutral / total)
-                .disgust(disgust / total)
+                .happy(happy)
+                .sad(sad)
+                .angry(angry)
+                .neutral(neutral)
+                .disgust(disgust)
                 .receiptThemeType(createReceipt.getReceiptThemeType())
                 .build();
 

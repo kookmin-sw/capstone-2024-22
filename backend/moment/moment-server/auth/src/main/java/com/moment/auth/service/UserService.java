@@ -20,6 +20,8 @@ public class UserService {
     }
     public void registerUserToCoreServer(User user) {
         try{
+            log.info("Core 서버에 유저 등록을 시도합니다.");
+            log.info("user : {}", user.getId());
             coreClient.registerUser(UserRequestDTO.registerUser
                     .builder()
                     .email(user.getEmail())

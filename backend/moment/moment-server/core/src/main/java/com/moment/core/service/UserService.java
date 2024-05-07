@@ -13,11 +13,15 @@ import com.moment.core.exception.UserAlreadyExistException;
 import com.moment.core.exception.UserNotValidException;
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UserService {
     private final UserRepository userRepository;
     private final TripService tripService;
@@ -32,25 +36,19 @@ public class UserService {
         if (isAlreadyExist) {
             throw new UserAlreadyExistException("이미 존재하는 아이디입니다.");
         }
-        User user = User.builder()
-                .id(request.getId())
-                .email(request.getEmail())
-                .notification(request.isNotification())
-                .dataUsage(request.isDataUsage())
-                .firebaseToken(request.getFirebaseToken())
-                .build();
-//        em.persist(user);
-        User managedUser = em.merge(user);
-        tripService.save(Trip.builder()
-                .user(managedUser)
-                        .analyzingCount(0)
-                        .startDate(null)
-                        .endDate(null)
-                        .tripName("untitled trip")
-                        .isNotTitled(true)
-                .build()
-        );
-        return userRepository.save(managedUser);
+        log.info("유저 등록을 시도합니다.");
+        log.info("user : {}", request.getId());
+//        User user = User.builder()
+//                .id(request.getId())
+//                .email(request.getEmail())
+//                .notification(request.isNotification())
+//                .dataUsage(request.isDataUsage())
+//                .firebaseToken(request.getFirebaseToken())
+//                .build();
+//        log.info("user : {}", user.getId());
+//        User mu = userRepository.save(user);
+        userRepository.saveN(request.getId(), LocalDateTime.now(), LocalDateTime.now(), request.getEmail(), request.isNotification(), request.isDataUsage(), request.getFirebaseToken());
+        return userRepository.findById(request.getId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
     }
 
     public void validateUserWithTrip(Long userId, Long tripId) {

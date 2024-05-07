@@ -2,9 +2,11 @@ package com.moment.core.controller;
 
 import com.moment.core.common.APIResponse;
 import com.moment.core.common.code.SuccessCode;
+import com.moment.core.domain.trip.Trip;
 import com.moment.core.domain.user.User;
 import com.moment.core.dto.request.UserRequestDTO;
 import com.moment.core.service.S3Service;
+import com.moment.core.service.TripService;
 import com.moment.core.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final S3Service s3Service;
+    private final TripService tripService;
 
     // 유저 등록
     @PostMapping("/register")
@@ -37,7 +40,17 @@ public class UserController {
             @RequestBody UserRequestDTO.registerUser request
             ) {
 //        s3Service.createFolder(request.getId().toString());
-        userService.save(request);
+        User user = userService.save(request);
+        log.info("user : {}", user.getId());
+        tripService.save(Trip.builder()
+                .user(user)
+                .analyzingCount(0)
+                .startDate(null)
+                .endDate(null)
+                .tripName("untitled trip")
+                .isNotTitled(true)
+                .build()
+        );
         return ResponseEntity.ok(APIResponse.of(SuccessCode.INSERT_SUCCESS));
     }
 
