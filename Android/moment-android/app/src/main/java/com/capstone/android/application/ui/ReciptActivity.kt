@@ -189,7 +189,10 @@ class ReciptActivity : ComponentActivity() {
                         val theme = navBackStackEntry.arguments?.getString("theme")
 
                         if (theme != null) {
-                            SaveRecipt(theme)
+                            SaveRecipt(theme,ReceiptContent_string(
+                                tripName, intro, depart_small, depart, arrive_small, arrive,
+                                cardnum,publicationdate,startdate,enddate, emotionList)
+                            )
                         }
                     }
                     composable(route = ReciptScreen.ReceiptPost_Big.name) {
@@ -439,12 +442,58 @@ class ReciptActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
-                        .clickable {
-                            navController.currentBackStackEntry?.savedStateHandle?.set(
-                                key = "theme",
-                                value = state.currentPage
+                        .clickable() {
+
+                            if (arrive.value == "" || depart.value == "") {
+                                showToastMessage(
+                                    context = this@ReciptActivity,
+                                    "출발지와 도착지는 꼭 입력해주세요!"
+                                )
+                            } else {
+
+                                receiptViewModel.postReceiptCreate(
+                                body = PostReceiptCreateRequest(
+                                    mainDeparture = depart.value,
+                                    mainDestination = arrive.value,
+                                    oneLineMemo = intro.value,
+                                    receiptThemeType = if (state.currentPage == 0) "A" else "B",
+                                    subDeparture = depart_small.value,
+                                    subDestination = arrive_small.value,
+                                    tripId = tripid
+                                )
                             )
-                            navController.navigate(ReciptScreen.SaveRecipt.name)
+                                if (intro.value == "") intro.value = " "
+                                if (depart_small.value == "") depart_small.value = " "
+                                if (arrive_small.value == "") arrive_small.value = " "
+
+                                val receiptData = ReceiptContent(
+                                    tripName, intro, depart_small, depart, arrive_small, arrive,
+                                    cardnum, publicationdate, startdate, enddate, emotionList
+                                )
+
+                            // 영수증 생성 성공
+                            receiptViewModel.postReceiptCreateSuccess.observe(this@ReciptActivity) { response ->
+                                Log.d(
+                                    "receiptViewModel_postReceiptCreateSuccess",
+                                    response.toString()
+                                )
+
+                                navController.navigate(
+                                    ReciptScreen.SaveRecipt.name +
+                                            "/${receiptData.tripName}" +
+                                            "/${receiptData.intro.value}" +
+                                            "/${receiptData.depart_small.value}" +
+                                            "/${receiptData.depart.value}" +
+                                            "/${receiptData.arrive_small.value}" +
+                                            "/${receiptData.arrive.value}" +
+                                            "/${receiptData.cardnum}" +
+                                            "/${receiptData.publicationdate}" +
+                                            "/${receiptData.startdate}" +
+                                            "/${receiptData.enddate}" +
+                                            "/${theme}"
+                                )
+                            }
+                            }
                         }) {
                     YJ_Bold15("완료", black)
                 }
@@ -1103,42 +1152,6 @@ class ReciptActivity : ComponentActivity() {
         val startdate = "2024.02.25"
         val enddate = "2024.02.27"
 
-        intro.value = "한줄 소개 입니다"
-        depart.value = "서울"
-        depart_small.value = "서울숲"
-        arrive.value = "부산"
-        arrive_small.value = "해운대"
-
-        val emotionList = mutableStateListOf<Emotion>()
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_common,
-                text = "평범해요",
-                persent = 60
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_happy,
-                text = "즐거워요",
-                persent = 20
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_angry,
-                text = "화가나요",
-                persent = 15
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요",
-                persent = 5
-            )
-        )
-        emotionList.sortByDescending { it.persent }
         Column(
             modifier = Modifier
                 .fillMaxSize()
