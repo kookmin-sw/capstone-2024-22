@@ -10,12 +10,8 @@ def extract_features(csv_file, model):
     DATA_PATH = "../"
     datasets_csv = pd.read_csv(csv_file)
     datasets_list = []
-    print(model.model)
     
     for wav_file, label in zip(datasets_csv['path'], datasets_csv['labels']):
-        if not os.path.exists(os.path.join(DATA_PATH, wav_file)) or label is None:
-            continue
-        
         npy_file = os.path.join(DATA_PATH, os.path.splitext(wav_file)[0] + ".npy")
         
         if not os.path.exists(npy_file):
@@ -27,13 +23,12 @@ def extract_features(csv_file, model):
 
         if os.path.exists(os.path.join(DATA_PATH, wav_file)):
             os.remove(os.path.join(DATA_PATH, wav_file))
-        
+    
     return datasets_list
 
 
 def load_dataloader(datasets_list):
     # 데이터셋 객체 생성
-    print("load dataloader", "-"*20)
     dataset = NpyDataset(datasets_list)
 
     # 데이터셋 분할
@@ -49,15 +44,14 @@ def load_dataloader(datasets_list):
 
 class NpyDataset(Dataset):
     def __init__(self, data_list):
-        self.datas = data_list
+        self.data_list = data_list
 
     def __len__(self):
-        return len(self.datas)
+        return len(self.data_list)
 
     def __getitem__(self, idx):
-        feat = np.load(self.data_list[idx])
-        feat = torch.from_numpy(feat)
-        label = self.data_list[idx]
+        feat = np.load(self.data_list[idx][0], allow_pickle=True)
+        label = self.data_list[idx][1]
         
         return feat, label
     
