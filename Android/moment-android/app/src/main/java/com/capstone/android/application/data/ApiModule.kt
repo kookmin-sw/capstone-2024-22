@@ -75,6 +75,12 @@ object ApiModule {
         return retrofit.create(TripFileRetrofitInterface::class.java)
     }
 
+    @Singleton
+    @Provides
+    fun provideReceiptService(@BaseRetrofit retrofit:Retrofit) : ReceiptRetrofitInterface {
+        return retrofit.create(ReceiptRetrofitInterface::class.java)
+    }
+
 
 
 //    @Singleton
