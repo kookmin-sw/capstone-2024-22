@@ -1,48 +1,94 @@
 //
-//  VideoPlayerView.swift
-//  moment-iOS
+//  Player.swift
+//  AudioPlayer
 //
-//  Created by 양시관 on 5/6/24.
+//  Created by Vinod Supnekar on 26/07/23.
 //
 
 import Foundation
 import SwiftUI
 import AVKit
-import UIKit
 import Combine
+import AVFoundation
 
-struct VideoPlayerView: UIViewRepresentable {
-    var url: URL
-    @Binding var player: AVPlayer
 
-    func makeUIView(context: Context) -> UIView {
-        return PlayerUIView(player: player)
+
+class AudioPlayer: ObservableObject {
+    var player: AVPlayer?
+    var playerItem: AVPlayerItem?
+    var timeObserverToken: Any?
+    
+    @Published var isPlaying = false
+    @Published var progress: Float = 0.0
+
+    init(url: URL) {
+        setupPlayer(url: url)
     }
-
-    func updateUIView(_ uiView: UIView, context: Context) {
+    
+    func setupPlayer(url: URL) {
+        playerItem = AVPlayerItem(url: url)
+        player = AVPlayer(playerItem: playerItem)
+        
+        // Observe the player item's completion
+        NotificationCenter.default.addObserver(self, selector: #selector(playerDidFinishPlaying), name: .AVPlayerItemDidPlayToEndTime, object: playerItem)
+        
+        addPeriodicTimeObserver()
     }
-
-    static func dismantleUIView(_ uiView: UIView, coordinator: ()) {
-        // Cleanup if needed
-    }
-
-    class PlayerUIView: UIView {
-        private var playerLayer: AVPlayerLayer?
-        init(player: AVPlayer) {
-            super.init(frame: .zero)
-            let playerLayer = AVPlayerLayer(player: player)
-            layer.addSublayer(playerLayer)
-            self.playerLayer = playerLayer
+    
+    @objc func playerDidFinishPlaying(note: NSNotification) {
+        DispatchQueue.main.async {
+            self.progress = 0.0
+            self.isPlaying = false
+            self.player?.seek(to: CMTime.zero) // Reset the player to the beginning
         }
-
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
+    }
+    
+    func playPauseAction() {
+        guard let player = player else { return }
+        
+        if isPlaying {
+            player.pause()
+        } else {
+            player.play()
         }
-
-        override func layoutSubviews() {
-            super.layoutSubviews()
-            playerLayer?.frame = bounds
+        isPlaying.toggle()
+    }
+    
+    private func addPeriodicTimeObserver() {
+        let interval = CMTime(seconds: 1, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+        timeObserverToken = player?.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
+            guard let self = self, let duration = self.playerItem?.duration else { return }
+            let durationSeconds = CMTimeGetSeconds(duration)
+            let currentTime = CMTimeGetSeconds(time)
+            self.progress = Float(currentTime / durationSeconds)
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+        if let token = timeObserverToken {
+            player?.removeTimeObserver(token)
         }
     }
 }
 
+
+
+
+struct CustomAudioPlayerView: View {
+    @ObservedObject var audioPlayer: AudioPlayer
+
+    var body: some View {
+        VStack {
+            Slider(value: $audioPlayer.progress, in: 0...1, step: 0.01)
+            Button(action: {
+                audioPlayer.playPauseAction()
+            }) {
+                Image(systemName: audioPlayer.isPlaying ? "pause.circle" : "play.circle")
+                    .resizable()
+                    .frame(width: 50, height: 50)
+            }
+        }
+        .padding()
+    }
+}

@@ -314,27 +314,16 @@ struct DynamicGradientRectangleView: View {
     let longText: String
 //    private let videoURL = URL(string: "https://kmumoment.s3.ap-northeast-2.amazonaws.com/users/3/2024-05-06T08%3A20%3A59.991719376.m4a")!
     var playerItem: AVPlayerItem?
-   // let player = AVPlayer()
-    @State private var player: AVPlayer = AVPlayer()
-       @State private var isPlaying: Bool = false
-        
-   // var playerItem: AVPlayerItem?
     
     var body: some View {
         //ScrollView {
         VStack {
-            
-            VideoPlayerView(url: URL(string: "https://kmumoment.s3.ap-northeast-2.amazonaws.com/users/3/2024-05-06T08%3A20%3A59.991719376.m4a")!, player: $player)
-                           .frame(height: 300)
-                       Button(action: togglePlayPause) {
-                           Image(systemName: isPlaying ? "pause.circle" : "play.circle")
-                               .font(.largeTitle)
-                       }
-                       .onAppear {
-                                 setupPlayer()
-                             }
-            
-           
+
+            let url = URL(string: "https://kmumoment.s3.ap-northeast-2.amazonaws.com/users/3/2024-05-06T08%3A20%3A59.991719376.m4a")!
+                   let audioPlayer = AudioPlayer(url: url)
+                   
+                   CustomAudioPlayerView(audioPlayer: audioPlayer)
+
             
             
             Text(longText)
@@ -350,21 +339,6 @@ struct DynamicGradientRectangleView: View {
         //}
         
     }
-    private func setupPlayer() {
-           guard let url = URL(string: "https://example.com/video.mp4") else { return }
-           let playerItem = AVPlayerItem(url: url)
-           player.replaceCurrentItem(with: playerItem)
-       }
-
-       private func togglePlayPause() {
-           if player.timeControlStatus == .paused {
-               player.play()
-               isPlaying = true
-           } else {
-               player.pause()
-               isPlaying = false
-           }
-       }
     
 }
 
