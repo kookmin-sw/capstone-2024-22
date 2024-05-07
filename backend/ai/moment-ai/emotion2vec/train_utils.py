@@ -27,7 +27,7 @@ def extract_features(csv_file, model, label_dict):
     return datasets_list
 
 
-def load_dataloader(datasets_list):
+def load_dataloader(datasets_list, batch_size):
     # 데이터셋 객체 생성
     dataset = NpyDataset(datasets_list)
 
@@ -38,9 +38,9 @@ def load_dataloader(datasets_list):
     test_size = data_size - train_size - validation_size
     
     train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, validation_size, test_size])
-    train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False)
-    test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     
     return train_loader, val_loader, test_loader
 

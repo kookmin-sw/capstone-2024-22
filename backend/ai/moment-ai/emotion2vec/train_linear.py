@@ -24,7 +24,8 @@ def fine_tuning(label_dict, datasets_csv):
     wandb.init(project="Capstone2024", name=f"emotion2vec")
     # set train hyperparameters
     torch.manual_seed(42)
-    epochs = 10000
+    epochs = 1000
+    batch_size = 128
     
     # load pretrained model
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -50,7 +51,7 @@ def fine_tuning(label_dict, datasets_csv):
     best_val_wa_epoch = 0
     
     # data loader
-    train_loader, val_loader, test_loader = load_dataloader(datasets_list)
+    train_loader, val_loader, test_loader = load_dataloader(datasets_list, batch_size=batch_size)
     
     # set save directory
     save_dir = os.path.join(str(Path.cwd()), f"emotion2vec_classifier.pth")
