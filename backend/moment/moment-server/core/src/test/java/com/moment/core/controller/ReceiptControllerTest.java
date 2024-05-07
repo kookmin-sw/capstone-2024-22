@@ -103,6 +103,7 @@ class ReceiptControllerTest {
                                 .sad(20.0f)
                                 .angry(20.95f)
                                 .neutral(19.05f)
+                                .disgust(0.0f)
                                 .stDate(LocalDate.parse("2021-01-01"))
                                 .edDate(LocalDate.parse("2021-01-03"))
                                 .numOfCard(3)
@@ -121,6 +122,7 @@ class ReceiptControllerTest {
                                 .sad(20.0f)
                                 .angry(20.95f)
                                 .neutral(19.05f)
+                                .disgust(0.0f)
                                 .stDate(LocalDate.parse("2021-02-01"))
                                 .edDate(LocalDate.parse("2021-02-02"))
                                 .numOfCard(3)
@@ -139,6 +141,7 @@ class ReceiptControllerTest {
                                 .sad(20.0f)
                                 .angry(20.95f)
                                 .neutral(19.05f)
+                                .disgust(0.0f)
                                 .stDate(LocalDate.parse("2021-03-01"))
                                 .edDate(LocalDate.parse("2021-03-02"))
                                 .numOfCard(3)
@@ -193,6 +196,7 @@ class ReceiptControllerTest {
                                         fieldWithPath("data.receiptList[].sad").type(JsonFieldType.NUMBER).description("슬픈 감정 비율"),
                                         fieldWithPath("data.receiptList[].angry").type(JsonFieldType.NUMBER).description("화난 감정 비율"),
                                         fieldWithPath("data.receiptList[].neutral").type(JsonFieldType.NUMBER).description("중립적인 감정 비율"),
+                                        fieldWithPath("data.receiptList[].disgust").type(JsonFieldType.NUMBER).description("역겨운 감정 비율"),
                                         fieldWithPath("data.receiptList[].receiptThemeType").type(JsonFieldType.STRING).attributes(getReceiptFormat()).description("영수증 테마 타입"),
                                         fieldWithPath("data.pagination").type(JsonFieldType.OBJECT).description("페이징 정보"),
                                         fieldWithPath("data.pagination.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
