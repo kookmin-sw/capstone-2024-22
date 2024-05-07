@@ -170,6 +170,7 @@ class OnboardingActivity:ComponentActivity() {
         // 로그인 성공
         authViewModel.postAuthLoginSuccess.observe(this@OnboardingActivity){ response->
             Log.d("weaggawegew",response.toString())
+            navController.navigate(OnboardingScreen.LoginComplete.name)
         }
 
         // 로그인 실패
