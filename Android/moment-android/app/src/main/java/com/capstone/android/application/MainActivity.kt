@@ -152,7 +152,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -1196,10 +1195,11 @@ class MainActivity : ComponentActivity() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.Center
             ) {
             Image(
-                modifier = Modifier.fillMaxWidth().height(379.dp),
+                modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.img_receipt_preview), contentDescription = "영수증미리보기"
             )
             Spacer(modifier = Modifier.height(70.dp))
@@ -1218,7 +1218,6 @@ class MainActivity : ComponentActivity() {
                 .padding(horizontal = 12.dp)) {
             MyGrid(receiptList, 2, EditCheckState, DeleteReceipt)
 
-            MyGrid(testList, 2, EditCheckState,ReceiptCheckState)
         }
     }
     @Composable
