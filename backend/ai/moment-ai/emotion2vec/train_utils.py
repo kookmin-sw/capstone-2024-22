@@ -19,7 +19,7 @@ def extract_features(csv_file, model):
         npy_file = os.path.join(DATA_PATH, os.path.splitext(wav_file)[0] + ".npy")
         
         if not os.path.exists(npy_file):
-            print(os.path.exists(os.path.join(DATA_PATH, wav_file)))
+            print(os.path.join(DATA_PATH, wav_file), os.path.exists(os.path.join(DATA_PATH, wav_file)))
             npy_feature = model.generate(os.path.join(DATA_PATH, wav_file), granularity="utterance")
             np.save(npy_file, npy_feature)
         
