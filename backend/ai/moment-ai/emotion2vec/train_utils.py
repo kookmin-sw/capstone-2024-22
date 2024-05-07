@@ -48,7 +48,7 @@ class NpyDataset(Dataset):
         self.datas = data_list
 
     def __len__(self):
-        return len(self.data_list)
+        return len(self.datas)
 
     def __getitem__(self, idx):
         feat = np.load(self.data_list[idx])
