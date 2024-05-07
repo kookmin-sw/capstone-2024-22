@@ -13,7 +13,7 @@ def extract_features(csv_file, model):
     print(model.model)
     
     for wav_file, label in zip(datasets_csv['path'], datasets_csv['labels']):
-        if label is None:
+        if not os.path.exists(os.path.join(DATA_PATH, wav_file)) or label is None:
             continue
         
         npy_file = os.path.join(DATA_PATH, os.path.splitext(wav_file)[0] + ".npy")
