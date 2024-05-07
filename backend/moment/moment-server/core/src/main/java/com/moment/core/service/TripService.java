@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -28,6 +29,7 @@ public class TripService {
     private final AlreadyBookedDateService alreadyBookedDateService;
     private final TripFileService tripFileService;
     private final EntityManager em;
+    private final ReceiptService receiptService;
 
     public void save(Trip trip) {
         tripRepository.save(trip);
@@ -137,5 +139,34 @@ public class TripService {
             rtnList.add(TripResponseDTO.GetTrip.fromEntity(trip));
         }
         return TripResponseDTO.GetAllTrip.builder().trips(rtnList).build();
+    }
+
+    public TripResponseDTO.GetTripSpec getTrip(Long tripId) {
+        Trip trip = tripRepository.findById(tripId).orElseThrow(() -> new RuntimeException("존재하지 않는 여행입니다."));
+        // 해당 여행이 끝났는지, 해당 여행에 분석중인 카드뷰가 남아있는지 확인
+        if (!trip.getEndDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("여행이 끝나지 않았습니다.");
+        }
+        if (trip.getAnalyzingCount() != 0) {
+            throw new IllegalArgumentException("분석중인 카드뷰가 남아있습니다.");
+        }
+        Map<String, Float> map = receiptService.getCardViewCount(trip);
+        int cardViewCount = map.get("total").intValue();
+
+        // 감정 별 통계
+        float happy = map.get("happy");
+        float sad = map.get("sad");
+        float angry = map.get("angry");
+        float neutral = map.get("neutral");
+        float disgust = map.get("disgust");
+        float total = happy + sad + angry + neutral + disgust;
+
+        happy = (Float.isNaN(happy / total)) ? (float) 0.0 : happy / total;
+        sad = (Float.isNaN(sad / total)) ? (float) 0.0 : sad / total;
+        angry = (Float.isNaN(angry / total)) ? (float) 0.0 : angry / total;
+        neutral = (Float.isNaN(neutral / total)) ? (float) 0.0 : neutral / total;
+        disgust = (Float.isNaN(disgust / total)) ? (float) 0.0 : disgust / total;
+
+        return TripResponseDTO.GetTripSpec.fromEntity(trip, cardViewCount, happy, sad, angry, neutral, disgust);
     }
 }
