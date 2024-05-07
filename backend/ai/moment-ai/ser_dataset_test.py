@@ -294,14 +294,14 @@ AIHUB_df = AIHUB_df.replace({'labels':'happiness'}, 'happy')
 AIHUB_df = AIHUB_df.replace({'labels':'sadness'}, 'sad')
 print(AIHUB_df.labels.value_counts())
 
-# remove fear labels
+# remove labels
 remove_list = ['fear', 'surprise']
 removes = AIHUB_df[AIHUB_df['labels'].str.contains("|".join(remove_list))]
 for i in removes['path']:
     if os.path.exists(i):
         os.remove(i)
 
-AIHUB_df = AIHUB_df[~AIHUB_df.isin(remove_list)]
+AIHUB_df = AIHUB_df[AIHUB_df['labels'].isin(labels)]
 
 print(AIHUB_df.head(10))
 print(AIHUB_df.labels.value_counts())
