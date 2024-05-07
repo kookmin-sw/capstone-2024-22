@@ -103,9 +103,13 @@ import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.utile.AndroidAudioPlayer
 import com.capstone.android.application.app.utile.MomentAudioRecorder
 import com.capstone.android.application.data.remote.card.model.card_post.request.PostCardUploadReqeust
+import com.capstone.android.application.data.remote.receipt.model.receipt_delete.ReceiptId
+import com.capstone.android.application.data.remote.receipt.model.receipt_delete.deleteReceiptDeleteRequest
 import com.capstone.android.application.domain.Card
+import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.Trip
 import com.capstone.android.application.presentation.CardViewModel
+import com.capstone.android.application.presentation.ReceiptViewModel
 import com.capstone.android.application.presentation.TripViewModel
 import com.capstone.android.application.ui.CardActivity
 import com.capstone.android.application.ui.PatchTripActivity
@@ -160,6 +164,7 @@ class MainActivity : ComponentActivity() {
     lateinit var navController: NavHostController
     private val tripViewModel : TripViewModel by viewModels()
     private val cardViewModel : CardViewModel by viewModels()
+    private val receiptViewModel : ReceiptViewModel by viewModels()
     private val recorder by lazy {
         MomentAudioRecorder(this@MainActivity)
     }
