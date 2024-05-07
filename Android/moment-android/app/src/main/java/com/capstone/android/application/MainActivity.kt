@@ -316,9 +316,8 @@ class MainActivity : ComponentActivity() {
         )
 
         val recordOpen = remember { mutableStateOf(false)}
-        var EditCheckState = remember { mutableStateOf(false) }
-        var ReceiptCheckState = remember { mutableStateOf(true) }
-
+        val EditCheckState = remember { mutableStateOf(false) }
+        val ReceiptCheckState = remember { mutableStateOf(true) }
         val viewModel: CustomTitleCheckViewModel = viewModel()
         val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
 
@@ -485,7 +484,10 @@ class MainActivity : ComponentActivity() {
                                             Column(
                                                 Modifier
                                                     .wrapContentSize()
-                                                    .clickable { EditCheckState.value = false }) {
+                                                    .clickable {
+                                                        EditCheckState.value = false
+                                                        DeleteReceipt.clear()
+                                                    }) {
                                                 YJ_Bold15(content = "완료", color = black)
                                             }
                                         }
@@ -507,8 +509,12 @@ class MainActivity : ComponentActivity() {
                                                     /*navController.navigate(MainScreen.ReceiptPost.rootRoute)*/}
                                                 "작게보기" -> {}
                                                 "편집" -> { EditCheckState.value = true }
-                                                "삭제" ->
+                                                "삭제" -> {
                                                     viewModel.showCustomTitleCheckDialog()
+
+                                                    Log.d("Delete", "DeleteReceipt: $DeleteReceipt")
+                                                }
+
                                             }
                                         },
                                     text = title.value,
@@ -521,13 +527,29 @@ class MainActivity : ComponentActivity() {
                                 )
                                 if (CustomTitleCheckDialogState.title.isNotBlank()) {
                                     CustomTitleCheckDialog(
-                                        title = CustomTitleCheckDialogState.title,
+                                        title = DeleteReceipt.size.toString() + CustomTitleCheckDialogState.title,
                                         description = CustomTitleCheckDialogState.description,
                                         checkleft = CustomTitleCheckDialogState.checkleft,
                                         checkright = CustomTitleCheckDialogState.checkright,
                                         onClickleft = {
-                                            CustomTitleCheckDialogState.onClickleft()
-                                            EditCheckState.value = false },
+
+                                           receiptViewModel.deleteReceiptDelete(
+                                                body = deleteReceiptDeleteRequest(receiptIds = DeleteReceipt)
+                                            )
+
+                                            // 영수증 삭제 성공
+                                            receiptViewModel.deleteReceiptDeleteSuccess.observe(this@MainActivity) { response ->
+                                                Log.d("receiptViewModel_deleteReceiptDeleteSuccess", response.toString())
+
+                                            }
+
+                                            // 영수증 삭제 실패
+                                            receiptViewModel.deleteReceiptDeleteFailure.observe(this@MainActivity) { response ->
+                                                Log.d("receiptViewModel_deleteReceiptDeleteFailure", response.toString())
+                                            }
+                                            DeleteReceipt.clear()
+                                            EditCheckState.value = false
+                                            CustomTitleCheckDialogState.onClickleft()},
                                         onClickright = { CustomTitleCheckDialogState.onClickright() },
                                         onClickCancel = { CustomTitleCheckDialogState.onClickCancel() },
                                     )
@@ -1239,6 +1261,11 @@ class MainActivity : ComponentActivity() {
                 val item = rowList[index]
                 val checkState = rememberSaveable { mutableStateOf(false) }
 
+                if (!EditCheckState.value) {
+                    checkState.value = false
+                }
+
+                val receiptId =  ReceiptId(item.id)
                 Box( modifier = Modifier
                     .width(columnWidth)
                     .height(224.dp)
@@ -1247,7 +1274,20 @@ class MainActivity : ComponentActivity() {
                     .clickable {
                         if (!EditCheckState.value) {
                             startActivity(intent)
-                        } else checkState.value = !checkState.value
+                        } else {
+                            if (checkState.value) {
+                                checkState.value = false
+                                if (DeleteReceipt.contains(receiptId)) {
+                                    DeleteReceipt.remove(receiptId)
+                                }
+
+                            } else {
+                                checkState.value = true
+                                if (!DeleteReceipt.contains(receiptId)) {
+                                    DeleteReceipt.add(receiptId)
+                                }
+                            }
+                        }
                     }) {
 
                     if(item.receiptThemeType == "A") MiniTheme1(item)
