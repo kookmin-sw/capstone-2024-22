@@ -12,7 +12,7 @@ import SwiftUI
 //TODO: -
 
 struct ReceiptGroupView: View {
-    //  @EnvironmentObject var sharedViewModel: SharedViewModel
+    @EnvironmentObject var sharedViewModel: SharedViewModel
     @Environment(\.presentationMode) var presentationMode
     @State private var isDeleteMode = false // 삭제 모드 상태
     @State private var isSelected = false // 체크박스 선택 여부
@@ -27,7 +27,7 @@ struct ReceiptGroupView: View {
                 HStack {
                     Button(action: {
                         // "뒤로" 버튼의 액션: 현재 뷰를 종료
-                        self.presentationMode.wrappedValue.dismiss()
+                        self.navigateToTargetView = true
                     }) {
                         HStack {
                             Spacer().frame(width: 10)
@@ -63,76 +63,15 @@ struct ReceiptGroupView: View {
                 .padding()
                 
 
+                ForEach(sharedViewModel.receipts) { receipt in
+                    if receipt.receiptThemeType == "A" {
+                        ReceiptATypeView(receipt: receipt)
+                    } else {
+                        ReceiptBTypeView(receipt: receipt)
+                    }
+                }
+           
                 
-                HStack
-                {
-                    Rectangle()
-                        .fill(Color.gray)
-                        .frame(height: 200)
-                        .padding()
-                        .overlay(
-                            Image(systemName: "pencil.tip")
-                                .font(.largeTitle)
-                                .foregroundColor(.customGray2)
-                        )
-                        .cornerRadius(10)
-                    Rectangle()
-                        .fill(Color.gray)
-                        .frame(height: 200)
-                        .padding()
-                        .overlay(
-                            Image(systemName: "pencil.tip")
-                                .font(.largeTitle)
-                                .foregroundColor(.customGray2)
-                        )
-                        .cornerRadius(10)
-                }
-                HStack
-                {
-                    Rectangle()
-                        .fill(Color.gray)
-                        .frame(height: 200)
-                        .padding()
-                        .overlay(
-                            Image(systemName: "pencil.tip")
-                                .font(.largeTitle)
-                                .foregroundColor(.customGray2)
-                        )
-                        .cornerRadius(10)
-                    Rectangle()
-                        .fill(Color.gray)
-                        .frame(height: 200)
-                        .padding()
-                        .overlay(
-                            Image(systemName: "pencil.tip")
-                                .font(.largeTitle)
-                                .foregroundColor(.customGray2)
-                        )
-                        .cornerRadius(10)
-                }
-                HStack
-                {
-                    Rectangle()
-                        .fill(Color.gray)
-                        .frame(height: 200)
-                        .padding()
-                        .overlay(
-                            Image(systemName: "pencil.tip")
-                                .font(.largeTitle)
-                                .foregroundColor(.customGray2)
-                        )
-                        .cornerRadius(10)
-                    Rectangle()
-                        .fill(Color.gray)
-                        .frame(height: 200)
-                        .padding()
-                        .overlay(
-                            Image(systemName: "pencil.tip")
-                                .font(.largeTitle)
-                                .foregroundColor(.customGray2)
-                        )
-                        .cornerRadius(10)
-                }
             }
             
             NavigationLink(destination: AnnouncementView(), isActive: $navigateToTargetView) {
@@ -141,7 +80,47 @@ struct ReceiptGroupView: View {
         }
       
         .navigationBarBackButtonHidden()
+        .onAppear(){
+            sharedViewModel.fetchReceipts()
+        }
     }
+}
+
+struct ReceiptATypeView: View {
+    var receipt: Receipt
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("A Type Receipt")
+            Text("Departure: \(receipt.mainDeparture)")
+            Text("Destination: \(receipt.mainDestination)")
+           
+        }
+        .padding()
+        .background(Color.blue)
+        .cornerRadius(10)
+        .navigationBarBackButtonHidden()
+        
+    }
+       
+}
+
+struct ReceiptBTypeView: View {
+    var receipt: Receipt
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("B Type Receipt")
+            Text("Departure: \(receipt.subDeparture)")
+            Text("Destination: \(receipt.subDestination)")
+            
+        }
+        .padding()
+        .background(Color.green)
+        .cornerRadius(10)
+        .navigationBarBackButtonHidden()
+    }
+    
 }
 
 
