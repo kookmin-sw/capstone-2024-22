@@ -28,9 +28,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -46,8 +47,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -68,6 +71,7 @@ import com.capstone.android.application.presentation.CountViewModel
 import com.capstone.android.application.ui.theme.BigButton
 import com.capstone.android.application.ui.theme.CheckButton
 import com.capstone.android.application.ui.theme.CountText
+import com.capstone.android.application.ui.theme.FontMoment
 import com.capstone.android.application.ui.theme.ImgBackButton
 import com.capstone.android.application.ui.theme.P_Bold30
 import com.capstone.android.application.ui.theme.P_ExtraBold16
@@ -359,8 +363,27 @@ class OnboardingActivity:ComponentActivity() {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 72.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Text(
+                    modifier = Modifier.clickable {
+                        tokenSharedPreferences.edit().putString("accessToken","Bearer " +
+                                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." +
+                                "eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTA4NzY0NCwiZXhwIjoxNzU4Mjg3NjQ0fQ" +
+                                ".6n5w1g87Pyoy11yyzsrxtwpdFHiGMzdjn56EgzFc9gc"
+                        ).apply()
+                        if(!tokenSharedPreferences.getString("accessToken","").isNullOrEmpty()){
+                            startActivity(Intent(this@OnboardingActivity,MainActivity::class.java))
+                            finish()
+                        }
+                    },
+                    text = "무료체험하기",
+                    textDecoration = TextDecoration.Underline,
+                    fontFamily = FontMoment.preStandardFont,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(12.dp))
                 if (id.value.isNotEmpty() && password.value.isNotEmpty()){
 
                     BigButton("로그인하기", true,
@@ -1403,6 +1426,6 @@ class OnboardingActivity:ComponentActivity() {
     @Preview
     @Composable
     fun OnboardingPreView(){
-        SignupEmail()
+        Login()
     }
 }
