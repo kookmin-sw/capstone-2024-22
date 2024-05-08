@@ -212,8 +212,24 @@ struct ReceiptCompleteDetailView: View {
                             
                             
                         } else {
-                            // 완료 버튼의 기능
+                            //TODO: - 완료버튼 부분기능부분임
                             
+                            switch selectedTab {
+                            case 0: break
+                                
+                                //TODO: - 이제 여기에서 0번인경우에의 함수를 호출해줘야함
+                                
+                                
+                            case 1: break
+                                
+                                
+                                
+                            default:
+                               return
+                            }
+                           
+                            
+                            //TODO: - 여기에다가 selectedTab 에 따라서 값을 따로 줘야하자나
                             
                             self.showingGroup = true
                             print("완료")
