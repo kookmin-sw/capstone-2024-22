@@ -9,8 +9,89 @@ import Foundation
 import SwiftUI
 
 
-
-
+//TODO: -
+struct ReceiptGroupView: View {
+    //  @EnvironmentObject var sharedViewModel: SharedViewModel
+    var body: some View {
+        ScrollView{
+            //TODO: - 여기서는 뒤로가기버튼의 위치가 AnnounceView 여야함
+            VStack{
+                HStack
+                {
+                    Rectangle()
+                        .fill(Color.gray)
+                        .frame(height: 200)
+                        .padding()
+                        .overlay(
+                            Image(systemName: "pencil.tip")
+                                .font(.largeTitle)
+                                .foregroundColor(.customGray2)
+                        )
+                        .cornerRadius(10)
+                    Rectangle()
+                        .fill(Color.gray)
+                        .frame(height: 200)
+                        .padding()
+                        .overlay(
+                            Image(systemName: "pencil.tip")
+                                .font(.largeTitle)
+                                .foregroundColor(.customGray2)
+                        )
+                        .cornerRadius(10)
+                }
+                HStack
+                {
+                    Rectangle()
+                        .fill(Color.gray)
+                        .frame(height: 200)
+                        .padding()
+                        .overlay(
+                            Image(systemName: "pencil.tip")
+                                .font(.largeTitle)
+                                .foregroundColor(.customGray2)
+                        )
+                        .cornerRadius(10)
+                    Rectangle()
+                        .fill(Color.gray)
+                        .frame(height: 200)
+                        .padding()
+                        .overlay(
+                            Image(systemName: "pencil.tip")
+                                .font(.largeTitle)
+                                .foregroundColor(.customGray2)
+                        )
+                        .cornerRadius(10)
+                }
+                HStack
+                {
+                    Rectangle()
+                        .fill(Color.gray)
+                        .frame(height: 200)
+                        .padding()
+                        .overlay(
+                            Image(systemName: "pencil.tip")
+                                .font(.largeTitle)
+                                .foregroundColor(.customGray2)
+                        )
+                        .cornerRadius(10)
+                    Rectangle()
+                        .fill(Color.gray)
+                        .frame(height: 200)
+                        .padding()
+                        .overlay(
+                            Image(systemName: "pencil.tip")
+                                .font(.largeTitle)
+                                .foregroundColor(.customGray2)
+                        )
+                        .cornerRadius(10)
+                }
+            }
+            
+        }
+        .navigationBarTitle("새 예시", displayMode: .inline)
+        .navigationBarBackButtonHidden()
+    }
+}
 
 
 struct ReceiptCompleteDetailView: View {
@@ -163,9 +244,7 @@ struct ReceiptCompleteDetailView: View {
                 }
                 
                 
-                
-                //TODO: - 여기에다가 두번째 디자인 카드를 추가하고 index 1 번으로 추가한다
-                
+            
                 
             } .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 .zIndex(0)

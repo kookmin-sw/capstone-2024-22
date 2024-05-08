@@ -18,6 +18,7 @@ class BillListViewModel: ObservableObject {
     var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjQsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTA5MTA4MywiZXhwIjoxNzU4MjkxMDgzfQ.XxixgGTkMGfNQPhQXm4Bt8Zz9rfRlq9UsY7wV0gxQUE"
     
     func createReceipt(for tripId: Int) {
+        print(tripId)
         let url = "http://211.205.171.117:8000/core/receipt"
         let headers: HTTPHeaders = [
             .contentType("application/json"),
