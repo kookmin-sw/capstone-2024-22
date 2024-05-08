@@ -71,6 +71,11 @@ class SplashActivity:ComponentActivity() {
 
         setContent{
             navController = rememberNavController()
+            val movenav = try {
+                intent.getStringExtra("MoveScreen")
+            }catch (e : Exception){
+                "Basic"
+            }
 
             val movenav = intent.getStringExtra("MoveScreen")
 

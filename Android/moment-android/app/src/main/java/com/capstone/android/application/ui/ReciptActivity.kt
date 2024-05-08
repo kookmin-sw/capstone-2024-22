@@ -152,7 +152,11 @@ class ReciptActivity : ComponentActivity() {
             )
             emotionList.sortByDescending { it.persent }
 
-            val movenav = intent.getStringExtra("MoveScreen")
+            val movenav = try {
+                intent.getStringExtra("MoveScreen")
+            }catch (e : Exception){
+                "Basic"
+            }
 
 
             //여행 부르기

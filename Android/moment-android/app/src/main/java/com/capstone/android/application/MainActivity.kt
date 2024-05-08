@@ -326,7 +326,11 @@ class MainActivity : ComponentActivity() {
                 closeSheet = { recordOpen.value = false })
         }
 
-        val movenav = intent.getStringExtra("MoveScreen")
+        val movenav = try {
+            intent.getStringExtra("MoveScreen")
+        }catch (e : Exception){
+            "Basic"
+        }
 
         Scaffold(
             modifier = Modifier
