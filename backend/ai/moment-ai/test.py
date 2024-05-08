@@ -209,12 +209,12 @@ def main(file_name, file_path=None):
   stt_model = whisper.load_model(args.whisper_version)
 
   # ser_classifer_dir = None
-  ser_classifer_dir = "./emotion2vec/emotion2vec_base/emotion2vec_classifier.pt"
+  ser_classifer_dir = "./emotion2vec/emotion2vec_classifier.pth"
   ser_model =  AutoModel(model="iic/emotion2vec_base_finetuned", model_revision="v2.0.4")
   
   if ser_classifer_dir:
     ser_classifer = BaseModel()
-    # ser_classifer.load_state_dict(torch.load(ser_classifer_dir))
+    ser_classifer.load_state_dict(torch.load(ser_classifer_dir))
     ser_model.model.proj = ser_classifer
 
   
