@@ -112,12 +112,16 @@ import com.capstone.android.application.app.utile.permission.MomentPermission
 import com.capstone.android.application.app.utile.recorder.MomentAudioPlayer
 import com.capstone.android.application.app.utile.recorder.MomentAudioRecorder
 import com.capstone.android.application.data.remote.card.model.card_post.request.PostCardUploadReqeust
+import com.capstone.android.application.data.remote.receipt.model.receipt_delete.ReceiptId
+import com.capstone.android.application.data.remote.receipt.model.receipt_delete.deleteReceiptDeleteRequest
 import com.capstone.android.application.domain.Card
+import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.CustomTitleCheckViewModel
 import com.capstone.android.application.domain.Emotion
 import com.capstone.android.application.domain.Trip
 import com.capstone.android.application.domain.TripFile
 import com.capstone.android.application.presentation.CardViewModel
+import com.capstone.android.application.presentation.ReceiptViewModel
 import com.capstone.android.application.presentation.KakaoViewModel
 import com.capstone.android.application.presentation.OpenWeatherViewModel
 import com.capstone.android.application.presentation.TripFileViewModel
@@ -193,6 +197,7 @@ class MainActivity : ComponentActivity() {
     lateinit var navController: NavHostController
     private val tripViewModel : TripViewModel by viewModels()
     private val cardViewModel : CardViewModel by viewModels()
+    private val receiptViewModel : ReceiptViewModel by viewModels()
     private val tripFileViewModel : TripFileViewModel by viewModels()
     private val kakaoViewModel : KakaoViewModel by viewModels()
     private val openWeatherViewModel : OpenWeatherViewModel by viewModels()
@@ -201,13 +206,6 @@ class MainActivity : ComponentActivity() {
     @Inject lateinit var recorder: MomentAudioRecorder
     @Inject lateinit var player: MomentAudioPlayer
     @Inject lateinit var momentAudioPlayer:MomentAudioPlayer
-//    private val recorder by lazy {
-//        MomentAudioRecorder(this@MainActivity)
-//    }
-
-//    private val player by lazy {
-//        AndroidAudioPlayer(this@MainActivity)
-//    }
     private var audioFile: File? = null
 
 
@@ -286,10 +284,28 @@ class MainActivity : ComponentActivity() {
         val favoriteCardList = remember{
             mutableStateListOf<Card>()
         }
-        val test:Int = 4
+
+        val receiptList = remember { mutableStateListOf<ReceiptAll>()}
+        val DeleteReceipt = remember { mutableListOf<ReceiptId>() }
+       val test:Int = 4
+        val colorName: Result<String> = runCatching {
+            when (test) {
+                1 -> "파란색"
+                2 -> "빨간색"
+                3 -> "노란색"
+                else -> throw Error("처음 들어보는 색")
+            }
+        }.onSuccess { it:String ->
+            Log.d("awegweagewag",it)
+        }.onFailure { it:Throwable ->
+            //실패시만 실행 (try - catch문의 catch와 유사)
+            Log.d("awegweagewag",it.message.toString())
+
+
 
         var mainTrip = remember {
             mutableStateOf(MainTrip())
+
         }
 
 
@@ -500,6 +516,13 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+
+        val recordOpen = remember { mutableStateOf(false)}
+        val EditCheckState = remember { mutableStateOf(false) }
+        val ReceiptCheckState = remember { mutableStateOf(true) }
+        val viewModel: CustomTitleCheckViewModel = viewModel()
+        val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
+
         openWeatherViewModel.getWeatherInCurrentLocationlSuccess.observe(this@MainActivity){ response ->
             try {
                 temp.value = response.main.temp.toFloat().minus(273.15).toInt().toString()
@@ -512,15 +535,19 @@ class MainActivity : ComponentActivity() {
 
         openWeatherViewModel.getWeatherInCurrentLocationFailure.observe(this@MainActivity){ error ->
 
+
         }
 
+
+        val movenav = try {
+            intent.getStringExtra("MoveScreen")
+        }catch (e : Exception){
+            "Basic"
+        }
 
         navController = rememberNavController()
 
 
-
-
-        val movenav = intent.getStringExtra("MoveScreen")
 
         Scaffold(
             modifier = Modifier
@@ -680,7 +707,10 @@ class MainActivity : ComponentActivity() {
                                             Column(
                                                 Modifier
                                                     .wrapContentSize()
-                                                    .clickable { EditCheckState.value = false }) {
+                                                    .clickable {
+                                                        EditCheckState.value = false
+                                                        DeleteReceipt.clear()
+                                                    }) {
                                                 YJ_Bold15(content = "완료", color = black)
                                             }
                                         }
@@ -704,8 +734,12 @@ class MainActivity : ComponentActivity() {
                                                     /*navController.navigate(MainScreen.ReceiptPost.rootRoute)*/}
                                                 "작게보기" -> {}
                                                 "편집" -> { EditCheckState.value = true }
-                                                "삭제" ->
+                                                "삭제" -> {
                                                     viewModel.showCustomTitleCheckDialog()
+
+                                                    Log.d("Delete", "DeleteReceipt: $DeleteReceipt")
+                                                }
+
                                             }
                                         },
                                     text = title.value,
@@ -718,13 +752,29 @@ class MainActivity : ComponentActivity() {
                                 )
                                 if (CustomTitleCheckDialogState.title.isNotBlank()) {
                                     CustomTitleCheckDialog(
-                                        title = CustomTitleCheckDialogState.title,
+                                        title = DeleteReceipt.size.toString() + CustomTitleCheckDialogState.title,
                                         description = CustomTitleCheckDialogState.description,
                                         checkleft = CustomTitleCheckDialogState.checkleft,
                                         checkright = CustomTitleCheckDialogState.checkright,
                                         onClickleft = {
-                                            CustomTitleCheckDialogState.onClickleft()
-                                            EditCheckState.value = false },
+
+                                           receiptViewModel.deleteReceiptDelete(
+                                                body = deleteReceiptDeleteRequest(receiptIds = DeleteReceipt)
+                                            )
+
+                                            // 영수증 삭제 성공
+                                            receiptViewModel.deleteReceiptDeleteSuccess.observe(this@MainActivity) { response ->
+                                                Log.d("receiptViewModel_deleteReceiptDeleteSuccess", response.toString())
+
+                                            }
+
+                                            // 영수증 삭제 실패
+                                            receiptViewModel.deleteReceiptDeleteFailure.observe(this@MainActivity) { response ->
+                                                Log.d("receiptViewModel_deleteReceiptDeleteFailure", response.toString())
+                                            }
+                                            DeleteReceipt.clear()
+                                            EditCheckState.value = false
+                                            CustomTitleCheckDialogState.onClickleft()},
                                         onClickright = { CustomTitleCheckDialogState.onClickright() },
                                         onClickCancel = { CustomTitleCheckDialogState.onClickCancel() },
                                     )
@@ -786,7 +836,52 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(MainScreen.ReceiptPost.screenRoute){
                     currentSelectedBottomRoute.value = MainScreen.ReceiptPost.rootRoute
-                    ReceiptPost(EditCheckState,ReceiptCheckState)
+
+                    val page = remember { mutableStateOf(0)}
+                    page.value = 0
+                    val size = 4
+                    var totalpage = 0
+                    var currentpage = 0
+
+                    receiptViewModel.getReceiptAll(page.value,size)
+                    // 영수증 전체 받기 성공
+                    receiptViewModel.getReceiptAllSuccess.observe(this@MainActivity) { response ->
+                        Log.d("receiptViewModel_getReceiptAllSuccess", response.toString())
+                        totalpage = response.data.pagination.totalPages
+                        currentpage = response.data.pagination.currentPage
+
+                        response.data.receiptList.mapNotNull { receiptAll -> runCatching{
+                            ReceiptAll(
+                                receiptAll.id,
+                                receiptAll.tripId,
+                                receiptAll.tripName,
+                                receiptAll.angry,
+                                receiptAll.disgust,
+                                receiptAll.happy,
+                                receiptAll.sad,
+                                receiptAll.neutral,
+                                receiptAll.stDate,
+                                receiptAll.edDate,
+                                receiptAll.numOfCard,
+                                receiptAll.mainDeparture,
+                                receiptAll.subDeparture,
+                                receiptAll.mainDestination,
+                                receiptAll.subDestination,
+                                receiptAll.oneLineMemo,
+                                receiptAll.receiptThemeType) }
+                            .onSuccess {receiptList.clear()}
+                            .onFailure {}.getOrNull()
+                        }.forEach {
+                            receiptList.add(it)
+                        }
+                    }
+
+                    // 영수증 전체 받기 실패
+                    receiptViewModel.getReceiptAllFailure.observe(this@MainActivity) { response ->
+                        Log.d("receiptViewModel_getReceiptAllFailure", response.toString())
+                    }
+
+                    ReceiptPost(receiptList,EditCheckState,DeleteReceipt)
                     if (EditCheckState.value) title.value = "삭제" else title.value = "편집"
                 }
 
@@ -1336,13 +1431,14 @@ class MainActivity : ComponentActivity() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.Center
             ) {
             Image(
                 modifier = Modifier.fillMaxWidth(),
-                painter = painterResource(id = R.drawable.test_image), contentDescription = "test"
+                painter = painterResource(id = R.drawable.img_receipt_preview), contentDescription = "영수증미리보기"
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(70.dp))
             BigButton("만들기", true,
                 onClick = {startActivity(Intent(this@MainActivity, ReciptActivity::class.java))})
 
@@ -1350,27 +1446,24 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ReceiptPost(EditCheckState: MutableState<Boolean>, ReceiptCheckState: MutableState<Boolean>) {
+    fun ReceiptPost(receiptList: MutableList<ReceiptAll>,EditCheckState: MutableState<Boolean>, DeleteReceipt :MutableList<ReceiptId> ) {
         //영수증 게시
-        val testList = mutableListOf<Int>(1,2,3,4,5,6,7,8,9,10,11)
-
-
         Column(
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp)) {
+            MyGrid(receiptList, 2, EditCheckState, DeleteReceipt)
 
-            MyGrid(testList, 2, EditCheckState,ReceiptCheckState)
         }
     }
     @Composable
     fun MyGrid(
-        content: List<Int>,
+        receiptList: MutableList<ReceiptAll>,
         columnSize: Int,
         EditCheckState: MutableState<Boolean>,
-        ReceiptCheckState: MutableState<Boolean>
+        DeleteReceipt: MutableList<ReceiptId>
     ){
-        val rowsCount = 1 + (content.size -1)/columnSize // row 개수
+        val rowsCount = 1 + (receiptList.size -1)/columnSize // row 개수
         BoxWithConstraints {
             val maxWidth = this.maxWidth
 
@@ -1378,24 +1471,22 @@ class MainActivity : ComponentActivity() {
                 items(rowsCount) { rowIndex ->
                     val rangeStart = rowIndex*columnSize
                     var rangeEnd = rangeStart + columnSize -1
-                    if (rangeEnd > content.lastIndex) rangeEnd = content.lastIndex // row로 표현될 list의 range를 계산, slice하여 row 생성
-                    RowOfGrid(content.slice(rangeStart..rangeEnd), maxWidth/columnSize, EditCheckState, ReceiptCheckState)
+                    if (rangeEnd > receiptList.lastIndex) rangeEnd = receiptList.lastIndex // row로 표현될 list의 range를 계산, slice하여 row 생성
+                    RowOfGrid(receiptList.slice(rangeStart..rangeEnd), maxWidth/columnSize,
+                        EditCheckState, DeleteReceipt)
                 }
             }
-
         }
     }
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
     fun RowOfGrid(
-        rowList: List<Int>,
+        rowList: List<ReceiptAll>,
         columnWidth: Dp,
         EditCheckState: MutableState<Boolean>,
-        ReceiptCheckState: MutableState<Boolean>
+        DeleteReceipt: MutableList<ReceiptId>
     ) {
-        val interactionSource = remember { MutableInteractionSource() }
-
         var intent = Intent(this@MainActivity, ReciptActivity::class.java)
         intent.putExtra("MoveScreen", "ReceiptPost_Big")
 
@@ -1403,9 +1494,13 @@ class MainActivity : ComponentActivity() {
             items(rowList.size) { index ->
 
                 val item = rowList[index]
-                Log.d("hihihi", "RowOfGrid: $item")
                 val checkState = rememberSaveable { mutableStateOf(false) }
 
+                if (!EditCheckState.value) {
+                    checkState.value = false
+                }
+
+                val receiptId =  ReceiptId(item.id)
                 Box( modifier = Modifier
                     .width(columnWidth)
                     .height(224.dp)
@@ -1414,11 +1509,25 @@ class MainActivity : ComponentActivity() {
                     .clickable {
                         if (!EditCheckState.value) {
                             startActivity(intent)
-                        } else checkState.value = !checkState.value
+                        } else {
+                            if (checkState.value) {
+                                checkState.value = false
+                                if (DeleteReceipt.contains(receiptId)) {
+                                    DeleteReceipt.remove(receiptId)
+                                }
+
+                            } else {
+                                checkState.value = true
+                                if (!DeleteReceipt.contains(receiptId)) {
+                                    DeleteReceipt.add(receiptId)
+                                }
+                            }
+                        }
                     }) {
 
-                    //MiniTheme1()
-                    MiniTheme2()
+                    if(item.receiptThemeType == "A") MiniTheme1(item)
+                    else MiniTheme2(item)
+
 
                     if (EditCheckState.value){
                         Column(
@@ -1450,7 +1559,7 @@ class MainActivity : ComponentActivity() {
                                     verticalArrangement = Arrangement.Center) {
                                     Image(
                                         painter = painterResource(R.drawable.ic_receipt_check_red),
-                                        contentDescription = "장소",
+                                        contentDescription = "체크버튼",
                                         Modifier.size(16.dp)
                                     )
                                 }
@@ -2299,14 +2408,14 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun MiniTheme1(){
+    fun MiniTheme1(receiptAll:ReceiptAll){
         val emotionList = mutableStateListOf<Emotion>()
 
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = 0f,
+                persent = receiptAll.neutral.toInt()
                 color = ""
             )
         )
@@ -2314,6 +2423,7 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
+                persent = receiptAll.happy.toInt()
                 persent = 0f,
                 color = ""
             )
@@ -2322,15 +2432,16 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = 0f,
+                persent = receiptAll.angry.toInt()
                 color = ""
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_sad,
+                text = "슬퍼요 ",
+                persent = receiptAll.sad.toInt()
                 text = "우울해요",
-                persent = 0f,
                 color = ""
             )
         )
@@ -2363,7 +2474,7 @@ class MainActivity : ComponentActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    P_Medium("암스테르담 성당 여행", white , 5.sp)
+                    P_Medium(receiptAll.tripName, white , 5.sp)
 
                     Image(
                         modifier = Modifier
@@ -2380,7 +2491,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    P_Medium("여행의 기록을 한 줄로 기록하세요:)",neutral_500, 5.sp)
+                    P_Medium(receiptAll.oneLineMemo,neutral_500, 5.sp)
 
                 }
             }
@@ -2398,7 +2509,7 @@ class MainActivity : ComponentActivity() {
                     Modifier.size(5.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium("북촌한옥마을",primary_500, 4.5.sp)
+                P_Medium(receiptAll.subDeparture,primary_500, 4.5.sp)
             }
 
             Column(
@@ -2408,7 +2519,7 @@ class MainActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                P_ExtraBold("서울", primary_500, 18.sp)
+                P_ExtraBold(receiptAll.mainDeparture, primary_500, 18.sp)
             }
 
             Column(
@@ -2438,7 +2549,7 @@ class MainActivity : ComponentActivity() {
                     Modifier.size(5.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                P_Medium("암스테르담 공항",primary_500, 4.5.sp)
+                P_Medium(receiptAll.subDestination,primary_500, 4.5.sp)
             }
 
             Column(
@@ -2448,7 +2559,7 @@ class MainActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                P_ExtraBold("암스테르담", primary_500, 18.sp)
+                P_ExtraBold(receiptAll.mainDestination, primary_500, 18.sp)
             }
 
             Row(
@@ -2478,12 +2589,12 @@ class MainActivity : ComponentActivity() {
                 ) {
                     P_Medium(content = "여행 카드", color = neutral_500, 4.sp)
                     Spacer(modifier = Modifier.height(2.dp))
-                    YJ_Bold(content = "27", color = primary_500, 5.sp)
+                    YJ_Bold(content = receiptAll.numOfCard.toString(), color = primary_500, 5.sp)
                     Spacer(modifier = Modifier.height(10.dp))
                     P_Medium(content = "여행 날짜", color = neutral_500, 4.sp)
                     Spacer(modifier = Modifier.height(2.dp))
-                    P_Medium(content = "2024.02.15", color = primary_500, 4.sp)
-                    P_Medium(content = "2024.02.15", color = primary_500, 4.sp)
+                    P_Medium(content = receiptAll.stDate, color = primary_500, 4.sp)
+                    P_Medium(content = receiptAll.edDate, color = primary_500, 4.sp)
                 }
                 Spacer(modifier = Modifier.width(15.dp))
                 Column() {
@@ -2551,7 +2662,7 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun MiniTheme2(){
+    fun MiniTheme2(receiptAll:ReceiptAll){
 
         val emotionList = mutableStateListOf<Emotion>()
 
@@ -2559,7 +2670,7 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = 20f*(0.01f),
+                persent = receiptAll.neutral.toInt()
                 color = ""
             )
         )
@@ -2567,6 +2678,7 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
+                persent = receiptAll.happy.toInt()
                 persent = 21f*(0.01f),
                 color = ""
             )
@@ -2575,15 +2687,16 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = 15f*(0.01f),
-                color = ""
+                persent = receiptAll.angry.toInt()
+                color = "",
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_sad,
+                text = "슬퍼요 ",
+                persent = receiptAll.sad.toInt()
                 text = "우울해요",
-                persent = 15f*(0.01f),
                 color = ""
             )
         )
@@ -2622,7 +2735,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 Column( modifier = Modifier
                     .padding(start = 4.dp)) {
-                    P_Medium(content = "여행의 기록을 한 줄로 기록하세요:)", color = neutral_500, 5.sp)
+                    P_Medium(content = receiptAll.oneLineMemo, color = neutral_500, 5.sp)
                 }
                 Spacer(modifier = Modifier.height(2.dp))
                 Divider(color = primary_500, thickness = 1.dp)
@@ -2646,7 +2759,7 @@ class MainActivity : ComponentActivity() {
                             Modifier.size(5.dp)
                         )
                         Spacer(modifier = Modifier.width(1.dp))
-                        P_Medium(content = "북촌 한옥마을", color =neutral_600, 4.5.sp)
+                        P_Medium(content = receiptAll.subDeparture, color =neutral_600, 4.5.sp)
                     }
                     Spacer(modifier = Modifier.height(1.dp))
                     Column(
@@ -2655,7 +2768,7 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        P_ExtraBold(content = "서울", color = black, size = 18.sp)
+                        P_ExtraBold(content = receiptAll.mainDeparture, color = black, size = 18.sp)
                     }
                     Spacer(modifier = Modifier.height(1.dp))
                     Column(
@@ -2685,7 +2798,7 @@ class MainActivity : ComponentActivity() {
                             Modifier.size(5.dp)
                         )
                         Spacer(modifier = Modifier.width(1.dp))
-                        P_Medium(content = "암스테르담 공항", color = neutral_600, 4.5.sp)
+                        P_Medium(content = receiptAll.subDestination, color = neutral_600, 4.5.sp)
                     }
 
                     Column(
@@ -2694,7 +2807,7 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        P_ExtraBold(content = "군산", color = black, size = 18.sp)
+                        P_ExtraBold(content = receiptAll.mainDestination, color = black, size = 18.sp)
                     }
                     Spacer(modifier = Modifier.height(27.dp))
                     Column(
@@ -2702,7 +2815,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        P_Medium(content = "전라도의 선유도", color = black, 5.sp)
+                        P_Medium(content = receiptAll.tripName, color = black, 5.sp)
                         Spacer(modifier = Modifier.height(4.dp))
 
                         Row(
@@ -2782,7 +2895,7 @@ class MainActivity : ComponentActivity() {
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.Center
                                 ) {
-                                    YJ_Bold(content = "27", color = primary_500, 8.sp)
+                                    YJ_Bold(content = receiptAll.numOfCard.toString(), color = primary_500, 8.sp)
                                 }
                             }
                         }
@@ -2795,9 +2908,9 @@ class MainActivity : ComponentActivity() {
                     .padding(bottom = 2.dp, end = 7.dp)
                     .align(Alignment.BottomEnd)
             ) {
-                P_Medium(content = "2024 . 02 . 15", color = neutral_500, 4.sp)
+                P_Medium(content = receiptAll.stDate, color = neutral_500, 4.sp)
                 P_Medium(content = " / ", color = neutral_500, 4.sp)
-                P_Medium(content = "2024 . 02 . 15", color = neutral_500, 4.sp)
+                P_Medium(content = receiptAll.edDate, color = neutral_500, 4.sp)
             }
 
             Row() {
@@ -2891,6 +3004,7 @@ class MainActivity : ComponentActivity() {
 //            RecordDaily()
 //            Setting()
 //            ItemTrip()
+            Receipt()
         }
     }
 

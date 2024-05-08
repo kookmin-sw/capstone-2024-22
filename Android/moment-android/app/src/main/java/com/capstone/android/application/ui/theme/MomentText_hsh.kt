@@ -184,7 +184,18 @@ fun P_ExtraBold(content: String, color: Color, size: TextUnit){
             fontSize = size)
     )
 }
-
+@Composable
+fun P_Bold(content: String, color: Color, size: TextUnit, textAlign: TextAlign){
+    Text(
+        text = content,
+        textAlign = textAlign,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = size)
+    )
+}
 @Composable
 fun P_Bold30(content: String, color: Color, textAlign: TextAlign){
     Text(

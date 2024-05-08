@@ -3,6 +3,7 @@ package com.capstone.android.application.data
 import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.data.remote.auth.AuthRetrofitInterface
 import com.capstone.android.application.data.remote.card.CardRetrofitInterface
+import com.capstone.android.application.data.remote.receipt.ReceiptRetrofitInterface
 import com.capstone.android.application.data.remote.download_link.DownloadLinkRetrofitInterface
 import com.capstone.android.application.data.remote.kakao.KakaoRetrofitInterface
 import com.capstone.android.application.data.remote.open_weather.OpenWeatherRetrofitInterface
@@ -183,6 +184,12 @@ object ApiModule {
 
     @Singleton
     @Provides
+    fun provideReceiptService(@BaseRetrofit retrofit:Retrofit) : ReceiptRetrofitInterface {
+        return retrofit.create(ReceiptRetrofitInterface::class.java)
+    }
+
+    @Singleton
+    @Provides
     fun provideKakaoService(@KakaoRetrofit retrofit:Retrofit) : KakaoRetrofitInterface {
         return retrofit.create(KakaoRetrofitInterface::class.java)
     }
@@ -199,7 +206,6 @@ object ApiModule {
     fun provideDownloadLinkService(@DownloadLinkRetrofit retrofit:Retrofit) : DownloadLinkRetrofitInterface {
         return retrofit.create(DownloadLinkRetrofitInterface::class.java)
     }
-
 
 
 

@@ -81,6 +81,7 @@ import com.capstone.android.application.ui.theme.P_Medium18
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
 import com.capstone.android.application.ui.theme.negative_600
+import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.primary_500
 import com.capstone.android.application.ui.theme.tertiary_500
@@ -271,7 +272,7 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(top = 54.dp)
                     .wrapContentSize()
             ) {
-                ImgBackButton(onClick = {startActivity(Intent(this@OnboardingActivity, SplashActivity::class.java))}, "로그인")
+                ImgBackButton(onClick = {startActivity(Intent(this@OnboardingActivity, SplashActivity::class.java).putExtra("MoveScreen","intro"))}, "로그인")
             }
 
             Column(
@@ -349,13 +350,6 @@ class OnboardingActivity:ComponentActivity() {
                         }
                         Spacer(modifier = Modifier.height(4.dp))
                         Divider(color = black)
-                    }
-                    Row(modifier = Modifier
-                        .padding(end = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically){
-                        P_Medium11(content = "자동로그인",color = black)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        CheckButton(autologin)
                     }
                 }
             }
@@ -862,6 +856,9 @@ class OnboardingActivity:ComponentActivity() {
         val passwordcheck = remember{
             mutableStateOf("")
         }
+        val wificheck = remember{
+            mutableStateOf(false)
+        }
         val pwequel = remember{ mutableStateOf(true) }
         val focusManager = LocalFocusManager.current
         val focusRequester = remember { FocusRequester() }
@@ -954,6 +951,18 @@ class OnboardingActivity:ComponentActivity() {
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Divider(color = if(pwequel.value)black else primary_500)
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End){
+                    Column(horizontalAlignment = Alignment.End) {
+                        P_Medium11(content = "와이파이가 없는 환경에서도 녹음 파일 저장하기",color = black)
+                        P_Medium11(content = "나중에 설정에서 바꿀 수 있어요",color = neutral_500)
+                    }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        CheckButton(wificheck)
+                    }
             }
 
             Column(
