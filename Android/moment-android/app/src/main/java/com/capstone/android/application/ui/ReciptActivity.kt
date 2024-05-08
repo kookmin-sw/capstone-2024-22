@@ -267,6 +267,8 @@ class ReciptActivity : ComponentActivity() {
                         val enddate = navBackStackEntry.arguments?.getString("enddate")
                         val theme = navBackStackEntry.arguments?.getString("theme")
 
+                        var emotionList = emotionPercent(tripDetailList[0].neutral,tripDetailList[0].happy,tripDetailList[0].angry, tripDetailList[0].sad)
+                        tripDetailList[0].neutral
                         if (theme != null) {
                             SaveRecipt(theme,ReceiptContent_string(
                                 tripName, intro, depart_small, depart, arrive_small, arrive,
@@ -495,14 +497,8 @@ class ReciptActivity : ComponentActivity() {
         val tripid = trip.id
         val cardnum = trip.numOfCard
         var theme = if (state.currentPage == 0) "A" else "B"
+        var emotionList = emotionPercent(trip.neutral, trip.happy, trip.angry, trip.sad)
 
-        val emotionList = mutableStateListOf<Emotion>()
-        emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "평범해요", persent = (trip.neutral*100).toInt()))
-        emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =( trip.happy*100).toInt()))
-        emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (trip.angry*100).toInt()))
-        emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (trip.sad *100).toInt()))
-        //emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = trip.disgust.toInt()))
-        emotionList.sortByDescending { it.persent }
 
         Column(
             modifier = Modifier
@@ -566,28 +562,25 @@ class ReciptActivity : ComponentActivity() {
                                     cardnum, publicationdate, startdate, enddate, emotionList
                                 )
 
-                            // 영수증 생성 성공
-                            receiptViewModel.postReceiptCreateSuccess.observe(this@ReciptActivity) { response ->
-                                Log.d(
-                                    "receiptViewModel_postReceiptCreateSuccess",
-                                    response.toString()
-                                )
+                                // 영수증 생성 성공
+                                receiptViewModel.postReceiptCreateSuccess.observe(this@ReciptActivity) { response ->
 
-                                navController.navigate(
-                                    ReciptScreen.SaveRecipt.name +
-                                            "/${receiptData.tripName}" +
-                                            "/${receiptData.intro.value}" +
-                                            "/${receiptData.depart_small.value}" +
-                                            "/${receiptData.depart.value}" +
-                                            "/${receiptData.arrive_small.value}" +
-                                            "/${receiptData.arrive.value}" +
-                                            "/${receiptData.cardnum}" +
-                                            "/${receiptData.publicationdate}" +
-                                            "/${receiptData.startdate}" +
-                                            "/${receiptData.enddate}" +
-                                            "/${theme}"
-                                )
-                            }
+                                    navController.navigate(
+                                        ReciptScreen.SaveRecipt.name +
+                                                "/${tripid}" +
+                                                "/${receiptData.tripName}" +
+                                                "/${receiptData.intro.value}" +
+                                                "/${receiptData.depart_small.value}" +
+                                                "/${receiptData.depart.value}" +
+                                                "/${receiptData.arrive_small.value}" +
+                                                "/${receiptData.arrive.value}" +
+                                                "/${receiptData.cardnum}" +
+                                                "/${receiptData.publicationdate}" +
+                                                "/${receiptData.startdate}" +
+                                                "/${receiptData.enddate}" +
+                                                "/${theme}"
+                                    )
+                                }
                             }
                         }) {
                     YJ_Bold15("완료", black)
@@ -2065,6 +2058,18 @@ class ReciptActivity : ComponentActivity() {
     fun isDatePassed(targetDate: LocalDate): Boolean {
         val currentDate = getCurrentDate()
         return currentDate.isAfter(targetDate) || currentDate.isEqual(targetDate)
+    }
+
+    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double): SnapshotStateList<Emotion> {
+        val emotionList = mutableStateListOf<Emotion>()
+        emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "평범해요", persent = (common*100).toInt()))
+        emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
+        emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (angry*100).toInt()))
+        emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
+        //emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = emotion5.toInt()))
+        emotionList.sortByDescending { it.persent }
+
+        return emotionList
     }
 
     @SuppressLint("UnrememberedMutableState")
