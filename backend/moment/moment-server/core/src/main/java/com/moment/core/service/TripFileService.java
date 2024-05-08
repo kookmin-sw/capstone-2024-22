@@ -79,6 +79,7 @@ public class TripFileService {
                         tripFileRepository.delete(tripFile);
                     } else {
                         tripFile.setTrip(untitledTrip);
+                        untitledTrip.setAnalyzingCount(untitledTrip.getAnalyzingCount() + tripFile.getAnalyzingCount());
                         tripFileRepository.save(tripFile);
                     }
                 }

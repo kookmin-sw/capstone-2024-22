@@ -46,6 +46,7 @@ public class TripService {
     // 2. 엮여있는 여행파일들 탐색
     // 3. 내부가 비어있는 여행파일들은 그냥 삭제, 내부가 비어있지 않다면 untitled 여행으로 넣는다.
     // 4. alreadyBookedDate에서 삭제한다.
+    // 5. 분석중 개수 증가
     @Transactional
     public Trip delete(Long tripId) {
         Trip trip = tripRepository.findById(tripId).orElseThrow(() -> new RuntimeException("존재하지 않는 여행입니다."));
@@ -74,6 +75,7 @@ public class TripService {
     // 여행 등록
     @Transactional
     public void register(TripRequestDTO.RegisterTrip registerTrip, Long userId) {
+        Trip untitledTrip = getUntitledTripById(userId);
         LocalDate stDate = registerTrip.getStartDate();
         LocalDate endDate = registerTrip.getEndDate();
         Integer analyzingCount = 0;
@@ -108,11 +110,13 @@ public class TripService {
         }
 
         trip.setAnalyzingCount(analyzingCount);
+        untitledTrip.setAnalyzingCount(untitledTrip.getAnalyzingCount() - analyzingCount);
 
         // 여행 등록 날짜에 추가
         alreadyBookedDateService.addAll(user, registerTrip.getStartDate(), registerTrip.getEndDate());
 
         tripRepository.save(trip);
+        tripRepository.save(untitledTrip);
     }
 
     // 묶이지 않은 여행 가져오기
