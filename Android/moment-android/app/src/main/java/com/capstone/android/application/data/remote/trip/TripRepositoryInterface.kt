@@ -1,6 +1,7 @@
 package com.capstone.android.application.data.remote.trip
 
 import com.capstone.android.application.data.remote.trip.model.trip_all.GetTripAllResponse
+import com.capstone.android.application.data.remote.trip.model.trip_detail.GetTripDetailResponse
 import com.capstone.android.application.data.remote.trip.model.trip_put.request.PutTripRequest
 import com.capstone.android.application.data.remote.trip.model.trip_register.request.PostTripRegisterRequest
 import com.capstone.android.application.domain.response.ApiResponse
@@ -19,4 +20,8 @@ interface TripRepositoryInterface {
     suspend fun putTrip(
         body : PutTripRequest
     ) : ApiResponse<MomentResponse>
+
+    suspend fun getTripDetail(
+        tripId:Int
+    ) : ApiResponse<GetTripDetailResponse>
 }

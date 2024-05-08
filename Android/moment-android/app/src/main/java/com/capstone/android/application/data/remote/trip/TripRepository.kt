@@ -1,6 +1,7 @@
 package com.capstone.android.application.data.remote.trip
 
 import com.capstone.android.application.data.remote.trip.model.trip_all.GetTripAllResponse
+import com.capstone.android.application.data.remote.trip.model.trip_detail.GetTripDetailResponse
 import com.capstone.android.application.data.remote.trip.model.trip_put.request.PutTripRequest
 import com.capstone.android.application.data.remote.trip.model.trip_register.request.PostTripRegisterRequest
 import com.capstone.android.application.domain.response.ApiResponse
@@ -30,5 +31,11 @@ class TripRepository @Inject constructor(private val tripRetrofitInterface:TripR
         body: PutTripRequest
     ): ApiResponse<MomentResponse> {
         return tripRetrofitInterface.putTripPatch( body = body)
+    }
+
+    override suspend fun getTripDetail(
+        tripId:Int
+    ): ApiResponse<GetTripDetailResponse> {
+        return tripRetrofitInterface.getTripDetail(tripId = tripId)
     }
 }
