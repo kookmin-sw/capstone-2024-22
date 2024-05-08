@@ -32,8 +32,8 @@ interface TripRetrofitInterface {
         @Body body : PutTripRequest
     ) : ApiResponse<MomentResponse>
 
-    @GET("core/trip/{tripId}")
+    @GET("/core/trip/{tripId}")
     suspend fun getTripDetail(
-        @Path(value = "tripId") tripId:Int
+        @Path(value = "tripId") tripId : Int
     ): ApiResponse<GetTripDetailResponse>
 }
