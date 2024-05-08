@@ -55,7 +55,8 @@ public class ImageFileService {
     public void deleteImages(List<Long> images, Long userId) {
         for (Long imageId : images) {
             ImageFile image = imageFileRepository.findById(imageId).orElseThrow(() -> new IllegalArgumentException("해당 이미지가 없습니다."));
-            userService.validateUserWithCardView(userId, image.getCardView().getId());
+            CardView cardView = image.getCardView();
+            userService.validateUserWithCardView(userId, cardView.getId());
             s3Service.deleteFile(image.getFileName(), userId.toString());
             imageFileRepository.delete(image);
         }

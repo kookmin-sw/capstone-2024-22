@@ -23,7 +23,7 @@ public class AlreadyBookedDate extends BaseEntity {
     private Long id;
 
     // 유저
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

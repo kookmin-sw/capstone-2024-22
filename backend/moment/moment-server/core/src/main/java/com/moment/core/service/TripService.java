@@ -1,7 +1,11 @@
 package com.moment.core.service;
 
+import com.moment.core.domain.cardView.CardView;
+import com.moment.core.domain.cardView.CardViewRepository;
 import com.moment.core.domain.trip.Trip;
 import com.moment.core.domain.trip.TripRepository;
+import com.moment.core.domain.tripFile.TripFile;
+import com.moment.core.domain.tripFile.TripFileRepository;
 import com.moment.core.domain.user.User;
 import com.moment.core.domain.user.UserRepository;
 import com.moment.core.dto.request.TripRequestDTO;
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +35,8 @@ public class TripService {
     private final TripFileService tripFileService;
     private final EntityManager em;
     private final ReceiptService receiptService;
+    private final TripFileRepository tripFileRepository;
+    private final CardViewRepository cardViewRepository;
 
     public void save(Trip trip) {
         tripRepository.save(trip);
@@ -42,12 +49,13 @@ public class TripService {
     @Transactional
     public Trip delete(Long tripId) {
         Trip trip = tripRepository.findById(tripId).orElseThrow(() -> new RuntimeException("존재하지 않는 여행입니다."));
+        User user = trip.getUser();
         if(trip.getIsNotTitled()){
             throw new UntitledTripDeleteException("묶이지 않은 여행은 삭제할 수 없습니다.");
         }
-        Trip untitledTrip = getUntitledTrip(trip.getUser());
+        Trip untitledTrip = getUntitledTrip(user);
         tripFileService.deleteByTripOrUntitled(trip, untitledTrip);
-        alreadyBookedDateService.deleteAll(trip.getUser(), trip.getStartDate(), trip.getEndDate());
+        alreadyBookedDateService.deleteAll(user, trip.getStartDate(), trip.getEndDate());
         tripRepository.delete(trip);
         return trip;
     }
@@ -131,12 +139,23 @@ public class TripService {
         tripRepository.save(trip);
     }
 
+    public int getCardNum(Trip trip) {
+//        List<TripFile> tripFiles = tripFileRepository.findAllByTrip(trip);
+//        int cardViewCount = 0;
+//        for (TripFile tripFile : tripFiles) {
+//            List<CardView> cardViews = cardViewRepository.findAllByTripFile(tripFile);
+//            cardViewCount += cardViews.size();
+//        }
+        return cardViewRepository.countByTripFile_Trip_Id(trip.getId()).intValue();
+    }
+
     public TripResponseDTO.GetAllTrip getAllTrip(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 유저입니다."));
         List<TripResponseDTO.GetTrip> rtnList = new ArrayList<>();
         List<Trip> trips = tripRepository.findAllByUserAndIsNotTitledOrderByStartDate(user, false);
         for (Trip trip : trips) {
-            rtnList.add(TripResponseDTO.GetTrip.fromEntity(trip));
+            int numOfCard = getCardNum(trip);
+            rtnList.add(TripResponseDTO.GetTrip.fromEntity(trip, numOfCard));
         }
         return TripResponseDTO.GetAllTrip.builder().trips(rtnList).build();
     }

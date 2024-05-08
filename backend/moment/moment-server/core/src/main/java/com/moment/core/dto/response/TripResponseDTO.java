@@ -32,8 +32,10 @@ public class TripResponseDTO {
         @Schema(description = "여행 이름")
         private final String tripName;
 
+        private final int numOfCard;
+
         // fromEntity
-        public static GetTrip fromEntity(Trip trip) {
+        public static GetTrip fromEntity(Trip trip, int numOfCard) {
             return GetTrip.builder()
                     .id(trip.getId())
                     .email(trip.getUser().getEmail())
@@ -41,6 +43,7 @@ public class TripResponseDTO {
                     .endDate(trip.getEndDate())
                     .analyzingCount(trip.getAnalyzingCount())
                     .tripName(trip.getTripName())
+                    .numOfCard(numOfCard)
                     .build();
         }
     }

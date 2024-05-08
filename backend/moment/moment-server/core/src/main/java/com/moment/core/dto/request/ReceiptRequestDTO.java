@@ -4,6 +4,7 @@ import com.moment.core.dto.Pagination;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ReceiptRequestDTO {
@@ -58,6 +59,8 @@ public class ReceiptRequestDTO {
         private Float disgust;
 
         private String receiptThemeType;
+
+        private LocalDateTime createdAt;
     }
 
     @Data
@@ -100,6 +103,29 @@ public class ReceiptRequestDTO {
     public static class createReceipt {
 
         private Long tripId;
+
+        private String mainDeparture;
+
+        private String subDeparture;
+
+        private String mainDestination;
+
+        private String subDestination;
+
+        private String oneLineMemo;
+
+        private String receiptThemeType;
+    }
+
+    @Data
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class updateReceipt {
+
+        private Long id;
 
         private String mainDeparture;
 

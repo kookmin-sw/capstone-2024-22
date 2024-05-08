@@ -22,7 +22,7 @@ public class Receipt extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_id", nullable = true)
     private Trip trip;
 

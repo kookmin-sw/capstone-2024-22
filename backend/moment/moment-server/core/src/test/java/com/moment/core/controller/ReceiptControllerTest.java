@@ -22,10 +22,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.moment.core.config.DocumentFormatGenerator.getReceiptFormat;
-import static com.moment.core.config.DocumentFormatGenerator.getStringNumFormat;
+import static com.moment.core.config.DocumentFormatGenerator.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -107,6 +107,7 @@ class ReceiptControllerTest {
                                 .stDate(LocalDate.parse("2021-01-01"))
                                 .edDate(LocalDate.parse("2021-01-03"))
                                 .numOfCard(3)
+                                .createdAt(LocalDateTime.parse("2021-01-01T00:00:00"))
                                 .build(),
                         ReceiptRequestDTO.getReceipt.builder()
                                 .id(2L)
@@ -126,6 +127,7 @@ class ReceiptControllerTest {
                                 .stDate(LocalDate.parse("2021-02-01"))
                                 .edDate(LocalDate.parse("2021-02-02"))
                                 .numOfCard(3)
+                                .createdAt(LocalDateTime.parse("2021-01-01T00:00:00"))
                                 .build(),
                         ReceiptRequestDTO.getReceipt.builder()
                                 .id(3L)
@@ -145,6 +147,7 @@ class ReceiptControllerTest {
                                 .stDate(LocalDate.parse("2021-03-01"))
                                 .edDate(LocalDate.parse("2021-03-02"))
                                 .numOfCard(3)
+                                .createdAt(LocalDateTime.parse("2021-01-01T00:00:00"))
                                 .build()
                 ))
                 .pagination(Pagination.builder()
@@ -198,6 +201,7 @@ class ReceiptControllerTest {
                                         fieldWithPath("data.receiptList[].neutral").type(JsonFieldType.NUMBER).description("중립적인 감정 비율"),
                                         fieldWithPath("data.receiptList[].disgust").type(JsonFieldType.NUMBER).description("역겨운 감정 비율"),
                                         fieldWithPath("data.receiptList[].receiptThemeType").type(JsonFieldType.STRING).attributes(getReceiptFormat()).description("영수증 테마 타입"),
+                                        fieldWithPath("data.receiptList[].createdAt").type(JsonFieldType.STRING).attributes(getDateTimeFormat()).description("생성 날짜"),
                                         fieldWithPath("data.pagination").type(JsonFieldType.OBJECT).description("페이징 정보"),
                                         fieldWithPath("data.pagination.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
                                         fieldWithPath("data.pagination.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
@@ -304,4 +308,53 @@ class ReceiptControllerTest {
                 )
                 .andDo(print());
     }
-}
+
+    @Test
+    public void updateReceipt() throws Exception {
+        ReceiptRequestDTO.updateReceipt updateReceipt = ReceiptRequestDTO.updateReceipt.builder()
+                .id(1L)
+                .mainDeparture("mainDeparture")
+                .subDeparture("subDeparture")
+                .mainDestination("mainDestination")
+                .subDestination("subDestination")
+                .oneLineMemo("oneLineMemo")
+                .receiptThemeType("A")
+                .build();
+
+        Mockito.doNothing().when(receiptService).updateReceipt(1L, updateReceipt);
+
+        ResultActions result = mockMvc.perform(RestDocumentationRequestBuilders.put("/core/receipt")
+                .header("userId", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(Json.pretty(updateReceipt))
+        );
+
+        result.andExpect(status().isOk())
+                .andDo(
+                        document("receipt/updateReceipt",
+                                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                                requestHeaders(
+                                        headerWithName("userId").description("Bearer Token")
+                                ),
+                                requestFields(
+                                        fieldWithPath("id").type(JsonFieldType.NUMBER).description("영수증 ID"),
+                                        fieldWithPath("mainDeparture").type(JsonFieldType.STRING).attributes(getStringNumFormat(7)).description("출발지(대)"),
+                                        fieldWithPath("subDeparture").type(JsonFieldType.STRING).attributes(getStringNumFormat(24)).description("출발지(소)"),
+                                        fieldWithPath("mainDestination").type(JsonFieldType.STRING).attributes(getStringNumFormat(7)).description("도착지(대)"),
+                                        fieldWithPath("subDestination").type(JsonFieldType.STRING).attributes(getStringNumFormat(24)).description("도착지(소)"),
+                                        fieldWithPath("oneLineMemo").type(JsonFieldType.STRING).attributes(getStringNumFormat(27)).description("한줄 메모"),
+                                        fieldWithPath("receiptThemeType").type(JsonFieldType.STRING).attributes(getReceiptFormat()).description("영수증 테마 타입")
+                                ),
+                                responseFields(
+                                        fieldWithPath("status").type(JsonFieldType.NUMBER).description("응답 상태 코드"),
+                                        fieldWithPath("code").type(JsonFieldType.STRING).description("응답 코드"),
+                                        fieldWithPath("msg").type(JsonFieldType.STRING).description("응답 메시지"),
+                                        fieldWithPath("detailMsg").type(JsonFieldType.STRING).description("상세 메시지"),
+                                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("데이터 없음")
+                                )
+                        )
+                )
+                .andDo(print());
+
+}   }
