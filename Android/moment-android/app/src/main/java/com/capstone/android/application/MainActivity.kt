@@ -932,7 +932,8 @@ class MainActivity : ComponentActivity() {
                                         receiptAll.mainDestination,
                                         receiptAll.subDestination,
                                         receiptAll.oneLineMemo,
-                                        receiptAll.receiptThemeType
+                                        receiptAll.receiptThemeType,
+                                        receiptAll.createdAt
                                     )
                                 }
                                     .onSuccess { receiptList.clear() }
@@ -1580,6 +1581,7 @@ class MainActivity : ComponentActivity() {
                     .background(Color.Gray)
                     .clickable {
                         if (!EditCheckState.value) {
+                            intent.putExtra("BigReceipt", item)
                             startActivity(intent)
                         } else {
                             if (checkState.value) {
