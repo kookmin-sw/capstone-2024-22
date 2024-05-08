@@ -21,7 +21,8 @@
 
 from funasr import AutoModel
 from pydub import AudioSegment
-import subprocess
+import subprocess, torch
+import numpy as np
 
 
 # # MP4 파일 로드
@@ -51,17 +52,23 @@ rec_result contains {'feats', 'labels', 'scores'}
 '''
 
 model = AutoModel(model="iic/emotion2vec_base_finetuned", model_revision="v2.0.4")
+ser_classifer_dir = "./emotion2vec/emotion2vec_classifier.pth"
 source_file = f"./source/test.m4a"
 wav_file = f"./source/test20.wav"
 command = f"ffmpeg -i {source_file} -ab 160k -ac 1 -ar 16000 -vn {wav_file}"
 subprocess.call(command, shell=True)
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 model.model.proj = BaseModel()
-model.model.to(model.kwargs['device'])
+params = torch.load(ser_classifer_dir, map_location=device)
+print(params)
+model.model.proj.load_state_dict(params)
+model.kwargs['device'] = device
+model.model.to(device)
 print(model.model)
 rec_result = model.generate(wav_file, output_dir="./outputs", granularity="utterance", extract_embedding=False)[0]
 print(rec_result)
-import numpy as np
+
 print(rec_result['scores'])
 scores = np.array(rec_result['scores'], dtype=np.float64)
 print(rec_result['labels'][np.argmax(scores)])

@@ -42,8 +42,11 @@ def fine_tuning(label_dict, datasets_csv):
     wandb.watch(classifier)
 
     # count_parameters(model)
-    optimizer = optim.RMSprop(classifier.parameters(), lr=5e-4, momentum=0.9)
-    scheduler = optim.lr_scheduler.CyclicLR(optimizer, base_lr=5e-4, max_lr=1e-3, step_size_up=10)
+    # optimizer = optim.RMSprop(classifier.parameters(), lr=5e-4, momentum=0.9)
+    # scheduler = optim.lr_scheduler.CyclicLR(optimizer, base_lr=5e-4, max_lr=1e-3, step_size_up=100)
+    optimizer = optim.Adam(classifier.parameters(), lr=5e-4)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=200, gamma=0.5)
+    
     criterion = nn.CrossEntropyLoss()
     
     test_wa_avg, test_ua_avg, test_f1_avg = 0., 0., 0.
@@ -54,7 +57,7 @@ def fine_tuning(label_dict, datasets_csv):
     train_loader, val_loader, test_loader = load_dataloader(datasets_list, batch_size=batch_size)
     
     # set save directory
-    save_dir = os.path.join(str(Path.cwd()), f"emotion2vec_classifier.pth")
+    save_dir = os.path.join(str(Path.cwd()), f"emotion2vec_classifier_Adam2.pth")
     
     # Training loop
     for epoch in range(epochs):
@@ -83,8 +86,8 @@ def fine_tuning(label_dict, datasets_csv):
         )
 
     ckpt = torch.load(save_dir)
-    model.load_state_dict(ckpt, strict=True)
-    test_wa, test_ua, test_f1 = validate_and_test(model, test_loader, device, num_classes=len(label_dict))
+    classifier.load_state_dict(ckpt, strict=True)
+    test_wa, test_ua, test_f1 = validate_and_test(classifier, test_loader, device, num_classes=len(label_dict))
     logger.info(f"{best_val_wa_epoch + 1}, test WA {test_wa}%; UA {test_ua}%; F1 {test_f1}%")
     
     test_wa_avg += test_wa
