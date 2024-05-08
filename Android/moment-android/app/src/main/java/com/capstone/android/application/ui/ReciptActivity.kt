@@ -194,14 +194,6 @@ class ReciptActivity : ComponentActivity() {
                     composable(route = ReciptScreen.MakeTripChoice.name) { MakeTripChoice(tripList) }
                     composable(route = ReciptScreen.MakeTrip.name){
 
-                        val ItemData = remember {
-                            navController.previousBackStackEntry?.savedStateHandle?.get<Int>("ItemData") }
-
-                        if (ItemData != null) {
-                            //tripViewModel.getTripDetail(tripId = ItemData)
-                            Log.d("qwerqwerqwer", "너 왜 계속 호출하니?")
-                        }
-
                         // 영수증 전체 받기 성공
                         tripViewModel.getTripDetailSuccess.observe(this@ReciptActivity) { response ->
                             Log.d("qwerqwerqwer", "success" +response.toString())
@@ -228,16 +220,12 @@ class ReciptActivity : ComponentActivity() {
                         tripViewModel.getTripDetailFailure.observe(this@ReciptActivity) { response ->
                             Log.d("qwerqwerqwer", response.toString())
                         }
-                        if(tripDetailList.size > 0) {
+
+                        if(tripDetailList.size == 1) {
                             MakeTrip(tripDetailList[0])
                             Log.d("qwerqwerqwer", "onCreate: 1개라고 임마")
                         }
-                        else {
-                            navController.navigate(ReciptScreen.MakeTripChoice.name)
-                            Log.d("qwerqwerqwer", "onCreate: 0개라고 임마")}
-
                     }
-
                     composable(route = ReciptScreen.SaveRecipt.name +
                             "/{tripName}/{intro.value}/{depart_small.value}/{depart.value}" +
                             "/{arrive_small.value}/{arrive.value}/{cardnum}" +
