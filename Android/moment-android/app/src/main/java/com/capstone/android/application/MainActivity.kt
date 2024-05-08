@@ -239,10 +239,11 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun MainRoot(){
+    fun MainRoot() {
         val postTrip =
             rememberLauncherForActivityResult(
-                ActivityResultContracts.StartActivityForResult()) { result ->
+                ActivityResultContracts.StartActivityForResult()
+            ) { result ->
                 if (result.resultCode == 1) {
 //                    val intent = result.data
                     tripViewModel.getTripAll()
@@ -262,7 +263,7 @@ class MainActivity : ComponentActivity() {
             mutableStateListOf<TripFile>()
         }
 
-        val lat = remember{
+        val lat = remember {
             mutableStateOf("")
         }
 
@@ -274,20 +275,20 @@ class MainActivity : ComponentActivity() {
             mutableStateOf("")
         }
 
-        val weather  = remember {
+        val weather = remember {
             mutableStateOf("")
         }
         val addressName = remember {
             mutableStateOf("")
         }
 
-        val favoriteCardList = remember{
+        val favoriteCardList = remember {
             mutableStateListOf<Card>()
         }
 
-        val receiptList = remember { mutableStateListOf<ReceiptAll>()}
+        val receiptList = remember { mutableStateListOf<ReceiptAll>() }
         val DeleteReceipt = remember { mutableListOf<ReceiptId>() }
-       val test:Int = 4
+        val test: Int = 4
         val colorName: Result<String> = runCatching {
             when (test) {
                 1 -> "파란색"
@@ -295,613 +296,684 @@ class MainActivity : ComponentActivity() {
                 3 -> "노란색"
                 else -> throw Error("처음 들어보는 색")
             }
-        }.onSuccess { it:String ->
-            Log.d("awegweagewag",it)
-        }.onFailure { it:Throwable ->
+        }.onSuccess { it: String ->
+            Log.d("awegweagewag", it)
+        }.onFailure { it: Throwable ->}
             //실패시만 실행 (try - catch문의 catch와 유사)
-            Log.d("awegweagewag",it.message.toString())
 
 
+            var mainTrip = remember {
+                mutableStateOf(MainTrip())
 
-        var mainTrip = remember {
-            mutableStateOf(MainTrip())
-
-        }
+            }
 
 
-        val bottomItems = listOf<BottomNavItem>(
-            BottomNavItem.Home,
-            BottomNavItem.Receipt,
-            BottomNavItem.Record,
-            BottomNavItem.Favorite,
-            BottomNavItem.Setting,
-        )
+            val bottomItems = listOf<BottomNavItem>(
+                BottomNavItem.Home,
+                BottomNavItem.Receipt,
+                BottomNavItem.Record,
+                BottomNavItem.Favorite,
+                BottomNavItem.Setting,
+            )
 
-        val scope = rememberCoroutineScope()
-        val title = remember{
-            mutableStateOf("추가")
-        }
+            val scope = rememberCoroutineScope()
+            val title = remember {
+                mutableStateOf("추가")
+            }
 
-        val currentSelectedBottomRoute = remember{
-            mutableStateOf("홈")
-        }
-        //Record Bottomsheet
-        val sheetState = rememberModalBottomSheetState(/*
+            val currentSelectedBottomRoute = remember {
+                mutableStateOf("홈")
+            }
+            //Record Bottomsheet
+            val sheetState = rememberModalBottomSheetState(/*
             initialValue = ModalBottomSheetValue.Hidden,
             confirmStateChange = {false}*/
-        )
-
-        val recordOpen = remember { mutableStateOf(false)}
-        val isRecorderIng = remember{ mutableStateOf(false) }
-        var EditCheckState = remember { mutableStateOf(false) }
-        var ReceiptCheckState = remember { mutableStateOf(true) }
-
-        val viewModel: CustomTitleCheckViewModel = viewModel()
-        val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
-        val coroutineScope = rememberCoroutineScope()
-        val emotionList = remember{
-            mutableStateListOf<Emotion>()
-        }
-
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_common,
-                text = "평범해요",
-                persent = 0f,
-                color = "#99342E"
             )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_happy,
-                text = "즐거워요",
-                persent = 0f,
-                color = "#030712"
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_angry,
-                text = "화가나요",
-                persent = 0f,
-                color = "#DAD0B4"
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요 ",
-                persent = 0f,
-                color = "#1F9854"
-            )
-        )
 
+            val recordOpen = remember { mutableStateOf(false) }
+            val isRecorderIng = remember { mutableStateOf(false) }
+            var EditCheckState = remember { mutableStateOf(false) }
+            var ReceiptCheckState = remember { mutableStateOf(true) }
 
-
-        tripViewModel.getTripAll()
-        cardViewModel.getCardLiked()
-        tripFileViewModel.getTripFileUntitled()
-
-
-
-        tripViewModel.getTripAllSuccess.observe(this@MainActivity){ response->
-            tripList.clear()
-            response.data.trips.mapNotNull { trip -> runCatching { Trip(id=trip.id,tripName = trip.tripName, startDate = trip.startDate, endDate = trip.endDate) }
-                .onSuccess {
-                }.onFailure {
-                }
-                .getOrNull()
-            }.forEach {
-                tripList.add(it)
+            val viewModel: CustomTitleCheckViewModel = viewModel()
+            val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
+            val coroutineScope = rememberCoroutineScope()
+            val emotionList = remember {
+                mutableStateListOf<Emotion>()
             }
 
+            emotionList.add(
+                Emotion(
+                    icon = R.drawable.ic_emotion_common,
+                    text = "평범해요",
+                    persent = 0f,
+                    color = "#99342E"
+                )
+            )
+            emotionList.add(
+                Emotion(
+                    icon = R.drawable.ic_emotion_happy,
+                    text = "즐거워요",
+                    persent = 0f,
+                    color = "#030712"
+                )
+            )
+            emotionList.add(
+                Emotion(
+                    icon = R.drawable.ic_emotion_angry,
+                    text = "화가나요",
+                    persent = 0f,
+                    color = "#DAD0B4"
+                )
+            )
+            emotionList.add(
+                Emotion(
+                    icon = R.drawable.ic_emotion_sad,
+                    text = "슬퍼요 ",
+                    persent = 0f,
+                    color = "#1F9854"
+                )
+            )
+
+
+
+            tripViewModel.getTripAll()
+            cardViewModel.getCardLiked()
+            tripFileViewModel.getTripFileUntitled()
+
+
+
+            tripViewModel.getTripAllSuccess.observe(this@MainActivity) { response ->
+                tripList.clear()
+                response.data.trips.mapNotNull { trip ->
+                    runCatching {
+                        Trip(
+                            id = trip.id,
+                            tripName = trip.tripName,
+                            startDate = trip.startDate,
+                            endDate = trip.endDate
+                        )
+                    }
+                        .onSuccess {
+                        }.onFailure {
+                        }
+                        .getOrNull()
+                }.forEach {
+                    tripList.add(it)
+                }
 
 
 
 
-            if(tripList.isNotEmpty()){
-                Log.d("awegagwea","waegewa")
-                tripList.sortedBy { it.startDate }
-                ApplicationClass.tripName=tripList.first().tripName
-                val format:SimpleDateFormat  =SimpleDateFormat("yyyy-MM-dd")
-                val currentDate = format.parse(getCurrentTime())
-                val compareDate = format.parse(tripList.first().startDate)
 
-                val different=getDifferenceInDay(startDate = currentDate , endDate = compareDate)
+                if (tripList.isNotEmpty()) {
+                    Log.d("awegagwea", "waegewa")
+                    tripList.sortedBy { it.startDate }
+                    ApplicationClass.tripName = tripList.first().tripName
+                    val format: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+                    val currentDate = format.parse(getCurrentTime())
+                    val compareDate = format.parse(tripList.first().startDate)
 
-                run breaker@ {
-                    tripList.forEach {
+                    val different =
+                        getDifferenceInDay(startDate = currentDate, endDate = compareDate)
 
-                        if(currentDate.compareTo(format.parse(it.startDate))<0){
-                            mainTrip.value=MainTrip(
-                                state = TripState.EXISTS,
-                                tripName=it.tripName,
-                                period=abs(getDifferenceInDay(startDate = currentDate , endDate = format.parse(it.startDate)))
-                            )
-                            ApplicationClass.tripName=it.tripName
-                            return@breaker
-                        }else if(currentDate.compareTo(format.parse(it.endDate))<0){
-                            mainTrip.value=MainTrip(
-                                state = TripState.ING,
-                                tripName=it.tripName,
-                                period=abs(getDifferenceInDay(startDate = currentDate , endDate = format.parse(it.startDate)))+1
-                            )
-                            ApplicationClass.tripName=it.tripName
-                            return@breaker
-                        }else{
-                            mainTrip.value=MainTrip(
-                                state = TripState.EMPTY,
-                                tripName=it.tripName,
-                                period=abs(getDifferenceInDay(startDate = currentDate , endDate = format.parse(it.startDate)))+1
-                            )
+                    run breaker@{
+                        tripList.forEach {
+
+                            if (currentDate.compareTo(format.parse(it.startDate)) < 0) {
+                                mainTrip.value = MainTrip(
+                                    state = TripState.EXISTS,
+                                    tripName = it.tripName,
+                                    period = abs(
+                                        getDifferenceInDay(
+                                            startDate = currentDate,
+                                            endDate = format.parse(it.startDate)
+                                        )
+                                    )
+                                )
+                                ApplicationClass.tripName = it.tripName
+                                return@breaker
+                            } else if (currentDate.compareTo(format.parse(it.endDate)) < 0) {
+                                mainTrip.value = MainTrip(
+                                    state = TripState.ING,
+                                    tripName = it.tripName,
+                                    period = abs(
+                                        getDifferenceInDay(
+                                            startDate = currentDate,
+                                            endDate = format.parse(it.startDate)
+                                        )
+                                    ) + 1
+                                )
+                                ApplicationClass.tripName = it.tripName
+                                return@breaker
+                            } else {
+                                mainTrip.value = MainTrip(
+                                    state = TripState.EMPTY,
+                                    tripName = it.tripName,
+                                    period = abs(
+                                        getDifferenceInDay(
+                                            startDate = currentDate,
+                                            endDate = format.parse(it.startDate)
+                                        )
+                                    ) + 1
+                                )
+                            }
                         }
                     }
+
+                } else {
+                    mainTrip.value = MainTrip(
+                        state = TripState.EMPTY
+                    )
+                    Log.d("awegwgwae", "wawegewa")
+                    tripList.clear()
                 }
 
-            }else{
-                mainTrip.value = MainTrip(
-                    state = TripState.EMPTY
-                )
-                Log.d("awegwgwae","wawegewa")
-                tripList.clear()
+
             }
 
+            tripViewModel.getTripAllFailure.observe(this@MainActivity) { response ->
 
-        }
+            }
 
-        tripViewModel.getTripAllFailure.observe(this@MainActivity){ response->
+            tripViewModel.deleteTripSuccess.observe(this@MainActivity) { response ->
+                runCatching {
+                    when (response.status) {
 
-        }
-
-        tripViewModel.deleteTripSuccess.observe(this@MainActivity){ response->
-            runCatching {
-                when(response.status){
-
+                    }
                 }
+                tripViewModel.getTripAll()
             }
-            tripViewModel.getTripAll()
-        }
 
-        cardViewModel.getCardLikedSuccess.observe(this@MainActivity){ response ->
-            favoriteCardList.clear()
-            response.data.cardViews.mapNotNull { cardView-> kotlin.runCatching {
-                Card(
-                    cardView = cardView,
-                    uploadImage = ArrayList<File>(),
-                    imageNum = mutableStateOf(0)
-                )
-            }.onSuccess {
+            cardViewModel.getCardLikedSuccess.observe(this@MainActivity) { response ->
                 favoriteCardList.clear()
-            }.onFailure {
+                response.data.cardViews.mapNotNull { cardView ->
+                    kotlin.runCatching {
+                        Card(
+                            cardView = cardView,
+                            uploadImage = ArrayList<File>(),
+                            imageNum = mutableStateOf(0)
+                        )
+                    }.onSuccess {
+                        favoriteCardList.clear()
+                    }.onFailure {
 
-            }.getOrNull()
-            }.forEach {card->
-                favoriteCardList.add(card)
-            }
-        }
-
-        cardViewModel.postCardUploadSuccess.observe(this@MainActivity){ response->
-            coroutineScope
-                .launch {
-                    sheetState.hide()
-                    recordOpen.value = false
+                    }.getOrNull()
+                }.forEach { card ->
+                    favoriteCardList.add(card)
                 }
-        }
-
-        cardViewModel.getCardLikedSuccess.observe(this@MainActivity){
-
-        }
-
-        tripFileViewModel.getTripFileUntitledSuccess.observe(this@MainActivity){ response->
-            response.data.tripFiles.mapNotNull { tripFile-> kotlin.runCatching { TripFile(
-                id = tripFile.id,
-                tripId = tripFile.tripId,
-                yearDate = tripFile.yearDate,
-                analyzingCount = mutableStateOf(tripFile.totalCount)
-            ) }.onSuccess {
-                tripFileUntitledList.clear()
-            }.onFailure {  }.getOrNull()
-            }.forEach { it->
-                tripFileUntitledList.add(it)
             }
-        }
 
-        kakaoViewModel.getLocalSuccess.observe(this@MainActivity){ response->
-            try {
-                addressName.value = response.documents.first().address_name
-
-
-            } catch (e:Exception){
-                Timber.e(e)
+            cardViewModel.postCardUploadSuccess.observe(this@MainActivity) { response ->
+                coroutineScope
+                    .launch {
+                        sheetState.hide()
+                        recordOpen.value = false
+                    }
             }
-        }
 
+            cardViewModel.getCardLikedSuccess.observe(this@MainActivity) {
 
-        val recordOpen = remember { mutableStateOf(false)}
-        val EditCheckState = remember { mutableStateOf(false) }
-        val ReceiptCheckState = remember { mutableStateOf(true) }
-        val viewModel: CustomTitleCheckViewModel = viewModel()
-        val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
-
-        openWeatherViewModel.getWeatherInCurrentLocationlSuccess.observe(this@MainActivity){ response ->
-            try {
-                temp.value = response.main.temp.toFloat().minus(273.15).toInt().toString()
-                weather.value = GetWeatherType(response.weather.first().main)
-
-            } catch (e:Exception){
-                Timber.e(e)
             }
-        }
 
-        openWeatherViewModel.getWeatherInCurrentLocationFailure.observe(this@MainActivity){ error ->
+            tripFileViewModel.getTripFileUntitledSuccess.observe(this@MainActivity) { response ->
+                response.data.tripFiles.mapNotNull { tripFile ->
+                    kotlin.runCatching {
+                        TripFile(
+                            id = tripFile.id,
+                            tripId = tripFile.tripId,
+                            yearDate = tripFile.yearDate,
+                            analyzingCount = mutableStateOf(tripFile.totalCount)
+                        )
+                    }.onSuccess {
+                        tripFileUntitledList.clear()
+                    }.onFailure { }.getOrNull()
+                }.forEach { it ->
+                    tripFileUntitledList.add(it)
+                }
+            }
+
+            kakaoViewModel.getLocalSuccess.observe(this@MainActivity) { response ->
+                try {
+                    addressName.value = response.documents.first().address_name
 
 
-        }
+                } catch (e: Exception) {
+                    Timber.e(e)
+                }
+            }
 
 
-        val movenav = try {
-            intent.getStringExtra("MoveScreen")
-        }catch (e : Exception){
-            "Basic"
-        }
+//        val recordOpen = remember { mutableStateOf(false)}
+//        val EditCheckState = remember { mutableStateOf(false) }
+//        val ReceiptCheckState = remember { mutableStateOf(true) }
+//        val viewModel: CustomTitleCheckViewModel = viewModel()
+//        val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
 
-        navController = rememberNavController()
+            openWeatherViewModel.getWeatherInCurrentLocationlSuccess.observe(this@MainActivity) { response ->
+                try {
+                    temp.value = response.main.temp.toFloat().minus(273.15).toInt().toString()
+                    weather.value = GetWeatherType(response.weather.first().main)
+
+                } catch (e: Exception) {
+                    Timber.e(e)
+                }
+            }
+
+            openWeatherViewModel.getWeatherInCurrentLocationFailure.observe(this@MainActivity) { error ->
+
+
+            }
+
+
+            val movenav = try {
+                intent.getStringExtra("MoveScreen")
+            } catch (e: Exception) {
+                "Basic"
+            }
+
+            navController = rememberNavController()
 
 
 
-        Scaffold(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = WindowInsets.navigationBars.getBottom(LocalDensity.current).dp / 2)
-                .shadow(elevation = 6.dp)
-            ,
-            bottomBar = {
-                Box(
-                    contentAlignment = Alignment.Center
-                ){
-                    BottomNavigation(
-                        modifier = Modifier
-                            .height(70.dp)
-                            .fillMaxWidth()
-                            .align(Alignment.BottomCenter)
-                        ,
-                        backgroundColor = Color.White,
-                        elevation = 20.dp
+            Scaffold(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = WindowInsets.navigationBars.getBottom(LocalDensity.current).dp / 2)
+                    .shadow(elevation = 6.dp),
+                bottomBar = {
+                    Box(
+                        contentAlignment = Alignment.Center
                     ) {
+                        BottomNavigation(
+                            modifier = Modifier
+                                .height(70.dp)
+                                .fillMaxWidth()
+                                .align(Alignment.BottomCenter),
+                            backgroundColor = Color.White,
+                            elevation = 20.dp
+                        ) {
 
-                        val navBackStackEntry by navController.currentBackStackEntryAsState()
-                        val currentDestination = navBackStackEntry?.destination
-                        bottomItems.forEach { screen ->
-                            BottomNavigationItem(
-                                selectedContentColor = Color.Black,
-                                unselectedContentColor = Color("#938F8F".toColorInt()),
-                                label = {
-                                    Column(
-                                        modifier = Modifier
-                                            .height(35.dp)
-                                    ) {
-                                        Text(
-                                            text = screen.label,
-                                            fontSize = 12.sp
-                                        )
-                                    }
-                                },
-                                icon = {
-                                    Column(
-                                        modifier = Modifier.height(35.dp),
-                                        verticalArrangement = Arrangement.Top,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Box(
-                                            contentAlignment = Alignment.Center,
+                            val navBackStackEntry by navController.currentBackStackEntryAsState()
+                            val currentDestination = navBackStackEntry?.destination
+                            bottomItems.forEach { screen ->
+                                BottomNavigationItem(
+                                    selectedContentColor = Color.Black,
+                                    unselectedContentColor = Color("#938F8F".toColorInt()),
+                                    label = {
+                                        Column(
                                             modifier = Modifier
-                                                .height(6.dp)
-                                        ){
-                                            Divider(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                thickness = (0.8).dp, color = Color.Black
+                                                .height(35.dp)
+                                        ) {
+                                            Text(
+                                                text = screen.label,
+                                                fontSize = 12.sp
                                             )
-                                            if(screen?.screenRoute==currentSelectedBottomRoute.value){
+                                        }
+                                    },
+                                    icon = {
+                                        Column(
+                                            modifier = Modifier.height(35.dp),
+                                            verticalArrangement = Arrangement.Top,
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Box(
+                                                contentAlignment = Alignment.Center,
+                                                modifier = Modifier
+                                                    .height(6.dp)
+                                            ) {
                                                 Divider(
-                                                    modifier = Modifier
-                                                        .width(36.dp)
-                                                        .padding(top = (1.5).dp),
-                                                    thickness = 4.dp, color = Color("#99342E".toColorInt())
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    thickness = (0.8).dp, color = Color.Black
+                                                )
+                                                if (screen?.screenRoute == currentSelectedBottomRoute.value) {
+                                                    Divider(
+                                                        modifier = Modifier
+                                                            .width(36.dp)
+                                                            .padding(top = (1.5).dp),
+                                                        thickness = 4.dp,
+                                                        color = Color("#99342E".toColorInt())
+                                                    )
+                                                }
+                                            }
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            if (screen.selectedDrawableId != 0) {
+                                                Image(
+                                                    modifier = Modifier.size(20.dp),
+                                                    painter =
+                                                    if (screen?.screenRoute == currentSelectedBottomRoute.value) painterResource(
+                                                        id = screen.selectedDrawableId
+                                                    ) else painterResource(id = screen.unselectedDrawableId),
+                                                    contentDescription = "search"
                                                 )
                                             }
                                         }
-                                        Spacer(modifier = Modifier.height(6.dp))
-                                        if(screen.selectedDrawableId!=0) {
-                                            Image(
-                                                modifier = Modifier.size(20.dp),
-                                                painter =
-                                                if (screen?.screenRoute == currentSelectedBottomRoute.value) painterResource(
-                                                    id = screen.selectedDrawableId
-                                                ) else painterResource(id = screen.unselectedDrawableId),
-                                                contentDescription = "search"
-                                            )
-                                        }
-                                    }
-                                },
-                                selected = false,
-                                onClick = {
-                                    if(screen!=BottomNavItem.Record){
-                                        navController.navigate(screen.screenRoute) {
-                                            // Pop up to the start destination of the graph to
-                                            // avoid building up a large stack of destinations
-                                            // on the back stack as users select items
-                                            popUpTo(navController.graph.findStartDestination().id) {
-                                                saveState = true
+                                    },
+                                    selected = false,
+                                    onClick = {
+                                        if (screen != BottomNavItem.Record) {
+                                            navController.navigate(screen.screenRoute) {
+                                                // Pop up to the start destination of the graph to
+                                                // avoid building up a large stack of destinations
+                                                // on the back stack as users select items
+                                                popUpTo(navController.graph.findStartDestination().id) {
+                                                    saveState = true
+                                                }
+
+                                                // Avoid multiple copies of the same destination when
+                                                // reselecting the same item
+                                                launchSingleTop = true
+
+                                                // Restore state when reselecting a previously selected item
+                                                restoreState = true
                                             }
-
-                                            // Avoid multiple copies of the same destination when
-                                            // reselecting the same item
-                                            launchSingleTop = true
-
-                                            // Restore state when reselecting a previously selected item
-                                            restoreState = true
                                         }
                                     }
+                                )
+                            }
+                        }
+                        Column(
+                            modifier = Modifier
+                                .height(90.dp)
+                                .clickable {
+                                    recordOpen.value = true
+                                    isRecorderIng.value = recorder.isActivity()
+
                                 }
+                        ) {
+                            Image(
+                                modifier = Modifier.size(50.dp),
+                                painter = if (isRecorderIng.value) painterResource(id = R.drawable.ic_record_ing) else painterResource(
+                                    id = R.drawable.ic_record_before
+                                ),
+                                contentDescription = ""
                             )
                         }
                     }
-                    Column(
-                        modifier = Modifier
-                            .height(90.dp)
-                            .clickable {
-                                recordOpen.value = true
-                                isRecorderIng.value = recorder.isActivity()
+                },
+                topBar = {
+                    TopAppBar(
+                        actions = {
 
-                            }
-                    ) {
-                        Image(
-                            modifier = Modifier.size(50.dp),
-                            painter = if(isRecorderIng.value) painterResource(id = R.drawable.ic_record_ing) else painterResource(id = R.drawable.ic_record_before),
-                            contentDescription = ""
-                        )
-                    }
-                }
-            },
-            topBar = {
-                TopAppBar(
-                    actions = {
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        title = {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(end = 20.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                                val currentDestination = navBackStackEntry?.destination
+                                navBackStackEntry.let {
+                                    if (it == null) {
+                                        Log.d("waegfwa", "null")
+                                    } else {
+                                        Log.d("waegfwa", it.destination.route.toString())
 
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    title = {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(end = 20.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            val navBackStackEntry by navController.currentBackStackEntryAsState()
-                            val currentDestination = navBackStackEntry?.destination
-                            navBackStackEntry.let {
-                                if(it==null){
-                                    Log.d("waegfwa","null")
-                                }else{
-                                    Log.d("waegfwa",it.destination.route.toString())
-
+                                    }
                                 }
-                            }
 
 
-                            navController.currentDestination.let {
-                                when(it?.route){
-                                    null ->  " "
-                                    "Home" ->  " "
-                                    "Receipt" ->  " "
-                                    "ReceiptPost" ->
-                                        if(!EditCheckState.value){
-                                            Column(Modifier.clickable { navController.navigate(BottomNavItem.Receipt.screenRoute) }) {
-                                                Text(
-                                                    text = "뒤로",
-                                                    fontFamily = FontMoment.obangFont,
-                                                    fontWeight = FontWeight.Bold,
-                                                    fontSize = 15.sp)
+                                navController.currentDestination.let {
+                                    when (it?.route) {
+                                        null -> " "
+                                        "Home" -> " "
+                                        "Receipt" -> " "
+                                        "ReceiptPost" ->
+                                            if (!EditCheckState.value) {
+                                                Column(Modifier.clickable {
+                                                    navController.navigate(
+                                                        BottomNavItem.Receipt.screenRoute
+                                                    )
+                                                }) {
+                                                    Text(
+                                                        text = "뒤로",
+                                                        fontFamily = FontMoment.obangFont,
+                                                        fontWeight = FontWeight.Bold,
+                                                        fontSize = 15.sp
+                                                    )
+                                                }
+                                            } else {
+                                                Column(
+                                                    Modifier
+                                                        .wrapContentSize()
+                                                        .clickable {
+                                                            EditCheckState.value = false
+                                                            DeleteReceipt.clear()
+                                                        }) {
+                                                    YJ_Bold15(content = "완료", color = black)
+                                                }
                                             }
-                                        }else{
-                                            Column(
-                                                Modifier
-                                                    .wrapContentSize()
-                                                    .clickable {
-                                                        EditCheckState.value = false
-                                                        DeleteReceipt.clear()
-                                                    }) {
-                                                YJ_Bold15(content = "완료", color = black)
-                                            }
-                                        }
-                                    "Favorite" -> " "
-                                    "Setting" ->  " "
-                                    else -> null
+
+                                        "Favorite" -> " "
+                                        "Setting" -> " "
+                                        else -> null
+                                    }
                                 }
-                            }
 
-                            Spacer(Modifier.weight(1f))
-                            Column() {
-                                Text(
-                                    modifier = Modifier
-                                        .clickable(enabled = if(title.value == "삭제" && !ReceiptCheckState.value) false else true) {
-                                            when(title.value){
-                                                "추가" -> {
-                                                    postTrip.launch(Intent(this@MainActivity,PostTripActivity::class.java))
+                                Spacer(Modifier.weight(1f))
+                                Column() {
+                                    Text(
+                                        modifier = Modifier
+                                            .clickable(enabled = if (title.value == "삭제" && !ReceiptCheckState.value) false else true) {
+                                                when (title.value) {
+                                                    "추가" -> {
+                                                        postTrip.launch(
+                                                            Intent(
+                                                                this@MainActivity,
+                                                                PostTripActivity::class.java
+                                                            )
+                                                        )
+                                                    }
+
+                                                    "영수증 모아보기" -> {
+                                                        startActivity(
+                                                            Intent(
+                                                                this@MainActivity,
+                                                                MainActivity::class.java
+                                                            ).putExtra("MoveScreen", "ReceiptPost")
+                                                        )
+                                                        /*navController.navigate(MainScreen.ReceiptPost.rootRoute)*/
+                                                    }
+
+                                                    "작게보기" -> {}
+                                                    "편집" -> {
+                                                        EditCheckState.value = true
+                                                    }
+
+                                                    "삭제" -> {
+                                                        viewModel.showCustomTitleCheckDialog()
+
+                                                        Log.d(
+                                                            "Delete",
+                                                            "DeleteReceipt: $DeleteReceipt"
+                                                        )
+                                                    }
+
                                                 }
-                                                "영수증 모아보기" -> {
-                                                    startActivity(Intent(this@MainActivity,MainActivity::class.java).putExtra("MoveScreen", "ReceiptPost"))
-                                                    /*navController.navigate(MainScreen.ReceiptPost.rootRoute)*/}
-                                                "작게보기" -> {}
-                                                "편집" -> { EditCheckState.value = true }
-                                                "삭제" -> {
-                                                    viewModel.showCustomTitleCheckDialog()
-
-                                                    Log.d("Delete", "DeleteReceipt: $DeleteReceipt")
-                                                }
-
-                                            }
-                                        },
-                                    text = title.value,
-                                    fontFamily = FontMoment.obangFont,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 15.sp,
-                                    color = if(title.value == "삭제"){
-                                        if(ReceiptCheckState.value) primary_500 else neutral_500
-                                    }  else black
-                                )
-                                if (CustomTitleCheckDialogState.title.isNotBlank()) {
-                                    CustomTitleCheckDialog(
-                                        title = DeleteReceipt.size.toString() + CustomTitleCheckDialogState.title,
-                                        description = CustomTitleCheckDialogState.description,
-                                        checkleft = CustomTitleCheckDialogState.checkleft,
-                                        checkright = CustomTitleCheckDialogState.checkright,
-                                        onClickleft = {
-
-                                           receiptViewModel.deleteReceiptDelete(
-                                                body = deleteReceiptDeleteRequest(receiptIds = DeleteReceipt)
-                                            )
-
-                                            // 영수증 삭제 성공
-                                            receiptViewModel.deleteReceiptDeleteSuccess.observe(this@MainActivity) { response ->
-                                                Log.d("receiptViewModel_deleteReceiptDeleteSuccess", response.toString())
-
-                                            }
-
-                                            // 영수증 삭제 실패
-                                            receiptViewModel.deleteReceiptDeleteFailure.observe(this@MainActivity) { response ->
-                                                Log.d("receiptViewModel_deleteReceiptDeleteFailure", response.toString())
-                                            }
-                                            DeleteReceipt.clear()
-                                            EditCheckState.value = false
-                                            CustomTitleCheckDialogState.onClickleft()},
-                                        onClickright = { CustomTitleCheckDialogState.onClickright() },
-                                        onClickCancel = { CustomTitleCheckDialogState.onClickCancel() },
+                                            },
+                                        text = title.value,
+                                        fontFamily = FontMoment.obangFont,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp,
+                                        color = if (title.value == "삭제") {
+                                            if (ReceiptCheckState.value) primary_500 else neutral_500
+                                        } else black
                                     )
+                                    if (CustomTitleCheckDialogState.title.isNotBlank()) {
+                                        CustomTitleCheckDialog(
+                                            title = DeleteReceipt.size.toString() + CustomTitleCheckDialogState.title,
+                                            description = CustomTitleCheckDialogState.description,
+                                            checkleft = CustomTitleCheckDialogState.checkleft,
+                                            checkright = CustomTitleCheckDialogState.checkright,
+                                            onClickleft = {
+
+                                                receiptViewModel.deleteReceiptDelete(
+                                                    body = deleteReceiptDeleteRequest(receiptIds = DeleteReceipt)
+                                                )
+
+                                                // 영수증 삭제 성공
+                                                receiptViewModel.deleteReceiptDeleteSuccess.observe(
+                                                    this@MainActivity
+                                                ) { response ->
+                                                    Log.d(
+                                                        "receiptViewModel_deleteReceiptDeleteSuccess",
+                                                        response.toString()
+                                                    )
+
+                                                }
+
+                                                // 영수증 삭제 실패
+                                                receiptViewModel.deleteReceiptDeleteFailure.observe(
+                                                    this@MainActivity
+                                                ) { response ->
+                                                    Log.d(
+                                                        "receiptViewModel_deleteReceiptDeleteFailure",
+                                                        response.toString()
+                                                    )
+                                                }
+                                                DeleteReceipt.clear()
+                                                EditCheckState.value = false
+                                                CustomTitleCheckDialogState.onClickleft()
+                                            },
+                                            onClickright = { CustomTitleCheckDialogState.onClickright() },
+                                            onClickCancel = { CustomTitleCheckDialogState.onClickCancel() },
+                                        )
+                                    }
                                 }
+
+
                             }
-
-
-
 
                         }
 
-                    }
-
-                )
-            }
-        ) { innerPadding ->
-            NavHost(
-                navController,
-                startDestination =
-                when(movenav){
-                    "Receipt" -> BottomNavItem.Receipt.screenRoute
-                    "ReceiptPost" -> MainScreen.ReceiptPost.screenRoute
-                    else -> BottomNavItem.Home.screenRoute
-                },
-                Modifier.padding(innerPadding)
-            ) {
-                composable(BottomNavItem.Home.screenRoute) {
-                    currentSelectedBottomRoute.value = "Home"
-                    Log.d("waegwagewa",tripList.toString())
-                    Home(tripList,mainTrip)
-                    title.value = "추가"
+                    )
                 }
-                composable(BottomNavItem.Receipt.screenRoute) {
-                    Toast.makeText(this@MainActivity,"추후 공개될 예정입니다.",Toast.LENGTH_SHORT).show()
-                    Log.d("waegwagewa",tripList.toString())
-                    Home(tripList,mainTrip)
-                    title.value = "추가"
+            ) { innerPadding ->
+                NavHost(
+                    navController,
+                    startDestination =
+                    when (movenav) {
+                        "Receipt" -> BottomNavItem.Receipt.screenRoute
+                        "ReceiptPost" -> MainScreen.ReceiptPost.screenRoute
+                        else -> BottomNavItem.Home.screenRoute
+                    },
+                    Modifier.padding(innerPadding)
+                ) {
+                    composable(BottomNavItem.Home.screenRoute) {
+                        currentSelectedBottomRoute.value = "Home"
+                        Log.d("waegwagewa", tripList.toString())
+                        Home(tripList, mainTrip)
+                        title.value = "추가"
+                    }
+                    composable(BottomNavItem.Receipt.screenRoute) {
+                        Toast.makeText(this@MainActivity, "추후 공개될 예정입니다.", Toast.LENGTH_SHORT)
+                            .show()
+                        Log.d("waegwagewa", tripList.toString())
+                        Home(tripList, mainTrip)
+                        title.value = "추가"
 //                    currentSelectedBottomRoute.value = "Receipt"
 //
 //                    Receipt()
 //                    title.value = "영수증 모아보기"
-                }
-                composable(BottomNavItem.Record.screenRoute) {
-                    currentSelectedBottomRoute.value = "Record"
+                    }
+                    composable(BottomNavItem.Record.screenRoute) {
+                        currentSelectedBottomRoute.value = "Record"
 
-                    Record()
+                        Record()
 
-                }
-                composable(BottomNavItem.Favorite.screenRoute) {
-                    currentSelectedBottomRoute.value = "Favorite"
-                    cardViewModel.getCardLiked()
-                    Favorite(cardItems = favoriteCardList, emotionList = emotionList)
-                    title.value = "작게보기"
-                }
-                composable(BottomNavItem.Setting.screenRoute) {
-                    currentSelectedBottomRoute.value = "Setting"
-                    Setting()
-                    title.value = ""
-                }
-                composable(MainScreen.ReceiptPost.screenRoute){
-                    currentSelectedBottomRoute.value = MainScreen.ReceiptPost.rootRoute
+                    }
+                    composable(BottomNavItem.Favorite.screenRoute) {
+                        currentSelectedBottomRoute.value = "Favorite"
+                        cardViewModel.getCardLiked()
+                        Favorite(cardItems = favoriteCardList, emotionList = emotionList)
+                        title.value = "작게보기"
+                    }
+                    composable(BottomNavItem.Setting.screenRoute) {
+                        currentSelectedBottomRoute.value = "Setting"
+                        Setting()
+                        title.value = ""
+                    }
+                    composable(MainScreen.ReceiptPost.screenRoute) {
+                        currentSelectedBottomRoute.value = MainScreen.ReceiptPost.rootRoute
 
-                    val page = remember { mutableStateOf(0)}
-                    page.value = 0
-                    val size = 4
-                    var totalpage = 0
-                    var currentpage = 0
+                        val page = remember { mutableStateOf(0) }
+                        page.value = 0
+                        val size = 4
+                        var totalpage = 0
+                        var currentpage = 0
 
-                    receiptViewModel.getReceiptAll(page.value,size)
-                    // 영수증 전체 받기 성공
-                    receiptViewModel.getReceiptAllSuccess.observe(this@MainActivity) { response ->
-                        Log.d("receiptViewModel_getReceiptAllSuccess", response.toString())
-                        totalpage = response.data.pagination.totalPages
-                        currentpage = response.data.pagination.currentPage
+                        receiptViewModel.getReceiptAll(page.value, size)
+                        // 영수증 전체 받기 성공
+                        receiptViewModel.getReceiptAllSuccess.observe(this@MainActivity) { response ->
+                            Log.d("receiptViewModel_getReceiptAllSuccess", response.toString())
+                            totalpage = response.data.pagination.totalPages
+                            currentpage = response.data.pagination.currentPage
 
-                        response.data.receiptList.mapNotNull { receiptAll -> runCatching{
-                            ReceiptAll(
-                                receiptAll.id,
-                                receiptAll.tripId,
-                                receiptAll.tripName,
-                                receiptAll.angry,
-                                receiptAll.disgust,
-                                receiptAll.happy,
-                                receiptAll.sad,
-                                receiptAll.neutral,
-                                receiptAll.stDate,
-                                receiptAll.edDate,
-                                receiptAll.numOfCard,
-                                receiptAll.mainDeparture,
-                                receiptAll.subDeparture,
-                                receiptAll.mainDestination,
-                                receiptAll.subDestination,
-                                receiptAll.oneLineMemo,
-                                receiptAll.receiptThemeType) }
-                            .onSuccess {receiptList.clear()}
-                            .onFailure {}.getOrNull()
-                        }.forEach {
-                            receiptList.add(it)
+                            response.data.receiptList.mapNotNull { receiptAll ->
+                                runCatching {
+                                    ReceiptAll(
+                                        receiptAll.id,
+                                        receiptAll.tripId,
+                                        receiptAll.tripName,
+                                        receiptAll.angry,
+                                        receiptAll.disgust,
+                                        receiptAll.happy,
+                                        receiptAll.sad,
+                                        receiptAll.neutral,
+                                        receiptAll.stDate,
+                                        receiptAll.edDate,
+                                        receiptAll.numOfCard,
+                                        receiptAll.mainDeparture,
+                                        receiptAll.subDeparture,
+                                        receiptAll.mainDestination,
+                                        receiptAll.subDestination,
+                                        receiptAll.oneLineMemo,
+                                        receiptAll.receiptThemeType
+                                    )
+                                }
+                                    .onSuccess { receiptList.clear() }
+                                    .onFailure {}.getOrNull()
+                            }.forEach {
+                                receiptList.add(it)
+                            }
                         }
+
+                        // 영수증 전체 받기 실패
+                        receiptViewModel.getReceiptAllFailure.observe(this@MainActivity) { response ->
+                            Log.d("receiptViewModel_getReceiptAllFailure", response.toString())
+                        }
+
+                        ReceiptPost(receiptList, EditCheckState, DeleteReceipt)
+                        if (EditCheckState.value) title.value = "삭제" else title.value = "편집"
                     }
 
-                    // 영수증 전체 받기 실패
-                    receiptViewModel.getReceiptAllFailure.observe(this@MainActivity) { response ->
-                        Log.d("receiptViewModel_getReceiptAllFailure", response.toString())
+                    composable(MainScreen.HomeTrip.screenRoute) {
+                        currentSelectedBottomRoute.value = MainScreen.HomeTrip.rootRoute
+                        HomeTrip()
                     }
+                    composable(MainScreen.RecordDaily.screenRoute) {
+                        currentSelectedBottomRoute.value = MainScreen.RecordDaily.rootRoute
 
-                    ReceiptPost(receiptList,EditCheckState,DeleteReceipt)
-                    if (EditCheckState.value) title.value = "삭제" else title.value = "편집"
+                        RecordDaily(tripFileUntitledList = tripFileUntitledList)
+                    }
                 }
-
-                composable(MainScreen.HomeTrip.screenRoute){
-                    currentSelectedBottomRoute.value = MainScreen.HomeTrip.rootRoute
-                    HomeTrip()
-                }
-                composable(MainScreen.RecordDaily.screenRoute){
-                    currentSelectedBottomRoute.value = MainScreen.RecordDaily.rootRoute
-
-                    RecordDaily(tripFileUntitledList = tripFileUntitledList)
-                }
-            }
-            if(recordOpen.value) {
-                RecordNavigatesheet(
-                    sheetState = sheetState, closeSheet = { recordOpen.value = false },
-                    lat = lat , lon = lon , temp = temp, addressName = addressName,weather = weather
+                if (recordOpen.value) {
+                    RecordNavigatesheet(
+                        sheetState = sheetState,
+                        closeSheet = { recordOpen.value = false },
+                        lat = lat,
+                        lon = lon,
+                        temp = temp,
+                        addressName = addressName,
+                        weather = weather
                     )
+                }
             }
-        }
+
     }
 
     enum class DragAnchors {
@@ -2415,7 +2487,7 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = receiptAll.neutral.toInt()
+                persent = receiptAll.neutral.toFloat(),
                 color = ""
             )
         )
@@ -2423,8 +2495,7 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
-                persent = receiptAll.happy.toInt()
-                persent = 0f,
+                persent = receiptAll.happy.toFloat(),
                 color = ""
             )
         )
@@ -2432,15 +2503,14 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = receiptAll.angry.toInt()
+                persent = receiptAll.angry.toFloat(),
                 color = ""
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요 ",
-                persent = receiptAll.sad.toInt()
+                persent = receiptAll.sad.toFloat(),
                 text = "우울해요",
                 color = ""
             )
@@ -2670,7 +2740,7 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = receiptAll.neutral.toInt()
+                persent = receiptAll.neutral.toFloat(),
                 color = ""
             )
         )
@@ -2678,8 +2748,7 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
-                persent = receiptAll.happy.toInt()
-                persent = 21f*(0.01f),
+                persent = receiptAll.happy.toFloat(),
                 color = ""
             )
         )
@@ -2687,15 +2756,14 @@ class MainActivity : ComponentActivity() {
             Emotion(
                 icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = receiptAll.angry.toInt()
+                persent = receiptAll.angry.toFloat(),
                 color = "",
             )
         )
         emotionList.add(
             Emotion(
                 icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요 ",
-                persent = receiptAll.sad.toInt()
+                persent = receiptAll.sad.toFloat(),
                 text = "우울해요",
                 color = ""
             )

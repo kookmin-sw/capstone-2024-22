@@ -85,7 +85,6 @@ class SplashActivity:ComponentActivity() {
                 "Basic"
             }
 
-            val movenav = intent.getStringExtra("MoveScreen")
 
             Column(
                 modifier = Modifier.fillMaxSize()
