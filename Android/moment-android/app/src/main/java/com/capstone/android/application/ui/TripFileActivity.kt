@@ -2,12 +2,12 @@ package com.capstone.android.application.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,7 +25,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -42,13 +41,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
-import com.capstone.android.application.domain.Trip
+import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.domain.TripFile
 import com.capstone.android.application.presentation.TripFileViewModel
 import com.capstone.android.application.ui.theme.FontMoment
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
-import java.lang.Exception
 
 @AndroidEntryPoint
 class TripFileActivity:ComponentActivity() {
@@ -86,7 +84,7 @@ class TripFileActivity:ComponentActivity() {
                 response.data.tripFiles.mapNotNull { tripFile-> runCatching {
                     TripFile(
                         id = tripFile.id , tripId = tripFile.tripId,
-                        yearDate = tripFile.yearDate, analyzingCount = tripFile.analyzingCount
+                        yearDate = tripFile.yearDate, analyzingCount = mutableStateOf(tripFile.totalCount)
                     )
                     }.onSuccess {
                         tripFileList.clear()
@@ -97,7 +95,6 @@ class TripFileActivity:ComponentActivity() {
                     .getOrNull()
                 }.forEach {
                     tripFileList.add(it)
-                    Log.d("wegwaegaew",it.analyzingCount.toString())
                 }
             }
 
@@ -158,6 +155,26 @@ class TripFileActivity:ComponentActivity() {
 
     @Composable
     fun Main(tripFileList:MutableList<TripFile>){
+        val cardActivityContract =
+            rememberLauncherForActivityResult(
+                ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == 1) {
+
+                    try {
+                        result.data?.let {
+                            val index = it.getIntExtra("tripFileListIndex",0)
+                            val totalCount = it.getIntExtra("totalCount",0)
+                            tripFileList[index].analyzingCount.value=totalCount
+
+                        }
+                    }catch(e:Exception){
+                        Toast.makeText(this@TripFileActivity,"server error",Toast.LENGTH_SHORT).show()
+                    }
+
+                    //do something here
+                }
+
+            }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -175,7 +192,7 @@ class TripFileActivity:ComponentActivity() {
                     .fillMaxWidth()
                     .padding(end = 16.dp)
                 ,
-                text = "전라도의 선유도",
+                text = ApplicationClass.tripName,
                 textAlign = TextAlign.End,
                 fontSize = 22.sp,
                 fontFamily = FontMoment.preStandardFont,
@@ -199,8 +216,9 @@ class TripFileActivity:ComponentActivity() {
                         Column(
                             modifier = Modifier.clickable {
                                 val intent = Intent(this@TripFileActivity,CardActivity::class.java)
-                                intent.putExtra("tripFileId",tripFileList[index].tripId)
-                                startActivity(intent)
+                                intent.putExtra("tripFileId",tripFileList[index].id)
+                                intent.putExtra("tripFileListIndex",index)
+                                cardActivityContract.launch(intent)
                             } ,
                         ) {
                             Box(
@@ -211,8 +229,7 @@ class TripFileActivity:ComponentActivity() {
                                 Row(
                                     modifier = Modifier
                                         .padding(top = 24.dp)
-                                        .fillMaxSize()
-                                        .background(color = Color.White),
+                                        .fillMaxSize(),
                                     verticalAlignment = Alignment.CenterVertically
                                 ){
                                     Column(
@@ -248,7 +265,7 @@ class TripFileActivity:ComponentActivity() {
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "${tripFileList[index].analyzingCount}개의 파일이 있어요",
+                                        text = "${tripFileList[index].analyzingCount.value}개의 파일이 있어요",
                                         fontSize = 11.sp,
                                         color = Color("#706969".toColorInt())
                                     )

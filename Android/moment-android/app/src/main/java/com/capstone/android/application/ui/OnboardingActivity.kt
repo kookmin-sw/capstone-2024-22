@@ -3,7 +3,7 @@ package com.capstone.android.application.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -28,9 +28,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -46,8 +47,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -57,6 +60,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
+import com.capstone.android.application.app.ApplicationClass.Companion.tokenSharedPreferences
 import com.capstone.android.application.app.composable.MomentTextField
 import com.capstone.android.application.data.remote.auth.auth_code.request.PostAuthAuthCodeRequest
 import com.capstone.android.application.data.remote.auth.auth_code_confirm.request.PatchAuthAuthCodeConfirmRequest
@@ -67,6 +71,7 @@ import com.capstone.android.application.presentation.CountViewModel
 import com.capstone.android.application.ui.theme.BigButton
 import com.capstone.android.application.ui.theme.CheckButton
 import com.capstone.android.application.ui.theme.CountText
+import com.capstone.android.application.ui.theme.FontMoment
 import com.capstone.android.application.ui.theme.ImgBackButton
 import com.capstone.android.application.ui.theme.P_Bold30
 import com.capstone.android.application.ui.theme.P_ExtraBold16
@@ -88,11 +93,11 @@ enum class OnboardingScreen(){
     Login,
     LoginComplete,
     Signup,
-    Signup_email,
-    Signup_number,
+    SignupEmail,
+    SignupNumber,
     FindPassword,
-    FindPassword_number,
-    FindPassword_Signup,
+    FindPasswordNumber,
+    FindPasswordSignup,
     SignupComplete,
     AgreeDetail
 }
@@ -110,7 +115,12 @@ class OnboardingActivity:ComponentActivity() {
 
 
         setContent{
-            val authCode = remember {
+
+            val authCodeInFindPassword = remember {
+                mutableStateOf("")
+            }
+
+            val authCodeInSignup = remember {
                 mutableStateOf("")
             }
 
@@ -146,17 +156,17 @@ class OnboardingActivity:ComponentActivity() {
                 ){
                     composable(route=OnboardingScreen.Login.name){ Login() }
                     composable(route=OnboardingScreen.LoginComplete.name){ LoginComplete()}
-                    composable(route=OnboardingScreen.Signup_email.name){ Signup_email() }
-                    composable(route=OnboardingScreen.Signup_number.name){
-                        Signup_number()
+                    composable(route=OnboardingScreen.SignupEmail.name){ SignupEmail() }
+                    composable(route=OnboardingScreen.SignupNumber.name){
+                        SignupNumber(authCode=authCodeInSignup)
                     }
-                    composable(route=OnboardingScreen.Signup.name){ Signup() }
+                    composable(route=OnboardingScreen.Signup.name){ Signup(authCodeInSignup) }
                     composable(route=OnboardingScreen.FindPassword.name){ FindPassword() }
-                    composable(route=OnboardingScreen.FindPassword_number.name){
-                        FindPassword_number(authCode)
+                    composable(route=OnboardingScreen.FindPasswordNumber.name){
+                        FindPasswordNumber(authCodeInFindPassword)
                     }
-                    composable(route=OnboardingScreen.FindPassword_Signup.name){
-                        FindPassword_Signup(code = authCode.value)
+                    composable(route=OnboardingScreen.FindPasswordSignup.name){
+                        FindPasswordSignup(code = authCodeInFindPassword.value)
                     }
                     composable(route=OnboardingScreen.SignupComplete.name){ SignupComplete() }
                     composable(route=OnboardingScreen.AgreeDetail.name){ AgreeDetail() }
@@ -169,39 +179,51 @@ class OnboardingActivity:ComponentActivity() {
     private fun initApi(){
         // 로그인 성공
         authViewModel.postAuthLoginSuccess.observe(this@OnboardingActivity){ response->
-            Log.d("weaggawegew",response.toString())
-            navController.navigate(OnboardingScreen.LoginComplete.name)
+            tokenSharedPreferences.edit().putString("accessToken",response.data.accessToken).apply()
+            startActivity(Intent(this@OnboardingActivity,MainActivity::class.java))
+            finish()
         }
 
         // 로그인 실패
         authViewModel.postAuthLoginFailure.observe(this@OnboardingActivity){ response->
-            Log.d("waegwgwae",response.toString())
+            Toast.makeText(this@OnboardingActivity,"로그인에 실패",Toast.LENGTH_SHORT).show()
         }
 
         // 인증코드 요청
         authViewModel.postAuthAuthCodeSuccess.observe(this@OnboardingActivity){ response->
-            if(navController.currentDestination?.route == OnboardingScreen.Signup_email.name){
-                navController.navigate(OnboardingScreen.Signup_number.name)
+            tokenSharedPreferences.edit().putString("accessToken",response.data.accessToken).apply()
+            if(navController.currentDestination?.route == OnboardingScreen.SignupEmail.name){
+                navController.navigate(OnboardingScreen.SignupNumber.name)
             }
 
             if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
-                navController.navigate(OnboardingScreen.FindPassword_number.name)
+                navController.navigate(OnboardingScreen.FindPasswordNumber.name)
             }
+
             userId=response.data.userId
         }
 
         // 인증코드 요청 실패
         authViewModel.postAuthAuthCodeFailure.observe(this@OnboardingActivity){ response->
+            Toast.makeText(this@OnboardingActivity,"인증코드요청에 실패했습니다.",Toast.LENGTH_SHORT).show()
 
         }
 
         // 인증코드 확인
         authViewModel.patchAuthAuthCodeConfirmSuccess.observe(this@OnboardingActivity){ response ->
-            navController.navigate(OnboardingScreen.Signup.name)
+            tokenSharedPreferences.edit().putString("accessToken",response.data.accessToken).apply()
+            if(navController.currentDestination?.route == OnboardingScreen.SignupNumber.name){
+                navController.navigate(OnboardingScreen.Signup.name)
+            }
+
+            if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
+                navController.navigate(OnboardingScreen.Login.name)
+            }
         }
 
         // 인증코드 확인 실패
         authViewModel.patchAuthAuthCodeConfirmFailure.observe(this@OnboardingActivity){ response->
+            Toast.makeText(this@OnboardingActivity,"인증번호가 틀렸습니다.",Toast.LENGTH_SHORT).show()
 
         }
 
@@ -212,7 +234,7 @@ class OnboardingActivity:ComponentActivity() {
 
         // 비밀번호 변경 실패
         authViewModel.patchAuthChangePasswordFailure.observe(this@OnboardingActivity){ response->
-
+            Toast.makeText(this@OnboardingActivity,"서버오류.",Toast.LENGTH_SHORT).show()
         }
 
 
@@ -335,8 +357,27 @@ class OnboardingActivity:ComponentActivity() {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 72.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Text(
+                    modifier = Modifier.clickable {
+                        tokenSharedPreferences.edit().putString("accessToken","Bearer " +
+                                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." +
+                                "eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTA4NzY0NCwiZXhwIjoxNzU4Mjg3NjQ0fQ" +
+                                ".6n5w1g87Pyoy11yyzsrxtwpdFHiGMzdjn56EgzFc9gc"
+                        ).apply()
+                        if(!tokenSharedPreferences.getString("accessToken","").isNullOrEmpty()){
+                            startActivity(Intent(this@OnboardingActivity,MainActivity::class.java))
+                            finish()
+                        }
+                    },
+                    text = "무료체험하기",
+                    textDecoration = TextDecoration.Underline,
+                    fontFamily = FontMoment.preStandardFont,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(12.dp))
                 if (id.value.isNotEmpty() && password.value.isNotEmpty()){
 
                     BigButton("로그인하기", true,
@@ -355,7 +396,7 @@ class OnboardingActivity:ComponentActivity() {
                     BigButton("로그인하기", false, onClick = {startActivity(Intent(this@OnboardingActivity, MainActivity::class.java))})
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                BigButton("가입하기", true) { navController.navigate(OnboardingScreen.Signup_email.name) }
+                BigButton("가입하기", true) { navController.navigate(OnboardingScreen.SignupEmail.name) }
             }
         }
     }
@@ -395,7 +436,7 @@ class OnboardingActivity:ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun Signup_email(){
+    fun SignupEmail(){
         val email = remember{mutableStateOf("")}
         //keyboard
         val focusRequester = remember { FocusRequester() }
@@ -527,7 +568,7 @@ class OnboardingActivity:ComponentActivity() {
 
                 }
             }else{
-                BigButton("다음", false) { navController.navigate(OnboardingScreen.Signup_number.name) }            }
+                BigButton("다음", false) { navController.navigate(OnboardingScreen.SignupNumber.name) }            }
             }
         }
     }
@@ -639,13 +680,14 @@ class OnboardingActivity:ComponentActivity() {
 
 
     @Composable
-    fun Signup_number(countViewModel: CountViewModel = viewModel()){
+    fun SignupNumber(countViewModel: CountViewModel = viewModel(),authCode:MutableState<String>){
 
         val timeLeft by countViewModel.timeLeft.collectAsState()
         val number = remember{mutableStateOf("")}
         val signnumState = remember {mutableStateOf(true)}
         val focusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
+        authCode.value = number.value
 
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
@@ -668,7 +710,7 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Signup_email.name)
+                    navController.navigate(OnboardingScreen.SignupEmail.name)
                 }, "회원가입")
             }
 
@@ -804,7 +846,7 @@ class OnboardingActivity:ComponentActivity() {
     }
 
     @Composable
-    fun Signup(){
+    fun Signup(emailAuthCode:MutableState<String>){
         val id = remember{
             mutableStateOf("")
         }
@@ -837,7 +879,7 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Signup_number.name)
+                    navController.navigate(OnboardingScreen.SignupNumber.name)
                 }, "회원가입")
             }
 
@@ -931,6 +973,12 @@ class OnboardingActivity:ComponentActivity() {
                 if (id.value.isNotEmpty() && password.value.isNotEmpty() && passwordcheck.value.isNotEmpty()){
                     BigButton("가입하기", true) {
                         if (password.value == passwordcheck.value) {
+                            authViewModel.patchAuthChangePassword(
+                                body = PatchAuthChangePasswordRequest(
+                                    code = emailAuthCode.value,
+                                    newPassword = password.value
+                                )
+                            )
                             pwequel.value = true
                             navController.navigate(OnboardingScreen.Login.name)
                         } else {
@@ -969,6 +1017,8 @@ class OnboardingActivity:ComponentActivity() {
         }
     }
 
+
+    // 비밀번호 찾기
     @Composable
     fun FindPassword(){
 
@@ -1052,13 +1102,14 @@ class OnboardingActivity:ComponentActivity() {
 
                 }
             }else{
-                BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPassword_number.name) }            }
+                BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPasswordNumber.name) }            }
             }
         }
     }
 
+    // 비밀번호 찾기에서 인증코드 확인
     @Composable
-    fun FindPassword_number(authCode:MutableState<String>){
+    fun FindPasswordNumber(authCode:MutableState<String>){
 
         val findpwnumState = remember{
             mutableStateOf(true)
@@ -1080,7 +1131,7 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Signup_email.name)
+                    navController.navigate(OnboardingScreen.SignupEmail.name)
                 }, "비밀번호 찾기")
             }
 
@@ -1196,11 +1247,16 @@ class OnboardingActivity:ComponentActivity() {
             ) {
                 if ( authCode.value.isNotEmpty()){
                     BigButton("다음", true) {
-
-                        navController.navigate(OnboardingScreen.FindPassword_Signup.name)
+                        authViewModel.patchAuthAuthCodeConfirm(
+                            body = PatchAuthAuthCodeConfirmRequest(
+                                userId = userId.toString(),
+                                code = authCode.value
+                            )
+                        )
+                        navController.navigate(OnboardingScreen.FindPasswordSignup.name)
                     }
                 }else{
-                    BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPassword_Signup.name) }
+                    BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPasswordSignup.name) }
                 }
 
             }
@@ -1208,7 +1264,7 @@ class OnboardingActivity:ComponentActivity() {
     }
 
     @Composable
-    fun  FindPassword_Signup(code:String) {
+    fun  FindPasswordSignup(code:String) {
 
         val password = remember {
             mutableStateOf("")
@@ -1238,7 +1294,7 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Signup_number.name)
+                    navController.navigate(OnboardingScreen.SignupNumber.name)
                 }, "비밀번호 찾기")
             }
 
@@ -1354,7 +1410,7 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(bottom = 50.dp),
             ) { Column(modifier = Modifier
                 .padding(horizontal = 14.dp, vertical = 10.dp)
-                .clickable { navController.navigate(OnboardingScreen.Signup_email.name) }) {
+                .clickable { navController.navigate(OnboardingScreen.SignupEmail.name) }) {
                 YJ_Bold15("확인",black)
             }  }
         }
@@ -1379,6 +1435,6 @@ class OnboardingActivity:ComponentActivity() {
     @Preview
     @Composable
     fun OnboardingPreView(){
-        Signup_email()
+        Login()
     }
 }

@@ -1,6 +1,5 @@
 package com.capstone.android.application.presentation
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +7,7 @@ import com.capstone.android.application.data.remote.card.CardRepository
 import com.capstone.android.application.data.remote.card.model.card_modify.request.PutCardModifyRequest
 import com.capstone.android.application.data.remote.card.model.card_post.response.PostCardUploadResponse
 import com.capstone.android.application.domain.response.ApiResponse
+import com.capstone.android.application.domain.response.MomentResponse
 import com.capstone.android.application.domain.response.card.CardResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -48,6 +48,27 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
     val getCardLikedFailure:MutableLiveData<ApiResponse.Error<Exception>> by lazy {
         MutableLiveData<ApiResponse.Error<Exception>>()
     }
+
+    val putCardLikeSuccess:MutableLiveData<MomentResponse> by lazy {
+        MutableLiveData<MomentResponse>()
+    }
+
+    val deleteCardSuccess:MutableLiveData<MomentResponse> by lazy {
+        MutableLiveData<MomentResponse>()
+    }
+
+    val deleteCardFailure:MutableLiveData<ApiResponse.Error<Exception>> by lazy {
+        MutableLiveData<ApiResponse.Error<Exception>>()
+    }
+
+    val postCardImageUploadSuccess:MutableLiveData<MomentResponse> by lazy {
+        MutableLiveData<MomentResponse>()
+    }
+
+    val postCardImageUploadFailure:MutableLiveData<ApiResponse.Error<Exception>> by lazy {
+        MutableLiveData<ApiResponse.Error<Exception>>()
+    }
+
     fun postCardUpload(
         cardUploadMultipart:RequestBody,
         recordFile : MultipartBody.Part
@@ -83,12 +104,16 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
     ){
         viewModelScope.launch {
             try {
-                val data = cardRepository.deleteCard(
+
+                val response = cardRepository.deleteCard(
                     cardViewId = cardViewId
                 )
 
+                if(response is ApiResponse.Success){
+                    deleteCardSuccess.value=response.data
+                }
+
             } catch (e: HttpException) {
-                Log.d("awegawegaew","404")
                 // Handle specific HTTP error codes
                 when (e.code()) {
                     404 -> {
@@ -97,11 +122,9 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                     // Handle other error codes
                 }
             } catch (e: IOException) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle other generic exceptions
             }
         }
@@ -119,7 +142,6 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                 }
 
             } catch (e: HttpException) {
-                Log.d("awegawegaew","404")
                 // Handle specific HTTP error codes
                 when (e.code()) {
                     404 -> {
@@ -128,11 +150,9 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                     // Handle other error codes
                 }
             } catch (e: IOException) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle other generic exceptions
             }
         }
@@ -150,7 +170,6 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                 )
 
             } catch (e: HttpException) {
-                Log.d("awegawegaew","404")
                 // Handle specific HTTP error codes
                 when (e.code()) {
                     404 -> {
@@ -159,11 +178,9 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                     // Handle other error codes
                 }
             } catch (e: IOException) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle other generic exceptions
             }
         }
@@ -179,7 +196,6 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                 )
 
             } catch (e: HttpException) {
-                Log.d("awegawegaew","404")
                 // Handle specific HTTP error codes
                 when (e.code()) {
                     404 -> {
@@ -188,11 +204,9 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                     // Handle other error codes
                 }
             } catch (e: IOException) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle other generic exceptions
             }
         }
@@ -212,7 +226,7 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
 
 
             } catch (e: HttpException) {
-                Log.d("awegawegaew","404")
+
                 // Handle specific HTTP error codes
                 when (e.code()) {
                     404 -> {
@@ -221,15 +235,54 @@ class CardViewModel @Inject constructor(private val cardRepository: CardReposito
                     // Handle other error codes
                 }
             } catch (e: IOException) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle network-related errors
 //                throw NetworkException("Network error occurred", e)
             } catch (e: Exception) {
-                Log.d("awegawegaew","${e.message}")
                 // Handle other generic exceptions
             }
         }
     }
 
+    fun postCardImageUpload(
+        cardViewId : Int,
+        uploadImageList:ArrayList<MultipartBody.Part>
+    ){
+        viewModelScope.launch {
+            try {
+
+                val response = cardRepository.postCardImageUpload(
+                    cardViewId = cardViewId,
+                    uploadImageList = uploadImageList
+                )
+
+
+                if(response is ApiResponse.Success){
+                    postCardImageUploadSuccess.value = response.data
+                }else{
+
+                }
+
+
+
+            } catch (e: HttpException) {
+
+                // Handle specific HTTP error codes
+                when (e.code()) {
+                    404 -> {
+                        // Handle resource not found error
+                    }
+                    // Handle other error codes
+                }
+            } catch (e: IOException) {
+
+                // Handle network-related errors
+//                throw NetworkException("Network error occurred", e)
+            } catch (e: Exception) {
+
+                // Handle other generic exceptions
+            }
+        }
+
+    }
 
 }

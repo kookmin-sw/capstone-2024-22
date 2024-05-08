@@ -22,7 +22,7 @@ class PostTripActivity:ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val mainIntent=intent
-        tripViewModel.getTripAllSuccess.observe(this@PostTripActivity){
+        tripViewModel.postTripRegisterSuccess.observe(this@PostTripActivity){
             setResult(1,mainIntent)
             finish()
         }

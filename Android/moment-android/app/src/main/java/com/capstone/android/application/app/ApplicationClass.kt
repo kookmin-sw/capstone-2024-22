@@ -24,6 +24,8 @@ class ApplicationClass: Application() {
 
         val API_URL="http://211.205.171.117:8000/"
         val KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/"
+        val OPEN_WATHER_API_URL = "https://api.openweathermap.org/"
+        var tripName:String = ""
     }
 
 
@@ -54,7 +56,7 @@ class ApplicationClass: Application() {
             proceed(
                 request()
                     .newBuilder()
-                    .addHeader("Authorization", "KakaoAK d1f4a1d0fde030076b6e307bd925ac90")
+                    .addHeader("Authorization", "KakaoAK 53abda48bb969b1264e59f56d17e1bb0")
                     .build()
             )
         }
@@ -65,7 +67,7 @@ class ApplicationClass: Application() {
             proceed(
                 request()
                     .newBuilder()
-                    .addHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNDk5NjA1NCwiZXhwIjoxNzU4MTk2MDU0fQ.hQwGE6cYN3Y3nhipe93kbIGerm6VfgVAJI4T9K8lAaw")
+                    .addHeader("Authorization", "Bearer ${tokenSharedPreferences.getString("accessToken","")}")
                     .build()
             )
         }
