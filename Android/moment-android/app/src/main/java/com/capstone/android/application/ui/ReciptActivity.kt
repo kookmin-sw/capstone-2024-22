@@ -67,6 +67,7 @@ import com.capstone.android.application.data.remote.receipt.model.receipt_post.P
 import com.capstone.android.application.domain.CustomNoTitleCheckViewModel
 import com.capstone.android.application.domain.ReceiptTrip
 import com.capstone.android.application.domain.Trip
+import com.capstone.android.application.domain.TripDetail
 import com.capstone.android.application.presentation.ReceiptViewModel
 import com.capstone.android.application.presentation.TripViewModel
 import com.capstone.android.application.ui.theme.ApplicationTheme
@@ -157,7 +158,7 @@ class ReciptActivity : ComponentActivity() {
             }catch (e : Exception){
                 "Basic"
             }
-
+            val tripDetailList = remember { mutableStateListOf<TripDetail>() }
 
             //여행 부르기
             tripViewModel.getTripAll()
@@ -191,10 +192,50 @@ class ReciptActivity : ComponentActivity() {
                     else ReciptScreen.MakeTripChoice.name
                 ) {
                     composable(route = ReciptScreen.MakeTripChoice.name) { MakeTripChoice(tripList) }
-                    composable(route = ReciptScreen.MakeTrip.name) {
+                    composable(route = ReciptScreen.MakeTrip.name){
+
                         val ItemData = remember {
                             navController.previousBackStackEntry?.savedStateHandle?.get<Int>("ItemData") }
-                        if (ItemData != null) { MakeTrip(tripList[ItemData]) }
+
+                        if (ItemData != null) {
+                            //tripViewModel.getTripDetail(tripId = ItemData)
+                            Log.d("qwerqwerqwer", "너 왜 계속 호출하니?")
+                        }
+
+                        // 영수증 전체 받기 성공
+                        tripViewModel.getTripDetailSuccess.observe(this@ReciptActivity) { response ->
+                            Log.d("qwerqwerqwer", "success" +response.toString())
+                            tripDetailList.clear()
+
+                            tripDetailList.add(TripDetail(
+                                tripName =response.data.tripName,
+                                startDate =response.data.startDate,
+                                endDate =response.data.endDate,
+                                id =response.data.id,
+                                happy =response.data.happy,
+                                disgust =response.data.disgust,
+                                angry =response.data.angry,
+                                neutral =response.data.neutral,
+                                sad =response.data.sad,
+                                numOfCard =response.data.numOfCard,
+                                analyzingCount =response.data.analyzingCount
+                            ))
+
+                            Log.d("qwerqwerqwer", "tripDetailList: ${tripDetailList[0]}")
+                        }
+
+                        // 영수증 전체 받기 실패
+                        tripViewModel.getTripDetailFailure.observe(this@ReciptActivity) { response ->
+                            Log.d("qwerqwerqwer", response.toString())
+                        }
+                        if(tripDetailList.size > 0) {
+                            MakeTrip(tripDetailList[0])
+                            Log.d("qwerqwerqwer", "onCreate: 1개라고 임마")
+                        }
+                        else {
+                            navController.navigate(ReciptScreen.MakeTripChoice.name)
+                            Log.d("qwerqwerqwer", "onCreate: 0개라고 임마")}
+
                     }
 
                     composable(route = ReciptScreen.SaveRecipt.name +
@@ -376,9 +417,11 @@ class ReciptActivity : ComponentActivity() {
             modifier = Modifier
                 .background(color = tertiary_500)
                 .clickable {
+                    tripViewModel.getTripDetail(tripId = trip.id)
+
                     navController.currentBackStackEntry?.savedStateHandle?.set(
                         key = "ItemData",
-                        value = index
+                        value = trip.id
                     )
                     navController.navigate(ReciptScreen.MakeTrip.name)
                 },
@@ -424,11 +467,12 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("UnrememberedMutableState")
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalPagerApi::class)
     @Composable
-    fun MakeTrip(trip: ReceiptTrip){
+    fun MakeTrip(trip: TripDetail){
+
         val page = 2
         val state = rememberPagerState()
 
@@ -439,47 +483,27 @@ class ReciptActivity : ComponentActivity() {
         receiptIntent.putExtra("MoveScreen", "Receipt")
 
         val intro = remember { mutableStateOf("") }
-        val tripName = trip.tripName
         val depart_small = remember { mutableStateOf("") }
         val depart = remember { mutableStateOf("") }
         val arrive_small = remember { mutableStateOf("") }
         val arrive = remember { mutableStateOf("") }
-        val cardnum = 27
+
         val publicationdate = getCurrentDate().year.toString() + " . " + getCurrentDate().monthValue.toString() +" . " + getCurrentDate().dayOfMonth.toString()
+        val tripName = trip.tripName
         val startdate = trip.startDate
         val enddate = trip.endDate
-        val emotionList = mutableStateListOf<Emotion>()
-        val tripid = trip.id //앞에서 선택한 여행 번호
+        val tripid = trip.id
+        val cardnum = trip.numOfCard
         var theme = if (state.currentPage == 0) "A" else "B"
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_common,
-                text = "평범해요",
-                persent = 60
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_happy,
-                text = "즐거워요",
-                persent = 20
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_angry,
-                text = "화가나요",
-                persent = 15
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요",
-                persent = 5
-            )
-        )
+
+        val emotionList = mutableStateListOf<Emotion>()
+        emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "평범해요", persent = (trip.neutral*100).toInt()))
+        emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =( trip.happy*100).toInt()))
+        emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (trip.angry*100).toInt()))
+        emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (trip.sad *100).toInt()))
+        //emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = trip.disgust.toInt()))
         emotionList.sortByDescending { it.persent }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
