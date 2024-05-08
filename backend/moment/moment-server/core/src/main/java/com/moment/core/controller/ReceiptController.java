@@ -47,6 +47,7 @@ public class ReceiptController {
             @RequestHeader Long userId,
             @RequestBody ReceiptRequestDTO.deleteReceipts deleteReceipts
     ) {
+
         receiptService.deleteReceipts(userId, deleteReceipts);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.DELETE_SUCCESS));
     }
@@ -59,5 +60,16 @@ public class ReceiptController {
     ) {
         receiptService.createReceipt(userId, createReceipt);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.INSERT_SUCCESS));
+    }
+
+    // 영수증 수정
+    @PutMapping()
+    public ResponseEntity<APIResponse> updateReceipt(
+            @RequestHeader Long userId,
+            @RequestBody ReceiptRequestDTO.updateReceipt updateReceipt
+    ) {
+        receiptService.validateUserWithReceipt(userId, updateReceipt.getId());
+        receiptService.updateReceipt(userId, updateReceipt);
+        return ResponseEntity.ok(APIResponse.of(SuccessCode.UPDATE_SUCCESS));
     }
 }

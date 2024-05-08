@@ -19,7 +19,7 @@ public class ImageFile {
     private Long id;
 
     // cardview 아이디
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "card_view_id", nullable = false)
     private CardView cardView;
 

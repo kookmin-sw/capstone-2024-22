@@ -2,6 +2,7 @@ package com.moment.core.service;
 
 import com.moment.core.domain.cardView.CardView;
 import com.moment.core.domain.cardView.CardViewRepository;
+import com.moment.core.domain.trip.Trip;
 import com.moment.core.domain.tripFile.TripFile;
 import com.moment.core.domain.user.User;
 import com.moment.core.domain.user.UserRepository;
@@ -97,7 +98,8 @@ public class CardViewService {
 
         // tripFile, trip의 analyzingCount 증가
         tripFileService.increaseAnalyzingCount(tripFile);
-        tripService.increaseAnalyzingCount(tripFile.getTrip());
+        Trip trip = tripFile.getTrip();
+        tripService.increaseAnalyzingCount(trip);
         List<String> imageUrls = new ArrayList<>();
         return CardViewResponseDTO.GetCardView.fromEntity(cardViewRepository.save(cardView), imageUrls);
     }
@@ -150,32 +152,36 @@ public class CardViewService {
     @Transactional
     public void deleteRecord(Long cardViewId) {
         CardView cardView = cardViewRepository.findById(cardViewId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카드뷰입니다."));
+        TripFile tripFile = cardView.getTripFile();
+        Trip trip = tripFile.getTrip();
+        User user = tripFile.getUser();
+        String userId = user.getId().toString();
+
         // cardView에 엮인 사진들 먼저 삭제
-        String userId = cardView.getTripFile().getUser().getId().toString();
         imageFileService.deleteAll(cardView, userId);
         s3Service.deleteFile(cardView.getRecordFileName(), userId);
-        boolean isAnalyzed = cardView.getRecordFileStatus().equals("WAIT");
+        boolean isWaiting = cardView.getRecordFileStatus().equals("WAIT");
+        boolean isFail = cardView.getRecordFileStatus().equals("FAIL");
+
         // 만약 tripfile의 Trip이 untitled일 경우
         //     만약 tripfile의 크기가 1이라면 tripFile과 cardView 전부 삭제, untitledTrip의 analyzingCount 감소
-        TripFile tripFile = cardView.getTripFile();
-        if (tripFile.getTrip().getIsNotTitled()) {
+        if (trip.getIsNotTitled()) {
             if (tripFileService.getCardViewCount(tripFile) == 1) {
-                cardViewRepository.delete(cardView);
-                tripFileService.delete(cardView.getTripFile());
-                if (isAnalyzed)
-                    tripService.decreaseAnalyzingCount(cardView.getTripFile().getTrip());
+                tripFileService.delete(tripFile);
+                if (isWaiting || isFail)
+                    tripService.decreaseAnalyzingCount(trip);
             }
         }
         // 만약 tripfile의 trip이 untitled가 아닐경우
         // cardView만 삭제, tripFile의 analyzingCount 감소
         // trip의 analyzingCount 감소
         else {
-            cardViewRepository.delete(cardView);
-            if (isAnalyzed){
-                tripFileService.decreaseAnalyzingCount(cardView.getTripFile());
-                tripService.decreaseAnalyzingCount(cardView.getTripFile().getTrip());
+            if (isWaiting || isFail){
+                tripFileService.decreaseAnalyzingCount(tripFile);
+                tripService.decreaseAnalyzingCount(trip);
             }
         }
+        cardViewRepository.delete(cardView);
     }
 
     public void likeCardView(Long cardViewId) {

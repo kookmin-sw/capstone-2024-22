@@ -31,14 +31,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ReceiptService {
     private final ReceiptRepository receiptRepository;
-    private final UserRepository userRepository;
     private final TripFileRepository tripFileRepository;
     private final TripRepository tripRepository;
     private final CardViewRepository cardViewRepository;
 
     public Integer getReceiptCount(Long userId) {
         // 유저의 총 영수증 개수 반환
-        return receiptRepository.findAllByTrip_User_Id(userId).size();
+        return receiptRepository.countByTrip_User_Id(userId).intValue();
     }
 
     public ReceiptRequestDTO.getReceiptAll getAllReceipt(Long userId, Pageable pageable) {
@@ -76,6 +75,7 @@ public class ReceiptService {
                 .neutral(receipt.getNeutral())
                 .disgust(receipt.getDisgust())
                 .receiptThemeType(receipt.getReceiptThemeType())
+                .createdAt(receipt.getCreatedAt())
                 .build();
     }
 
@@ -83,9 +83,7 @@ public class ReceiptService {
         List<Receipt> receipts = new ArrayList<>();
         for (ReceiptRequestDTO.deleteReceipt deleteReceipt : deleteReceipts.getReceiptIds()) {
             Receipt receipt = receiptRepository.findById(deleteReceipt.getReceiptId()).orElseThrow(() -> new IllegalArgumentException("해당 영수증이 존재하지 않습니다."));
-            if (!receipt.getTrip().getUser().getId().equals(userId)) {
-                throw new IllegalArgumentException("해당 영수증을 삭제할 권한이 없습니다.");
-            }
+            validateUserWithReceipt(userId, deleteReceipt.getReceiptId());
             receipts.add(receipt);
         }
         receiptRepository.deleteAll(receipts);
@@ -125,7 +123,8 @@ public class ReceiptService {
     public void createReceipt(Long userId, ReceiptRequestDTO.createReceipt createReceipt) {
         // 유저가 해당 여행에 접근 권한이 있는지 확인
         Trip trip = tripRepository.findById(createReceipt.getTripId()).orElseThrow(() -> new IllegalArgumentException("해당 여행이 존재하지 않습니다."));
-        if (!trip.getUser().getId().equals(userId)) {
+        User user = trip.getUser();
+        if (!user.getId().equals(userId)) {
             throw new IllegalArgumentException("해당 여행에 접근 권한이 없습니다.");
         }
 
@@ -176,5 +175,26 @@ public class ReceiptService {
                 .build();
 
         receiptRepository.save(receipt);
+    }
+
+    public void updateReceipt(Long userId, ReceiptRequestDTO.updateReceipt updateReceipt) {
+        Receipt receipt = receiptRepository.findById(updateReceipt.getId()).orElseThrow(() -> new IllegalArgumentException("해당 영수증이 존재하지 않습니다."));
+        receipt.setMainDeparture(updateReceipt.getMainDeparture());
+        receipt.setSubDeparture(updateReceipt.getSubDeparture());
+        receipt.setMainDestination(updateReceipt.getMainDestination());
+        receipt.setSubDestination(updateReceipt.getSubDestination());
+        receipt.setOneLineMemo(updateReceipt.getOneLineMemo());
+        receipt.setReceiptThemeType(updateReceipt.getReceiptThemeType());
+
+        receiptRepository.save(receipt);
+    }
+
+    public void validateUserWithReceipt(Long userId, Long id) {
+        Receipt receipt = receiptRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 영수증이 존재하지 않습니다."));
+        Trip trip = receipt.getTrip();
+        User user = trip.getUser();
+        if (!user.getId().equals(userId)) {
+            throw new IllegalArgumentException("해당 영수증을 수정할 권한이 없습니다.");
+        }
     }
 }

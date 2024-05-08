@@ -20,4 +20,5 @@ public interface ReceiptRepository extends PagingAndSortingRepository<Receipt, L
 //    void deleteAll(List<Receipt> receipts);
 
 //    void save(Receipt receipt);
+    Long countByTrip_User_Id(Long userId);
 }
