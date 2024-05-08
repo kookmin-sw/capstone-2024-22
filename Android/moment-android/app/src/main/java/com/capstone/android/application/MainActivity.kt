@@ -870,15 +870,15 @@ class MainActivity : ComponentActivity() {
                         title.value = "추가"
                     }
                     composable(BottomNavItem.Receipt.screenRoute) {
-                        Toast.makeText(this@MainActivity, "추후 공개될 예정입니다.", Toast.LENGTH_SHORT)
+                        /*Toast.makeText(this@MainActivity, "추후 공개될 예정입니다.", Toast.LENGTH_SHORT)
                             .show()
                         Log.d("waegwagewa", tripList.toString())
-                        Home(tripList, mainTrip)
+                        Home(tripList, mainTrip)*/
                         title.value = "추가"
-//                    currentSelectedBottomRoute.value = "Receipt"
-//
-//                    Receipt()
-//                    title.value = "영수증 모아보기"
+                        currentSelectedBottomRoute.value = "Receipt"
+
+                        Receipt()
+                        title.value = "영수증 모아보기"
                     }
                     composable(BottomNavItem.Record.screenRoute) {
                         currentSelectedBottomRoute.value = "Record"
