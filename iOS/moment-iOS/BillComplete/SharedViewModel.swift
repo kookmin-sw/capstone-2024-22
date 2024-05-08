@@ -30,7 +30,7 @@ class SharedViewModel: ObservableObject {
    
 
     
-    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjQsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTA5MTA4MywiZXhwIjoxNzU4MjkxMDgzfQ.XxixgGTkMGfNQPhQXm4Bt8Zz9rfRlq9UsY7wV0gxQUE"
+    var authToken: String = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjQsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTA5MTA4MywiZXhwIjoxNzU4MjkxMDgzfQ.XxixgGTkMGfNQPhQXm4Bt8Zz9rfRlq9UsY7wV0gxQUE"
     
     func createReceipt(for tripId: Int, themeType: String) {
         print(tripId)
@@ -38,17 +38,13 @@ class SharedViewModel: ObservableObject {
         let headers: HTTPHeaders = [
             .contentType("application/json"),
             .accept("application/json"),
-            .authorization(bearerToken: authToken)  // 적절한 토큰으로 교체하세요.
+            .authorization(bearerToken:authToken)  // 적절한 토큰으로 교체하세요.
         ]
         var parameters: [String: Any] = [
             "tripId": tripId,
             "receiptThemeType": themeType
         ]
-//        "mainDeparture": "mainDepartureValue",
-//        "subDeparture": "subDepartureValue",
-//        "mainDestination": "mainDestinationValue",
-//        "subDestination": "subDestinationValue",
-//        "oneLineMemo": "oneLineMemoValue",
+
         
         switch themeType {
            case "A":
@@ -71,6 +67,9 @@ class SharedViewModel: ObservableObject {
            }
 
         AF.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+            if let statusCode = response.response?.statusCode {
+                       print("HTTP Status Code: \(statusCode)")
+                   }
             switch response.result {
             case .success(let data):
                 print("Receipt creation successful: \(data)")

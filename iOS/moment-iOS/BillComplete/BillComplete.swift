@@ -10,12 +10,60 @@ import SwiftUI
 
 
 //TODO: -
+
 struct ReceiptGroupView: View {
     //  @EnvironmentObject var sharedViewModel: SharedViewModel
+    @Environment(\.presentationMode) var presentationMode
+    @State private var isDeleteMode = false // 삭제 모드 상태
+    @State private var isSelected = false // 체크박스 선택 여부
+    @State private var isEditing = false // 편집 모드 상태
+    @State private var showConfirmationDialog = false // 커스텀 다이얼로그 표시 여부
+    @State private var navigateToTargetView = false
+    
     var body: some View {
         ScrollView{
             //TODO: - 여기서는 뒤로가기버튼의 위치가 AnnounceView 여야함
             VStack{
+                HStack {
+                    Button(action: {
+                        // "뒤로" 버튼의 액션: 현재 뷰를 종료
+                        self.presentationMode.wrappedValue.dismiss()
+                    }) {
+                        HStack {
+                            Spacer().frame(width: 10)
+                            Text("뒤로")
+                                .font(.yjObangBold15)
+                                .tint(Color.black)
+                        }
+                    }
+                    Spacer()
+                    
+                    if isEditing {
+                        Button("삭제") {
+                            
+                            self.showConfirmationDialog = true
+                        }.font(.yjObangBold15)
+                            .tint(Color.black)
+                        Spacer().frame(width: 10)
+                    } else {
+                        Button("편집") { // 편집모드인 삭제
+                            isEditing.toggle()
+                        }.font(.yjObangBold15)
+                            .tint(Color.black)
+                        Spacer().frame(width: 10)
+                    }
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                }
+                .padding()
+                
+
+                
                 HStack
                 {
                     Rectangle()
@@ -87,8 +135,11 @@ struct ReceiptGroupView: View {
                 }
             }
             
+            NavigationLink(destination: AnnouncementView(), isActive: $navigateToTargetView) {
+                        EmptyView()
+                    }
         }
-        .navigationBarTitle("새 예시", displayMode: .inline)
+      
         .navigationBarBackButtonHidden()
     }
 }
@@ -215,13 +266,13 @@ struct ReceiptCompleteDetailView: View {
                             //TODO: - 완료버튼 부분기능부분임
                             
                             switch selectedTab {
-                            case 0: break
+                            case 0:
                                 
                                 //TODO: - 이제 여기에서 0번인경우에의 함수를 호출해줘야함
+                                sharedViewModel.createReceipt(for: item.id, themeType: "A")
                                 
-                                
-                            case 1: break
-                                
+                            case 1:
+                                sharedViewModel.createReceipt(for: item.id, themeType: "B")
                                 
                                 
                             default:

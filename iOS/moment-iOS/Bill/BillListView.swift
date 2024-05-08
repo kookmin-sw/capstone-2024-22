@@ -43,7 +43,7 @@ struct BillListView: View {
 
 
 
-private struct AnnouncementView: View {
+ struct AnnouncementView: View {
     @EnvironmentObject private var calendarViewModel: CalendarViewModel
     @EnvironmentObject private var billListViewModel: BillListViewModel
     @EnvironmentObject var homeViewModel: HomeViewModel

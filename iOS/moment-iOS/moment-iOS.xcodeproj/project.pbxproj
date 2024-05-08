@@ -506,7 +506,6 @@
 				8E5CAE5B2B970E0400A483B4 /* BillListView.swift */,
 				8E86C0672BD0103F00291360 /* ActivityView.swift */,
 				8E86C12C2BDA766A00291360 /* SnapshotManager.swift */,
-				8E86C1E82BEA358F00291360 /* SharedViewModel.swift */,
 			);
 			path = Bill;
 			sourceTree = "<group>";
@@ -548,6 +547,7 @@
 			isa = PBXGroup;
 			children = (
 				8EDC94DC2BEA8AE400B646AB /* BillComplete.swift */,
+				8E86C1E82BEA358F00291360 /* SharedViewModel.swift */,
 			);
 			path = BillComplete;
 			sourceTree = "<group>";
