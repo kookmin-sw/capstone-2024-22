@@ -65,6 +65,7 @@ import com.capstone.android.application.app.composable.CustomNoTitleCheckDialog
 import com.capstone.android.application.data.local.Emotion
 import com.capstone.android.application.data.remote.receipt.model.receipt_post.PostReceiptCreateRequest
 import com.capstone.android.application.domain.CustomNoTitleCheckViewModel
+import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.ReceiptTrip
 import com.capstone.android.application.domain.Trip
 import com.capstone.android.application.domain.TripDetail
@@ -265,8 +266,14 @@ class ReciptActivity : ComponentActivity() {
                         }
                     }
                     composable(route = ReciptScreen.ReceiptPost_Big.name) {
-                        //MainAvtivity 영수증모아보기에서 선택한 데이터로 크게 띄움
-                        ReceiptPost_Big(/*receiptcontent*/) }
+
+                        val data = intent.getSerializableExtra("BigReceipt") as ReceiptAll
+                        val emotionList = emotionPercent(data.neutral,data.happy,data.angry,data.sad)
+                        val created = data.created.take(10)
+                        val receiptcontent = ReceiptContent_string(data.tripName,data.oneLineMemo, data.subDeparture,data.mainDeparture,
+                            data.subDestination,data.mainDestination,data.numOfCard,created,data.stDate,data.edDate,emotionList)
+                        Log.d("RowOfGrid", "receiptcontent: $receiptcontent")
+                        ReceiptPost_Big(receiptcontent, data.receiptThemeType) }
                     composable(route = ReciptScreen.EditReceipt.name) {
 
                         //앞에서 받아올 데이터들
@@ -1742,53 +1749,24 @@ class ReciptActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun ReceiptPost_Big(){
-        //모아보기에서 영수증 하나 선택해서 크게 보는 화면 (수정, 내보내기 가능)
+    fun ReceiptPost_Big(content: ReceiptContent_string, theme : String){
 
         var intent = Intent(this@ReciptActivity, MainActivity::class.java)
         intent.putExtra("MoveScreen", "ReceiptPost")
 
-        val chosenTheme  = "theme1"
-        val tripname = "여행이름"
-        val intro = "한줄 소개"
-        val depart_small = "소제목"
-        val depart = "제목"
-        val arrive_small = "소제목2"
-        val arrive = "제목2"
-        val cardnum = 20
-        val publicationdate = "2024.02.25"
-        val startdate = "2024.02.25"
-        val enddate = "2024.02.27"
-        val emotionList = mutableStateListOf<Emotion>()
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_common,
-                text = "평범해요",
-                persent = 60
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_happy,
-                text = "즐거워요",
-                persent = 20
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_angry,
-                text = "화가나요",
-                persent = 15
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요 ",
-                persent = 5
-            )
-        )
-        emotionList.sortByDescending { it.persent }
+        val chosenTheme  = theme
+        val tripname = content.tripName
+        val intro = content.intro
+        val depart_small = content.depart_small
+        val depart = content.depart
+        val arrive_small = content.arrive_small
+        val arrive = content.arrive
+        val cardnum = content.cardnum
+        val publicationdate = content.publicationdate
+        val startdate = content.startdate
+        val enddate = content.enddate
+        val emotionList = content.emotionList
+
         val receiptcontent = ReceiptContent_string(
             tripname, intro, depart_small, depart, arrive_small, arrive,
             cardnum, publicationdate, startdate, enddate, emotionList
@@ -1835,11 +1813,10 @@ class ReciptActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 앞에서 불러온 화면 데이터 받아와서 수정안되는 버전으로 넣기
-            if (chosenTheme == "theme1") {
+            if (chosenTheme == "A") {
                 SaveTheme1(receiptcontent)
             }
-            if(chosenTheme == "theme2"){
+            if(chosenTheme == "B"){
                 SaveTheme2(receiptcontent)
 
             }
