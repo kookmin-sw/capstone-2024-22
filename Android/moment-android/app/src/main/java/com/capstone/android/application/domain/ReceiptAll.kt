@@ -1,5 +1,7 @@
 package com.capstone.android.application.domain
 
+import java.io.Serializable
+
 data class ReceiptAll(
     val id: Int,
     val tripId: Int,
@@ -17,5 +19,6 @@ data class ReceiptAll(
     val mainDestination: String,
     val subDestination: String,
     val oneLineMemo: String,
-    val receiptThemeType: String
-    )
+    val receiptThemeType: String,
+    val created: String
+    ) : Serializable
