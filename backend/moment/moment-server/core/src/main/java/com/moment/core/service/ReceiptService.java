@@ -116,6 +116,11 @@ public class ReceiptService {
                 neutral += cardView.getNeutral();
             }
         }
+        emotionMap.put("happy", happy);
+        emotionMap.put("sad", sad);
+        emotionMap.put("angry", angry);
+        emotionMap.put("neutral", neutral);
+        emotionMap.put("disgust", disgust);
         emotionMap.put("total", (float) cardViewCount);
         return emotionMap;
     }
@@ -129,9 +134,9 @@ public class ReceiptService {
         }
 
         // 해당 여행이 끝났는지, 해당 여행에 분석중인 카드뷰가 남아있는지 확인
-        if (!trip.getEndDate().isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("여행이 끝나지 않았습니다.");
-        }
+//        if (!trip.getEndDate().isBefore(LocalDate.now())) {
+//            throw new IllegalArgumentException("여행이 끝나지 않았습니다.");
+//        }
         if (trip.getAnalyzingCount() != 0) {
             throw new IllegalArgumentException("분석중인 카드뷰가 남아있습니다.");
         }
@@ -166,11 +171,11 @@ public class ReceiptService {
                 .stDate(trip.getStartDate())
                 .edDate(trip.getEndDate())
                 .tripName(trip.getTripName())
-                .happy(happy)
-                .sad(sad)
-                .angry(angry)
-                .neutral(neutral)
-                .disgust(disgust)
+                .happy(happy * 100)
+                .sad(sad * 100)
+                .angry(angry * 100)
+                .neutral(neutral * 100)
+                .disgust(disgust * 100)
                 .receiptThemeType(createReceipt.getReceiptThemeType())
                 .build();
 
