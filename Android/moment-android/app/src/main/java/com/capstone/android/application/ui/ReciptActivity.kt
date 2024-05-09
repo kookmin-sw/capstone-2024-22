@@ -123,36 +123,7 @@ class ReciptActivity : ComponentActivity() {
         setContent {
             navController = rememberNavController()
             initApi()
-            val emotionList = mutableStateListOf<Emotion>()
-            emotionList.add(
-                Emotion(
-                    icon = R.drawable.ic_emotion_common,
-                    text = "평범해요",
-                    persent = 60
-                )
-            )
-            emotionList.add(
-                Emotion(
-                    icon = R.drawable.ic_emotion_happy,
-                    text = "즐거워요",
-                    persent = 20
-                )
-            )
-            emotionList.add(
-                Emotion(
-                    icon = R.drawable.ic_emotion_angry,
-                    text = "화가나요",
-                    persent = 15
-                )
-            )
-            emotionList.add(
-                Emotion(
-                    icon = R.drawable.ic_emotion_sad,
-                    text = "슬퍼요",
-                    persent = 5
-                )
-            )
-            emotionList.sortByDescending { it.persent }
+
 
             val movenav = try {
                 intent.getStringExtra("MoveScreen")
@@ -272,32 +243,55 @@ class ReciptActivity : ComponentActivity() {
                         val created = data.created.take(10)
                         val receiptcontent = ReceiptContent_string(data.tripName,data.oneLineMemo, data.subDeparture,data.mainDeparture,
                             data.subDestination,data.mainDestination,data.numOfCard,created,data.stDate,data.edDate,emotionList)
-                        Log.d("RowOfGrid", "receiptcontent: $receiptcontent")
-                        ReceiptPost_Big(receiptcontent, data.receiptThemeType) }
-                    composable(route = ReciptScreen.EditReceipt.name) {
+                        Log.d("ReciptScreen", "onCreat: ${data}")
+                        ReceiptPost_Big(receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad) }
+                    composable(route = ReciptScreen.EditReceipt.name +
+                            "/{tripName}/{intro}/{depart_small}/{depart}" +
+                            "/{arrive_small}/{arrive}/{cardnum}" +
+                            "/{publicationdate}/{startdate}/{enddate}/{happy}/{sad}/{neutral}/{angry}",
+                        arguments = listOf(
+                            navArgument("tripName"){  defaultValue = "defaultValue" },
+                            navArgument("intro"){  defaultValue = "" },
+                            navArgument("depart_small"){  defaultValue = "" },
+                            navArgument("depart"){  defaultValue = "defaultValue" },
+                            navArgument("arrive_small"){  defaultValue = "" },
+                            navArgument("arrive"){  defaultValue = "defaultValue" },
+                            navArgument("cardnum"){  defaultValue = 1 },
+                            navArgument("publicationdate"){  defaultValue = "defaultValue" },
+                            navArgument("startdate"){  defaultValue = "defaultValue" },
+                            navArgument("enddate"){  defaultValue = "defaultValue" }
+                        )) { navBackStackEntry ->
+                        val tripname = navBackStackEntry.arguments?.getString("tripName")?:" "
+                        val intro = navBackStackEntry.arguments?.getString("intro")?:" "
+                        val depart_small = navBackStackEntry.arguments?.getString("depart_small")?:" "
+                        val depart = navBackStackEntry.arguments?.getString("depart")?:" "
+                        val arrive_small = navBackStackEntry.arguments?.getString("arrive_small")?:" "
+                        val arrive = navBackStackEntry.arguments?.getString("arrive")?:" "
+                        val cardnum = navBackStackEntry.arguments?.getInt("cardnum")?:0
+                        val publicationdate = navBackStackEntry.arguments?.getString("publicationdate")?:" "
+                        val startdate = navBackStackEntry.arguments?.getString("startdate")?:" "
+                        val enddate = navBackStackEntry.arguments?.getString("enddate")?:" "
+                        val happy = navBackStackEntry.arguments?.getDouble("happy")?:0.0
+                        val sad = navBackStackEntry.arguments?.getDouble("sad")?:0.0
+                        val neutral = navBackStackEntry.arguments?.getDouble("neutral")?:0.0
+                        val angry = navBackStackEntry.arguments?.getDouble("angry")?:0.0
 
-                        //앞에서 받아올 데이터들
-                        val tripname = "여행이름"
-                        val intro = remember { mutableStateOf("") }
-                        val depart_small = remember { mutableStateOf("") }
-                        val depart = remember { mutableStateOf("") }
-                        val arrive_small = remember { mutableStateOf("") }
-                        val arrive = remember { mutableStateOf("") }
-                        val cardnum = 27
-                        val publicationdate = "2024.02.25"
-                        val startdate = "2024.02.25"
-                        val enddate = "2024.02.27"
+                        val emotionList = emotionPercent(happy, sad, neutral,angry)
+                        val Intro = mutableStateOf("")
+                        val Depart_small = mutableStateOf("")
+                        val Depart = mutableStateOf("")
+                        val Arrive_small = mutableStateOf("")
+                        val Arrive = mutableStateOf("")
 
-
-                        intro.value = "한줄 소개"
-                        depart_small.value = "소제목"
-                        depart.value = "제목"
-                        arrive_small.value = "소제목2"
-                        arrive.value = "제목2"
+                        Intro.value = intro
+                        Depart_small.value = depart_small
+                        Depart.value = depart
+                        Arrive_small.value = arrive_small
+                        Arrive.value = arrive
 
 
                         val data = ReceiptContent(
-                            tripname, intro, depart_small, depart, arrive_small, arrive,
+                            tripname, Intro, Depart_small, Depart, Arrive_small, Arrive,
                             cardnum,publicationdate,startdate,enddate, emotionList)
                         EditReceipt(data)
                     }
@@ -1749,17 +1743,17 @@ class ReciptActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun ReceiptPost_Big(content: ReceiptContent_string, theme : String){
+    fun ReceiptPost_Big(content: ReceiptContent_string, theme : String,
+                        neutral:Double ,happy:Double ,angry:Double ,sad:Double){
 
         var intent = Intent(this@ReciptActivity, MainActivity::class.java)
         intent.putExtra("MoveScreen", "ReceiptPost")
 
-        val chosenTheme  = theme
-        val tripname = content.tripName
-        val intro = content.intro
-        val depart_small = content.depart_small
+        val tripName = content.tripName
+        val intro = if(content.intro?.isEmpty() == true) " "  else content.intro
+        val depart_small = if(content.depart_small?.isEmpty() == true) " "  else content.depart_small
         val depart = content.depart
-        val arrive_small = content.arrive_small
+        val arrive_small = if(content.arrive_small?.isEmpty() == true) " "  else content.arrive_small
         val arrive = content.arrive
         val cardnum = content.cardnum
         val publicationdate = content.publicationdate
@@ -1768,7 +1762,7 @@ class ReciptActivity : ComponentActivity() {
         val emotionList = content.emotionList
 
         val receiptcontent = ReceiptContent_string(
-            tripname, intro, depart_small, depart, arrive_small, arrive,
+            tripName, intro, depart_small, depart, arrive_small, arrive,
             cardnum, publicationdate, startdate, enddate, emotionList
         )
         Column(
@@ -1803,7 +1797,23 @@ class ReciptActivity : ComponentActivity() {
                             Modifier
                                 .padding(vertical = 10.dp, horizontal = 14.dp)
                                 .clickable {
-                                    navController.navigate(ReciptScreen.EditReceipt.name)
+                                    navController.navigate(
+                                        ReciptScreen.EditReceipt.name +
+                                                "/${tripName}" +
+                                                "/${intro}" +
+                                                "/${depart_small}" +
+                                                "/${depart}" +
+                                                "/${arrive_small}" +
+                                                "/${arrive}" +
+                                                "/${cardnum}" +
+                                                "/${publicationdate}" +
+                                                "/${startdate}" +
+                                                "/${enddate}" +
+                                                "/${happy}" +
+                                                "/${sad}" +
+                                                "/${neutral}" +
+                                                "/${angry}"
+                                    )
                                 }) {
                             YJ_Bold15("수정", black)
                         }
@@ -1813,10 +1823,10 @@ class ReciptActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (chosenTheme == "A") {
+            if (theme == "A") {
                 SaveTheme1(receiptcontent)
             }
-            if(chosenTheme == "B"){
+            if (theme == "B") {
                 SaveTheme2(receiptcontent)
 
             }
