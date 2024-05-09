@@ -17,6 +17,7 @@ struct ReceiptGroupView: View {
     @EnvironmentObject var homeBaseViewModel : HomeBaseViewModel
     @Environment(\.presentationMode) var presentationMode
     @State private var isDeleteMode = false // 삭제 모드 상태
+    @State private var selectedReceiptId: Int?
     @State private var isSelected = false // 체크박스 선택 여부
     @State private var isEditing = false // 편집 모드 상태
     @State private var showConfirmationDialog = false // 커스텀 다이얼로그 표시 여부
@@ -27,13 +28,13 @@ struct ReceiptGroupView: View {
     
     
     
-   
+    
     
     let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
     
     var body: some View {
-       
-            //TODO: - 여기서는 뒤로가기버튼의 위치가 AnnounceView 여야함
+        
+        //TODO: - 여기서는 뒤로가기버튼의 위치가 AnnounceView 여야함
         NavigationView{
             VStack{
                 HStack {
@@ -59,10 +60,10 @@ struct ReceiptGroupView: View {
                                 .tint(Color.black)
                         }
                     }
-
-
                     
-                   // presentationMode.wrappedValue.dismiss()
+                    
+                    
+                    // presentationMode.wrappedValue.dismiss()
                     Spacer()
                     
                     if isEditing {
@@ -71,7 +72,7 @@ struct ReceiptGroupView: View {
                             self.showConfirmationDialog = true
                             print("삭제")
                             let idsToDelete = checkboxStates.compactMap { $0.value ? $0.key : nil }
-                                           sharedViewModel.deleteReceipts(with: idsToDelete)
+                            sharedViewModel.deleteReceipts(with: idsToDelete)
                         }.font(.yjObangBold15)
                             .tint(Color.black)
                         Spacer().frame(width: 10)
@@ -91,66 +92,61 @@ struct ReceiptGroupView: View {
                     
                 }
                 .padding()
-                ScrollView {
-                    LazyVGrid(columns: columns, spacing: 10) {
-                        ForEach(sharedViewModel.receipts) { receipt in
-                            if receipt.receiptThemeType == "A" {
-                                ReceiptATypeView(receipt: receipt, isEditing: isEditing, isChecked: Binding(get: {
-                                    checkboxStates[receipt.id, default: false]
-                                }, set: { newValue in
-                                    checkboxStates[receipt.id] = newValue
-                                }))
-                                .onTapGesture {
-                                                                       if isEditing {
-                                                                           checkboxStates[receipt.id] = !(checkboxStates[receipt.id] ?? false)
-                                                                       }
-                                                                   }
-                                .frame(width: 125, height: 244)
-                                .padding()
-                            } else {
-                                ReceiptBTypeView(receipt: receipt, isEditing: isEditing, isChecked: Binding(get: {
-                                    checkboxStates[receipt.id, default: false]
-                                }, set: { newValue in
-                                    checkboxStates[receipt.id] = newValue
-                                }))
-                                .onTapGesture {
-                                                                       if isEditing {
-                                                                           checkboxStates[receipt.id] = !(checkboxStates[receipt.id] ?? false)
-                                                                       }
-                                                                   }
-                                .frame(width: 125, height: 244)
-                                .padding()
-                            }
-                        }
-                    }
-                }
 
-//                ScrollView {
-//                    LazyVGrid(columns: columns, spacing: 10) {
-//                        ForEach(sharedViewModel.receipts) { receipt in
-//                            if receipt.receiptThemeType == "A" {
-//                                ReceiptATypeView(receipt: receipt, isEditing: isEditing, isChecked: checkboxStates[receipt.id, default: false])
-//                                    .onTapGesture {
-//                                        if isEditing {
-//                                            checkboxStates[receipt.id] = !(checkboxStates[receipt.id] ?? false)
-//                                        }
-//                                    }
-//                                    .frame(width: 125, height: 244)
-//                                    .padding()
-//                            } else {
-//                                ReceiptBTypeView(receipt: receipt, isEditing: isEditing, isChecked: $checkboxStates[receipt.id, default: false])
-//                                               .frame(width: 125, height: 244)
-//                                               .padding()
-//                            }
-//                        }
-//                    }
-//                }
+                
+                ScrollView {
+                                LazyVGrid(columns: columns, spacing: 20) {
+                                    ForEach(sharedViewModel.receipts) { receipt in
+                                        ZStack {
+                                            // NavigationLink to navigate to detail view when a receipt is selected.
+                                            NavigationLink(destination: ReceiptcompleteView(receipt: receipt), tag: receipt.id, selection: $selectedReceiptId) {
+                                                EmptyView()
+                                            }
+                                            .buttonStyle(PlainButtonStyle()) // To avoid any default button styles applied by NavigationLink
+                                            .frame(width: 0, height: 0) // Invisible NavigationLink
+
+                                            // Receipt view
+                                            Group {
+                                                if receipt.receiptThemeType == "A" {
+                                                    ReceiptATypeView(receipt: receipt, isEditing: isEditing, isChecked: Binding(
+                                                        get: { checkboxStates[receipt.id, default: false] },
+                                                        set: { newValue in checkboxStates[receipt.id] = newValue }
+                                                    ))
+                                                } else {
+                                                    ReceiptBTypeView(receipt: receipt, isEditing: isEditing, isChecked: Binding(
+                                                        get: { checkboxStates[receipt.id, default: false] },
+                                                        set: { newValue in checkboxStates[receipt.id] = newValue }
+                                                    ))
+                                                }
+                                            }
+                                            .onTapGesture {
+                                                if isEditing {
+                                                    checkboxStates[receipt.id] = !(checkboxStates[receipt.id] ?? false)
+                                                } else {
+                                                    selectedReceiptId = receipt.id // Set the ID to navigate to the detail view
+                                                }
+                                            }
+                                        }
+                                        .frame(width: 125, height: 244)
+                                        .padding()
+                                    }
+                                }
+                            }
+                
             }
         }
         .navigationBarBackButtonHidden()
         .onAppear(){
             sharedViewModel.fetchReceipts()
         }
+    }
+}
+
+struct ReceiptcompleteView: View {
+    var receipt: Receipt
+    
+    var body: some View {
+        Text("Showing details for \(receipt.mainDeparture)")
     }
 }
 
@@ -252,7 +248,7 @@ struct ReceiptATypeView: View {
                         
                         
                     )
-               
+                
                 
                 
             }
@@ -260,7 +256,7 @@ struct ReceiptATypeView: View {
             .overlay(
                 RoundedRectangle(cornerRadius:3)
                     .stroke(Color.Secondary50,lineWidth: 1)
-            ) 
+            )
             if isChecked {
                 Color.black.opacity(0.3) // 반투명 검정색 오버레이
             }
@@ -270,22 +266,22 @@ struct ReceiptATypeView: View {
                     .padding() // 체크박스 주변에 패딩 추가
                     .alignmentGuide(.trailing) { d in d[.trailing] }
                     .alignmentGuide(.bottom) { d in d[.bottom] }
-//                if isChecked == true {
-//
-//                }
+                //                if isChecked == true {
+                //
+                //                }
             }
-          
+            
             
             
         }
         
     }
-       
+    
 }
 
 struct Checkbox: View {
     @Binding var isChecked: Bool
-
+    
     var body: some View {
         Image(systemName: isChecked ? "checkmark.square.fill" : "square")
             .foregroundColor(isChecked ? .homeRed : .gray) // 선택 상태에 따라 색상 변경
@@ -298,7 +294,7 @@ struct Checkbox: View {
 
 struct StatsSmallView : View {
     var receipt: Receipt
-   // var pagination : Pagination
+    // var pagination : Pagination
     @EnvironmentObject var sharedViewModel: SharedViewModel
     var body: some View{
         HStack(spacing:15) {
@@ -312,7 +308,7 @@ struct StatsSmallView : View {
                     .foregroundColor(.homeRed)
                     .multilineTextAlignment(.center)
                     .padding(.bottom,5)
-               
+                
                 Text("여행 날짜")
                     .font(.pretendardMedium5)
                     .foregroundColor(.gray500)
@@ -578,7 +574,7 @@ struct SentimentTrackerSmallView : View {
                 
             }
             HStack{
-               // Spacer()
+                // Spacer()
                 VStack(spacing: 0){
                     HStack{
                         Image("netralSmallB")
@@ -586,10 +582,10 @@ struct SentimentTrackerSmallView : View {
                             .cornerRadius(3)
                             .scaleEffect(x: 1, y: 1, anchor: .center)
                             .tint(.homeRed)
-//                        ProgressView(value: 0.2).frame(width: 40,height: 3)
-//                            .scaleEffect(x: 1, y: 2, anchor: .center)
-//                            .cornerRadius(3)
-//                            .tint(.Natural300)
+                        //                        ProgressView(value: 0.2).frame(width: 40,height: 3)
+                        //                            .scaleEffect(x: 1, y: 2, anchor: .center)
+                        //                            .cornerRadius(3)
+                        //                            .tint(.Natural300)
                         
                     }
                     HStack{
@@ -615,7 +611,7 @@ struct SentimentTrackerSmallView : View {
                     }
                     
                 }
-               // Spacer().frame(width:10)
+                // Spacer().frame(width:10)
                 VStack{
                     Spacer()
                     Text("27")
@@ -625,11 +621,11 @@ struct SentimentTrackerSmallView : View {
                         .background(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 1))
                     Spacer()
                 }
-//                .frame(width: 30,height: 30)
-//                .padding(.trailing,25)
+                //                .frame(width: 30,height: 30)
+                //                .padding(.trailing,25)
             }
         }
-       // Spacer().frame(height: 15)
+        // Spacer().frame(height: 15)
     }
 }
 
@@ -674,17 +670,17 @@ struct ReceiptCompleteDetailView: View {
                 HStack {
                     
                     Button(action: {
-                                           presentationMode.wrappedValue.dismiss()
-                                       }) {
-                                           Text("수정")
-                                               .padding(.horizontal, 20)
-                                               .padding()
-                                               .font(.yjObangBold15)
-                                               .foregroundColor(.black)
-                                       }
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Text("수정")
+                            .padding(.horizontal, 20)
+                            .padding()
+                            .font(.yjObangBold15)
+                            .foregroundColor(.black)
+                    }
                     
-                  
-                                       
+                    
+                    
                     
                     Button(action: {
                         
@@ -708,8 +704,8 @@ struct ReceiptCompleteDetailView: View {
                                 
                                 
                                 snapshotManager = SnapshotManager(rootView: AnyView(ReceiptSecondView()
-                                        .environmentObject(sharedViewModel)
-                                                                                   ))
+                                    .environmentObject(sharedViewModel)
+                                ))
                             default:
                                 
                                 //  image = UIImage()
@@ -765,9 +761,9 @@ struct ReceiptCompleteDetailView: View {
                                 
                                 
                             default:
-                               return
+                                return
                             }
-                           
+                            
                             
                             //TODO: - 여기에다가 selectedTab 에 따라서 값을 따로 줘야하자나
                             
@@ -800,7 +796,7 @@ struct ReceiptCompleteDetailView: View {
                 }
                 
                 
-            
+                
                 
             } .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
                 .zIndex(0)
@@ -962,13 +958,13 @@ struct ReceiptCompleteView : View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 19, height: 19)
-
+                                
                                 
                                 
                                 Text(sharedViewModel.inputText)
-                                .font(.pretendardMedium14)
-                                .foregroundColor(.homeRed)
-                                .multilineTextAlignment(.center)
+                                    .font(.pretendardMedium14)
+                                    .foregroundColor(.homeRed)
+                                    .multilineTextAlignment(.center)
                                 
                                 
                                 
@@ -979,7 +975,7 @@ struct ReceiptCompleteView : View {
                             
                             HStack{
                                 Text(sharedViewModel.StartLocatio)
-                                    
+                                
                                     .font(.pretendardExtrabold45)
                                     .foregroundColor(.homeRed)  // 글씨
                                     .multilineTextAlignment(.center)
@@ -999,8 +995,8 @@ struct ReceiptCompleteView : View {
                                     .frame(width: 19, height: 19)
                                 
                                 Text(sharedViewModel.EndLocationend)
-                                .font(.pretendardMedium14)
-                                .foregroundColor(.homeRed)
+                                    .font(.pretendardMedium14)
+                                    .foregroundColor(.homeRed)
                             }
                             
                             
@@ -1008,7 +1004,7 @@ struct ReceiptCompleteView : View {
                             HStack{
                                 
                                 Text(sharedViewModel.EndLocation)
-                               
+                                
                                     .font(.pretendardExtrabold45)
                                     .foregroundColor(.homeRed)  // 글씨
                                     .multilineTextAlignment(.center)
@@ -1076,7 +1072,7 @@ struct ReceiptSecondView: View {
     @State var currentPage = 0 // 현재 페이지를 나타내는 상태 변수
     var topColor: Color = .homeRed
     var textColor: Color = .white // 상단 바에 사용할 텍스트 색상
-     @EnvironmentObject var sharedViewModel: SharedViewModel
+    @EnvironmentObject var sharedViewModel: SharedViewModel
     @State private var tripRecord : String = ""
     @State private var tripExplaneStart : String = ""
     @State private var tripnameStart : String = ""
@@ -1112,9 +1108,9 @@ struct ReceiptSecondView: View {
                         .frame(width: 19, height: 19)
                     
                     Text(sharedViewModel.tripExplaneStart)
-                    .font(.pretendardMedium14)
-                    .foregroundColor(.gray600)
-                    .multilineTextAlignment(.center)
+                        .font(.pretendardMedium14)
+                        .foregroundColor(.gray600)
+                        .multilineTextAlignment(.center)
                 }.frame(maxWidth: .infinity)
                     .padding(.bottom,8)
                 
@@ -1147,9 +1143,9 @@ struct ReceiptSecondView: View {
                         .frame(width: 19, height: 19)
                     
                     Text(sharedViewModel.tripExplaneEnd)
-                    .font(.pretendardMedium14)
-                    .foregroundColor(.gray600)
-                    .multilineTextAlignment(.center)
+                        .font(.pretendardMedium14)
+                        .foregroundColor(.gray600)
+                        .multilineTextAlignment(.center)
                 }  .padding(.bottom,8)
                 
                 
