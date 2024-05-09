@@ -63,7 +63,7 @@ class CustomTitleCheckViewModel @Inject constructor() : ViewModel(){
         )
     fun showCustomTitleCheckDialog(){
         CustomTitleCheckDialogState.value = CustomTitleCheckDialogState(
-            title = "2 개의 영수증을 정말 삭제 할까요?",
+            title = " 개의 영수증을 정말 삭제 할까요?",
             description = "삭제된 영수증은 복구할 수 없어요",
             checkleft = "네",
             checkright = "아니요",
