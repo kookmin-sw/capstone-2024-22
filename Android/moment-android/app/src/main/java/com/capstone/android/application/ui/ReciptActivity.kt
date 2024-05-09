@@ -1560,7 +1560,15 @@ class ReciptActivity : ComponentActivity() {
                                     contentDescription = ""
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                P_Medium11(content = item.persent.toString()+"%", color = primary_500)
+                                P_Medium11(content = item.persent.toString()+"%",
+                                    color = when(index)
+                                {
+                                    0 -> primary_500
+                                    1 -> neutral_600
+                                    2 -> neutral_400
+                                    3 -> neutral_200
+                                    else -> primary_500
+                                })
                             }
                         }
                     }
