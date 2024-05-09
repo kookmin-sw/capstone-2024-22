@@ -2957,28 +2957,28 @@ class MainActivity : ComponentActivity() {
             com.capstone.android.application.data.local.Emotion(
                 icon = R.drawable.ic_emotion_common,
                 text = "평범해요",
-                persent = (common * 100).toInt()
+                persent = (common).toInt()
             )
         )
         emotionList.add(
             com.capstone.android.application.data.local.Emotion(
                 icon = R.drawable.ic_emotion_happy,
                 text = "즐거워요",
-                persent = (happy * 100).toInt()
+                persent = (happy).toInt()
             )
         )
         emotionList.add(
             com.capstone.android.application.data.local.Emotion(
                 icon = R.drawable.ic_emotion_angry,
                 text = "화가나요",
-                persent = (angry * 100).toInt()
+                persent = (angry).toInt()
             )
         )
         emotionList.add(
             com.capstone.android.application.data.local.Emotion(
                 icon = R.drawable.ic_emotion_sad,
                 text = "슬퍼요",
-                persent = (sad * 100).toInt()
+                persent = (sad).toInt()
             )
         )
         //emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = emotion5.toInt()))
