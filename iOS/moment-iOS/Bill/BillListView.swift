@@ -541,6 +541,7 @@ struct ReceiptBillView1 : View {
                         
                         TextField("여행의 기록을 한줄로 기록하세요", text: $sharedViewModel.text, prompt: Text("여행의 기록을 한줄로 기록하세요")
                             .foregroundColor(.Natural200))
+                        
                         .foregroundColor(.gray500)
                         .font(.pretendardMedium14)
                         .padding(.bottom,30)

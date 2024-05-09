@@ -82,6 +82,7 @@ struct ReceiptGroupView: View {
                                 ReceiptATypeView(receipt: receipt)
                                
                                     .frame(width: 125,height: 244)
+                                    .padding()
                             } else {
                                 ReceiptBTypeView(receipt: receipt)
                                     .frame(width: 125,height: 244)
@@ -113,7 +114,7 @@ struct ReceiptATypeView: View {
     var textColor: Color = .white
     
     var body: some View {
-        VStack {
+        VStack(spacing:0) {
             Rectangle()
                 .fill(topColor)
                 .frame(height: 20)
@@ -122,14 +123,189 @@ struct ReceiptATypeView: View {
                         Text("암스테르담 성당 여행")
                             .foregroundColor(textColor)
                             .font(.pretendardMedium5)
+                            .padding()
+                        Spacer()
+                        Image("LogoSmall")
+                            .padding()
+                        
                     }
                 )
+            Rectangle()
+                .fill(Color.Secondary50)
+                .frame(height: 224)
+                .border(.gray500)
+                .overlay(
+                    VStack(alignment: .center){
+                        Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이")
+                            .font(.pretendardMedium1)
+                        
+                        Spacer()
+                        
+                        Text("\(receipt.mainDeparture)")//placeholder : 여행의 기록을 한줄로 기록하세요임
+                        .foregroundColor(.gray500)
+                        .font(.pretendardMedium5)
+                        //.padding(.bottom,30)
+                        .multilineTextAlignment(.center)
+
+                        
+                        VStack(alignment:.center,spacing: 0){
+                            HStack(alignment:.center,spacing:1){
+                                Image("LocationSmall")//여기부터 하면됨
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 6,height: 6)
+                                
+                                Text("\(receipt.subDeparture)")
+                                    .font(.pretendardMedium5)
+                                    .foregroundColor(.homeRed)
+                            }
+                            .frame(maxWidth:.infinity)
+                            
+                            
+                            HStack{
+                                Text("\(receipt.mainDestination)")
+                                    .foregroundColor(.homeRed)  // 글씨
+                                    .font(.pretendardExtrabold18)
+                                    .multilineTextAlignment(.center)
+                            }
+                            
+                        }
+                        
+                        Image("airplaneSmall")
+                            .padding(.bottom,20)
+                        
+                        VStack(spacing:0){
+                            HStack(alignment:.center,spacing: 0){
+                                Image("LocationSmall")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width:6,height: 6)
+                                
+                                Text("\(receipt.subDestination)")
+                                    .font(.pretendardMedium5)
+                                    .foregroundColor(.homeRed)
+                            }
+                            
+                            HStack{
+                                Text("\(receipt.oneLineMemo)")
+                                    .font(.pretendardExtrabold18)
+                                    .foregroundColor(.homeRed)  // 글씨
+                                    .multilineTextAlignment(.center)
+                            }
+                        }
+                        Spacer()
+                        Image("CutSmall")
+                            .padding()
+                        
+                        //TODO: - statsView 들어가야함
+                        StatsSmallView()
+                        Spacer()
+                        
+                    }
+                    
+                    
+            )
 
            
         }
+        .cornerRadius(5)
+        .overlay(
+            RoundedRectangle(cornerRadius:3)
+                .stroke(Color.Secondary50,lineWidth: 1)
+        )
         
     }
        
+}
+
+struct StatsSmallView : View {
+    var body: some View{
+        HStack(spacing:30) {
+            VStack(spacing:10) {
+                Text("여행 카드")
+                    .font(.pretendardMedium5)
+                    .foregroundColor(.gray500)
+                    .multilineTextAlignment(.center)
+                Text("27")
+                    .font(.yjObangBold4)
+                    .foregroundColor(.homeRed)
+                    .multilineTextAlignment(.center)
+                
+                Text("여행 날짜")
+                    .font(.yjObangBold4)
+                    .foregroundColor(.gray500)
+                    .multilineTextAlignment(.center)
+                Text("2024. 03. 05")
+                    .font(.pretendardMedium4)
+                    .foregroundColor(.homeRed)
+                    .multilineTextAlignment(.center)
+                Text("2024. 03. 13")
+                    .font(.pretendardMedium4)
+                    .foregroundColor(.homeRed)
+                    .multilineTextAlignment(.center)
+            }
+            
+            VStack(alignment:.leading,spacing: 9){
+                Text("여행 감정")
+                    .font(.pretendardMedium11)
+                    .foregroundColor(.gray500)
+                //.padding(.vertical,10)
+                    .padding(.top,25)
+                    .padding(.bottom,5)
+                
+                HStack{
+                    ProgressView(value: 0.6).frame(width: 40,height: 3)
+                        .cornerRadius(3)
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .tint(.homeRed)
+                    
+                    Image("netral")
+                    
+                    Text("60%")
+                        .font(.pretendardMedium4)
+                        .foregroundColor(.homeRed)
+                        .frame(width: 9)
+                    
+                }
+                
+                HStack{
+                    ProgressView(value: 0.3).frame(width: 40,height: 3)
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .tint(.Natural300)
+                    Image("sad")
+                    Text("30%")
+                        .font(.pretendardMedium4)
+                        .frame(width: 9)
+                    
+                }
+                
+                HStack{
+                    ProgressView(value: 0.5).frame(width: 40,height: 3)
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .cornerRadius(3)
+                        .tint(.Natural300)
+                    Image("fun")
+                    Text("50%")
+                        .font(.pretendardMedium4)
+                        .frame(width: 9)
+                    
+                }
+                HStack{
+                    ProgressView(value: 0.2).frame(width: 40,height: 15)
+                        .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .cornerRadius(3)
+                        .tint(.Natural300)
+                    Image("angry")
+                    Text("20%")
+                        .font(.pretendardMedium4)
+                        .frame(width: 9)
+                    
+                }
+                Spacer().frame(height: 16)
+            }
+            
+        }
+    }
 }
 
 struct ReceiptBTypeView: View {
