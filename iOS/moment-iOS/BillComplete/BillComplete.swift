@@ -92,46 +92,52 @@ struct ReceiptGroupView: View {
                     
                 }
                 .padding()
-
+                
                 
                 ScrollView {
-                                LazyVGrid(columns: columns, spacing: 20) {
-                                    ForEach(sharedViewModel.receipts) { receipt in
-                                        ZStack {
-                                            // NavigationLink to navigate to detail view when a receipt is selected.
-                                            NavigationLink(destination: ReceiptcompleteView(receipt: receipt), tag: receipt.id, selection: $selectedReceiptId) {
-                                                EmptyView()
-                                            }
-                                            .buttonStyle(PlainButtonStyle()) // To avoid any default button styles applied by NavigationLink
-                                            .frame(width: 0, height: 0) // Invisible NavigationLink
-
-                                            // Receipt view
-                                            Group {
-                                                if receipt.receiptThemeType == "A" {
-                                                    ReceiptATypeView(receipt: receipt, isEditing: isEditing, isChecked: Binding(
-                                                        get: { checkboxStates[receipt.id, default: false] },
-                                                        set: { newValue in checkboxStates[receipt.id] = newValue }
-                                                    ))
-                                                } else {
-                                                    ReceiptBTypeView(receipt: receipt, isEditing: isEditing, isChecked: Binding(
-                                                        get: { checkboxStates[receipt.id, default: false] },
-                                                        set: { newValue in checkboxStates[receipt.id] = newValue }
-                                                    ))
-                                                }
-                                            }
-                                            .onTapGesture {
-                                                if isEditing {
-                                                    checkboxStates[receipt.id] = !(checkboxStates[receipt.id] ?? false)
-                                                } else {
-                                                    selectedReceiptId = receipt.id // Set the ID to navigate to the detail view
-                                                }
-                                            }
-                                        }
-                                        .frame(width: 125, height: 244)
-                                        .padding()
+                    LazyVGrid(columns: columns, spacing: 20) {
+                        ForEach(sharedViewModel.receipts) { receipt in
+                            ZStack {
+                                // NavigationLink to navigate to detail view when a receipt is selected.
+                                if receipt.receiptThemeType == "A" {
+                                                              NavigationLink(destination: ReceiptcompleteView(receipt: receipt), tag: receipt.id, selection: $selectedReceiptId) {
+                                                                  EmptyView()
+                                                              }
+                                                          } else {
+                                                              NavigationLink(destination: ReceiptBTypeDetailView(receipt: receipt), tag: receipt.id, selection: $selectedReceiptId) {
+                                                                  EmptyView()
+                                                              }
+                                                          }
+                              
+                               
+                                
+                                // Receipt view
+                                Group {
+                                    if receipt.receiptThemeType == "A" {
+                                        ReceiptATypeView(receipt: receipt, isEditing: isEditing, isChecked: Binding(
+                                            get: { checkboxStates[receipt.id, default: false] },
+                                            set: { newValue in checkboxStates[receipt.id] = newValue }
+                                        ))
+                                    } else {
+                                        ReceiptBTypeView(receipt: receipt, isEditing: isEditing, isChecked: Binding(
+                                            get: { checkboxStates[receipt.id, default: false] },
+                                            set: { newValue in checkboxStates[receipt.id] = newValue }
+                                        ))
+                                    }
+                                }
+                                .onTapGesture {
+                                    if isEditing {
+                                        checkboxStates[receipt.id] = !(checkboxStates[receipt.id] ?? false)
+                                    } else {
+                                        selectedReceiptId = receipt.id // Set the ID to navigate to the detail view
                                     }
                                 }
                             }
+                            .frame(width: 125, height: 244)
+                            .padding()
+                        }
+                    }
+                }
                 
             }
         }
@@ -142,11 +148,12 @@ struct ReceiptGroupView: View {
     }
 }
 
-struct ReceiptcompleteView: View {
+struct ReceiptBTypeDetailView: View {
     var receipt: Receipt
     
     var body: some View {
-        Text("Showing details for \(receipt.mainDeparture)")
+        Text("B Type Detail for \(receipt.mainDeparture)")
+        // 상세 페이지 내용 구성
     }
 }
 
