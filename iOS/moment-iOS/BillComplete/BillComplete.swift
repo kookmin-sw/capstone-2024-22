@@ -136,15 +136,13 @@ struct ReceiptATypeView: View {
                 .border(.gray500)
                 .overlay(
                     VStack(alignment: .center){
-                        Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이")
-                            .font(.pretendardMedium1)
-                        
-                        Spacer()
-                        
+                        Spacer().frame(height:11)
+                
                         Text("\(receipt.mainDeparture)")//placeholder : 여행의 기록을 한줄로 기록하세요임
                         .foregroundColor(.gray500)
                         .font(.pretendardMedium5)
-                        //.padding(.bottom,30)
+                        .padding(.top,4)
+                        .padding(.bottom,13)
                         .multilineTextAlignment(.center)
 
                         
@@ -192,10 +190,10 @@ struct ReceiptATypeView: View {
                                     .foregroundColor(.homeRed)  // 글씨
                                     .multilineTextAlignment(.center)
                             }
-                        }
-                        Spacer()
+                        }.padding(.bottom,4)
+                   //     Spacer()
                         Image("CutSmall")
-                            .padding()
+                            // .padding()
                         
                         //TODO: - statsView 들어가야함
                         StatsSmallView()
@@ -220,8 +218,8 @@ struct ReceiptATypeView: View {
 
 struct StatsSmallView : View {
     var body: some View{
-        HStack(spacing:30) {
-            VStack(spacing:10) {
+        HStack(spacing:15) {
+            VStack(spacing:2) {
                 Text("여행 카드")
                     .font(.pretendardMedium5)
                     .foregroundColor(.gray500)
@@ -230,9 +228,10 @@ struct StatsSmallView : View {
                     .font(.yjObangBold4)
                     .foregroundColor(.homeRed)
                     .multilineTextAlignment(.center)
-                
+                    .padding(.bottom,5)
+               
                 Text("여행 날짜")
-                    .font(.yjObangBold4)
+                    .font(.pretendardMedium5)
                     .foregroundColor(.gray500)
                     .multilineTextAlignment(.center)
                 Text("2024. 03. 05")
@@ -243,23 +242,28 @@ struct StatsSmallView : View {
                     .font(.pretendardMedium4)
                     .foregroundColor(.homeRed)
                     .multilineTextAlignment(.center)
+                
+                Spacer().frame(height: 8)
             }
             
-            VStack(alignment:.leading,spacing: 9){
+            VStack(alignment:.leading,spacing: 2){
                 Text("여행 감정")
-                    .font(.pretendardMedium11)
+                    .font(.pretendardMedium5)
                     .foregroundColor(.gray500)
                 //.padding(.vertical,10)
-                    .padding(.top,25)
+                    .padding(.top,9)
                     .padding(.bottom,5)
                 
                 HStack{
                     ProgressView(value: 0.6).frame(width: 40,height: 3)
-                        .cornerRadius(3)
                         .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .cornerRadius(3)
                         .tint(.homeRed)
                     
-                    Image("netral")
+                    Image("netralSmall")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 5,height: 5)
                     
                     Text("60%")
                         .font(.pretendardMedium4)
@@ -271,8 +275,12 @@ struct StatsSmallView : View {
                 HStack{
                     ProgressView(value: 0.3).frame(width: 40,height: 3)
                         .scaleEffect(x: 1, y: 2, anchor: .center)
+                        .cornerRadius(3)
                         .tint(.Natural300)
-                    Image("sad")
+                    Image("sadSmall")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 5,height: 5)
                     Text("30%")
                         .font(.pretendardMedium4)
                         .frame(width: 9)
@@ -284,18 +292,24 @@ struct StatsSmallView : View {
                         .scaleEffect(x: 1, y: 2, anchor: .center)
                         .cornerRadius(3)
                         .tint(.Natural300)
-                    Image("fun")
+                    Image("funSmall")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 5,height: 5)
                     Text("50%")
                         .font(.pretendardMedium4)
                         .frame(width: 9)
                     
                 }
                 HStack{
-                    ProgressView(value: 0.2).frame(width: 40,height: 15)
+                    ProgressView(value: 0.2).frame(width: 40,height: 3)
                         .scaleEffect(x: 1, y: 2, anchor: .center)
                         .cornerRadius(3)
                         .tint(.Natural300)
-                    Image("angry")
+                    Image("angrySmall")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 5,height: 5)
                     Text("20%")
                         .font(.pretendardMedium4)
                         .frame(width: 9)
