@@ -201,7 +201,7 @@ class ReciptActivity : ComponentActivity() {
                     composable(route = ReciptScreen.SaveRecipt.name +
                             "/{tripName}/{intro.value}/{depart_small.value}/{depart.value}" +
                             "/{arrive_small.value}/{arrive.value}/{cardnum}" +
-                            "/{publicationdate}/{startdate}/{enddate}/{theme}",
+                            "/{publicationdate}/{startdate}/{enddate}/{theme}/{happy}/{sad}/{neutral}/{angry}",
                         arguments = listOf(
                             navArgument("tripName"){  defaultValue = "defaultValue" },
                             navArgument("intro"){  defaultValue = "" },
@@ -213,7 +213,11 @@ class ReciptActivity : ComponentActivity() {
                             navArgument("publicationdate"){  defaultValue = "defaultValue" },
                             navArgument("startdate"){  defaultValue = "defaultValue" },
                             navArgument("enddate"){  defaultValue = "defaultValue" },
-                            navArgument("theme"){  defaultValue = "A" }
+                            navArgument("theme"){  defaultValue = "A" },
+                            navArgument("happy"){  defaultValue = "0.0" },
+                            navArgument("sad"){  defaultValue = "0.0" },
+                            navArgument("neutral"){  defaultValue = "0.0" },
+                            navArgument("angry"){  defaultValue = "0.0" }
                         )) { navBackStackEntry ->
                         val tripName = navBackStackEntry.arguments?.getString("tripName")
                         val intro = navBackStackEntry.arguments?.getString("intro.value")
@@ -225,10 +229,19 @@ class ReciptActivity : ComponentActivity() {
                         val publicationdate = navBackStackEntry.arguments?.getString("publicationdate")
                         val startdate = navBackStackEntry.arguments?.getString("startdate")
                         val enddate = navBackStackEntry.arguments?.getString("enddate")
-                        val theme = navBackStackEntry.arguments?.getString("theme")
+                        val theme = navBackStackEntry.arguments?.getString("theme")?:"A"
+                        val happy = navBackStackEntry.arguments?.getString("happy")?:0.0
+                        val sad = navBackStackEntry.arguments?.getString("sad")?:0.0
+                        val neutral = navBackStackEntry.arguments?.getString("neutral")?:0.0
+                        val angry = navBackStackEntry.arguments?.getString("angry")?:0.0
 
-                        var emotionList = emotionPercent(tripDetailList[0].neutral,tripDetailList[0].happy,tripDetailList[0].angry, tripDetailList[0].sad)
-                        tripDetailList[0].neutral
+                        val emotionList = emotionPercent(
+                            happy.toString().toDouble(),
+                            sad.toString().toDouble(),
+                            neutral.toString().toDouble(),
+                            angry.toString().toDouble(), theme)
+
+
                         if (theme != null) {
                             SaveRecipt(theme,ReceiptContent_string(
                                 tripName, intro, depart_small, depart, arrive_small, arrive,
@@ -239,12 +252,12 @@ class ReciptActivity : ComponentActivity() {
                     composable(route = ReciptScreen.ReceiptPost_Big.name) {
 
                         val data = intent.getSerializableExtra("BigReceipt") as ReceiptAll
-                        val emotionList = emotionPercent(data.neutral,data.happy,data.angry,data.sad)
+                        val emotionList = emotionPercent(data.neutral/100,data.happy/100,data.angry/100,data.sad/100, data.receiptThemeType)
                         val created = data.created.take(10)
                         val receiptcontent = ReceiptContent_string(data.tripName,data.oneLineMemo, data.subDeparture,data.mainDeparture,
                             data.subDestination,data.mainDestination,data.numOfCard,created,data.stDate,data.edDate,emotionList)
-                        Log.d("ReciptScreen", "onCreat: ${data}")
-                        ReceiptPost_Big(receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad) }
+                        ReceiptPost_Big(receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad)
+                    }
                     composable(route = ReciptScreen.EditReceipt.name +
                             "/{tripName}/{intro}/{depart_small}/{depart}" +
                             "/{arrive_small}/{arrive}/{cardnum}" +
@@ -259,7 +272,11 @@ class ReciptActivity : ComponentActivity() {
                             navArgument("cardnum"){  defaultValue = 1 },
                             navArgument("publicationdate"){  defaultValue = "defaultValue" },
                             navArgument("startdate"){  defaultValue = "defaultValue" },
-                            navArgument("enddate"){  defaultValue = "defaultValue" }
+                            navArgument("enddate"){  defaultValue = "defaultValue" },
+                            navArgument("happy"){  defaultValue = "0.0" },
+                            navArgument("sad"){  defaultValue = "0.0" },
+                            navArgument("neutral"){  defaultValue = "0.0" },
+                            navArgument("angry"){  defaultValue = "0.0" }
                         )) { navBackStackEntry ->
                         val tripname = navBackStackEntry.arguments?.getString("tripName")?:" "
                         val intro = navBackStackEntry.arguments?.getString("intro")?:" "
@@ -271,12 +288,17 @@ class ReciptActivity : ComponentActivity() {
                         val publicationdate = navBackStackEntry.arguments?.getString("publicationdate")?:" "
                         val startdate = navBackStackEntry.arguments?.getString("startdate")?:" "
                         val enddate = navBackStackEntry.arguments?.getString("enddate")?:" "
-                        val happy = navBackStackEntry.arguments?.getDouble("happy")?:0.0
-                        val sad = navBackStackEntry.arguments?.getDouble("sad")?:0.0
-                        val neutral = navBackStackEntry.arguments?.getDouble("neutral")?:0.0
-                        val angry = navBackStackEntry.arguments?.getDouble("angry")?:0.0
+                        val happy = navBackStackEntry.arguments?.getString("happy")?:0.0
+                        val sad = navBackStackEntry.arguments?.getString("sad")?:0.0
+                        val neutral = navBackStackEntry.arguments?.getString("neutral")?:0.0
+                        val angry = navBackStackEntry.arguments?.getString("angry")?:0.0
 
-                        val emotionList = emotionPercent(happy, sad, neutral,angry)
+                        val emotionList = emotionPercent(
+                            happy.toString().toDouble()/100,
+                            sad.toString().toDouble()/100,
+                            neutral.toString().toDouble()/100,
+                            angry.toString().toDouble()/100, "notheme")
+
                         val Intro = mutableStateOf("")
                         val Depart_small = mutableStateOf("")
                         val Depart = mutableStateOf("")
@@ -293,7 +315,8 @@ class ReciptActivity : ComponentActivity() {
                         val data = ReceiptContent(
                             tripname, Intro, Depart_small, Depart, Arrive_small, Arrive,
                             cardnum,publicationdate,startdate,enddate, emotionList)
-                        EditReceipt(data)
+                        EditReceipt(data,neutral.toString().toDouble()/100,happy.toString().toDouble()/100,
+                            sad.toString().toDouble()/100,angry.toString().toDouble()/100)
                     }
                     /*composable(route = ReciptScreen.SaveEditReceipt.name) {
                         val theme = remember {
@@ -331,7 +354,7 @@ class ReciptActivity : ComponentActivity() {
         val publicationdate: String,
         val startdate: String,
         val enddate: String,
-        val emotionList: SnapshotStateList<Emotion>
+        var emotionList: SnapshotStateList<Emotion>
     )
 
     data class ReceiptContent_string(
@@ -486,8 +509,7 @@ class ReciptActivity : ComponentActivity() {
         val tripid = trip.id
         val cardnum = trip.numOfCard
         var theme = if (state.currentPage == 0) "A" else "B"
-        var emotionList = emotionPercent(trip.neutral, trip.happy, trip.angry, trip.sad)
-
+        var emotionList = emotionPercent(trip.neutral, trip.happy, trip.angry, trip.sad, theme)
 
         Column(
             modifier = Modifier
@@ -1836,7 +1858,8 @@ class ReciptActivity : ComponentActivity() {
 
     @OptIn(ExperimentalPagerApi::class)
     @Composable
-    fun EditReceipt(receiptContent: ReceiptContent){
+    fun EditReceipt(receiptContent: ReceiptContent,
+                    neutral:Double ,happy:Double ,angry:Double ,sad:Double){
 
         val page = 2
         val state = rememberPagerState()
@@ -1847,7 +1870,7 @@ class ReciptActivity : ComponentActivity() {
         val receiptIntent = Intent(this@ReciptActivity, MainActivity::class.java)
         receiptIntent.putExtra("MoveScreen", "ReceiptPost")
 
-
+        receiptContent.emotionList = emotionPercent(neutral,happy,angry,sad, if(state.currentPage == 0) "A" else "B")
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -2035,15 +2058,32 @@ class ReciptActivity : ComponentActivity() {
         return currentDate.isAfter(targetDate) || currentDate.isEqual(targetDate)
     }
 
-    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double): SnapshotStateList<Emotion> {
+    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double, theme : String): SnapshotStateList<Emotion> {
         val emotionList = mutableStateListOf<Emotion>()
-        emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "평범해요", persent = (common*100).toInt()))
-        emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
-        emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (angry*100).toInt()))
-        emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
-        //emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = emotion5.toInt()))
-        emotionList.sortByDescending { it.persent }
 
+        if(theme == "A") {
+            emotionList.clear()
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "평범해요", persent = (common*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (angry*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
+            //emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = emotion5.toInt()))
+            emotionList.sortByDescending { it.persent }
+        }
+        if(theme == "B") {
+            emotionList.clear()
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (angry*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "평범해요", persent = (common*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
+        }
+        else {
+            emotionList.clear()
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "평범해요", persent = (common*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (angry*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
+            emotionList.sortByDescending { it.persent } }
         return emotionList
     }
 
