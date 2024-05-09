@@ -105,6 +105,32 @@ class SharedViewModel: ObservableObject {
             }
         }
     
+    func deleteReceipts(with ids: [Int]) {
+           let url = "http://211.205.171.117:8000/core/receipt/delete"
+           let headers: HTTPHeaders = [
+               "Authorization": authToken,
+               "Content-Type": "application/json"
+           ]
+           let parameters: [String: Any] = [
+               "receiptIds": ids.map { ["receiptId": $0] }
+           ]
+
+           AF.request(url, method: .delete, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+               switch response.result {
+               case .success(let data):
+                   print("Deletion successful: \(data)")
+                   // 성공 시, 로컬 데이터 업데이트
+                   DispatchQueue.main.async {
+                       self.receipts.removeAll { receipt in
+                           ids.contains(receipt.id)
+                       }
+                   }
+               case .failure(let error):
+                   print("Deletion failed: \(error)")
+               }
+           }
+       }
+    
 
 }
 
