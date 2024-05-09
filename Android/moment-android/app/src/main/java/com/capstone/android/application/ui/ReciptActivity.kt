@@ -220,10 +220,10 @@ class ReciptActivity : ComponentActivity() {
                             navArgument("angry"){  defaultValue = "0.0" }
                         )) { navBackStackEntry ->
                         val tripName = navBackStackEntry.arguments?.getString("tripName")
-                        val intro = navBackStackEntry.arguments?.getString("intro.value")
-                        val depart_small = navBackStackEntry.arguments?.getString("depart_small.value")
+                        val intro = navBackStackEntry.arguments?.getString("intro.value")?:" "
+                        val depart_small = navBackStackEntry.arguments?.getString("depart_small.value")?:" "
                         val depart = navBackStackEntry.arguments?.getString("depart.value")
-                        val arrive_small = navBackStackEntry.arguments?.getString("arrive_small.value")
+                        val arrive_small = navBackStackEntry.arguments?.getString("arrive_small.value")?:" "
                         val arrive = navBackStackEntry.arguments?.getString("arrive.value")
                         val cardnum = navBackStackEntry.arguments?.getInt("cardnum")
                         val publicationdate = navBackStackEntry.arguments?.getString("publicationdate")
@@ -279,10 +279,10 @@ class ReciptActivity : ComponentActivity() {
                             navArgument("angry"){  defaultValue = "0.0" }
                         )) { navBackStackEntry ->
                         val tripname = navBackStackEntry.arguments?.getString("tripName")?:" "
-                        val intro = navBackStackEntry.arguments?.getString("intro")?:" "
-                        val depart_small = navBackStackEntry.arguments?.getString("depart_small")?:" "
+                        var intro = navBackStackEntry.arguments?.getString("intro")?:" "
+                        var depart_small = navBackStackEntry.arguments?.getString("depart_small")?:" "
                         val depart = navBackStackEntry.arguments?.getString("depart")?:" "
-                        val arrive_small = navBackStackEntry.arguments?.getString("arrive_small")?:" "
+                        var arrive_small = navBackStackEntry.arguments?.getString("arrive_small")?:" "
                         val arrive = navBackStackEntry.arguments?.getString("arrive")?:" "
                         val cardnum = navBackStackEntry.arguments?.getInt("cardnum")?:0
                         val publicationdate = navBackStackEntry.arguments?.getString("publicationdate")?:" "
@@ -304,6 +304,9 @@ class ReciptActivity : ComponentActivity() {
                         val Depart = mutableStateOf("")
                         val Arrive_small = mutableStateOf("")
                         val Arrive = mutableStateOf("")
+                        if(intro.trim().isEmpty()) intro = intro.trim()
+                        if(depart_small.trim().isEmpty()) depart_small = depart_small.trim()
+                        if(arrive_small.trim().isEmpty()) arrive_small = arrive_small.trim()
 
                         Intro.value = intro
                         Depart_small.value = depart_small
@@ -553,6 +556,10 @@ class ReciptActivity : ComponentActivity() {
                                 )
                             } else {
 
+                                if (intro.value == "") intro.value = " "
+                                if (depart_small.value == "") depart_small.value = " "
+                                if (arrive_small.value == "") arrive_small.value = " "
+
                                 receiptViewModel.postReceiptCreate(
                                 body = PostReceiptCreateRequest(
                                     mainDeparture = depart.value,
@@ -575,6 +582,10 @@ class ReciptActivity : ComponentActivity() {
 
                                 // 영수증 생성 성공
                                 receiptViewModel.postReceiptCreateSuccess.observe(this@ReciptActivity) { response ->
+
+                                    if (intro.value == "") intro.value = " "
+                                    if (depart_small.value == "") depart_small.value = " "
+                                    if (arrive_small.value == "") arrive_small.value = " "
 
                                     navController.navigate(
                                         ReciptScreen.SaveRecipt.name +
