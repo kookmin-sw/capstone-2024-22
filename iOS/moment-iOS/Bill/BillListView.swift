@@ -27,7 +27,7 @@ struct BillListView: View {
             Color(.homeBack).edgesIgnoringSafeArea(.all)
             VStack{
                 
-                AnnouncementView()
+                AnnouncementView( homeBaseViewModel: homeBaseViewModel)
                 
                 
             }.onAppear {
@@ -47,10 +47,8 @@ struct BillListView: View {
     @EnvironmentObject private var calendarViewModel: CalendarViewModel
     @EnvironmentObject private var billListViewModel: BillListViewModel
     @EnvironmentObject var homeViewModel: HomeViewModel
+     @StateObject var homeBaseViewModel : HomeBaseViewModel
     //@EnvironmentObject var sharedViewModel: SharedViewModel
-    
-    
-    
     // NavigationLink 활성화를 위한 State 변수들
     @State private var isShowingCreateView = false
     @State private var isShowingReceiptsView = false
@@ -61,7 +59,7 @@ struct BillListView: View {
                 Spacer()
                 HStack{
                     Spacer()
-                    NavigationLink(destination: ReceiptGroupView(), isActive: $isShowingCreateView) {
+                    NavigationLink(destination: ReceiptGroupView().environmentObject(homeBaseViewModel), isActive: $isShowingCreateView) {
                         Button("영수증 모아보기") {
                             isShowingCreateView = true
                         }
@@ -97,9 +95,11 @@ struct BillListView: View {
             .foregroundColor(.customGray2)
             .padding()
             .navigationBarTitle("", displayMode: .inline)
+            
             .onAppear {
                 homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
             }
+           
         }
     }
 }

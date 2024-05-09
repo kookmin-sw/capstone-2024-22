@@ -28,6 +28,7 @@ extension Font {
     static let pretendardMedium13: Font = .custom("Pretendard-Medium", size: 13)
     static let pretendardMedium11: Font = .custom("Pretendard-Medium", size: 11)
     static let pretendardMedium8: Font = .custom("Pretendard-Medium", size: 8)
+    static let pretendardMedium5: Font = .custom("Pretendard-Medium", size: 5)
     
     // obang
     static let yjObangBold15 : Font = .custom("YJ_Obang-Bold", size: 15)

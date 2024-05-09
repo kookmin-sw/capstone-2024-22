@@ -7,12 +7,14 @@
 
 import Foundation
 import SwiftUI
+import UIKit
 
 
 //TODO: -
 
 struct ReceiptGroupView: View {
     @EnvironmentObject var sharedViewModel: SharedViewModel
+    @EnvironmentObject var homeBaseViewModel : HomeBaseViewModel
     @Environment(\.presentationMode) var presentationMode
     @State private var isDeleteMode = false // 삭제 모드 상태
     @State private var isSelected = false // 체크박스 선택 여부
@@ -20,14 +22,25 @@ struct ReceiptGroupView: View {
     @State private var showConfirmationDialog = false // 커스텀 다이얼로그 표시 여부
     @State private var navigateToTargetView = false
     
+    
+   
+    
+    let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
+    
     var body: some View {
-        ScrollView{
+       
             //TODO: - 여기서는 뒤로가기버튼의 위치가 AnnounceView 여야함
+        NavigationView{
             VStack{
                 HStack {
                     Button(action: {
                         // "뒤로" 버튼의 액션: 현재 뷰를 종료
-                        self.navigateToTargetView = true
+                      //  self.navigateToTargetView = true
+//                        print("Current tab before: \(homeBaseViewModel.selectedTab)")
+//                           homeBaseViewModel.selectedTab = .Bill
+//                           print("Current tab after: \(homeBaseViewModel.selectedTab)")
+                        presentationMode.wrappedValue.dismiss()
+                        
                     }) {
                         HStack {
                             Spacer().frame(width: 10)
@@ -62,22 +75,27 @@ struct ReceiptGroupView: View {
                 }
                 .padding()
                 
-
-                ForEach(sharedViewModel.receipts) { receipt in
-                    if receipt.receiptThemeType == "A" {
-                        ReceiptATypeView(receipt: receipt)
-                    } else {
-                        ReceiptBTypeView(receipt: receipt)
+                ScrollView{
+                    LazyVGrid(columns: columns, spacing: 10) {
+                        ForEach(sharedViewModel.receipts) { receipt in
+                            if receipt.receiptThemeType == "A" {
+                                ReceiptATypeView(receipt: receipt)
+                               
+                                    .frame(width: 125,height: 244)
+                            } else {
+                                ReceiptBTypeView(receipt: receipt)
+                                    .frame(width: 125,height: 244)
+                            }
+                        }
                     }
                 }
-           
+                
                 
             }
-            
-            NavigationLink(destination: AnnouncementView(), isActive: $navigateToTargetView) {
-                        EmptyView()
-                    }
         }
+            
+          
+        
       
         .navigationBarBackButtonHidden()
         .onAppear(){
@@ -88,18 +106,27 @@ struct ReceiptGroupView: View {
 
 struct ReceiptATypeView: View {
     var receipt: Receipt
-
+    //            Text("Departure: \(receipt.mainDeparture)")
+    //            Text("Destination: \(receipt.mainDestination)")
+    // 사용예시
+    var topColor: Color = .homeRed
+    var textColor: Color = .white
+    
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("A Type Receipt")
-            Text("Departure: \(receipt.mainDeparture)")
-            Text("Destination: \(receipt.mainDestination)")
+        VStack {
+            Rectangle()
+                .fill(topColor)
+                .frame(height: 20)
+                .overlay(
+                    HStack{
+                        Text("암스테르담 성당 여행")
+                            .foregroundColor(textColor)
+                            .font(.pretendardMedium5)
+                    }
+                )
+
            
         }
-        .padding()
-        .background(Color.blue)
-        .cornerRadius(10)
-        .navigationBarBackButtonHidden()
         
     }
        

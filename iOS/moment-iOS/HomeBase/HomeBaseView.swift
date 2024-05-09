@@ -47,11 +47,12 @@ struct HomeBaseView: View {
                     switch homeBaseViewModel.selectedTab {
                     case .Home:
                         HomeView(showingCustomAlert: $showingCustomAlertInHome, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
-                           // .environmentObject(sharedViewModel)
+                          
                     case .Bill:
                         BillListView()
                             .environmentObject(homeViewModel)
-                          //  .environmentObject(sharedViewModel)
+                            .environmentObject(homeBaseViewModel)
+                       
                     case .voiceRecorder:
                         VoiceRecorderView()
                           //  .environmentObject(sharedViewModel)

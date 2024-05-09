@@ -12,6 +12,7 @@ struct moment_iOSApp: App {
     
     var homeViewModel = HomeViewModel()
     var authViewModel = AuthViewModel()
+    var homeBaseViewModel = HomeBaseViewModel()
    // var sharedViewModel = SharedViewModel()
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
@@ -22,6 +23,7 @@ struct moment_iOSApp: App {
             OnboardingView() // 이게 어떤 뷰부터 시작할지를 정해주는거구만
                 .environmentObject(homeViewModel)
                 .environmentObject(authViewModel) 
+                .environmentObject(homeBaseViewModel)
                 .environmentObject(SharedViewModel())
             
         }
