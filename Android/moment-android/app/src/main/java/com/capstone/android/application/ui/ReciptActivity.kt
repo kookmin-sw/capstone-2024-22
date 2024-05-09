@@ -688,6 +688,18 @@ class ReciptActivity : ComponentActivity() {
     fun EditTripTheme1(
         receiptcontent: ReceiptContent
     ) {
+        val intro = remember { mutableStateOf(receiptcontent.intro.value) }
+        val depart_small = remember { mutableStateOf(receiptcontent.depart_small.value) }
+        val depart = remember { mutableStateOf(receiptcontent.depart.value) }
+        val arrive_small = remember { mutableStateOf(receiptcontent.arrive_small.value) }
+        val arrive = remember { mutableStateOf(receiptcontent.arrive.value) }
+
+        receiptcontent.intro.value = intro.value
+        receiptcontent.depart_small.value = depart_small.value
+        receiptcontent.depart.value = depart.value
+        receiptcontent.arrive_small.value = arrive_small.value
+        receiptcontent.arrive.value = arrive.value
+
 
         Box(
             modifier = Modifier
@@ -740,18 +752,16 @@ class ReciptActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    receiptcontent.intro?.let {
-                        ReciptTextField(
-                            hint = "여행의 기록을 한 줄로 기록하세요:)",
-                            onValueChanged = { receiptcontent.intro.value = it },
-                            text = it,
-                            keyboardType = KeyboardType.Text,
-                            textcolor = neutral_500,
-                            fontweight = FontWeight.Medium,
-                            fontsize = 14.sp,
-                            type = "intro"
-                        )
-                    }
+                    ReciptTextField(
+                        hint = "여행의 기록을 한 줄로 기록하세요:)",
+                        onValueChanged = { intro.value = it },
+                        text = intro,
+                        keyboardType = KeyboardType.Text,
+                        textcolor = neutral_500,
+                        fontweight = FontWeight.Medium,
+                        fontsize = 14.sp,
+                        type = "intro"
+                    )
                 }
             }
 
@@ -768,18 +778,16 @@ class ReciptActivity : ComponentActivity() {
                     Modifier.size(19.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                receiptcontent.depart_small?.let {
-                    ReciptTextField(
-                        hint = "기억 속에 오래 저장할",
-                        onValueChanged = {receiptcontent.depart_small.value = it },
-                        text = it,
-                        keyboardType = KeyboardType.Text,
-                        textcolor = primary_500,
-                        fontweight = FontWeight.Medium,
-                        fontsize = 14.sp,
-                        type = "small"
-                    )
-                }
+                ReciptTextField(
+                    hint = "기억 속에 오래 저장할",
+                    onValueChanged = {depart_small.value = it },
+                    text = depart_small,
+                    keyboardType = KeyboardType.Text,
+                    textcolor = primary_500,
+                    fontweight = FontWeight.Medium,
+                    fontsize = 14.sp,
+                    type = "small"
+                )
             }
 
             Column(
@@ -791,8 +799,8 @@ class ReciptActivity : ComponentActivity() {
             ) {
                 ReciptTextField(
                     hint = "출발지",
-                    onValueChanged = {receiptcontent.depart.value = it },
-                    text = receiptcontent.depart,
+                    onValueChanged = {depart.value = it },
+                    text = depart,
                     keyboardType = KeyboardType.Text,
                     textcolor = primary_500,
                     fontweight = FontWeight.Black,
@@ -830,7 +838,7 @@ class ReciptActivity : ComponentActivity() {
                 receiptcontent.arrive_small?.let {
                     ReciptTextField(
                         hint = "기억 속에 오래 저장할",
-                        onValueChanged = { receiptcontent.arrive_small.value = it },
+                        onValueChanged = { arrive_small.value = it },
                         text = it,
                         keyboardType = KeyboardType.Text,
                         textcolor = primary_500,
@@ -850,8 +858,8 @@ class ReciptActivity : ComponentActivity() {
             ) {
                 ReciptTextField(
                     hint = "도착지",
-                    onValueChanged = {receiptcontent.arrive.value = it },
-                    text = receiptcontent.arrive,
+                    onValueChanged = {arrive.value = it },
+                    text = arrive,
                     keyboardType = KeyboardType.Text,
                     textcolor = primary_500,
                     fontweight = FontWeight.Black,
@@ -957,6 +965,17 @@ class ReciptActivity : ComponentActivity() {
     fun EditTripTheme2(
         receiptcontent: ReceiptContent
     ) {
+        val intro = remember { mutableStateOf(receiptcontent.intro.value) }
+        val depart_small = remember { mutableStateOf(receiptcontent.depart_small.value) }
+        val depart = remember { mutableStateOf(receiptcontent.depart.value) }
+        val arrive_small = remember { mutableStateOf(receiptcontent.arrive_small.value) }
+        val arrive = remember { mutableStateOf(receiptcontent.arrive.value) }
+
+        receiptcontent.intro.value = intro.value
+        receiptcontent.depart_small.value = depart_small.value
+        receiptcontent.depart.value = depart.value
+        receiptcontent.arrive_small.value = arrive_small.value
+        receiptcontent.arrive.value = arrive.value
 
         Box(
             modifier = Modifier
@@ -980,7 +999,7 @@ class ReciptActivity : ComponentActivity() {
                 receiptcontent.intro?.let {
                     ReciptTextField(
                         hint = "여행의 기록을 한 줄로 기록하세요:)",
-                        onValueChanged = { receiptcontent.intro.value = it },
+                        onValueChanged = { intro.value = it },
                         text = it,
                         keyboardType = KeyboardType.Text,
                         textcolor = neutral_500,
@@ -1046,7 +1065,7 @@ class ReciptActivity : ComponentActivity() {
                 receiptcontent.depart_small?.let {
                     ReciptTextField(
                         hint = "기억 속에 오래 저장할",
-                        onValueChanged = { receiptcontent.depart_small.value = it },
+                        onValueChanged = { depart_small.value = it },
                         text = it,
                         keyboardType = KeyboardType.Text,
                         textcolor = neutral_600,
@@ -1066,7 +1085,7 @@ class ReciptActivity : ComponentActivity() {
             ) {
                 ReciptTextField(
                     hint = "출발지",
-                    onValueChanged = {receiptcontent.depart.value = it },
+                    onValueChanged = {depart.value = it },
                     text = receiptcontent.depart,
                     keyboardType = KeyboardType.Text,
                     textcolor = black,
@@ -1105,7 +1124,7 @@ class ReciptActivity : ComponentActivity() {
                 receiptcontent.arrive_small?.let {
                     ReciptTextField(
                         hint = "기억 속에 오래 저장할",
-                        onValueChanged = {receiptcontent.arrive_small.value = it },
+                        onValueChanged = {arrive_small.value = it },
                         text = it,
                         keyboardType = KeyboardType.Text,
                         textcolor = neutral_600,
@@ -1125,7 +1144,7 @@ class ReciptActivity : ComponentActivity() {
             ) {
                 ReciptTextField(
                     hint = "도착지",
-                    onValueChanged = {receiptcontent.arrive.value = it },
+                    onValueChanged = {arrive.value = it },
                     text = receiptcontent.arrive,
                     keyboardType = KeyboardType.Text,
                     textcolor = black,
