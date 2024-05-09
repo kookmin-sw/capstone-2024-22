@@ -21,6 +21,9 @@ struct ReceiptGroupView: View {
     @State private var isEditing = false // 편집 모드 상태
     @State private var showConfirmationDialog = false // 커스텀 다이얼로그 표시 여부
     @State private var navigateToTargetView = false
+    @State var isCheckedStates: [Bool]
+    @State private var checkboxStates: [Int: Bool] = [:]
+    
     
     
     
@@ -40,6 +43,8 @@ struct ReceiptGroupView: View {
                             // 예: 편집 내용 저장
                             print("Editing completed")
                             isEditing.toggle() // 편집 상태를 비활성화
+                            checkboxStates = [:] // 모든 체크박스 상태 초기화
+                            
                         } else {
                             // 뒤로 버튼 클릭 시 수행할 액션
                             // 예: 뷰를 닫거나 이전 화면으로 이동
@@ -84,24 +89,25 @@ struct ReceiptGroupView: View {
                 }
                 .padding()
                 
-                ScrollView{
+                ScrollView {
                     LazyVGrid(columns: columns, spacing: 10) {
-                        
                         ForEach(sharedViewModel.receipts) { receipt in
                             if receipt.receiptThemeType == "A" {
-                                ReceiptATypeView(receipt: receipt, isEditing: isEditing)
-                               
-                                    .frame(width: 125,height: 244)
+                                ReceiptATypeView(receipt: receipt, isEditing: isEditing, isChecked: checkboxStates[receipt.id, default: false])
+                                    .onTapGesture {
+                                        if isEditing {
+                                            checkboxStates[receipt.id] = !(checkboxStates[receipt.id] ?? false)
+                                        }
+                                    }
+                                    .frame(width: 125, height: 244)
                                     .padding()
                             } else {
                                 ReceiptBTypeView(receipt: receipt)
-                                    .frame(width: 125,height: 244)
+                                    .frame(width: 125, height: 244)
                             }
                         }
                     }
                 }
-                
-                
             }
         }
             
@@ -120,7 +126,9 @@ struct ReceiptATypeView: View {
     var isEditing: Bool
     var topColor: Color = .homeRed
     var textColor: Color = .white
-    @State private var isChecked = false // 체크박스 상태
+   // @State private var isChecked = false // 체크박스 상태
+   // @Binding var isChecked: Bool
+    var isChecked: Bool
     
     var body: some View {
         ZStack(alignment: .bottomTrailing){
@@ -221,14 +229,21 @@ struct ReceiptATypeView: View {
             .overlay(
                 RoundedRectangle(cornerRadius:3)
                     .stroke(Color.Secondary50,lineWidth: 1)
-            )
+            ) 
+            if isChecked {
+                Color.black.opacity(0.3) // 반투명 검정색 오버레이
+            }
             
             if isEditing {
-                Checkbox(isChecked: $isChecked)
+                Checkbox(isChecked: .constant(isChecked))
                     .padding() // 체크박스 주변에 패딩 추가
                     .alignmentGuide(.trailing) { d in d[.trailing] }
                     .alignmentGuide(.bottom) { d in d[.bottom] }
+//                if isChecked == true {
+//
+//                }
             }
+          
             
             
         }
@@ -236,12 +251,13 @@ struct ReceiptATypeView: View {
     }
        
 }
+
 struct Checkbox: View {
     @Binding var isChecked: Bool
 
     var body: some View {
         Image(systemName: isChecked ? "checkmark.square.fill" : "square")
-            .foregroundColor(isChecked ? .green : .gray) // 선택 상태에 따라 색상 변경
+            .foregroundColor(isChecked ? .homeRed : .gray) // 선택 상태에 따라 색상 변경
             .onTapGesture {
                 self.isChecked.toggle()
             }
@@ -590,7 +606,7 @@ struct ReceiptCompleteDetailView: View {
     @State private var showingGroup = false
     @State private var showingCompleteBillView = false
     @State private var showExportButton = false
-    
+    @State private var isCheckedStates = false
     
     var snapshotManager: SnapshotManager?
     
@@ -774,8 +790,8 @@ struct ReceiptCompleteDetailView: View {
                 })
             }
             
-            
-            NavigationLink(destination : ReceiptGroupView(),isActive: $showingGroup){
+            //문제 있을수도
+            NavigationLink(destination : ReceiptGroupView( isCheckedStates: [false]),isActive: $showingGroup){
                 EmptyView()
                 
             }

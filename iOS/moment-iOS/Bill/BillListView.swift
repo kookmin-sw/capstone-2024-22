@@ -59,7 +59,7 @@ struct BillListView: View {
                 Spacer()
                 HStack{
                     Spacer()
-                    NavigationLink(destination: ReceiptGroupView().environmentObject(homeBaseViewModel), isActive: $isShowingCreateView) {
+                    NavigationLink(destination: ReceiptGroupView( isCheckedStates: [false]).environmentObject(homeBaseViewModel), isActive: $isShowingCreateView) {
                         Button("영수증 모아보기") {
                             isShowingCreateView = true
                         }
@@ -440,7 +440,7 @@ struct ReceiptDetailView: View {
             }
             
             
-            NavigationLink(destination : ReceiptGroupView(),isActive: $showingGroup){
+            NavigationLink(destination : ReceiptGroupView( isCheckedStates: [false]),isActive: $showingGroup){
                 EmptyView()
                 
             }
