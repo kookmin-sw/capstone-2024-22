@@ -29,6 +29,7 @@ class SharedViewModel: ObservableObject {
     @Published var totalReceiptCount = 0
     
     @Published var receipts = [Receipt]()
+    //@Published var pagination : Pagination?
    
 
     
@@ -122,6 +123,12 @@ struct Receipt: Identifiable, Decodable {
     let angry: Double
     let neutral: Double
     let disgust: Double
+    let numOfCard: Int
+    let stDate : String
+    let edDate : String
+    let tripName : String
+  
+
 }
 
 // API 응답을 위한 모델

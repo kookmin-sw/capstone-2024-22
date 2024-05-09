@@ -35,6 +35,7 @@ extension Font {
     
     // obang
     static let yjObangBold4 : Font = .custom("YJ_Obang-Bold", size: 4)
+    static let yjObangBold8 : Font = .custom("YJ_Obang-Bold", size: 8)
     static let yjObangBold15 : Font = .custom("YJ_Obang-Bold", size: 15)
     static let yjObangBold12 : Font = .custom("YJ_Obang-Bold", size: 12)
     static let yjObangBold20 : Font = .custom("YJ_Obang-Bold", size: 20)

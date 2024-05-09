@@ -23,6 +23,7 @@ struct ReceiptGroupView: View {
     @State private var navigateToTargetView = false
     
     
+    
    
     
     let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
@@ -77,6 +78,7 @@ struct ReceiptGroupView: View {
                 
                 ScrollView{
                     LazyVGrid(columns: columns, spacing: 10) {
+                        
                         ForEach(sharedViewModel.receipts) { receipt in
                             if receipt.receiptThemeType == "A" {
                                 ReceiptATypeView(receipt: receipt)
@@ -107,9 +109,7 @@ struct ReceiptGroupView: View {
 
 struct ReceiptATypeView: View {
     var receipt: Receipt
-    //            Text("Departure: \(receipt.mainDeparture)")
-    //            Text("Destination: \(receipt.mainDestination)")
-    // 사용예시
+  
     var topColor: Color = .homeRed
     var textColor: Color = .white
     
@@ -120,7 +120,7 @@ struct ReceiptATypeView: View {
                 .frame(height: 20)
                 .overlay(
                     HStack{
-                        Text("암스테르담 성당 여행")
+                        Text("\(receipt.tripName)")
                             .foregroundColor(textColor)
                             .font(.pretendardMedium5)
                             .padding()
@@ -196,7 +196,7 @@ struct ReceiptATypeView: View {
                             // .padding()
                         
                         //TODO: - statsView 들어가야함
-                        StatsSmallView()
+                        StatsSmallView(receipt: receipt)
                         Spacer()
                         
                     }
@@ -217,6 +217,9 @@ struct ReceiptATypeView: View {
 }
 
 struct StatsSmallView : View {
+    var receipt: Receipt
+   // var pagination : Pagination
+    @EnvironmentObject var sharedViewModel: SharedViewModel
     var body: some View{
         HStack(spacing:15) {
             VStack(spacing:2) {
@@ -224,7 +227,7 @@ struct StatsSmallView : View {
                     .font(.pretendardMedium5)
                     .foregroundColor(.gray500)
                     .multilineTextAlignment(.center)
-                Text("27")
+                Text("\(receipt.numOfCard)")
                     .font(.yjObangBold4)
                     .foregroundColor(.homeRed)
                     .multilineTextAlignment(.center)
@@ -234,11 +237,12 @@ struct StatsSmallView : View {
                     .font(.pretendardMedium5)
                     .foregroundColor(.gray500)
                     .multilineTextAlignment(.center)
-                Text("2024. 03. 05")
+                Text("\(receipt.stDate)")
                     .font(.pretendardMedium4)
                     .foregroundColor(.homeRed)
                     .multilineTextAlignment(.center)
-                Text("2024. 03. 13")
+                
+                Text("\(receipt.edDate)")
                     .font(.pretendardMedium4)
                     .foregroundColor(.homeRed)
                     .multilineTextAlignment(.center)
@@ -322,22 +326,210 @@ struct StatsSmallView : View {
     }
 }
 
+
+
 struct ReceiptBTypeView: View {
     var receipt: Receipt
-
+    
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("B Type Receipt")
-            Text("Departure: \(receipt.subDeparture)")
-            Text("Destination: \(receipt.subDestination)")
+        VStack(spacing:0) {
+            Spacer().frame(height: 9)
+            HStack{
+                Spacer().frame(width: 20)
+                Text("\(receipt.oneLineMemo)")
+                    .font(.pretendardMedium5)
+                    .foregroundColor(.gray500)
+                
+                Spacer()
+                
+            }
+            Spacer().frame(height: 35)
+            
+            VStack(alignment:.center,spacing: 0){
+                HStack(alignment:.center,spacing: 1){
+                    Image("LocationSmall")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 6, height: 6)
+                    
+                    Text("\(receipt.subDeparture)")
+                        .font(.pretendardMedium5)
+                        .foregroundColor(.gray600)
+                }.frame(maxWidth: .infinity)
+                    .padding(.bottom,4)
+                
+                HStack{
+                    Text("\(receipt.mainDeparture)")
+                        .font(.pretendardExtrabold18)
+                        .foregroundColor(.black)  // 글씨
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.bottom,5)
+            }
+            
+            Image("subwaySmall")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 15,height: 34)
+                .padding(.bottom,5)
+            
+            VStack(spacing:0){
+                HStack(alignment:.center,spacing: 0)
+                {
+                    Image("LocationSmall")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 6, height: 6)
+                    
+                    Text("\(receipt.subDestination)")
+                        .font(.pretendardMedium5)
+                        .foregroundColor(.gray600)
+                    
+                }
+                .padding(.bottom,4)
+                
+                
+                
+                HStack{
+                    Text("\(receipt.mainDestination)")
+                        .font(.pretendardExtrabold18)
+                        .foregroundColor(.black)  // 글씨
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.bottom,10)
+                Spacer()
+            }
+            SentimentTrackerSmallView()
+            
             
         }
-        .padding()
-        .background(Color.green)
-        .cornerRadius(10)
-        .navigationBarBackButtonHidden()
+        .frame(width:124.34,height:244)
+        .cornerRadius(5) // 모서리를 둥글게 처리합니다.
+        .overlay(
+            RoundedRectangle(cornerRadius: 3)
+                .stroke(Color.Natural500, lineWidth: 1)
+            
+        )
+        .overlay(
+            
+            
+            Rectangle() // 색칠할 부분의 모양
+                .fill(Color.homeRed) // 색칠할 색상
+                .frame(width: 10, height: 244), // 색칠할 영역의 크기
+            alignment: .leading
+            
+        ) .overlay(
+            Image("LogoVerticalSmall") // 다른 이미지 오버레이 추가
+                .resizable()
+                .scaledToFit()
+                .frame(width: 6, height: 233) // 이미지 프레임 설정
+                .offset(x:-58)
+            )
+        //오른족 얇은 부분의 사각형
+        .overlay(
+            Rectangle() // 색칠할 부분의 모양
+                .fill(Color.homeRed) // 색칠할 색상
+                .frame(width: 3.74, height: 223), // 색칠할 영역의 크기
+            alignment: .init(horizontal: .trailing, vertical: .bottom)
+        )
+        .overlay(
+            Rectangle() // 색칠할 부분의 모양
+                .offset(x:5,y:-101)
+                .fill(Color.homeRed) // 색칠할 색상
+                .frame(width: 115, height: 1) // 색칠할 영역의 크기
+            
+            
+            
+        )
+        .overlay(
+            Image("CircleDividerSmall")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 129.66, height: 4.48)
+                .offset(x:4,y:50)
+        )
+        
+        
     }
-    
+}
+struct SentimentTrackerSmallView : View {
+    var body: some View {
+        VStack(spacing:0) {
+            HStack{
+                Text("전라도의 선유도")
+                    .font(.pretendardMedium5)
+                    .padding(.bottom,7)
+                    .multilineTextAlignment(.center)
+            }
+            
+            HStack{
+                Spacer().frame(width:40)
+                Text("여행 감정")
+                    .foregroundColor(.gray500)
+                    .frame(width: 20)
+                    .font(.pretendardMedium5)
+                Spacer().frame(width:15)
+                Text("카드 갯수")
+                    .foregroundColor(.gray500)
+                    .font(.pretendardMedium5)
+                    .frame(width:20)
+                Spacer().frame(width:33)
+                
+            }
+            HStack{
+               // Spacer()
+                VStack(spacing: 0){
+                    HStack{
+                        Image("netralSmallB")
+                        ProgressView(value: 0.6).frame(width: 31.13,height: 1)
+                            .cornerRadius(3)
+                            .scaleEffect(x: 1, y: 1, anchor: .center)
+                            .tint(.homeRed)
+//                        ProgressView(value: 0.2).frame(width: 40,height: 3)
+//                            .scaleEffect(x: 1, y: 2, anchor: .center)
+//                            .cornerRadius(3)
+//                            .tint(.Natural300)
+                        
+                    }
+                    HStack{
+                        Image("funSmallB")
+                        ProgressView(value: 0.6).frame(width: 31.13,height: 1)
+                            .cornerRadius(3)
+                            .scaleEffect(x: 1, y: 1, anchor: .center)
+                            .tint(.black)
+                    }
+                    HStack{
+                        Image("sadSmallB")
+                        ProgressView(value: 0.6).frame(width: 31.13,height: 1)
+                            .cornerRadius(3)
+                            .scaleEffect(x: 1, y: 1, anchor: .center)
+                            .tint(.Basic)
+                    }
+                    HStack{
+                        Image("angrySmallB")
+                        ProgressView(value: 0.6).frame(width: 31.13,height: 1)
+                            .cornerRadius(3)
+                            .scaleEffect(x: 1, y: 1, anchor: .center)
+                            .tint(.green)
+                    }
+                    
+                }
+               // Spacer().frame(width:10)
+                VStack{
+                    Spacer()
+                    Text("27")
+                        .foregroundColor(.homeRed)
+                        .font(.yjObangBold8)
+                        .frame(width: 30,height: 30)
+                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 1))
+                    Spacer()
+                }
+//                .frame(width: 30,height: 30)
+//                .padding(.trailing,25)
+            }
+        }
+       // Spacer().frame(height: 15)
+    }
 }
 
 

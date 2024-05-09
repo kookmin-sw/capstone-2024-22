@@ -1200,6 +1200,7 @@ struct ReceiptView: View {
         
         
     }
+    
     private func showShareSheet(_ image: UIImage) {
         
         guard let rootVC = UIApplication.shared.windows.first?.rootViewController else {
