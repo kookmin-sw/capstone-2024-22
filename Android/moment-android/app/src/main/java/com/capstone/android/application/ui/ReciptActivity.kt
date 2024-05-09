@@ -321,19 +321,54 @@ class ReciptActivity : ComponentActivity() {
                         EditReceipt(data,neutral.toString().toDouble()/100,happy.toString().toDouble()/100,
                             sad.toString().toDouble()/100,angry.toString().toDouble()/100)
                     }
-                    /*composable(route = ReciptScreen.SaveEditReceipt.name) {
-                        val theme = remember {
-                            navController.previousBackStackEntry?.savedStateHandle?.get<Int>("theme")
-                        }
-                        val receipt_content = remember {
-                            navController.previousBackStackEntry?.savedStateHandle?.get<ReceiptContent_string>("receipt_content")
-                        }
-                        if (theme != null) {
-                            if (receipt_content != null) {
-                                SaveEditReceipt (theme,receipt_content)
-                            }
-                        }
-                    }*/
+                    composable(route = ReciptScreen.SaveEditReceipt.name  +
+                            "/{tripName}/{intro.value}/{depart_small.value}/{depart.value}" +
+                            "/{arrive_small.value}/{arrive.value}/{cardnum}" +
+                            "/{publicationdate}/{startdate}/{enddate}/{theme}/{happy}/{sad}/{neutral}/{angry}",
+                        arguments = listOf(
+                            navArgument("tripName"){  defaultValue = "defaultValue" },
+                            navArgument("intro"){  defaultValue = "" },
+                            navArgument("depart_small"){  defaultValue = "" },
+                            navArgument("depart"){  defaultValue = "defaultValue" },
+                            navArgument("arrive_small"){  defaultValue = "" },
+                            navArgument("arrive"){  defaultValue = "defaultValue" },
+                            navArgument("cardnum"){  defaultValue = 1 },
+                            navArgument("publicationdate"){  defaultValue = "defaultValue" },
+                            navArgument("startdate"){  defaultValue = "defaultValue" },
+                            navArgument("enddate"){  defaultValue = "defaultValue" },
+                            navArgument("theme"){  defaultValue = "A" },
+                            navArgument("happy"){  defaultValue = "0.0" },
+                            navArgument("sad"){  defaultValue = "0.0" },
+                            navArgument("neutral"){  defaultValue = "0.0" },
+                            navArgument("angry"){  defaultValue = "0.0" }
+                        )) { navBackStackEntry ->
+                        val tripName = navBackStackEntry.arguments?.getString("tripName")
+                        val intro = navBackStackEntry.arguments?.getString("intro.value")?:" "
+                        val depart_small = navBackStackEntry.arguments?.getString("depart_small.value")?:" "
+                        val depart = navBackStackEntry.arguments?.getString("depart.value")
+                        val arrive_small = navBackStackEntry.arguments?.getString("arrive_small.value")?:" "
+                        val arrive = navBackStackEntry.arguments?.getString("arrive.value")
+                        val cardnum = navBackStackEntry.arguments?.getInt("cardnum")
+                        val publicationdate = navBackStackEntry.arguments?.getString("publicationdate")
+                        val startdate = navBackStackEntry.arguments?.getString("startdate")
+                        val enddate = navBackStackEntry.arguments?.getString("enddate")
+                        val theme = navBackStackEntry.arguments?.getString("theme")?:"A"
+                        val happy = navBackStackEntry.arguments?.getString("happy")?:0.0
+                        val sad = navBackStackEntry.arguments?.getString("sad")?:0.0
+                        val neutral = navBackStackEntry.arguments?.getString("neutral")?:0.0
+                        val angry = navBackStackEntry.arguments?.getString("angry")?:0.0
+
+                        val emotionList = emotionPercent(
+                            happy.toString().toDouble(),
+                            sad.toString().toDouble(),
+                            neutral.toString().toDouble(),
+                            angry.toString().toDouble(), theme)
+
+                        SaveEditReceipt(theme,ReceiptContent_string(
+                            tripName, intro, depart_small, depart, arrive_small, arrive,
+                            cardnum,publicationdate,startdate,enddate, emotionList)
+                        )
+                    }
                 }
             }
         }
@@ -1924,25 +1959,29 @@ class ReciptActivity : ComponentActivity() {
                                 )
                             } else {
 
+                                var theme = "A"
                                 if (receiptContent.intro.value == "") receiptContent.intro.value = " "
                                 if (receiptContent.depart_small.value == "") receiptContent.depart_small.value = " "
                                 if (receiptContent.arrive_small.value == "") receiptContent.arrive_small.value = " "
-
-                                val receiptData = receiptContent
+                                theme = if (state.currentPage == 0) "A" else "B"
 
                                 navController.navigate(
-                                    ReciptScreen.SaveRecipt.name +
-                                            "/${receiptData.tripName}" +
-                                            "/${receiptData.intro.value}" +
-                                            "/${receiptData.depart_small.value}" +
-                                            "/${receiptData.depart.value}" +
-                                            "/${receiptData.arrive_small.value}" +
-                                            "/${receiptData.arrive.value}" +
-                                            "/${receiptData.cardnum}" +
-                                            "/${receiptData.publicationdate}" +
-                                            "/${receiptData.startdate}" +
-                                            "/${receiptData.enddate}" +
-                                            "/${theme}"
+                                    ReciptScreen.SaveEditReceipt.name +
+                                            "/${receiptContent.tripName}" +
+                                            "/${receiptContent.intro.value}" +
+                                            "/${receiptContent.depart_small.value}" +
+                                            "/${receiptContent.depart.value}" +
+                                            "/${receiptContent.arrive_small.value}" +
+                                            "/${receiptContent.arrive.value}" +
+                                            "/${receiptContent.cardnum}" +
+                                            "/${receiptContent.publicationdate}" +
+                                            "/${receiptContent.startdate}" +
+                                            "/${receiptContent.enddate}" +
+                                            "/${theme}" +
+                                            "/${happy}" +
+                                            "/${sad}" +
+                                            "/${neutral}" +
+                                            "/${angry}"
                                 )
                             }
                         }) {
@@ -1956,8 +1995,13 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
-    /*@Composable
-    fun SaveEditReceipt(theme :Int, receiptcontent: ReceiptContent_string){
+
+    @SuppressLint("UnrememberedMutableState")
+    @Composable
+    fun SaveEditReceipt(theme: String, receiptcontent: ReceiptContent_string){
+
+        var Theme = 0
+        Theme = if (theme == "A") 0 else 1
 
         Column(
             modifier = Modifier
@@ -1982,11 +2026,8 @@ class ReciptActivity : ComponentActivity() {
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
                         .clickable {
-                            val intent = Intent(
-                                this@ReciptActivity,
-                                MainActivity::class.java
-                            )
-                            intent.putExtra("MoveScreen", "ReceiptPost")
+                            var intent = Intent(this@ReciptActivity, MainActivity::class.java)
+                            intent.putExtra("MoveScreen", "Receipt")
                             startActivity(intent)
                         }) {
                     YJ_Bold15("완료", primary_500)
@@ -1994,16 +2035,15 @@ class ReciptActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 앞에서 불러온 화면 데이터 받아와서 수정안되는 버전으로 넣기
-            if (theme == 0) {
+            if (Theme == 0) {
                 SaveTheme1(receiptcontent)
             }
-            if(theme == 1){
+            if(Theme == 1){
                 SaveTheme2(receiptcontent)
-
             }
         }
-    }*/
+    }
+
 
     @Composable
     fun Theme1_Emotion(kind: String, index: Int): Int {
