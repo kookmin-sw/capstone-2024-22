@@ -1363,7 +1363,7 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if(receiptcontent.depart_small == " "){
+                if(receiptcontent.depart_small == " " || receiptcontent.depart_small == ""){
                     Spacer(modifier = Modifier.size(19.dp))
                 }else{
                     Image(
@@ -1406,7 +1406,7 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if(receiptcontent.arrive_small == " "){
+                if(receiptcontent.arrive_small == " " || receiptcontent.arrive_small == ""){
                     Spacer(modifier = Modifier.size(19.dp))
                 }else{
                     Image(
@@ -1587,7 +1587,7 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if(receiptcontent.depart_small == " "){
+                if(receiptcontent.depart_small == " " || receiptcontent.depart_small == ""){
                     Spacer(modifier = Modifier.size(19.dp))
                 }else{
                     Image(
@@ -1632,7 +1632,7 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if(receiptcontent.arrive_small == " "){
+                if(receiptcontent.arrive_small == " " || receiptcontent.arrive_small == ""){
                     Spacer(modifier = Modifier.size(19.dp))
                 }else{
                     Image(
