@@ -1,3 +1,5 @@
+
+
 plugins {
     kotlin("plugin.serialization") version "1.5.0"
     kotlin("kapt")
@@ -23,6 +25,17 @@ android {
         }
     }
 
+
+
+    signingConfigs {
+        create("release") {
+            keyAlias = "moment-release-key2"
+            keyPassword = "rlaalswnd1"
+            storeFile = file("/Users/kimminjung/AndroidStudioProjects/moment-key-manage/release/moment-releasekeystore2")
+            storePassword = "rlaalswnd1"
+        }
+    }
+
     buildTypes {
 
 //        배포 준비 할 때 디버그 모드와 릴리즈 모드 나누기
@@ -33,7 +46,9 @@ android {
 //        }
 
         release {
+
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
