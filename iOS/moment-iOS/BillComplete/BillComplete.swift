@@ -35,21 +35,29 @@ struct ReceiptGroupView: View {
             VStack{
                 HStack {
                     Button(action: {
-                        // "뒤로" 버튼의 액션: 현재 뷰를 종료
-                      //  self.navigateToTargetView = true
-//                        print("Current tab before: \(homeBaseViewModel.selectedTab)")
-//                           homeBaseViewModel.selectedTab = .Bill
-//                           print("Current tab after: \(homeBaseViewModel.selectedTab)")
-                        presentationMode.wrappedValue.dismiss()
-                        
+                        if isEditing {
+                            // 완료 버튼 클릭 시 수행할 액션
+                            // 예: 편집 내용 저장
+                            print("Editing completed")
+                            isEditing.toggle() // 편집 상태를 비활성화
+                        } else {
+                            // 뒤로 버튼 클릭 시 수행할 액션
+                            // 예: 뷰를 닫거나 이전 화면으로 이동
+                            print("Going back")
+                            presentationMode.wrappedValue.dismiss()
+                        }
                     }) {
                         HStack {
                             Spacer().frame(width: 10)
-                            Text("뒤로")
+                            Text(isEditing ? "완료" : "뒤로")
                                 .font(.yjObangBold15)
                                 .tint(Color.black)
                         }
                     }
+
+
+                    
+                   // presentationMode.wrappedValue.dismiss()
                     Spacer()
                     
                     if isEditing {
@@ -81,7 +89,7 @@ struct ReceiptGroupView: View {
                         
                         ForEach(sharedViewModel.receipts) { receipt in
                             if receipt.receiptThemeType == "A" {
-                                ReceiptATypeView(receipt: receipt)
+                                ReceiptATypeView(receipt: receipt, isEditing: isEditing)
                                
                                     .frame(width: 125,height: 244)
                                     .padding()
@@ -109,112 +117,137 @@ struct ReceiptGroupView: View {
 
 struct ReceiptATypeView: View {
     var receipt: Receipt
-  
+    var isEditing: Bool
     var topColor: Color = .homeRed
     var textColor: Color = .white
+    @State private var isChecked = false // 체크박스 상태
     
     var body: some View {
-        VStack(spacing:0) {
-            Rectangle()
-                .fill(topColor)
-                .frame(height: 20)
-                .overlay(
-                    HStack{
-                        Text("\(receipt.tripName)")
-                            .foregroundColor(textColor)
-                            .font(.pretendardMedium5)
-                            .padding()
-                        Spacer()
-                        Image("LogoSmall")
-                            .padding()
-                        
-                    }
-                )
-            Rectangle()
-                .fill(Color.Secondary50)
-                .frame(height: 224)
-                .border(.gray500)
-                .overlay(
-                    VStack(alignment: .center){
-                        Spacer().frame(height:11)
-                
-                        Text("\(receipt.mainDeparture)")//placeholder : 여행의 기록을 한줄로 기록하세요임
-                        .foregroundColor(.gray500)
-                        .font(.pretendardMedium5)
-                        .padding(.top,4)
-                        .padding(.bottom,13)
-                        .multilineTextAlignment(.center)
-
-                        
-                        VStack(alignment:.center,spacing: 0){
-                            HStack(alignment:.center,spacing:1){
-                                Image("LocationSmall")//여기부터 하면됨
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 6,height: 6)
+        ZStack(alignment: .bottomTrailing){
+            VStack(spacing:0) {
+                Rectangle()
+                    .fill(topColor)
+                    .frame(height: 20)
+                    .overlay(
+                        HStack{
+                            Text("\(receipt.tripName)")
+                                .foregroundColor(textColor)
+                                .font(.pretendardMedium5)
+                                .padding()
+                            Spacer()
+                            Image("LogoSmall")
+                                .padding()
+                            
+                        }
+                    )
+                Rectangle()
+                    .fill(Color.Secondary50)
+                    .frame(height: 224)
+                    .border(.gray500)
+                    .overlay(
+                        VStack(alignment: .center){
+                            Spacer().frame(height:11)
+                            
+                            Text("\(receipt.mainDeparture)")//placeholder : 여행의 기록을 한줄로 기록하세요임
+                                .foregroundColor(.gray500)
+                                .font(.pretendardMedium5)
+                                .padding(.top,4)
+                                .padding(.bottom,13)
+                                .multilineTextAlignment(.center)
+                            
+                            
+                            VStack(alignment:.center,spacing: 0){
+                                HStack(alignment:.center,spacing:1){
+                                    Image("LocationSmall")//여기부터 하면됨
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 6,height: 6)
+                                    
+                                    Text("\(receipt.subDeparture)")
+                                        .font(.pretendardMedium5)
+                                        .foregroundColor(.homeRed)
+                                }
+                                .frame(maxWidth:.infinity)
                                 
-                                Text("\(receipt.subDeparture)")
-                                    .font(.pretendardMedium5)
-                                    .foregroundColor(.homeRed)
+                                
+                                HStack{
+                                    Text("\(receipt.mainDestination)")
+                                        .foregroundColor(.homeRed)  // 글씨
+                                        .font(.pretendardExtrabold18)
+                                        .multilineTextAlignment(.center)
+                                }
+                                
                             }
-                            .frame(maxWidth:.infinity)
                             
+                            Image("airplaneSmall")
+                                .padding(.bottom,20)
                             
-                            HStack{
-                                Text("\(receipt.mainDestination)")
-                                    .foregroundColor(.homeRed)  // 글씨
-                                    .font(.pretendardExtrabold18)
-                                    .multilineTextAlignment(.center)
-                            }
+                            VStack(spacing:0){
+                                HStack(alignment:.center,spacing: 0){
+                                    Image("LocationSmall")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width:6,height: 6)
+                                    
+                                    Text("\(receipt.subDestination)")
+                                        .font(.pretendardMedium5)
+                                        .foregroundColor(.homeRed)
+                                }
+                                
+                                HStack{
+                                    Text("\(receipt.oneLineMemo)")
+                                        .font(.pretendardExtrabold18)
+                                        .foregroundColor(.homeRed)  // 글씨
+                                        .multilineTextAlignment(.center)
+                                }
+                            }.padding(.bottom,4)
+                            //     Spacer()
+                            Image("CutSmall")
+                            // .padding()
+                            
+                            //TODO: - statsView 들어가야함
+                            StatsSmallView(receipt: receipt)
+                            Spacer()
                             
                         }
                         
-                        Image("airplaneSmall")
-                            .padding(.bottom,20)
                         
-                        VStack(spacing:0){
-                            HStack(alignment:.center,spacing: 0){
-                                Image("LocationSmall")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width:6,height: 6)
-                                
-                                Text("\(receipt.subDestination)")
-                                    .font(.pretendardMedium5)
-                                    .foregroundColor(.homeRed)
-                            }
-                            
-                            HStack{
-                                Text("\(receipt.oneLineMemo)")
-                                    .font(.pretendardExtrabold18)
-                                    .foregroundColor(.homeRed)  // 글씨
-                                    .multilineTextAlignment(.center)
-                            }
-                        }.padding(.bottom,4)
-                   //     Spacer()
-                        Image("CutSmall")
-                            // .padding()
-                        
-                        //TODO: - statsView 들어가야함
-                        StatsSmallView(receipt: receipt)
-                        Spacer()
-                        
-                    }
-                    
-                    
+                    )
+               
+                
+                
+            }
+            .cornerRadius(5)
+            .overlay(
+                RoundedRectangle(cornerRadius:3)
+                    .stroke(Color.Secondary50,lineWidth: 1)
             )
-
-           
+            
+            if isEditing {
+                Checkbox(isChecked: $isChecked)
+                    .padding() // 체크박스 주변에 패딩 추가
+                    .alignmentGuide(.trailing) { d in d[.trailing] }
+                    .alignmentGuide(.bottom) { d in d[.bottom] }
+            }
+            
+            
         }
-        .cornerRadius(5)
-        .overlay(
-            RoundedRectangle(cornerRadius:3)
-                .stroke(Color.Secondary50,lineWidth: 1)
-        )
         
     }
        
 }
+struct Checkbox: View {
+    @Binding var isChecked: Bool
+
+    var body: some View {
+        Image(systemName: isChecked ? "checkmark.square.fill" : "square")
+            .foregroundColor(isChecked ? .green : .gray) // 선택 상태에 따라 색상 변경
+            .onTapGesture {
+                self.isChecked.toggle()
+            }
+    }
+}
+
 
 struct StatsSmallView : View {
     var receipt: Receipt
