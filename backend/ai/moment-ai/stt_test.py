@@ -1,6 +1,6 @@
 import whisper.whisper as whisper
 import torch, os
-from torcheval.metrics import WordErrorRate
+# from torcheval.metrics import WordErrorRate
 from torchmetrics.text import CharErrorRate
 import pandas as pd
 from tqdm import tqdm
@@ -22,7 +22,7 @@ targets = []
 for path, text in tqdm(random.sample(list(zip(source_data['path'], source_data['text'])), 100)):
   file_path = os.path.join(data_dir, path)
   if os.path.exists(file_path):
-    res = stt_model.transcribe(os.path.join(data_dir, path))
+    res = stt_model.transcribe(os.path.join(data_dir, path), hallucination_silence_threshold=0.5)
     preds.append(res['text'])
     targets.append(text)
     print(f"\npredict : {res['text']}\nground truth : {text}\ntotal_CER = {metric(preds, targets)}\n")
