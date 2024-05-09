@@ -596,19 +596,16 @@ class ReciptActivity : ComponentActivity() {
                                 if (arrive_small.value == "") arrive_small.value = " "
 
                                 receiptViewModel.postReceiptCreate(
-                                body = PostReceiptCreateRequest(
-                                    mainDeparture = depart.value,
-                                    mainDestination = arrive.value,
-                                    oneLineMemo = intro.value,
-                                    receiptThemeType = if (state.currentPage == 0) "A" else "B",
-                                    subDeparture = depart_small.value,
-                                    subDestination = arrive_small.value,
-                                    tripId = tripid
+                                    body = PostReceiptCreateRequest(
+                                        mainDeparture = depart.value,
+                                        mainDestination = arrive.value,
+                                        oneLineMemo = intro.value,
+                                        receiptThemeType = if (state.currentPage == 0) "A" else "B",
+                                        subDeparture = depart_small.value,
+                                        subDestination = arrive_small.value,
+                                        tripId = tripid
+                                    )
                                 )
-                            )
-                                if (intro.value == "") intro.value = " "
-                                if (depart_small.value == "") depart_small.value = " "
-                                if (arrive_small.value == "") arrive_small.value = " "
 
                                 val receiptData = ReceiptContent(
                                     tripName, intro, depart_small, depart, arrive_small, arrive,
@@ -624,7 +621,6 @@ class ReciptActivity : ComponentActivity() {
 
                                     navController.navigate(
                                         ReciptScreen.SaveRecipt.name +
-                                                "/${tripid}" +
                                                 "/${receiptData.tripName}" +
                                                 "/${receiptData.intro.value}" +
                                                 "/${receiptData.depart_small.value}" +
@@ -635,7 +631,11 @@ class ReciptActivity : ComponentActivity() {
                                                 "/${receiptData.publicationdate}" +
                                                 "/${receiptData.startdate}" +
                                                 "/${receiptData.enddate}" +
-                                                "/${theme}"
+                                                "/${theme}" +
+                                                "/${trip.happy}" +
+                                                "/${trip.sad}" +
+                                                "/${trip.neutral}" +
+                                                "/${trip.angry}"
                                     )
                                 }
                             }
