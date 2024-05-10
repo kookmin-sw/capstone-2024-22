@@ -13,7 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
-
+/app/release/output-metadata.json
 # Created by https://www.toptal.com/developers/gitignore/api/android,androidstudio,kotlin,java,windows,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=android,androidstudio,kotlin,java,windows,macos
 
