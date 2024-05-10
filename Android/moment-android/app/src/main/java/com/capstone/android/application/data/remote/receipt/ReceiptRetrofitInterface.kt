@@ -4,12 +4,14 @@ import com.capstone.android.application.data.remote.receipt.model.receipt_all.ge
 import com.capstone.android.application.data.remote.receipt.model.receipt_count.getReceiptCountResponse
 import com.capstone.android.application.data.remote.receipt.model.receipt_delete.deleteReceiptDeleteRequest
 import com.capstone.android.application.data.remote.receipt.model.receipt_post.PostReceiptCreateRequest
+import com.capstone.android.application.data.remote.receipt.model.receipt_put.PutReceiptCreateRequest
 import com.capstone.android.application.domain.response.ApiResponse
 import com.capstone.android.application.domain.response.MomentResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.HTTP
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Query
 interface ReceiptRetrofitInterface {
 
@@ -34,5 +36,8 @@ interface ReceiptRetrofitInterface {
     suspend fun getReceiptCount()
             : ApiResponse<getReceiptCountResponse>
 
-
+    @PUT("/core/receipt")
+    suspend fun putReceiptmodify(
+        @Body body: PutReceiptCreateRequest
+    ): ApiResponse<MomentResponse>
 }

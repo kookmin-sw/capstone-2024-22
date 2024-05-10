@@ -9,6 +9,7 @@ import com.capstone.android.application.data.remote.receipt.model.receipt_all.ge
 import com.capstone.android.application.data.remote.receipt.model.receipt_count.getReceiptCountResponse
 import com.capstone.android.application.data.remote.receipt.model.receipt_delete.deleteReceiptDeleteRequest
 import com.capstone.android.application.data.remote.receipt.model.receipt_post.PostReceiptCreateRequest
+import com.capstone.android.application.data.remote.receipt.model.receipt_put.PutReceiptCreateRequest
 import com.capstone.android.application.domain.response.ApiResponse
 import com.capstone.android.application.domain.response.MomentResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +21,16 @@ import javax.inject.Inject
 @HiltViewModel
 class ReceiptViewModel @Inject constructor(private val receiptRepository: ReceiptRepository):
     ViewModel() {
+
+    //영수증 생성 성공
+    val  putReceiptCreateSuccess : MutableLiveData<MomentResponse> by lazy{
+        MutableLiveData<MomentResponse>()
+    }
+
+    //영수증 생성 실패
+    val  putReceiptCreateFailure : MutableLiveData<ApiResponse.Error<Exception>> by lazy{
+        MutableLiveData<ApiResponse.Error<Exception>>()
+    }
 
     //영수증 생성 성공
     val  postReceiptCreateSuccess : MutableLiveData<MomentResponse> by lazy{
@@ -197,5 +208,38 @@ class ReceiptViewModel @Inject constructor(private val receiptRepository: Receip
             }
         }
     }
+    fun putReceiptCreate(
+        body : PutReceiptCreateRequest
+    ){
+        viewModelScope.launch {
+            try {
+                val response = receiptRepository.putReceiptCreate(body = body)
 
+                if (response is ApiResponse.Success){
+                    putReceiptCreateSuccess.postValue(response.data)
+                }else{
+
+                }
+            } catch (e: HttpException) {
+                Log.d("qwer_postReceiptCreate", "404")
+                putReceiptCreateFailure.postValue(ApiResponse.Error(e))
+                // Handle specific HTTP error codes
+                when (e.code()) {
+                    404 -> {
+                        // Handle resource not found error
+                    }
+                    // Handle other error codes
+                }
+            }   catch (e: IOException) {
+                Log.d("qwer_postReceiptCreate","${e.message}")
+                putReceiptCreateFailure.postValue(ApiResponse.Error(e))
+                // Handle network-related errors
+//                throw NetworkException("Network error occurred", e)
+            } catch (e: Exception) {
+                Log.d("qwer_postReceiptCreate","${e.message}")
+                putReceiptCreateFailure.postValue(ApiResponse.Error(e))
+                // Handle other generic exceptions
+            }
+        }
+    }
 }
