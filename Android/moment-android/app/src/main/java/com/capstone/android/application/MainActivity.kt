@@ -115,15 +115,15 @@ import com.capstone.android.application.data.remote.card.model.card_post.request
 import com.capstone.android.application.data.remote.receipt.model.receipt_delete.ReceiptId
 import com.capstone.android.application.data.remote.receipt.model.receipt_delete.deleteReceiptDeleteRequest
 import com.capstone.android.application.domain.Card
-import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.CustomTitleCheckViewModel
 import com.capstone.android.application.domain.Emotion
+import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.Trip
 import com.capstone.android.application.domain.TripFile
 import com.capstone.android.application.presentation.CardViewModel
-import com.capstone.android.application.presentation.ReceiptViewModel
 import com.capstone.android.application.presentation.KakaoViewModel
 import com.capstone.android.application.presentation.OpenWeatherViewModel
+import com.capstone.android.application.presentation.ReceiptViewModel
 import com.capstone.android.application.presentation.TripFileViewModel
 import com.capstone.android.application.presentation.TripViewModel
 import com.capstone.android.application.ui.CardActivity
@@ -1172,6 +1172,8 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.clickable {
                                 val intent = Intent(this@MainActivity,CardActivity::class.java)
                                 intent.putExtra("tripFileId",tripFileUntitledList[index].id)
+                                intent.putExtra("tripFileListIndex",tripFileUntitledList[index].id)
+
                                 startActivity(intent)
                             } ,
                         ) {
@@ -1205,7 +1207,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "${tripFileUntitledList[index].analyzingCount}개의 파일이 있어요",
+                                        text = "${tripFileUntitledList[index].analyzingCount.value}개의 파일이 있어요",
                                         fontSize = 11.sp,
                                         color = Color("#706969".toColorInt())
                                     )
