@@ -138,7 +138,8 @@ class ReciptActivity : ComponentActivity() {
             val tripList = remember { mutableStateListOf<ReceiptTrip>()}
             tripViewModel.getTripAllSuccess.observe(this@ReciptActivity){ response->
                 response.data.trips.mapNotNull { trip -> runCatching {
-                    ReceiptTrip(id=trip.id,tripName = trip.tripName, startDate = trip.startDate, endDate = trip.endDate, analyzingCount = trip.analyzingCount) }
+                    ReceiptTrip(id=trip.id,tripName = trip.tripName, startDate = trip.startDate,
+                        endDate = trip.endDate, analyzingCount = trip.analyzingCount, numOfCard = trip.numOfCard) }
                     .onSuccess { tripList.clear() }
                     .onFailure {}.getOrNull()
                 }.forEach {
@@ -446,7 +447,9 @@ class ReciptActivity : ComponentActivity() {
                         count = tripList.size,
                         itemContent = {index->
 
-                            if(tripList[index].analyzingCount==0 && isDatePassed(LocalDate.parse(tripList[index].endDate))){
+                            if(tripList[index].analyzingCount==0 &&
+                                isDatePassed(LocalDate.parse(tripList[index].endDate)) &&
+                                tripList[index].numOfCard != 0 ){
                                 ItemTrip(
                                     Trip(id=tripList[index].id,
                                         tripName = tripList[index].tripName,
