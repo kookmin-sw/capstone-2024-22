@@ -45,6 +45,13 @@ struct cardViews: Codable,Identifiable {
 
 }
 
+struct EmotionDataCard {
+    let name: String
+    let score: Double
+    let color: Color
+    let image: String
+}
+
 extension String {
     func parseISODate() -> Date? {
         let dateFormatter = ISO8601DateFormatter()
@@ -57,12 +64,26 @@ extension String {
 
 class CardViewModel: ObservableObject {
     @Published var cardItems: [cardViews] = []
-   
+    @Published var emotions: [EmotionDataCard] = []
+    
+    init() {
+         updateEmotions(happy: 24.09, sad: 15.9, angry: 14.95, neutral: 21.14, disgust: 23.91)
+     }
 
 
     var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjQsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTA5MTA4MywiZXhwIjoxNzU4MjkxMDgzfQ.XxixgGTkMGfNQPhQXm4Bt8Zz9rfRlq9UsY7wV0gxQUE"
     
     
+    private func updateEmotions(happy: Double, sad: Double, angry: Double, neutral: Double, disgust: Double) {
+           let total = happy + sad + angry + neutral + disgust
+           emotions = [
+            EmotionDataCard(name: "Happy", score: happy / total, color: .Basic, image: "fun"),
+            EmotionDataCard(name: "Sad", score: sad / total, color: .unsafeColor, image: "sad"),
+            EmotionDataCard(name: "Angry", score: angry / total, color: .StrangeColor, image: "angry"),
+            EmotionDataCard(name: "Neutral", score: neutral / total, color: .homeRed, image: "netral"),
+            EmotionDataCard(name: "Disgust", score: disgust / total, color: .black, image: "disgustFace")
+           ].sorted { $0.score > $1.score }
+       }
 
     func fetchAllCardViews(tripFileId: Int) {
         
