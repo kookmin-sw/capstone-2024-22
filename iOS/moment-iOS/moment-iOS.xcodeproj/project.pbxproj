@@ -103,6 +103,7 @@
 		8EDC94DD2BEA8AE400B646AB /* BillComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94DC2BEA8AE400B646AB /* BillComplete.swift */; };
 		8EDC94E02BED3FB900B646AB /* ReceiptcompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94DF2BED3FB900B646AB /* ReceiptcompleteView.swift */; };
 		8EDC94E22BEE881700B646AB /* ReceiptCompleteviewB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94E12BEE881700B646AB /* ReceiptCompleteviewB.swift */; };
+		8EDC94E42BEEAFA400B646AB /* CustomSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94E32BEEAFA400B646AB /* CustomSlider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -221,6 +222,7 @@
 		8EDC94DC2BEA8AE400B646AB /* BillComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillComplete.swift; sourceTree = "<group>"; };
 		8EDC94DF2BED3FB900B646AB /* ReceiptcompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptcompleteView.swift; sourceTree = "<group>"; };
 		8EDC94E12BEE881700B646AB /* ReceiptCompleteviewB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptCompleteviewB.swift; sourceTree = "<group>"; };
+		8EDC94E32BEEAFA400B646AB /* CustomSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSlider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -499,6 +501,7 @@
 				8ECCFBA62BB59F0100C39125 /* CardView.swift */,
 				8ECCFBD82BB9463700C39125 /* CardViewModel.swift */,
 				8E86C1AC2BE8FAC100291360 /* VideoPlayerView.swift */,
+				8EDC94E32BEEAFA400B646AB /* CustomSlider.swift */,
 			);
 			path = CardView;
 			sourceTree = "<group>";
@@ -766,6 +769,7 @@
 				8E5CAE382B970C5600A483B4 /* OnboardingContent.swift in Sources */,
 				8E5CAE4E2B970D5D00A483B4 /* Todo.swift in Sources */,
 				8E7FB8FE2BA1E66200F05045 /* CustomDevider.swift in Sources */,
+				8EDC94E42BEEAFA400B646AB /* CustomSlider.swift in Sources */,
 				8E970E172BC3E070003476C4 /* DailyView.swift in Sources */,
 				8E15C8732B6527E3001468C7 /* ContentView.swift in Sources */,
 				8EDC94E22BEE881700B646AB /* ReceiptCompleteviewB.swift in Sources */,

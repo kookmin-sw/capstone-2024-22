@@ -80,13 +80,16 @@ struct CustomAudioPlayerView: View {
 
     var body: some View {
         VStack {
-            Slider(value: $audioPlayer.progress, in: 0...1, step: 0.01)
+          
+            CustomSlider(value: $audioPlayer.progress, range: (0, 1), thumbImageName: "thumb")
+
             Button(action: {
                 audioPlayer.playPauseAction()
             }) {
-                Image(systemName: audioPlayer.isPlaying ? "pause.circle" : "play.circle")
-                    .resizable()
-                    .frame(width: 50, height: 50)
+                Image(systemName: audioPlayer.isPlaying ? "pause" : "play")
+                  
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
             }
         }
         .padding()

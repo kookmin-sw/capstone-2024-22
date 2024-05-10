@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "State=Play.png",
+      "filename" : "Rectangle 3369.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "State=Play (1).png",
+      "filename" : "Rectangle 3369 (1).png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "State=Play (2).png",
+      "filename" : "Rectangle 3369 (2).png",
       "idiom" : "universal",
       "scale" : "3x"
     }

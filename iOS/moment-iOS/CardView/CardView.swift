@@ -334,9 +334,9 @@ struct DynamicGradientRectangleView: View {
             LinearGradient(gradient: Gradient(colors: [.homeBack, .toastColor]), startPoint: .top, endPoint: .bottom)
         )
         .cornerRadius(3)
-        // .padding(.horizontal,3)
+      
         .frame(width: 340)
-        //}
+   
         
     }
     
@@ -449,11 +449,7 @@ struct EmotionView: View {
                 
             }
             CustomEmotionViewDivider()
-            
-//            emotionRow(imageName: "netral", emotionText: "평범해요", progressValue: 0.6, percentage: "60%")
-//            emotionRow(imageName: "fun", emotionText: "즐거워요", progressValue: 0.2, percentage: "20%")
-//            emotionRow(imageName: "angry", emotionText: "화나요", progressValue: 0.15, percentage: "15%")
-//            emotionRow(imageName: "sad", emotionText: "슬퍼요", progressValue: 0.05, percentage: "5%")
+ 
             ForEach(cardViewModel.emotions, id: \.name) { emotion in
                         emotionRow(emotion: emotion)
                     }
@@ -461,36 +457,7 @@ struct EmotionView: View {
         .padding(.horizontal, 1) // HStack에 패딩을 적용하여 내용이 화면 가장자리에 붙지 않도록 합니다.
         
     }
-    
-//    @ViewBuilder
-//    private func emotionRow(imageName: String, emotionText: String, progressValue: Double, percentage: String) -> some View {
-//        HStack {
-//            
-//            Image(imageName)
-//                .resizable()
-//                .scaledToFit()
-//                .frame(width: 12, height: 12) // 이미지의 크기를 설정합니다.
-//            
-//            Text(emotionText)
-//                .font(.pretendardMedium11)
-//                .frame(width: 50, alignment: .leading) // 텍스트의 너비와 정렬을 설정합니다.
-//            
-//            
-//            Spacer().frame(width:35)
-//            
-//            ProgressView(value: progressValue, total: 1.0)
-//            
-//                .progressViewStyle(LinearProgressViewStyle(tint: getColorForEmotion(emotionText: emotionText))) // 감정에 따른 색상
-//                .frame(width: 136) // 진행률 표시기의 너비를 설정합니다.
-//            Spacer().frame(width:35)
-//            Text(percentage)
-//                .font(.pretendardMedium11)
-//                .frame(width: 27, alignment: .trailing) // 퍼센트 텍스트의 너비와 정렬을 설정합니다.
-//            
-//            // Spacer() // 오른쪽에 Spacer를 추가하여 모든 요소를 왼쪽으로 정렬합니다.
-//        }
-//        
-//    }
+ 
     
     
     @ViewBuilder
@@ -519,20 +486,7 @@ struct EmotionView: View {
           }
       }
     
-    private func getColorForEmotion(emotionText: String) -> Color {
-        switch emotionText {
-        case "평범해요":
-            return .homeRed
-        case "즐거워요":
-            return .black
-        case "화나요":
-            return .StrangeColor
-        case "슬퍼요":
-            return .unsafeColor
-        default:
-            return .gray
-        }
-    }
+   
 }
  
 
