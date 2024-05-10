@@ -30,7 +30,7 @@ struct ReceiptCompleteviewB: View {
                 HStack{
                     
                     Spacer().frame(width: 40)
-                    Text(sharedViewModel.tripRecord)
+                    Text("\(receipt.mainDeparture)")
                         .font(.pretendardMedium14)
                         .foregroundColor(.gray500)  // 글씨
                         .multilineTextAlignment(.center)
@@ -50,7 +50,7 @@ struct ReceiptCompleteviewB: View {
                             .scaledToFit()
                             .frame(width: 19, height: 19)
                         
-                        Text(sharedViewModel.tripExplaneStart)
+                        Text("\(receipt.subDeparture)")
                             .font(.pretendardMedium14)
                             .foregroundColor(.gray600)
                             .multilineTextAlignment(.center)
@@ -59,7 +59,7 @@ struct ReceiptCompleteviewB: View {
                     
                     
                     HStack{
-                        Text(sharedViewModel.tripnameStart)
+                        Text("\(receipt.mainDestination)")
                             .font(.pretendardExtrabold45)
                             .foregroundColor(.black)  // 글씨
                             .multilineTextAlignment(.center)
@@ -85,7 +85,7 @@ struct ReceiptCompleteviewB: View {
                             .scaledToFit()
                             .frame(width: 19, height: 19)
                         
-                        Text(sharedViewModel.tripExplaneEnd)
+                        Text("\(receipt.subDestination)")
                             .font(.pretendardMedium14)
                             .foregroundColor(.gray600)
                             .multilineTextAlignment(.center)
@@ -95,7 +95,7 @@ struct ReceiptCompleteviewB: View {
                     
                     HStack{
                         
-                        Text(sharedViewModel.tripnameEnd)
+                        Text("\(receipt.oneLineMemo)")
                             .font(.pretendardExtrabold45)
                             .foregroundColor(.black)  // 글씨
                             .multilineTextAlignment(.center)
@@ -104,13 +104,13 @@ struct ReceiptCompleteviewB: View {
                     Spacer()
                 }
                 
-                SentimentTrackerView()
+                SentimentTrackerViewCompleteB(receipt: receipt)
                 
                 
                 
                 
             }
-            // .fill(Color.white) // 전체 색상을 회색으로 설정
+            
             .frame(width: 335, height: 653) // 335,653
             .cornerRadius(5) // 모서리를 둥글게 처리합니다.
             .overlay(
@@ -162,4 +162,81 @@ struct ReceiptCompleteviewB: View {
             
         }
     
+}
+
+
+
+struct SentimentTrackerViewCompleteB: View {
+    var receipt : Receipt
+    var body: some View {
+        VStack(spacing:0){
+            HStack{
+                Text("전라도의 선유도")
+                    .font(.pretendardMedium14)
+                    .padding(.bottom,15)
+                    .multilineTextAlignment(.center)
+            }
+            
+            HStack{
+                Spacer().frame(width: 142)
+                Text("여행 감정")
+                    .foregroundColor(.gray500)
+                    .frame(width: 50)
+                    .font(.pretendardMedium11)
+                Spacer().frame(width: 50)
+                Text("카드 갯수")
+                    .foregroundColor(.gray500)
+                    .font(.pretendardMedium11)
+                    .frame(width: 50)
+                Spacer().frame(width: 66)
+            }
+            HStack{
+                Spacer()
+                VStack{
+                    HStack{
+                        Image("netral")
+                        ProgressView(value: 0.6).frame(width: 109,height: 15)
+                            .cornerRadius(3)
+                            .scaleEffect(x: 1, y: 1, anchor: .center)
+                            .tint(.homeRed)
+                    }
+                    HStack{
+                        Image("sad")
+                        ProgressView(value: 0.6).frame(width: 109,height: 15)
+                            .cornerRadius(3)
+                            .scaleEffect(x: 1, y: 1, anchor: .center)
+                            .tint(.black)
+                    }
+                    HStack{
+                        Image("fun")
+                        ProgressView(value: 0.6).frame(width: 109,height: 15)
+                            .cornerRadius(3)
+                            .scaleEffect(x: 1, y: 1, anchor: .center)
+                            .tint(.Basic)
+                    }
+                    HStack{
+                        Image("angry")
+                        ProgressView(value: 0.6).frame(width: 109,height: 15)
+                            .cornerRadius(3)
+                            .scaleEffect(x: 1, y: 1, anchor: .center)
+                            .tint(.green)
+                    }
+                }
+                Spacer().frame(width: 48)
+                VStack {
+                    Spacer()
+                    Text("27")
+                        .foregroundColor(.homeRed)
+                        .font(.yjObangBold20)
+                        .frame(width: 60,height: 60)
+                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 2))
+                    Spacer()
+                }
+                .frame(width: 60, height: 60)
+                .padding(.trailing,50)
+                
+            }
+        }
+        Spacer().frame(height: 30)
+    }
 }
