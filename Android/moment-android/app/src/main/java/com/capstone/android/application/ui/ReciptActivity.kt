@@ -64,6 +64,7 @@ import com.capstone.android.application.R
 import com.capstone.android.application.app.composable.CustomNoTitleCheckDialog
 import com.capstone.android.application.data.local.Emotion
 import com.capstone.android.application.data.remote.receipt.model.receipt_post.PostReceiptCreateRequest
+import com.capstone.android.application.data.remote.receipt.model.receipt_put.PutReceiptCreateRequest
 import com.capstone.android.application.domain.CustomNoTitleCheckViewModel
 import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.ReceiptTrip
@@ -256,12 +257,12 @@ class ReciptActivity : ComponentActivity() {
                         val created = data.created.take(10)
                         val receiptcontent = ReceiptContent_string(data.tripName,data.oneLineMemo, data.subDeparture,data.mainDeparture,
                             data.subDestination,data.mainDestination,data.numOfCard,created,data.stDate,data.edDate,emotionList)
-                        ReceiptPost_Big(receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad)
+                        ReceiptPost_Big(receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad, data.id)
                     }
                     composable(route = ReciptScreen.EditReceipt.name +
                             "/{tripName}/{intro}/{depart_small}/{depart}" +
                             "/{arrive_small}/{arrive}/{cardnum}" +
-                            "/{publicationdate}/{startdate}/{enddate}/{happy}/{sad}/{neutral}/{angry}",
+                            "/{publicationdate}/{startdate}/{enddate}/{happy}/{sad}/{neutral}/{angry}/{receiptid}",
                         arguments = listOf(
                             navArgument("tripName"){  defaultValue = "defaultValue" },
                             navArgument("intro"){  defaultValue = "" },
@@ -276,7 +277,8 @@ class ReciptActivity : ComponentActivity() {
                             navArgument("happy"){  defaultValue = "0.0" },
                             navArgument("sad"){  defaultValue = "0.0" },
                             navArgument("neutral"){  defaultValue = "0.0" },
-                            navArgument("angry"){  defaultValue = "0.0" }
+                            navArgument("angry"){  defaultValue = "0.0" },
+                            navArgument("receiptid"){  defaultValue = "0" }
                         )) { navBackStackEntry ->
                         val tripname = navBackStackEntry.arguments?.getString("tripName")?:" "
                         var intro = navBackStackEntry.arguments?.getString("intro")?:" "
@@ -292,6 +294,7 @@ class ReciptActivity : ComponentActivity() {
                         val sad = navBackStackEntry.arguments?.getString("sad")?:0.0
                         val neutral = navBackStackEntry.arguments?.getString("neutral")?:0.0
                         val angry = navBackStackEntry.arguments?.getString("angry")?:0.0
+                        val receiptid = navBackStackEntry.arguments?.getString("receiptid")?:0
 
                         val emotionList = emotionPercent(
                             happy.toString().toDouble()/100,
@@ -319,7 +322,7 @@ class ReciptActivity : ComponentActivity() {
                             tripname, Intro, Depart_small, Depart, Arrive_small, Arrive,
                             cardnum,publicationdate,startdate,enddate, emotionList)
                         EditReceipt(data,neutral.toString().toDouble()/100,happy.toString().toDouble()/100,
-                            sad.toString().toDouble()/100,angry.toString().toDouble()/100)
+                            sad.toString().toDouble()/100,angry.toString().toDouble()/100,receiptid.toString().toInt())
                     }
                     composable(route = ReciptScreen.SaveEditReceipt.name  +
                             "/{tripName}/{intro.value}/{depart_small.value}/{depart.value}" +
@@ -1839,7 +1842,7 @@ class ReciptActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
     @Composable
     fun ReceiptPost_Big(content: ReceiptContent_string, theme : String,
-                        neutral:Double ,happy:Double ,angry:Double ,sad:Double){
+                        neutral:Double ,happy:Double ,angry:Double ,sad:Double, receiptid : Int){
 
         var intent = Intent(this@ReciptActivity, MainActivity::class.java)
         intent.putExtra("MoveScreen", "ReceiptPost")
@@ -1907,7 +1910,8 @@ class ReciptActivity : ComponentActivity() {
                                                 "/${happy}" +
                                                 "/${sad}" +
                                                 "/${neutral}" +
-                                                "/${angry}"
+                                                "/${angry}" +
+                                                "/${receiptid}"
                                     )
                                 }) {
                             YJ_Bold15("수정", black)
@@ -1932,7 +1936,7 @@ class ReciptActivity : ComponentActivity() {
     @OptIn(ExperimentalPagerApi::class)
     @Composable
     fun EditReceipt(receiptContent: ReceiptContent,
-                    neutral:Double ,happy:Double ,angry:Double ,sad:Double){
+                    neutral:Double ,happy:Double ,angry:Double ,sad:Double, receiptid : Int){
 
         val page = 2
         val state = rememberPagerState()
@@ -1986,31 +1990,52 @@ class ReciptActivity : ComponentActivity() {
                                 )
                             } else {
 
-                                var theme = "A"
-                                if (receiptContent.intro.value == "") receiptContent.intro.value = " "
-                                if (receiptContent.depart_small.value == "") receiptContent.depart_small.value = " "
-                                if (receiptContent.arrive_small.value == "") receiptContent.arrive_small.value = " "
-                                theme = if (state.currentPage == 0) "A" else "B"
-
-                                navController.navigate(
-                                    ReciptScreen.SaveEditReceipt.name +
-                                            "/${receiptContent.tripName}" +
-                                            "/${receiptContent.intro.value}" +
-                                            "/${receiptContent.depart_small.value}" +
-                                            "/${receiptContent.depart.value}" +
-                                            "/${receiptContent.arrive_small.value}" +
-                                            "/${receiptContent.arrive.value}" +
-                                            "/${receiptContent.cardnum}" +
-                                            "/${receiptContent.publicationdate}" +
-                                            "/${receiptContent.startdate}" +
-                                            "/${receiptContent.enddate}" +
-                                            "/${theme}" +
-                                            "/${happy}" +
-                                            "/${sad}" +
-                                            "/${neutral}" +
-                                            "/${angry}"
+                                receiptViewModel.putReceiptCreate(body =
+                                PutReceiptCreateRequest(
+                                    mainDeparture = receiptContent.depart.value,
+                                    mainDestination =  receiptContent.arrive.value,
+                                    oneLineMemo =  receiptContent.intro.value,
+                                    receiptThemeType = if (state.currentPage == 0) "A" else "B",
+                                    subDeparture =  receiptContent.depart_small.value,
+                                    subDestination =  receiptContent.arrive_small.value,
+                                    id =  receiptid
+                                    )
                                 )
-                            }
+                                // 영수증 전체 받기 성공
+                                receiptViewModel.putReceiptCreateSuccess .observe(this@ReciptActivity) { response ->
+                                    Log.d("putReceiptCreateSuccess", "success" +response.toString())
+
+                                    var theme = "A"
+                                    if (receiptContent.intro.value == "") receiptContent.intro.value = " "
+                                    if (receiptContent.depart_small.value == "") receiptContent.depart_small.value = " "
+                                    if (receiptContent.arrive_small.value == "") receiptContent.arrive_small.value = " "
+                                    theme = if (state.currentPage == 0) "A" else "B"
+
+                                    navController.navigate(
+                                        ReciptScreen.SaveEditReceipt.name +
+                                                "/${receiptContent.tripName}" +
+                                                "/${receiptContent.intro.value}" +
+                                                "/${receiptContent.depart_small.value}" +
+                                                "/${receiptContent.depart.value}" +
+                                                "/${receiptContent.arrive_small.value}" +
+                                                "/${receiptContent.arrive.value}" +
+                                                "/${receiptContent.cardnum}" +
+                                                "/${receiptContent.publicationdate}" +
+                                                "/${receiptContent.startdate}" +
+                                                "/${receiptContent.enddate}" +
+                                                "/${theme}" +
+                                                "/${happy}" +
+                                                "/${sad}" +
+                                                "/${neutral}" +
+                                                "/${angry}"
+                                    )
+                                }
+                                }
+
+                                // 영수증 전체 받기 실패
+                                receiptViewModel.putReceiptCreateFailure.observe(this@ReciptActivity) { response ->
+                                    Log.d("putReceiptCreateFailure", response.toString())
+                                }
                         }) {
                     YJ_Bold15("완료", black)
                 }
