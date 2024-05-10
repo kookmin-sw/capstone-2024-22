@@ -65,6 +65,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -870,15 +871,15 @@ class MainActivity : ComponentActivity() {
                         title.value = "추가"
                     }
                     composable(BottomNavItem.Receipt.screenRoute) {
-                        Toast.makeText(this@MainActivity, "추후 공개될 예정입니다.", Toast.LENGTH_SHORT)
+                        /*Toast.makeText(this@MainActivity, "추후 공개될 예정입니다.", Toast.LENGTH_SHORT)
                             .show()
                         Log.d("waegwagewa", tripList.toString())
-                        Home(tripList, mainTrip)
+                        Home(tripList, mainTrip)*/
                         title.value = "추가"
-//                    currentSelectedBottomRoute.value = "Receipt"
-//
-//                    Receipt()
-//                    title.value = "영수증 모아보기"
+                        currentSelectedBottomRoute.value = "Receipt"
+
+                        Receipt()
+                        title.value = "영수증 모아보기"
                     }
                     composable(BottomNavItem.Record.screenRoute) {
                         currentSelectedBottomRoute.value = "Record"
@@ -932,7 +933,8 @@ class MainActivity : ComponentActivity() {
                                         receiptAll.mainDestination,
                                         receiptAll.subDestination,
                                         receiptAll.oneLineMemo,
-                                        receiptAll.receiptThemeType
+                                        receiptAll.receiptThemeType,
+                                        receiptAll.createdAt
                                     )
                                 }
                                     .onSuccess { receiptList.clear() }
@@ -1582,6 +1584,7 @@ class MainActivity : ComponentActivity() {
                     .background(Color.Gray)
                     .clickable {
                         if (!EditCheckState.value) {
+                            intent.putExtra("BigReceipt", item)
                             startActivity(intent)
                         } else {
                             if (checkState.value) {
@@ -2480,44 +2483,10 @@ class MainActivity : ComponentActivity() {
             }
     }
 
-    @SuppressLint("UnrememberedMutableState")
     @Composable
     fun MiniTheme1(receiptAll:ReceiptAll){
-        val emotionList = mutableStateListOf<Emotion>()
+        val emotionList = emotionPercent(receiptAll.neutral,receiptAll.happy,receiptAll.angry,receiptAll.sad)
 
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_common,
-                text = "평범해요",
-                persent = receiptAll.neutral.toFloat(),
-                color = ""
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_happy,
-                text = "즐거워요",
-                persent = receiptAll.happy.toFloat(),
-                color = ""
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_angry,
-                text = "화가나요",
-                persent = receiptAll.angry.toFloat(),
-                color = ""
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_sad,
-                persent = receiptAll.sad.toFloat(),
-                text = "우울해요",
-                color = ""
-            )
-        )
-        emotionList.sortedByDescending { it.persent }
         Box(
             modifier = Modifier
                 .height(244.dp)
@@ -2575,13 +2544,15 @@ class MainActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_location_red),
-                    contentDescription = "장소",
-                    Modifier.size(5.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                P_Medium(receiptAll.subDeparture,primary_500, 4.5.sp)
+                if(receiptAll.subDeparture !=""){
+                    Image(
+                        painter = painterResource(R.drawable.ic_location_red),
+                        contentDescription = "장소",
+                        Modifier.size(5.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    P_Medium(receiptAll.subDeparture,primary_500, 4.5.sp)
+                }else{}
             }
 
             Column(
@@ -2615,13 +2586,15 @@ class MainActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_location_red),
-                    contentDescription = "장소",
-                    Modifier.size(5.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                P_Medium(receiptAll.subDestination,primary_500, 4.5.sp)
+                if(receiptAll.subDestination != ""){
+                    Image(
+                        painter = painterResource(R.drawable.ic_location_red),
+                        contentDescription = "장소",
+                        Modifier.size(5.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    P_Medium(receiptAll.subDestination,primary_500, 4.5.sp)
+                }
             }
 
             Column(
@@ -2732,45 +2705,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @SuppressLint("UnrememberedMutableState")
     @Composable
     fun MiniTheme2(receiptAll:ReceiptAll){
+        val emotionList = emotionPercent(receiptAll.neutral,receiptAll.happy,receiptAll.angry,receiptAll.sad)
 
-        val emotionList = mutableStateListOf<Emotion>()
-
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_common,
-                text = "평범해요",
-                persent = receiptAll.neutral.toFloat(),
-                color = ""
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_happy,
-                text = "즐거워요",
-                persent = receiptAll.happy.toFloat(),
-                color = ""
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_angry,
-                text = "화가나요",
-                persent = receiptAll.angry.toFloat(),
-                color = "",
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_sad,
-                persent = receiptAll.sad.toFloat(),
-                text = "우울해요",
-                color = ""
-            )
-        )
-        emotionList.sortedByDescending { it.persent }
         Box(
             modifier = Modifier
                 .height(244.dp)
@@ -2810,10 +2748,10 @@ class MainActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(2.dp))
                 Divider(color = primary_500, thickness = 1.dp)
                 P_Medium_Oneline(
-                    " 티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                            "티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                            "티켓이 발행된 날짜는 2024 02 15 입니다. " +
-                            "티켓이 발행된 날짜는 2024 02 15 입니다. ", primary_200, 3.sp
+                    " 티켓이 발행된 날짜는 "+ receiptAll.created + "입니다. " +
+                            " 티켓이 발행된 날짜는 "+ receiptAll.created + "입니다. " +
+                            " 티켓이 발행된 날짜는 "+ receiptAll.created + "입니다. " +
+                            " 티켓이 발행된 날짜는 "+ receiptAll.created + "입니다. ", primary_200, 3.sp
                 )
                 Spacer(modifier = Modifier.height(15.dp))
                 Column {
@@ -3015,7 +2953,40 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
+    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double): SnapshotStateList<com.capstone.android.application.data.local.Emotion> {
+        val emotionList = mutableStateListOf<com.capstone.android.application.data.local.Emotion>()
+        emotionList.add(
+            com.capstone.android.application.data.local.Emotion(
+                icon = R.drawable.ic_emotion_common,
+                text = "평범해요",
+                persent = (common).toInt()
+            )
+        )
+        emotionList.add(
+            com.capstone.android.application.data.local.Emotion(
+                icon = R.drawable.ic_emotion_happy,
+                text = "즐거워요",
+                persent = (happy).toInt()
+            )
+        )
+        emotionList.add(
+            com.capstone.android.application.data.local.Emotion(
+                icon = R.drawable.ic_emotion_angry,
+                text = "화가나요",
+                persent = (angry).toInt()
+            )
+        )
+        emotionList.add(
+            com.capstone.android.application.data.local.Emotion(
+                icon = R.drawable.ic_emotion_sad,
+                text = "슬퍼요",
+                persent = (sad).toInt()
+            )
+        )
+        //emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = emotion5.toInt()))
+        emotionList.sortByDescending { it.persent }
+        return emotionList
+    }
     @Composable
     fun Theme1_Emotion(kind: String, index: Int): Int {
 

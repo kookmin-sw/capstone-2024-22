@@ -64,9 +64,12 @@ import com.capstone.android.application.R
 import com.capstone.android.application.app.composable.CustomNoTitleCheckDialog
 import com.capstone.android.application.data.local.Emotion
 import com.capstone.android.application.data.remote.receipt.model.receipt_post.PostReceiptCreateRequest
+import com.capstone.android.application.data.remote.receipt.model.receipt_put.PutReceiptCreateRequest
 import com.capstone.android.application.domain.CustomNoTitleCheckViewModel
+import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.ReceiptTrip
 import com.capstone.android.application.domain.Trip
+import com.capstone.android.application.domain.TripDetail
 import com.capstone.android.application.presentation.ReceiptViewModel
 import com.capstone.android.application.presentation.TripViewModel
 import com.capstone.android.application.ui.theme.ApplicationTheme
@@ -121,50 +124,22 @@ class ReciptActivity : ComponentActivity() {
         setContent {
             navController = rememberNavController()
             initApi()
-            val emotionList = mutableStateListOf<Emotion>()
-            emotionList.add(
-                Emotion(
-                    icon = R.drawable.ic_emotion_common,
-                    text = "평범해요",
-                    persent = 60
-                )
-            )
-            emotionList.add(
-                Emotion(
-                    icon = R.drawable.ic_emotion_happy,
-                    text = "즐거워요",
-                    persent = 20
-                )
-            )
-            emotionList.add(
-                Emotion(
-                    icon = R.drawable.ic_emotion_angry,
-                    text = "화가나요",
-                    persent = 15
-                )
-            )
-            emotionList.add(
-                Emotion(
-                    icon = R.drawable.ic_emotion_sad,
-                    text = "슬퍼요",
-                    persent = 5
-                )
-            )
-            emotionList.sortByDescending { it.persent }
+
 
             val movenav = try {
                 intent.getStringExtra("MoveScreen")
             }catch (e : Exception){
                 "Basic"
             }
-
+            val tripDetailList = remember { mutableStateListOf<TripDetail>() }
 
             //여행 부르기
             tripViewModel.getTripAll()
             val tripList = remember { mutableStateListOf<ReceiptTrip>()}
             tripViewModel.getTripAllSuccess.observe(this@ReciptActivity){ response->
                 response.data.trips.mapNotNull { trip -> runCatching {
-                    ReceiptTrip(id=trip.id,tripName = trip.tripName, startDate = trip.startDate, endDate = trip.endDate, analyzingCount = trip.analyzingCount) }
+                    ReceiptTrip(id=trip.id,tripName = trip.tripName, startDate = trip.startDate,
+                        endDate = trip.endDate, analyzingCount = trip.analyzingCount, numOfCard = trip.numOfCard) }
                     .onSuccess { tripList.clear() }
                     .onFailure {}.getOrNull()
                 }.forEach {
@@ -191,16 +166,44 @@ class ReciptActivity : ComponentActivity() {
                     else ReciptScreen.MakeTripChoice.name
                 ) {
                     composable(route = ReciptScreen.MakeTripChoice.name) { MakeTripChoice(tripList) }
-                    composable(route = ReciptScreen.MakeTrip.name) {
-                        val ItemData = remember {
-                            navController.previousBackStackEntry?.savedStateHandle?.get<Int>("ItemData") }
-                        if (ItemData != null) { MakeTrip(tripList[ItemData]) }
-                    }
+                    composable(route = ReciptScreen.MakeTrip.name){
 
+                        // 영수증 전체 받기 성공
+                        tripViewModel.getTripDetailSuccess.observe(this@ReciptActivity) { response ->
+                            Log.d("qwerqwerqwer", "success" +response.toString())
+                            tripDetailList.clear()
+
+                            tripDetailList.add(TripDetail(
+                                tripName =response.data.tripName,
+                                startDate =response.data.startDate,
+                                endDate =response.data.endDate,
+                                id =response.data.id,
+                                happy =response.data.happy,
+                                disgust =response.data.disgust,
+                                angry =response.data.angry,
+                                neutral =response.data.neutral,
+                                sad =response.data.sad,
+                                numOfCard =response.data.numOfCard,
+                                analyzingCount =response.data.analyzingCount
+                            ))
+
+                            Log.d("qwerqwerqwer", "tripDetailList: ${tripDetailList[0]}")
+                        }
+
+                        // 영수증 전체 받기 실패
+                        tripViewModel.getTripDetailFailure.observe(this@ReciptActivity) { response ->
+                            Log.d("qwerqwerqwer", response.toString())
+                        }
+
+                        if(tripDetailList.size == 1) {
+                            MakeTrip(tripDetailList[0])
+                            Log.d("qwerqwerqwer", "onCreate: 1개라고 임마")
+                        }
+                    }
                     composable(route = ReciptScreen.SaveRecipt.name +
                             "/{tripName}/{intro.value}/{depart_small.value}/{depart.value}" +
                             "/{arrive_small.value}/{arrive.value}/{cardnum}" +
-                            "/{publicationdate}/{startdate}/{enddate}/{theme}",
+                            "/{publicationdate}/{startdate}/{enddate}/{theme}/{happy}/{sad}/{neutral}/{angry}",
                         arguments = listOf(
                             navArgument("tripName"){  defaultValue = "defaultValue" },
                             navArgument("intro"){  defaultValue = "" },
@@ -212,19 +215,34 @@ class ReciptActivity : ComponentActivity() {
                             navArgument("publicationdate"){  defaultValue = "defaultValue" },
                             navArgument("startdate"){  defaultValue = "defaultValue" },
                             navArgument("enddate"){  defaultValue = "defaultValue" },
-                            navArgument("theme"){  defaultValue = "A" }
+                            navArgument("theme"){  defaultValue = "A" },
+                            navArgument("happy"){  defaultValue = "0.0" },
+                            navArgument("sad"){  defaultValue = "0.0" },
+                            navArgument("neutral"){  defaultValue = "0.0" },
+                            navArgument("angry"){  defaultValue = "0.0" }
                         )) { navBackStackEntry ->
                         val tripName = navBackStackEntry.arguments?.getString("tripName")
-                        val intro = navBackStackEntry.arguments?.getString("intro.value")
-                        val depart_small = navBackStackEntry.arguments?.getString("depart_small.value")
+                        val intro = navBackStackEntry.arguments?.getString("intro.value")?:" "
+                        val depart_small = navBackStackEntry.arguments?.getString("depart_small.value")?:" "
                         val depart = navBackStackEntry.arguments?.getString("depart.value")
-                        val arrive_small = navBackStackEntry.arguments?.getString("arrive_small.value")
+                        val arrive_small = navBackStackEntry.arguments?.getString("arrive_small.value")?:" "
                         val arrive = navBackStackEntry.arguments?.getString("arrive.value")
                         val cardnum = navBackStackEntry.arguments?.getInt("cardnum")
                         val publicationdate = navBackStackEntry.arguments?.getString("publicationdate")
                         val startdate = navBackStackEntry.arguments?.getString("startdate")
                         val enddate = navBackStackEntry.arguments?.getString("enddate")
-                        val theme = navBackStackEntry.arguments?.getString("theme")
+                        val theme = navBackStackEntry.arguments?.getString("theme")?:"A"
+                        val happy = navBackStackEntry.arguments?.getString("happy")?:0.0
+                        val sad = navBackStackEntry.arguments?.getString("sad")?:0.0
+                        val neutral = navBackStackEntry.arguments?.getString("neutral")?:0.0
+                        val angry = navBackStackEntry.arguments?.getString("angry")?:0.0
+
+                        val emotionList = emotionPercent(
+                            happy.toString().toDouble(),
+                            sad.toString().toDouble(),
+                            neutral.toString().toDouble(),
+                            angry.toString().toDouble(), theme)
+
 
                         if (theme != null) {
                             SaveRecipt(theme,ReceiptContent_string(
@@ -234,48 +252,127 @@ class ReciptActivity : ComponentActivity() {
                         }
                     }
                     composable(route = ReciptScreen.ReceiptPost_Big.name) {
-                        //MainAvtivity 영수증모아보기에서 선택한 데이터로 크게 띄움
-                        ReceiptPost_Big(/*receiptcontent*/) }
-                    composable(route = ReciptScreen.EditReceipt.name) {
 
-                        //앞에서 받아올 데이터들
-                        val tripname = "여행이름"
-                        val intro = remember { mutableStateOf("") }
-                        val depart_small = remember { mutableStateOf("") }
-                        val depart = remember { mutableStateOf("") }
-                        val arrive_small = remember { mutableStateOf("") }
-                        val arrive = remember { mutableStateOf("") }
-                        val cardnum = 27
-                        val publicationdate = "2024.02.25"
-                        val startdate = "2024.02.25"
-                        val enddate = "2024.02.27"
+                        val data = intent.getSerializableExtra("BigReceipt") as ReceiptAll
+                        val emotionList = emotionPercent(data.neutral/100,data.happy/100,data.angry/100,data.sad/100, data.receiptThemeType)
+                        val created = data.created.take(10)
+                        val receiptcontent = ReceiptContent_string(data.tripName,data.oneLineMemo, data.subDeparture,data.mainDeparture,
+                            data.subDestination,data.mainDestination,data.numOfCard,created,data.stDate,data.edDate,emotionList)
+                        ReceiptPost_Big(receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad, data.id)
+                    }
+                    composable(route = ReciptScreen.EditReceipt.name +
+                            "/{tripName}/{intro}/{depart_small}/{depart}" +
+                            "/{arrive_small}/{arrive}/{cardnum}" +
+                            "/{publicationdate}/{startdate}/{enddate}/{happy}/{sad}/{neutral}/{angry}/{receiptid}",
+                        arguments = listOf(
+                            navArgument("tripName"){  defaultValue = "defaultValue" },
+                            navArgument("intro"){  defaultValue = "" },
+                            navArgument("depart_small"){  defaultValue = "" },
+                            navArgument("depart"){  defaultValue = "defaultValue" },
+                            navArgument("arrive_small"){  defaultValue = "" },
+                            navArgument("arrive"){  defaultValue = "defaultValue" },
+                            navArgument("cardnum"){  defaultValue = 1 },
+                            navArgument("publicationdate"){  defaultValue = "defaultValue" },
+                            navArgument("startdate"){  defaultValue = "defaultValue" },
+                            navArgument("enddate"){  defaultValue = "defaultValue" },
+                            navArgument("happy"){  defaultValue = "0.0" },
+                            navArgument("sad"){  defaultValue = "0.0" },
+                            navArgument("neutral"){  defaultValue = "0.0" },
+                            navArgument("angry"){  defaultValue = "0.0" },
+                            navArgument("receiptid"){  defaultValue = "0" }
+                        )) { navBackStackEntry ->
+                        val tripname = navBackStackEntry.arguments?.getString("tripName")?:" "
+                        var intro = navBackStackEntry.arguments?.getString("intro")?:" "
+                        var depart_small = navBackStackEntry.arguments?.getString("depart_small")?:" "
+                        val depart = navBackStackEntry.arguments?.getString("depart")?:" "
+                        var arrive_small = navBackStackEntry.arguments?.getString("arrive_small")?:" "
+                        val arrive = navBackStackEntry.arguments?.getString("arrive")?:" "
+                        val cardnum = navBackStackEntry.arguments?.getInt("cardnum")?:0
+                        val publicationdate = navBackStackEntry.arguments?.getString("publicationdate")?:" "
+                        val startdate = navBackStackEntry.arguments?.getString("startdate")?:" "
+                        val enddate = navBackStackEntry.arguments?.getString("enddate")?:" "
+                        val happy = navBackStackEntry.arguments?.getString("happy")?:0.0
+                        val sad = navBackStackEntry.arguments?.getString("sad")?:0.0
+                        val neutral = navBackStackEntry.arguments?.getString("neutral")?:0.0
+                        val angry = navBackStackEntry.arguments?.getString("angry")?:0.0
+                        val receiptid = navBackStackEntry.arguments?.getString("receiptid")?:0
 
+                        val emotionList = emotionPercent(
+                            happy.toString().toDouble()/100,
+                            sad.toString().toDouble()/100,
+                            neutral.toString().toDouble()/100,
+                            angry.toString().toDouble()/100, "notheme")
 
-                        intro.value = "한줄 소개"
-                        depart_small.value = "소제목"
-                        depart.value = "제목"
-                        arrive_small.value = "소제목2"
-                        arrive.value = "제목2"
+                        val Intro = mutableStateOf("")
+                        val Depart_small = mutableStateOf("")
+                        val Depart = mutableStateOf("")
+                        val Arrive_small = mutableStateOf("")
+                        val Arrive = mutableStateOf("")
+                        if(intro.trim().isEmpty()) intro = intro.trim()
+                        if(depart_small.trim().isEmpty()) depart_small = depart_small.trim()
+                        if(arrive_small.trim().isEmpty()) arrive_small = arrive_small.trim()
+
+                        Intro.value = intro
+                        Depart_small.value = depart_small
+                        Depart.value = depart
+                        Arrive_small.value = arrive_small
+                        Arrive.value = arrive
 
 
                         val data = ReceiptContent(
-                            tripname, intro, depart_small, depart, arrive_small, arrive,
+                            tripname, Intro, Depart_small, Depart, Arrive_small, Arrive,
                             cardnum,publicationdate,startdate,enddate, emotionList)
-                        EditReceipt(data)
+                        EditReceipt(data,neutral.toString().toDouble()/100,happy.toString().toDouble()/100,
+                            sad.toString().toDouble()/100,angry.toString().toDouble()/100,receiptid.toString().toInt())
                     }
-                    /*composable(route = ReciptScreen.SaveEditReceipt.name) {
-                        val theme = remember {
-                            navController.previousBackStackEntry?.savedStateHandle?.get<Int>("theme")
-                        }
-                        val receipt_content = remember {
-                            navController.previousBackStackEntry?.savedStateHandle?.get<ReceiptContent_string>("receipt_content")
-                        }
-                        if (theme != null) {
-                            if (receipt_content != null) {
-                                SaveEditReceipt (theme,receipt_content)
-                            }
-                        }
-                    }*/
+                    composable(route = ReciptScreen.SaveEditReceipt.name  +
+                            "/{tripName}/{intro.value}/{depart_small.value}/{depart.value}" +
+                            "/{arrive_small.value}/{arrive.value}/{cardnum}" +
+                            "/{publicationdate}/{startdate}/{enddate}/{theme}/{happy}/{sad}/{neutral}/{angry}",
+                        arguments = listOf(
+                            navArgument("tripName"){  defaultValue = "defaultValue" },
+                            navArgument("intro"){  defaultValue = "" },
+                            navArgument("depart_small"){  defaultValue = "" },
+                            navArgument("depart"){  defaultValue = "defaultValue" },
+                            navArgument("arrive_small"){  defaultValue = "" },
+                            navArgument("arrive"){  defaultValue = "defaultValue" },
+                            navArgument("cardnum"){  defaultValue = 1 },
+                            navArgument("publicationdate"){  defaultValue = "defaultValue" },
+                            navArgument("startdate"){  defaultValue = "defaultValue" },
+                            navArgument("enddate"){  defaultValue = "defaultValue" },
+                            navArgument("theme"){  defaultValue = "A" },
+                            navArgument("happy"){  defaultValue = "0.0" },
+                            navArgument("sad"){  defaultValue = "0.0" },
+                            navArgument("neutral"){  defaultValue = "0.0" },
+                            navArgument("angry"){  defaultValue = "0.0" }
+                        )) { navBackStackEntry ->
+                        val tripName = navBackStackEntry.arguments?.getString("tripName")
+                        val intro = navBackStackEntry.arguments?.getString("intro.value")?:" "
+                        val depart_small = navBackStackEntry.arguments?.getString("depart_small.value")?:" "
+                        val depart = navBackStackEntry.arguments?.getString("depart.value")
+                        val arrive_small = navBackStackEntry.arguments?.getString("arrive_small.value")?:" "
+                        val arrive = navBackStackEntry.arguments?.getString("arrive.value")
+                        val cardnum = navBackStackEntry.arguments?.getInt("cardnum")
+                        val publicationdate = navBackStackEntry.arguments?.getString("publicationdate")
+                        val startdate = navBackStackEntry.arguments?.getString("startdate")
+                        val enddate = navBackStackEntry.arguments?.getString("enddate")
+                        val theme = navBackStackEntry.arguments?.getString("theme")?:"A"
+                        val happy = navBackStackEntry.arguments?.getString("happy")?:0.0
+                        val sad = navBackStackEntry.arguments?.getString("sad")?:0.0
+                        val neutral = navBackStackEntry.arguments?.getString("neutral")?:0.0
+                        val angry = navBackStackEntry.arguments?.getString("angry")?:0.0
+
+                        val emotionList = emotionPercent(
+                            happy.toString().toDouble(),
+                            sad.toString().toDouble(),
+                            neutral.toString().toDouble(),
+                            angry.toString().toDouble(), theme)
+
+                        SaveEditReceipt(theme,ReceiptContent_string(
+                            tripName, intro, depart_small, depart, arrive_small, arrive,
+                            cardnum,publicationdate,startdate,enddate, emotionList)
+                        )
+                    }
                 }
             }
         }
@@ -299,7 +396,7 @@ class ReciptActivity : ComponentActivity() {
         val publicationdate: String,
         val startdate: String,
         val enddate: String,
-        val emotionList: SnapshotStateList<Emotion>
+        var emotionList: SnapshotStateList<Emotion>
     )
 
     data class ReceiptContent_string(
@@ -350,7 +447,9 @@ class ReciptActivity : ComponentActivity() {
                         count = tripList.size,
                         itemContent = {index->
 
-                            if(tripList[index].analyzingCount==0 && isDatePassed(LocalDate.parse(tripList[index].endDate))){
+                            if(tripList[index].analyzingCount==0 &&
+                                isDatePassed(LocalDate.parse(tripList[index].endDate)) &&
+                                tripList[index].numOfCard != 0 ){
                                 ItemTrip(
                                     Trip(id=tripList[index].id,
                                         tripName = tripList[index].tripName,
@@ -376,9 +475,11 @@ class ReciptActivity : ComponentActivity() {
             modifier = Modifier
                 .background(color = tertiary_500)
                 .clickable {
+                    tripViewModel.getTripDetail(tripId = trip.id)
+
                     navController.currentBackStackEntry?.savedStateHandle?.set(
                         key = "ItemData",
-                        value = index
+                        value = trip.id
                     )
                     navController.navigate(ReciptScreen.MakeTrip.name)
                 },
@@ -424,11 +525,12 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("UnrememberedMutableState")
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalPagerApi::class)
     @Composable
-    fun MakeTrip(trip: ReceiptTrip){
+    fun MakeTrip(trip: TripDetail){
+
         val page = 2
         val state = rememberPagerState()
 
@@ -439,47 +541,20 @@ class ReciptActivity : ComponentActivity() {
         receiptIntent.putExtra("MoveScreen", "Receipt")
 
         val intro = remember { mutableStateOf("") }
-        val tripName = trip.tripName
         val depart_small = remember { mutableStateOf("") }
         val depart = remember { mutableStateOf("") }
         val arrive_small = remember { mutableStateOf("") }
         val arrive = remember { mutableStateOf("") }
-        val cardnum = 27
+
         val publicationdate = getCurrentDate().year.toString() + " . " + getCurrentDate().monthValue.toString() +" . " + getCurrentDate().dayOfMonth.toString()
+        val tripName = trip.tripName
         val startdate = trip.startDate
         val enddate = trip.endDate
-        val emotionList = mutableStateListOf<Emotion>()
-        val tripid = trip.id //앞에서 선택한 여행 번호
+        val tripid = trip.id
+        val cardnum = trip.numOfCard
         var theme = if (state.currentPage == 0) "A" else "B"
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_common,
-                text = "평범해요",
-                persent = 60
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_happy,
-                text = "즐거워요",
-                persent = 20
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_angry,
-                text = "화가나요",
-                persent = 15
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요",
-                persent = 5
-            )
-        )
-        emotionList.sortByDescending { it.persent }
+        var emotionList = emotionPercent(trip.neutral, trip.happy, trip.angry, trip.sad, theme)
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -522,48 +597,53 @@ class ReciptActivity : ComponentActivity() {
                                 )
                             } else {
 
-                                receiptViewModel.postReceiptCreate(
-                                body = PostReceiptCreateRequest(
-                                    mainDeparture = depart.value,
-                                    mainDestination = arrive.value,
-                                    oneLineMemo = intro.value,
-                                    receiptThemeType = if (state.currentPage == 0) "A" else "B",
-                                    subDeparture = depart_small.value,
-                                    subDestination = arrive_small.value,
-                                    tripId = tripid
-                                )
-                            )
                                 if (intro.value == "") intro.value = " "
                                 if (depart_small.value == "") depart_small.value = " "
                                 if (arrive_small.value == "") arrive_small.value = " "
+
+                                receiptViewModel.postReceiptCreate(
+                                    body = PostReceiptCreateRequest(
+                                        mainDeparture = depart.value,
+                                        mainDestination = arrive.value,
+                                        oneLineMemo = intro.value,
+                                        receiptThemeType = if (state.currentPage == 0) "A" else "B",
+                                        subDeparture = depart_small.value,
+                                        subDestination = arrive_small.value,
+                                        tripId = tripid
+                                    )
+                                )
 
                                 val receiptData = ReceiptContent(
                                     tripName, intro, depart_small, depart, arrive_small, arrive,
                                     cardnum, publicationdate, startdate, enddate, emotionList
                                 )
 
-                            // 영수증 생성 성공
-                            receiptViewModel.postReceiptCreateSuccess.observe(this@ReciptActivity) { response ->
-                                Log.d(
-                                    "receiptViewModel_postReceiptCreateSuccess",
-                                    response.toString()
-                                )
+                                // 영수증 생성 성공
+                                receiptViewModel.postReceiptCreateSuccess.observe(this@ReciptActivity) { response ->
 
-                                navController.navigate(
-                                    ReciptScreen.SaveRecipt.name +
-                                            "/${receiptData.tripName}" +
-                                            "/${receiptData.intro.value}" +
-                                            "/${receiptData.depart_small.value}" +
-                                            "/${receiptData.depart.value}" +
-                                            "/${receiptData.arrive_small.value}" +
-                                            "/${receiptData.arrive.value}" +
-                                            "/${receiptData.cardnum}" +
-                                            "/${receiptData.publicationdate}" +
-                                            "/${receiptData.startdate}" +
-                                            "/${receiptData.enddate}" +
-                                            "/${theme}"
-                                )
-                            }
+                                    if (intro.value == "") intro.value = " "
+                                    if (depart_small.value == "") depart_small.value = " "
+                                    if (arrive_small.value == "") arrive_small.value = " "
+
+                                    navController.navigate(
+                                        ReciptScreen.SaveRecipt.name +
+                                                "/${receiptData.tripName}" +
+                                                "/${receiptData.intro.value}" +
+                                                "/${receiptData.depart_small.value}" +
+                                                "/${receiptData.depart.value}" +
+                                                "/${receiptData.arrive_small.value}" +
+                                                "/${receiptData.arrive.value}" +
+                                                "/${receiptData.cardnum}" +
+                                                "/${receiptData.publicationdate}" +
+                                                "/${receiptData.startdate}" +
+                                                "/${receiptData.enddate}" +
+                                                "/${theme}" +
+                                                "/${trip.happy}" +
+                                                "/${trip.sad}" +
+                                                "/${trip.neutral}" +
+                                                "/${trip.angry}"
+                                    )
+                                }
                             }
                         }) {
                     YJ_Bold15("완료", black)
@@ -614,6 +694,18 @@ class ReciptActivity : ComponentActivity() {
     fun EditTripTheme1(
         receiptcontent: ReceiptContent
     ) {
+        val intro = remember { mutableStateOf(receiptcontent.intro.value) }
+        val depart_small = remember { mutableStateOf(receiptcontent.depart_small.value) }
+        val depart = remember { mutableStateOf(receiptcontent.depart.value) }
+        val arrive_small = remember { mutableStateOf(receiptcontent.arrive_small.value) }
+        val arrive = remember { mutableStateOf(receiptcontent.arrive.value) }
+
+        receiptcontent.intro.value = intro.value
+        receiptcontent.depart_small.value = depart_small.value
+        receiptcontent.depart.value = depart.value
+        receiptcontent.arrive_small.value = arrive_small.value
+        receiptcontent.arrive.value = arrive.value
+
 
         Box(
             modifier = Modifier
@@ -666,18 +758,16 @@ class ReciptActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    receiptcontent.intro?.let {
-                        ReciptTextField(
-                            hint = "여행의 기록을 한 줄로 기록하세요:)",
-                            onValueChanged = { receiptcontent.intro.value = it },
-                            text = it,
-                            keyboardType = KeyboardType.Text,
-                            textcolor = neutral_500,
-                            fontweight = FontWeight.Medium,
-                            fontsize = 14.sp,
-                            type = "intro"
-                        )
-                    }
+                    ReciptTextField(
+                        hint = "여행의 기록을 한 줄로 기록하세요:)",
+                        onValueChanged = { intro.value = it },
+                        text = intro,
+                        keyboardType = KeyboardType.Text,
+                        textcolor = neutral_500,
+                        fontweight = FontWeight.Medium,
+                        fontsize = 14.sp,
+                        type = "intro"
+                    )
                 }
             }
 
@@ -694,18 +784,16 @@ class ReciptActivity : ComponentActivity() {
                     Modifier.size(19.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                receiptcontent.depart_small?.let {
-                    ReciptTextField(
-                        hint = "기억 속에 오래 저장할",
-                        onValueChanged = {receiptcontent.depart_small.value = it },
-                        text = it,
-                        keyboardType = KeyboardType.Text,
-                        textcolor = primary_500,
-                        fontweight = FontWeight.Medium,
-                        fontsize = 14.sp,
-                        type = "small"
-                    )
-                }
+                ReciptTextField(
+                    hint = "기억 속에 오래 저장할",
+                    onValueChanged = {depart_small.value = it },
+                    text = depart_small,
+                    keyboardType = KeyboardType.Text,
+                    textcolor = primary_500,
+                    fontweight = FontWeight.Medium,
+                    fontsize = 14.sp,
+                    type = "small"
+                )
             }
 
             Column(
@@ -717,8 +805,8 @@ class ReciptActivity : ComponentActivity() {
             ) {
                 ReciptTextField(
                     hint = "출발지",
-                    onValueChanged = {receiptcontent.depart.value = it },
-                    text = receiptcontent.depart,
+                    onValueChanged = {depart.value = it },
+                    text = depart,
                     keyboardType = KeyboardType.Text,
                     textcolor = primary_500,
                     fontweight = FontWeight.Black,
@@ -756,7 +844,7 @@ class ReciptActivity : ComponentActivity() {
                 receiptcontent.arrive_small?.let {
                     ReciptTextField(
                         hint = "기억 속에 오래 저장할",
-                        onValueChanged = { receiptcontent.arrive_small.value = it },
+                        onValueChanged = { arrive_small.value = it },
                         text = it,
                         keyboardType = KeyboardType.Text,
                         textcolor = primary_500,
@@ -776,8 +864,8 @@ class ReciptActivity : ComponentActivity() {
             ) {
                 ReciptTextField(
                     hint = "도착지",
-                    onValueChanged = {receiptcontent.arrive.value = it },
-                    text = receiptcontent.arrive,
+                    onValueChanged = {arrive.value = it },
+                    text = arrive,
                     keyboardType = KeyboardType.Text,
                     textcolor = primary_500,
                     fontweight = FontWeight.Black,
@@ -883,6 +971,17 @@ class ReciptActivity : ComponentActivity() {
     fun EditTripTheme2(
         receiptcontent: ReceiptContent
     ) {
+        val intro = remember { mutableStateOf(receiptcontent.intro.value) }
+        val depart_small = remember { mutableStateOf(receiptcontent.depart_small.value) }
+        val depart = remember { mutableStateOf(receiptcontent.depart.value) }
+        val arrive_small = remember { mutableStateOf(receiptcontent.arrive_small.value) }
+        val arrive = remember { mutableStateOf(receiptcontent.arrive.value) }
+
+        receiptcontent.intro.value = intro.value
+        receiptcontent.depart_small.value = depart_small.value
+        receiptcontent.depart.value = depart.value
+        receiptcontent.arrive_small.value = arrive_small.value
+        receiptcontent.arrive.value = arrive.value
 
         Box(
             modifier = Modifier
@@ -906,7 +1005,7 @@ class ReciptActivity : ComponentActivity() {
                 receiptcontent.intro?.let {
                     ReciptTextField(
                         hint = "여행의 기록을 한 줄로 기록하세요:)",
-                        onValueChanged = { receiptcontent.intro.value = it },
+                        onValueChanged = { intro.value = it },
                         text = it,
                         keyboardType = KeyboardType.Text,
                         textcolor = neutral_500,
@@ -972,7 +1071,7 @@ class ReciptActivity : ComponentActivity() {
                 receiptcontent.depart_small?.let {
                     ReciptTextField(
                         hint = "기억 속에 오래 저장할",
-                        onValueChanged = { receiptcontent.depart_small.value = it },
+                        onValueChanged = { depart_small.value = it },
                         text = it,
                         keyboardType = KeyboardType.Text,
                         textcolor = neutral_600,
@@ -992,7 +1091,7 @@ class ReciptActivity : ComponentActivity() {
             ) {
                 ReciptTextField(
                     hint = "출발지",
-                    onValueChanged = {receiptcontent.depart.value = it },
+                    onValueChanged = {depart.value = it },
                     text = receiptcontent.depart,
                     keyboardType = KeyboardType.Text,
                     textcolor = black,
@@ -1031,7 +1130,7 @@ class ReciptActivity : ComponentActivity() {
                 receiptcontent.arrive_small?.let {
                     ReciptTextField(
                         hint = "기억 속에 오래 저장할",
-                        onValueChanged = {receiptcontent.arrive_small.value = it },
+                        onValueChanged = {arrive_small.value = it },
                         text = it,
                         keyboardType = KeyboardType.Text,
                         textcolor = neutral_600,
@@ -1051,7 +1150,7 @@ class ReciptActivity : ComponentActivity() {
             ) {
                 ReciptTextField(
                     hint = "도착지",
-                    onValueChanged = {receiptcontent.arrive.value = it },
+                    onValueChanged = {arrive.value = it },
                     text = receiptcontent.arrive,
                     keyboardType = KeyboardType.Text,
                     textcolor = black,
@@ -1324,7 +1423,7 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if(receiptcontent.depart_small == " "){
+                if(receiptcontent.depart_small == " " || receiptcontent.depart_small == ""){
                     Spacer(modifier = Modifier.size(19.dp))
                 }else{
                     Image(
@@ -1367,7 +1466,7 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if(receiptcontent.arrive_small == " "){
+                if(receiptcontent.arrive_small == " " || receiptcontent.arrive_small == ""){
                     Spacer(modifier = Modifier.size(19.dp))
                 }else{
                     Image(
@@ -1467,7 +1566,15 @@ class ReciptActivity : ComponentActivity() {
                                     contentDescription = ""
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                P_Medium11(content = item.persent.toString()+"%", color = primary_500)
+                                P_Medium11(content = item.persent.toString()+"%",
+                                    color = when(index)
+                                {
+                                    0 -> primary_500
+                                    1 -> neutral_600
+                                    2 -> neutral_400
+                                    3 -> neutral_200
+                                    else -> primary_500
+                                })
                             }
                         }
                     }
@@ -1548,7 +1655,7 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if(receiptcontent.depart_small == " "){
+                if(receiptcontent.depart_small == " " || receiptcontent.depart_small == ""){
                     Spacer(modifier = Modifier.size(19.dp))
                 }else{
                     Image(
@@ -1593,7 +1700,7 @@ class ReciptActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if(receiptcontent.arrive_small == " "){
+                if(receiptcontent.arrive_small == " " || receiptcontent.arrive_small == ""){
                     Spacer(modifier = Modifier.size(19.dp))
                 }else{
                     Image(
@@ -1737,55 +1844,26 @@ class ReciptActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun ReceiptPost_Big(){
-        //모아보기에서 영수증 하나 선택해서 크게 보는 화면 (수정, 내보내기 가능)
+    fun ReceiptPost_Big(content: ReceiptContent_string, theme : String,
+                        neutral:Double ,happy:Double ,angry:Double ,sad:Double, receiptid : Int){
 
         var intent = Intent(this@ReciptActivity, MainActivity::class.java)
         intent.putExtra("MoveScreen", "ReceiptPost")
 
-        val chosenTheme  = "theme1"
-        val tripname = "여행이름"
-        val intro = "한줄 소개"
-        val depart_small = "소제목"
-        val depart = "제목"
-        val arrive_small = "소제목2"
-        val arrive = "제목2"
-        val cardnum = 20
-        val publicationdate = "2024.02.25"
-        val startdate = "2024.02.25"
-        val enddate = "2024.02.27"
-        val emotionList = mutableStateListOf<Emotion>()
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_common,
-                text = "평범해요",
-                persent = 60
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_happy,
-                text = "즐거워요",
-                persent = 20
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_angry,
-                text = "화가나요",
-                persent = 15
-            )
-        )
-        emotionList.add(
-            Emotion(
-                icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요 ",
-                persent = 5
-            )
-        )
-        emotionList.sortByDescending { it.persent }
+        val tripName = content.tripName
+        val intro = if(content.intro?.isEmpty() == true) " "  else content.intro
+        val depart_small = if(content.depart_small?.isEmpty() == true) " "  else content.depart_small
+        val depart = content.depart
+        val arrive_small = if(content.arrive_small?.isEmpty() == true) " "  else content.arrive_small
+        val arrive = content.arrive
+        val cardnum = content.cardnum
+        val publicationdate = content.publicationdate
+        val startdate = content.startdate
+        val enddate = content.enddate
+        val emotionList = content.emotionList
+
         val receiptcontent = ReceiptContent_string(
-            tripname, intro, depart_small, depart, arrive_small, arrive,
+            tripName, intro, depart_small, depart, arrive_small, arrive,
             cardnum, publicationdate, startdate, enddate, emotionList
         )
         Column(
@@ -1820,7 +1898,24 @@ class ReciptActivity : ComponentActivity() {
                             Modifier
                                 .padding(vertical = 10.dp, horizontal = 14.dp)
                                 .clickable {
-                                    navController.navigate(ReciptScreen.EditReceipt.name)
+                                    navController.navigate(
+                                        ReciptScreen.EditReceipt.name +
+                                                "/${tripName}" +
+                                                "/${intro}" +
+                                                "/${depart_small}" +
+                                                "/${depart}" +
+                                                "/${arrive_small}" +
+                                                "/${arrive}" +
+                                                "/${cardnum}" +
+                                                "/${publicationdate}" +
+                                                "/${startdate}" +
+                                                "/${enddate}" +
+                                                "/${happy}" +
+                                                "/${sad}" +
+                                                "/${neutral}" +
+                                                "/${angry}" +
+                                                "/${receiptid}"
+                                    )
                                 }) {
                             YJ_Bold15("수정", black)
                         }
@@ -1830,11 +1925,10 @@ class ReciptActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 앞에서 불러온 화면 데이터 받아와서 수정안되는 버전으로 넣기
-            if (chosenTheme == "theme1") {
+            if (theme == "A") {
                 SaveTheme1(receiptcontent)
             }
-            if(chosenTheme == "theme2"){
+            if (theme == "B") {
                 SaveTheme2(receiptcontent)
 
             }
@@ -1844,7 +1938,8 @@ class ReciptActivity : ComponentActivity() {
 
     @OptIn(ExperimentalPagerApi::class)
     @Composable
-    fun EditReceipt(receiptContent: ReceiptContent){
+    fun EditReceipt(receiptContent: ReceiptContent,
+                    neutral:Double ,happy:Double ,angry:Double ,sad:Double, receiptid : Int){
 
         val page = 2
         val state = rememberPagerState()
@@ -1855,7 +1950,7 @@ class ReciptActivity : ComponentActivity() {
         val receiptIntent = Intent(this@ReciptActivity, MainActivity::class.java)
         receiptIntent.putExtra("MoveScreen", "ReceiptPost")
 
-
+        receiptContent.emotionList = emotionPercent(neutral,happy,angry,sad, if(state.currentPage == 0) "A" else "B")
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -1898,27 +1993,52 @@ class ReciptActivity : ComponentActivity() {
                                 )
                             } else {
 
-                                if (receiptContent.intro.value == "") receiptContent.intro.value = " "
-                                if (receiptContent.depart_small.value == "") receiptContent.depart_small.value = " "
-                                if (receiptContent.arrive_small.value == "") receiptContent.arrive_small.value = " "
-
-                                val receiptData = receiptContent
-
-                                navController.navigate(
-                                    ReciptScreen.SaveRecipt.name +
-                                            "/${receiptData.tripName}" +
-                                            "/${receiptData.intro.value}" +
-                                            "/${receiptData.depart_small.value}" +
-                                            "/${receiptData.depart.value}" +
-                                            "/${receiptData.arrive_small.value}" +
-                                            "/${receiptData.arrive.value}" +
-                                            "/${receiptData.cardnum}" +
-                                            "/${receiptData.publicationdate}" +
-                                            "/${receiptData.startdate}" +
-                                            "/${receiptData.enddate}" +
-                                            "/${theme}"
+                                receiptViewModel.putReceiptCreate(body =
+                                PutReceiptCreateRequest(
+                                    mainDeparture = receiptContent.depart.value,
+                                    mainDestination =  receiptContent.arrive.value,
+                                    oneLineMemo =  receiptContent.intro.value,
+                                    receiptThemeType = if (state.currentPage == 0) "A" else "B",
+                                    subDeparture =  receiptContent.depart_small.value,
+                                    subDestination =  receiptContent.arrive_small.value,
+                                    id =  receiptid
+                                    )
                                 )
-                            }
+                                // 영수증 전체 받기 성공
+                                receiptViewModel.putReceiptCreateSuccess .observe(this@ReciptActivity) { response ->
+                                    Log.d("putReceiptCreateSuccess", "success" +response.toString())
+
+                                    var theme = "A"
+                                    if (receiptContent.intro.value == "") receiptContent.intro.value = " "
+                                    if (receiptContent.depart_small.value == "") receiptContent.depart_small.value = " "
+                                    if (receiptContent.arrive_small.value == "") receiptContent.arrive_small.value = " "
+                                    theme = if (state.currentPage == 0) "A" else "B"
+
+                                    navController.navigate(
+                                        ReciptScreen.SaveEditReceipt.name +
+                                                "/${receiptContent.tripName}" +
+                                                "/${receiptContent.intro.value}" +
+                                                "/${receiptContent.depart_small.value}" +
+                                                "/${receiptContent.depart.value}" +
+                                                "/${receiptContent.arrive_small.value}" +
+                                                "/${receiptContent.arrive.value}" +
+                                                "/${receiptContent.cardnum}" +
+                                                "/${receiptContent.publicationdate}" +
+                                                "/${receiptContent.startdate}" +
+                                                "/${receiptContent.enddate}" +
+                                                "/${theme}" +
+                                                "/${happy}" +
+                                                "/${sad}" +
+                                                "/${neutral}" +
+                                                "/${angry}"
+                                    )
+                                }
+                                }
+
+                                // 영수증 전체 받기 실패
+                                receiptViewModel.putReceiptCreateFailure.observe(this@ReciptActivity) { response ->
+                                    Log.d("putReceiptCreateFailure", response.toString())
+                                }
                         }) {
                     YJ_Bold15("완료", black)
                 }
@@ -1930,8 +2050,13 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
-    /*@Composable
-    fun SaveEditReceipt(theme :Int, receiptcontent: ReceiptContent_string){
+
+    @SuppressLint("UnrememberedMutableState")
+    @Composable
+    fun SaveEditReceipt(theme: String, receiptcontent: ReceiptContent_string){
+
+        var Theme = 0
+        Theme = if (theme == "A") 0 else 1
 
         Column(
             modifier = Modifier
@@ -1956,11 +2081,8 @@ class ReciptActivity : ComponentActivity() {
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
                         .clickable {
-                            val intent = Intent(
-                                this@ReciptActivity,
-                                MainActivity::class.java
-                            )
-                            intent.putExtra("MoveScreen", "ReceiptPost")
+                            var intent = Intent(this@ReciptActivity, MainActivity::class.java)
+                            intent.putExtra("MoveScreen", "Receipt")
                             startActivity(intent)
                         }) {
                     YJ_Bold15("완료", primary_500)
@@ -1968,16 +2090,15 @@ class ReciptActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 앞에서 불러온 화면 데이터 받아와서 수정안되는 버전으로 넣기
-            if (theme == 0) {
+            if (Theme == 0) {
                 SaveTheme1(receiptcontent)
             }
-            if(theme == 1){
+            if(Theme == 1){
                 SaveTheme2(receiptcontent)
-
             }
         }
-    }*/
+    }
+
 
     @Composable
     fun Theme1_Emotion(kind: String, index: Int): Int {
@@ -2041,6 +2162,35 @@ class ReciptActivity : ComponentActivity() {
     fun isDatePassed(targetDate: LocalDate): Boolean {
         val currentDate = getCurrentDate()
         return currentDate.isAfter(targetDate) || currentDate.isEqual(targetDate)
+    }
+
+    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double, theme : String): SnapshotStateList<Emotion> {
+        val emotionList = mutableStateListOf<Emotion>()
+
+        if(theme == "A") {
+            emotionList.clear()
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "평범해요", persent = (common*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (angry*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
+            //emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = emotion5.toInt()))
+            emotionList.sortByDescending { it.persent }
+        }
+        if(theme == "B") {
+            emotionList.clear()
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (angry*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "평범해요", persent = (common*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
+        }
+        else {
+            emotionList.clear()
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "평범해요", persent = (common*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (angry*100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
+            emotionList.sortByDescending { it.persent } }
+        return emotionList
     }
 
     @SuppressLint("UnrememberedMutableState")

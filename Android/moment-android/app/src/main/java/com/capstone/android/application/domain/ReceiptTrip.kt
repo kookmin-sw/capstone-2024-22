@@ -5,5 +5,6 @@ data class ReceiptTrip(
     val tripName:String,
     val startDate:String,
     val endDate:String,
-    val analyzingCount:Int
+    val analyzingCount:Int,
+    val numOfCard : Int
 )

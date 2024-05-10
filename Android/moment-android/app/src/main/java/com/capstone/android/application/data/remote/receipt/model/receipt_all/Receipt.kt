@@ -18,5 +18,6 @@ data class Receipt(
     val subDestination: String,
     val oneLineMemo: String,
     val receiptThemeType: String,
+    val createdAt : String
 
 )

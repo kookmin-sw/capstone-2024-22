@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capstone.android.application.data.remote.trip.TripRepository
 import com.capstone.android.application.data.remote.trip.model.trip_all.GetTripAllResponse
+import com.capstone.android.application.data.remote.trip.model.trip_detail.GetTripDetailResponse
 import com.capstone.android.application.data.remote.trip.model.trip_put.request.PutTripRequest
 import com.capstone.android.application.data.remote.trip.model.trip_register.request.PostTripRegisterRequest
 import com.capstone.android.application.domain.response.ApiResponse
@@ -58,6 +59,15 @@ class TripViewModel @Inject constructor(private val tripRepository:TripRepositor
         MutableLiveData<ApiResponse.Error<Exception>>()
     }
 
+    // 여행 세부 내용 조회 성공
+    val getTripDetailSuccess : MutableLiveData<GetTripDetailResponse> by lazy{
+        MutableLiveData<GetTripDetailResponse>()
+    }
+
+    // 여행 세부 내용 조회 실패
+    val getTripDetailFailure : MutableLiveData<ApiResponse.Error<Exception>> by lazy {
+        MutableLiveData<ApiResponse.Error<Exception>>()
+    }
 
     fun getTripAll(){
         viewModelScope.launch {
@@ -196,6 +206,43 @@ class TripViewModel @Inject constructor(private val tripRepository:TripRepositor
                 putTripFailure.postValue(ApiResponse.Error(e))
             }
 
+        }
+    }
+
+    fun getTripDetail(
+        tripId:Int,
+
+        ){
+        viewModelScope.launch {
+            try {
+
+                val response = tripRepository.getTripDetail(
+                    tripId = tripId
+                )
+
+                if(response is ApiResponse.Success){
+                    getTripDetailSuccess.postValue(response.data)
+                }else{
+
+                }
+
+
+            } catch (e:HttpException){
+                getTripDetailFailure.postValue(ApiResponse.Error(e))
+                when(e.code()){
+                    404 -> {
+
+                    }
+                }
+
+            } catch (e:IOException){
+                getTripDetailFailure.postValue(ApiResponse.Error(e))
+
+
+            } catch (e:Exception){
+                getTripDetailFailure.postValue(ApiResponse.Error(e))
+
+            }
         }
     }
 }
