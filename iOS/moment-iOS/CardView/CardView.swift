@@ -97,14 +97,9 @@ struct CardView: View {
                             .padding(.top, -7)
                         
                         ScrollView {
-                            // ForEach를 사용하여 cardViewModel의 cardItems 배열을 반복 처리
+                    
                             
-                           Text("Card View for Trip File ID: \(tripFileId)")
-                           
-//                            Text(cardViewModel.cardViewsData?.question ?? "nil")
-//                            Text(cardViewModel.cardViewsData?.location ?? "위치 정보 없음")
-//
-//                            
+            
                             ForEach(cardViewModel.cardItems) { cardItem in
                                 // 각 cardItem에 대한 AccordionView 인스턴스를 생성
                                 AccordionView(audioRecorderManager: audioRecorderManager, isEditing: $isEditing, selectedCardIDs: $selectedCardIDs, cardViewModel: cardViewModel, cardItem: cardItem)
@@ -183,8 +178,6 @@ struct AccordionView: View {
                     HeaderView(isExpanded: $isExpanded, cardItem: cardItem, cardViewModel: cardViewModel)
                 }
                 .accentColor(.black)
-                
-                //                .padding(.horizontal, isEditing ? 15 : 5) // 편집 모드일 때의 패딩 조정
                 .padding()
                 
                 
@@ -227,23 +220,26 @@ struct AccordionView: View {
     // 위치 및 시간 정보를 보여주는 HStack을 별도의 ViewBuilder로 추출
     @ViewBuilder
     private var locationAndTimeInfo: some View {
+        
         HStack {
             Image("Location")
-            Text("선유도 공영주차장")
+            Text("\(cardItem.location)")
                 .font(.pretendardMedium11)
             Spacer()
-            Text("해가 쨍쨍한날")
+            Text("\(cardItem.weather)")
                 .font(.pretendardMedium11)
             Image("Weather_Sunny")
         }
         HStack {
+            let (date, time) = cardViewModel.formatDateAndTime(dateString: cardItem.recordedAt)
+            
             Image("CardTime")
-            Text("시간").font(.pretendardMedium11)
+            Text("\(date)").font(.pretendardMedium11)
             //cardItem.recordedAt
             //날짜부가 들어가야함
             Spacer()
             CustomCarbarDivider()
-            Text("시간").font(.pretendardMedium11) // 시간부만 들어가야함
+            Text("\(time)").font(.pretendardMedium11) // 시간부만 들어가야함
             //cardItem.recordedAt
 
         }
@@ -270,12 +266,13 @@ struct HeaderView: View {
                     Image(isHeartFilled ? "HeartFill" : "HeartEmpty")
                     
                 }
-                Text("\(cardItem.recordedAt)") // 타이틀 예시
+                let (date, time) = cardViewModel.formatDateAndTime(dateString: cardItem.recordedAt)
+                Text("\(date)") // 타이틀 예시
                     .foregroundColor(.black)
                     .font(.pretendardExtrabold14)
                 Spacer()
                 
-                Text("\(cardItem.id)")
+                Text("_00\(cardItem.id)")
                     .font(.pretendardExtrabold14)
                     .foregroundColor(.black)
             }
@@ -291,7 +288,7 @@ struct HeaderView: View {
                         .padding(.horizontal,10)
                         .padding(.top,10)
                     Spacer()
-                    Text("해가 쨍쨍한날")
+                    Text("\(cardItem.weather)")
                         .font(.pretendardMedium11)
                         .foregroundColor(.gray500)
                         .padding(.top,10)
@@ -312,7 +309,7 @@ struct DynamicGradientRectangleView: View {
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @ObservedObject var cardViewModel: CardViewModel
     let longText: String
-//    private let videoURL = URL(string: "https://kmumoment.s3.ap-northeast-2.amazonaws.com/users/3/2024-05-06T08%3A20%3A59.991719376.m4a")!
+
     var playerItem: AVPlayerItem?
     var cardItem : cardViews
     
@@ -327,7 +324,7 @@ struct DynamicGradientRectangleView: View {
                    CustomAudioPlayerView(audioPlayer: audioPlayer)
           
 
-            Text("URL: \(cardItem.recordFileUrl)")
+      
             
             Text(longText)
                 .font(.pretendardMedium13)
@@ -500,6 +497,28 @@ struct EmotionView: View {
         }
     }
 }
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 struct CustomDialogRecordCard: View {
     @Binding var isActive: Bool

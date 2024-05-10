@@ -30,22 +30,28 @@ struct cardViews: Codable,Identifiable {
     let recordFileLength: Int
     let weather: String
     let temperature: String
-    let stt: String?
-    let happy: Double?
-    let sad: Double?
-    let angry: Double?
-    let neutral: Double?
-    let disgust: Double?
+    let stt: String
+    let happy: Double
+    let sad: Double
+    let angry: Double
+    let neutral: Double
+    let disgust: Double
     let question: String
     let recordFileStatus: String
-    let imageUrls: [String]?
+    let imageUrls: [String]
     let id: Int
     var loved: Bool
     
 
 }
 
-
+extension String {
+    func parseISODate() -> Date? {
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withFullDate, .withTime, .withDashSeparatorInDate, .withColonSeparatorInTime]
+        return dateFormatter.date(from: self)
+    }
+}
 
 
 
@@ -102,6 +108,24 @@ class CardViewModel: ObservableObject {
             }
         }
     }
+    
+
+    func formatDateAndTime(dateString: String) -> (dateString: String, timeString: String) {
+        guard let date = dateString.parseISODate() else {
+            return ("Invalid date", "Invalid time")
+        }
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"  // 날짜 형식
+        let formattedDate = dateFormatter.string(from: date)
+
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "HH:mm"  // 시간 형식
+        let formattedTime = timeFormatter.string(from: date)
+
+        return (formattedDate, formattedTime)
+    }
+
 
     func updateCardViewLikeStatus(cardViewId: Int) {
            let urlString = "http://211.205.171.117:8000/core/cardView/like/\(cardViewId)"
