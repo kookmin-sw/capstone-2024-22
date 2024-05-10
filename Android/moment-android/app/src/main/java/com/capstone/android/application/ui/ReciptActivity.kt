@@ -121,6 +121,8 @@ class ReciptActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val mainIntent = intent
+
         setContent {
             navController = rememberNavController()
             initApi()
@@ -165,7 +167,8 @@ class ReciptActivity : ComponentActivity() {
                     if(movenav == "ReceiptPost_Big") ReciptScreen.ReceiptPost_Big.name
                     else ReciptScreen.MakeTripChoice.name
                 ) {
-                    composable(route = ReciptScreen.MakeTripChoice.name) { MakeTripChoice(tripList) }
+                    composable(route = ReciptScreen.MakeTripChoice.name) {
+                        MakeTripChoice(tripList, mainIntent) }
                     composable(route = ReciptScreen.MakeTrip.name){
 
                         // 영수증 전체 받기 성공
@@ -193,6 +196,7 @@ class ReciptActivity : ComponentActivity() {
                         // 영수증 전체 받기 실패
                         tripViewModel.getTripDetailFailure.observe(this@ReciptActivity) { response ->
                             Log.d("qwerqwerqwer", response.toString())
+                            setResult(3,mainIntent)
                         }
 
                         if(tripDetailList.size == 1) {
@@ -415,7 +419,7 @@ class ReciptActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun MakeTripChoice(tripList:MutableList<ReceiptTrip>) {
+    fun MakeTripChoice(tripList: MutableList<ReceiptTrip>, mainIntent: Intent) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -434,7 +438,11 @@ class ReciptActivity : ComponentActivity() {
                         .padding(top = 23.dp)
                         .wrapContentSize()
                 ) {
-                    ImgBackButton(onClick = {startActivity(Intent(this@ReciptActivity, MainActivity::class.java).putExtra("MoveScreen","Receipt"))}, "여행 선택하기")
+                    ImgBackButton(
+                        onClick = {
+                            setResult(3, mainIntent)
+                            finish()
+                        }, "")
                 }
                 LazyColumn(
                     modifier = Modifier

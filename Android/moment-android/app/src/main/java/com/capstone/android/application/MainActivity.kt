@@ -7,8 +7,10 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -257,6 +259,16 @@ class MainActivity : ComponentActivity() {
                     //do something here
                 }
             }
+
+        val makeReceipt =
+            rememberLauncherForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == 1) {
+
+                }
+            }
+
         val tripList = remember {
             mutableStateListOf<Trip>()
         }
@@ -878,7 +890,7 @@ class MainActivity : ComponentActivity() {
                         title.value = "추가"
                         currentSelectedBottomRoute.value = "Receipt"
 
-                        Receipt()
+                        Receipt(makeReceipt)
                         title.value = "영수증 모아보기"
                     }
                     composable(BottomNavItem.Record.screenRoute) {
@@ -1501,7 +1513,9 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Receipt(){
+    fun Receipt(makeReceipt :
+                ManagedActivityResultLauncher<Intent, ActivityResult>
+    ){
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -1514,8 +1528,12 @@ class MainActivity : ComponentActivity() {
             )
             Spacer(modifier = Modifier.height(70.dp))
             BigButton("만들기", true,
-                onClick = {startActivity(Intent(this@MainActivity, ReciptActivity::class.java))})
-
+                onClick = { makeReceipt.launch(
+                    Intent(
+                        this@MainActivity,
+                        ReciptActivity::class.java
+                    )
+                ) })
         }
     }
 
