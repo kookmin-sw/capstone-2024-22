@@ -33,7 +33,7 @@ struct LikeView: View {
                     
                     VStack {
                         Spacer().frame(height: 70)
-                      
+                        
                         
                         CustomTitleMainDivider()
                             .padding(.bottom, -10)
@@ -87,10 +87,13 @@ struct LikeView: View {
             
         }
         .navigationBarBackButtonHidden(true)
-        
+        .onAppear{
+            cardViewModel.fetchLikedCardViews()
+        }
         
         
     }
+      
 }
 
 

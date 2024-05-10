@@ -45,6 +45,8 @@ struct cardViews: Codable,Identifiable {
 
 }
 
+
+
 struct EmotionDataCard {
     let name: String
     let score: Double
@@ -65,6 +67,7 @@ extension String {
 class CardViewModel: ObservableObject {
     @Published var cardItems: [cardViews] = []
     @Published var emotions: [EmotionDataCard] = []
+    @Published var cardItemsLike: [LikeCardViewData] = []
     
     init() {
          updateEmotions(happy: 24.09, sad: 15.9, angry: 14.95, neutral: 21.14, disgust: 23.91)
@@ -176,4 +179,53 @@ class CardViewModel: ObservableObject {
                }
            }
        }
+    
+    func fetchLikedCardViews() {
+            let urlString = "http://211.205.171.117:8000/core/cardView/like"  // 서버 URL에 맞게 수정하세요.
+            let headers: HTTPHeaders = [
+                "Authorization": authToken,
+                "Content-Type": "application/json"
+            ]
+
+            AF.request(urlString, headers: headers).responseDecodable(of: StateCardLike.self) { response in
+                switch response.result {
+                case .success(let responseData):
+                    DispatchQueue.main.async {
+                        self.cardItemsLike = responseData.data.cardViewsLike
+                        print("Liked card views fetched successfully.")
+                    }
+                case .failure(let error):
+                    print("Failed to fetch liked card views: \(error.localizedDescription)")
+                }
+            }
+        }
+}
+
+
+struct StateCardLike: Codable {
+    let status: Int
+    let code, msg, detailMsg: String
+    let data: LikeClass
+}
+
+// MARK: - DataClass
+struct LikeClass: Codable {
+    let cardViewsLike: [LikeCardViewData]
+}
+
+// MARK: - CardView
+struct LikeCardViewData: Codable {
+    let tripFileID: Int
+    let recordedAt, recordFileName: String
+    let recordFileURL: String
+    let location: String
+    let recordFileLength: Int
+    let weather, temperature, stt: String
+    let happy, sad, angry, neutral: Double
+    let disgust: Double
+    let question, recordFileStatus: String
+    let imageUrls: [String]
+    let id: Int
+    let loved: Bool
+
 }
