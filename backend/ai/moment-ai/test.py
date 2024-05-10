@@ -214,7 +214,7 @@ def main(file_name, file_path=None):
   
   if ser_classifer_dir:
     ser_classifer = BaseModel()
-    ser_classifer.load_state_dict(torch.load(ser_classifer_dir))
+    ser_classifer.load_state_dict(torch.load(ser_classifer_dir, map_location='cpu'))
     ser_model.model.proj = ser_classifer
 
   
@@ -243,7 +243,7 @@ def main(file_name, file_path=None):
       else:
           # print("Model could not be run on GPU or CPU. Please check your model or system configuration.")
           output["status"] = "400"
-          output['error'] = "Model could not be run on GPU or CPU. Please check your model or system configuration."
+          output['error'] += "\nModel could not be run on GPU or CPU. Please check your model or system configuration."
     
   if os.path.exists(source_file):
     os.remove(source_file)
@@ -263,8 +263,8 @@ def main(file_name, file_path=None):
 
 if __name__ == "__main__":
   # file_name = "../moment_ai/test.mp4" if args.file_path is None else args.file_path
-  file_path = 'users/1/'
-  file_name = '2024-04-30T10:27:06.293422421.mp4'
+  file_path = 'users/4/'
+  file_name = '2024-05-08T10:13:17.614667032.m4a'
   print(file_path, file_name)
   result = main(file_path=file_path, file_name=file_name)
   print('results :', result)
