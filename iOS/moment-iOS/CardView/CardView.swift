@@ -262,6 +262,7 @@ struct HeaderView: View {
                 Button(action: {
                     // 하트 버튼을 눌렀을 때의 액션
                     isHeartFilled.toggle()
+                    cardViewModel.updateCardViewLikeStatus(cardViewId: cardItem.id)
                 }) {
                     Image(isHeartFilled ? "HeartFill" : "HeartEmpty")
                     

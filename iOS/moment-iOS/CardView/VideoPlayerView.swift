@@ -81,8 +81,10 @@ struct CustomAudioPlayerView: View {
     var body: some View {
         VStack {
           
-            CustomSlider(value: $audioPlayer.progress, range: (0, 1), thumbImageName: "thumb")
-
+            ZStack{
+                CustomSlider(value: $audioPlayer.progress, range: (0, 1), thumbImageName: "thumb")
+                    .frame(width: 335)
+            }
             Button(action: {
                 audioPlayer.playPauseAction()
             }) {
