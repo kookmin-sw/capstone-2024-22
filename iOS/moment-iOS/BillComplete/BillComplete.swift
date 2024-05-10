@@ -11,7 +11,6 @@ import UIKit
 
 
 //TODO: -
-
 struct ReceiptGroupView: View {
     @EnvironmentObject var sharedViewModel: SharedViewModel
     @EnvironmentObject var homeBaseViewModel : HomeBaseViewModel
@@ -104,7 +103,7 @@ struct ReceiptGroupView: View {
                                                                   EmptyView()
                                                               }
                                                           } else {
-                                                              NavigationLink(destination: ReceiptBTypeDetailView(receipt: receipt), tag: receipt.id, selection: $selectedReceiptId) {
+                                                              NavigationLink(destination: ReceiptCompleteviewB(receipt: receipt), tag: receipt.id, selection: $selectedReceiptId) {
                                                                   EmptyView()
                                                               }
                                                           }
@@ -156,6 +155,7 @@ struct ReceiptBTypeDetailView: View {
         // 상세 페이지 내용 구성
     }
 }
+
 
 struct ReceiptATypeView: View {
     var receipt: Receipt
@@ -423,7 +423,7 @@ struct ReceiptBTypeView: View {
                 Spacer().frame(height: 9)
                 HStack{
                     Spacer().frame(width: 20)
-                    Text("\(receipt.oneLineMemo)")
+                    Text("\(receipt.mainDeparture)")
                         .font(.pretendardMedium5)
                         .foregroundColor(.gray500)
                     
@@ -446,7 +446,7 @@ struct ReceiptBTypeView: View {
                         .padding(.bottom,4)
                     
                     HStack{
-                        Text("\(receipt.mainDeparture)")
+                        Text("\(receipt.mainDestination)")
                             .font(.pretendardExtrabold18)
                             .foregroundColor(.black)  // 글씨
                             .multilineTextAlignment(.center)
@@ -478,7 +478,7 @@ struct ReceiptBTypeView: View {
                     
                     
                     HStack{
-                        Text("\(receipt.mainDestination)")
+                        Text("\(receipt.oneLineMemo)")
                             .font(.pretendardExtrabold18)
                             .foregroundColor(.black)  // 글씨
                             .multilineTextAlignment(.center)
@@ -486,7 +486,7 @@ struct ReceiptBTypeView: View {
                     .padding(.bottom,10)
                     Spacer()
                 }
-                SentimentTrackerSmallView()
+                SentimentTrackerSmallView(receipt: receipt)
                 
                 
             }
@@ -557,10 +557,12 @@ struct ReceiptBTypeView: View {
 
 
 struct SentimentTrackerSmallView : View {
+    var receipt : Receipt
+    
     var body: some View {
         VStack(spacing:0) {
             HStack{
-                Text("전라도의 선유도")
+                Text("\(receipt.tripName)")
                     .font(.pretendardMedium5)
                     .padding(.bottom,7)
                     .multilineTextAlignment(.center)
@@ -589,10 +591,7 @@ struct SentimentTrackerSmallView : View {
                             .cornerRadius(3)
                             .scaleEffect(x: 1, y: 1, anchor: .center)
                             .tint(.homeRed)
-                        //                        ProgressView(value: 0.2).frame(width: 40,height: 3)
-                        //                            .scaleEffect(x: 1, y: 2, anchor: .center)
-                        //                            .cornerRadius(3)
-                        //                            .tint(.Natural300)
+                    
                         
                     }
                     HStack{
@@ -621,18 +620,17 @@ struct SentimentTrackerSmallView : View {
                 // Spacer().frame(width:10)
                 VStack{
                     Spacer()
-                    Text("27")
+                    Text("\(receipt.numOfCard)")
                         .foregroundColor(.homeRed)
                         .font(.yjObangBold8)
                         .frame(width: 30,height: 30)
                         .background(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 1))
                     Spacer()
                 }
-                //                .frame(width: 30,height: 30)
-                //                .padding(.trailing,25)
+                
             }
         }
-        // Spacer().frame(height: 15)
+     
     }
 }
 
@@ -850,9 +848,7 @@ struct ReceiptCompleteDetailView: View {
                 EmptyView()
                 
             }
-            //                NavigationLink(destination: ReceiptCompleteView(item: item), isActive: $showingCompleteBillView) {
-            //                    EmptyView()
-            //                                }
+           
         }
         .background(.homeBack)
         .navigationBarBackButtonHidden()

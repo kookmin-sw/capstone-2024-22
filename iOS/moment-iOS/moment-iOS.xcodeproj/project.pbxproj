@@ -102,6 +102,7 @@
 		8ECCFBDA2BB9463700C39125 /* CardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFBD82BB9463700C39125 /* CardViewModel.swift */; };
 		8EDC94DD2BEA8AE400B646AB /* BillComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94DC2BEA8AE400B646AB /* BillComplete.swift */; };
 		8EDC94E02BED3FB900B646AB /* ReceiptcompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94DF2BED3FB900B646AB /* ReceiptcompleteView.swift */; };
+		8EDC94E22BEE881700B646AB /* ReceiptCompleteviewB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94E12BEE881700B646AB /* ReceiptCompleteviewB.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -219,6 +220,7 @@
 		8ECCFBD82BB9463700C39125 /* CardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewModel.swift; sourceTree = "<group>"; };
 		8EDC94DC2BEA8AE400B646AB /* BillComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillComplete.swift; sourceTree = "<group>"; };
 		8EDC94DF2BED3FB900B646AB /* ReceiptcompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptcompleteView.swift; sourceTree = "<group>"; };
+		8EDC94E12BEE881700B646AB /* ReceiptCompleteviewB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptCompleteviewB.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -559,6 +561,7 @@
 			isa = PBXGroup;
 			children = (
 				8EDC94DF2BED3FB900B646AB /* ReceiptcompleteView.swift */,
+				8EDC94E12BEE881700B646AB /* ReceiptCompleteviewB.swift */,
 			);
 			path = BillLastCompleteView;
 			sourceTree = "<group>";
@@ -765,6 +768,7 @@
 				8E7FB8FE2BA1E66200F05045 /* CustomDevider.swift in Sources */,
 				8E970E172BC3E070003476C4 /* DailyView.swift in Sources */,
 				8E15C8732B6527E3001468C7 /* ContentView.swift in Sources */,
+				8EDC94E22BEE881700B646AB /* ReceiptCompleteviewB.swift in Sources */,
 				8EDC94DD2BEA8AE400B646AB /* BillComplete.swift in Sources */,
 				8E5CAE522B970DB600A483B4 /* HomeView.swift in Sources */,
 				8E8C17562BAAC8F000BF1E1C /* AuthComplete.swift in Sources */,

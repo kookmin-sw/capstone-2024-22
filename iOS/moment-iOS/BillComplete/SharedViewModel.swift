@@ -85,7 +85,7 @@ class SharedViewModel: ObservableObject {
     }
 
         func fetchReceipts() {
-            let url = "http://211.205.171.117:8000/core/receipt/all?page=0&size=10"
+            let url = "http://211.205.171.117:8000/core/receipt/all?page=0&size=100"
             
             let headers: HTTPHeaders = [
                 "Authorization": authToken,
@@ -98,7 +98,7 @@ class SharedViewModel: ObservableObject {
                     DispatchQueue.main.async {
                         self.receipts = receiptsResponse.data.receiptList
                     }
-                    print("Received data: \(receiptsResponse)")  // 전체 응답 데이터 출력
+                  //  print("Received data: \(receiptsResponse)")  // 전체 응답 데이터 출력
                 case .failure(let error):
                     print("Error fetching receipts: \(error.localizedDescription)")
                 }
