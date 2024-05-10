@@ -7,8 +7,8 @@ import com.capstone.android.application.data.remote.receipt.model.receipt_post.P
 import com.capstone.android.application.domain.response.ApiResponse
 import com.capstone.android.application.domain.response.MomentResponse
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.Query
 interface ReceiptRetrofitInterface {
@@ -18,7 +18,8 @@ interface ReceiptRetrofitInterface {
         @Body body: PostReceiptCreateRequest
     ): ApiResponse<MomentResponse>
 
-    @DELETE("/core/receipt/delete")
+
+    @HTTP(method = "DELETE", path = "/core/receipt/delete",hasBody = true)
     suspend fun deleteReceiptDelete(
         @Body body: deleteReceiptDeleteRequest
     ) : ApiResponse<MomentResponse>
