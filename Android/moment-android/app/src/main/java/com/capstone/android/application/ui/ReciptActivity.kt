@@ -278,7 +278,7 @@ class ReciptActivity : ComponentActivity() {
                         val created = data.created.take(10)
                         val receiptcontent = ReceiptContent_string(data.tripName,data.oneLineMemo, data.subDeparture,data.mainDeparture,
                             data.subDestination,data.mainDestination,data.numOfCard,created,data.stDate,data.edDate,emotionList)
-                        ReceiptPost_Big(receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad, data.id)
+                        ReceiptPost_Big(mainIntent, receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad, data.id)
                     }
                     composable(route = ReciptScreen.EditReceipt.name +
                             "/{tripName}/{intro}/{depart_small}/{depart}" +
@@ -1886,11 +1886,8 @@ class ReciptActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun ReceiptPost_Big(content: ReceiptContent_string, theme : String,
+    fun ReceiptPost_Big(mainIntent: Intent, content: ReceiptContent_string, theme : String,
                         neutral:Double ,happy:Double ,angry:Double ,sad:Double, receiptid : Int){
-
-        var intent = Intent(this@ReciptActivity, MainActivity::class.java)
-        intent.putExtra("MoveScreen", "ReceiptPost")
 
         val tripName = content.tripName
         val intro = if(content.intro?.isEmpty() == true) " "  else content.intro
@@ -1937,7 +1934,11 @@ class ReciptActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
-                        .clickable { startActivity(intent) }) {
+                        .clickable {
+                            setResult(2, mainIntent)
+                            finish()
+
+                           }) {
                     YJ_Bold15("뒤로", black)
                 }
                 Column() {

@@ -265,7 +265,8 @@ class MainActivity : ComponentActivity() {
                 ActivityResultContracts.StartActivityForResult()
             ) { result ->
                 if (result.resultCode == 1) {
-
+                }
+                if (result.resultCode == 2) {
                 }
             }
 
@@ -912,56 +913,8 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(MainScreen.ReceiptPost.screenRoute) {
                         currentSelectedBottomRoute.value = MainScreen.ReceiptPost.rootRoute
-
-                        val page = remember { mutableStateOf(0) }
-                        page.value = 0
-                        val size = 4
-                        var totalpage = 0
-                        var currentpage = 0
-
-                        receiptViewModel.getReceiptAll(page.value, size)
-                        // 영수증 전체 받기 성공
-                        receiptViewModel.getReceiptAllSuccess.observe(this@MainActivity) { response ->
-                            Log.d("receiptViewModel_getReceiptAllSuccess", response.toString())
-                            totalpage = response.data.pagination.totalPages
-                            currentpage = response.data.pagination.currentPage
-
-                            response.data.receiptList.mapNotNull { receiptAll ->
-                                runCatching {
-                                    ReceiptAll(
-                                        receiptAll.id,
-                                        receiptAll.tripId,
-                                        receiptAll.tripName,
-                                        receiptAll.angry,
-                                        receiptAll.disgust,
-                                        receiptAll.happy,
-                                        receiptAll.sad,
-                                        receiptAll.neutral,
-                                        receiptAll.stDate,
-                                        receiptAll.edDate,
-                                        receiptAll.numOfCard,
-                                        receiptAll.mainDeparture,
-                                        receiptAll.subDeparture,
-                                        receiptAll.mainDestination,
-                                        receiptAll.subDestination,
-                                        receiptAll.oneLineMemo,
-                                        receiptAll.receiptThemeType,
-                                        receiptAll.createdAt
-                                    )
-                                }
-                                    .onSuccess { receiptList.clear() }
-                                    .onFailure {}.getOrNull()
-                            }.forEach {
-                                receiptList.add(it)
-                            }
-                        }
-
-                        // 영수증 전체 받기 실패
-                        receiptViewModel.getReceiptAllFailure.observe(this@MainActivity) { response ->
-                            Log.d("receiptViewModel_getReceiptAllFailure", response.toString())
-                        }
-
-                        ReceiptPost(receiptList, EditCheckState, DeleteReceipt)
+                        Log.d("MainRootMainRoot", "컴포즈에 왔다 ${receiptList.size}")
+                        ReceiptPost(makeReceipt, receiptList, EditCheckState, DeleteReceipt)
                         if (EditCheckState.value) title.value = "삭제" else title.value = "편집"
                     }
 
@@ -1538,18 +1491,20 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ReceiptPost(receiptList: MutableList<ReceiptAll>,EditCheckState: MutableState<Boolean>, DeleteReceipt :MutableList<ReceiptId> ) {
+    fun ReceiptPost(makeReceipt : ManagedActivityResultLauncher<Intent, ActivityResult>,
+                    receiptList: MutableList<ReceiptAll>,EditCheckState: MutableState<Boolean>, DeleteReceipt :MutableList<ReceiptId> ) {
         //영수증 게시
         Column(
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp)) {
-            MyGrid(receiptList, 2, EditCheckState, DeleteReceipt)
+            MyGrid(makeReceipt, receiptList, 2, EditCheckState, DeleteReceipt)
 
         }
     }
     @Composable
     fun MyGrid(
+        makeReceipt : ManagedActivityResultLauncher<Intent, ActivityResult>,
         receiptList: MutableList<ReceiptAll>,
         columnSize: Int,
         EditCheckState: MutableState<Boolean>,
@@ -1564,7 +1519,7 @@ class MainActivity : ComponentActivity() {
                     val rangeStart = rowIndex*columnSize
                     var rangeEnd = rangeStart + columnSize -1
                     if (rangeEnd > receiptList.lastIndex) rangeEnd = receiptList.lastIndex // row로 표현될 list의 range를 계산, slice하여 row 생성
-                    RowOfGrid(receiptList.slice(rangeStart..rangeEnd), maxWidth/columnSize,
+                    RowOfGrid(makeReceipt, receiptList.slice(rangeStart..rangeEnd), maxWidth/columnSize,
                         EditCheckState, DeleteReceipt)
                 }
             }
@@ -1574,6 +1529,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
     @Composable
     fun RowOfGrid(
+        makeReceipt : ManagedActivityResultLauncher<Intent, ActivityResult>,
         rowList: List<ReceiptAll>,
         columnWidth: Dp,
         EditCheckState: MutableState<Boolean>,
@@ -1600,8 +1556,14 @@ class MainActivity : ComponentActivity() {
                     .background(Color.Gray)
                     .clickable {
                         if (!EditCheckState.value) {
-                            intent.putExtra("BigReceipt", item)
-                            startActivity(intent)
+
+                            makeReceipt.launch(
+                                Intent(
+                                    this@MainActivity,
+                                    ReciptActivity::class.java
+                                ).putExtra("MoveScreen", "ReceiptPost_Big")
+                                    .putExtra("BigReceipt", item)
+                            )
                         } else {
                             if (checkState.value) {
                                 checkState.value = false
