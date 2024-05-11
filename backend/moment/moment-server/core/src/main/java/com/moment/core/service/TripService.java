@@ -2,6 +2,8 @@ package com.moment.core.service;
 
 import com.moment.core.domain.cardView.CardView;
 import com.moment.core.domain.cardView.CardViewRepository;
+import com.moment.core.domain.receipt.Receipt;
+import com.moment.core.domain.receipt.ReceiptRepository;
 import com.moment.core.domain.trip.Trip;
 import com.moment.core.domain.trip.TripRepository;
 import com.moment.core.domain.tripFile.TripFile;
@@ -37,6 +39,7 @@ public class TripService {
     private final ReceiptService receiptService;
     private final TripFileRepository tripFileRepository;
     private final CardViewRepository cardViewRepository;
+    private final ReceiptRepository receiptRepository;
 
     public void save(Trip trip) {
         tripRepository.save(trip);
@@ -57,6 +60,11 @@ public class TripService {
         Trip untitledTrip = getUntitledTrip(user);
         tripFileService.deleteByTripOrUntitled(trip, untitledTrip);
         alreadyBookedDateService.deleteAll(user, trip.getStartDate(), trip.getEndDate());
+        List<Receipt> receipts = receiptRepository.findAllByTrip(trip);
+        // receipt에 trip을 전부 null 처리
+        for (Receipt receipt : receipts) {
+            receipt.setTrip(null);
+        }
         tripRepository.delete(trip);
         return trip;
     }
@@ -121,13 +129,13 @@ public class TripService {
 
     // 묶이지 않은 여행 가져오기
     public Trip getUntitledTrip(User user) {
-        return tripRepository.findByUserAndIsNotTitledOrderByStartDate(user, true)
+        return tripRepository.findByUserAndIsNotTitled(user, true)
                 .orElseThrow(() -> new RuntimeException("묶이지 않은 기록이 존재하지 않음."));
     }
 
     // 묶이지 않은 여행 가져오기 userId로
     public Trip getUntitledTripById(Long userId) {
-        return tripRepository.findByUser_IdAndIsNotTitledOrderByStartDate(userId, true)
+        return tripRepository.findByUser_IdAndIsNotTitled(userId, true)
                 .orElseThrow(() -> new RuntimeException("묶이지 않은 기록이 존재하지 않음."));
     }
 
