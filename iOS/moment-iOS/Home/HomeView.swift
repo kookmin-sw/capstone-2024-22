@@ -26,7 +26,7 @@ struct HomeView: View {
     @State private var showSlideOverCard = false
     @State private var selectedItemId: Int?
     
-    
+
     
     var body: some View {
         // NavigationView {
@@ -57,7 +57,7 @@ struct HomeView: View {
                         .tag(0)
                     
                     
-                    NavigationLink(destination: DailyView()) {
+                    NavigationLink(destination: DailyView(audioRecorderManager: audioRecorderManager)) {
                         Text("일상기록")
                             .font(.pretendardMedium14)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)

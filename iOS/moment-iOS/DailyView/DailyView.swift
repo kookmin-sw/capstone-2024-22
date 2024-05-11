@@ -13,12 +13,19 @@ import Foundation
 struct DailyView: View {
     @ObservedObject var DailyViewModel = DailyItemViewModel() // 뷰 모델 인스턴스화
     @Environment(\.presentationMode) var presentationMode
+    @State private var selectedTripFileId: Int? = 0 // 선택된 여행 파일 ID
+    @ObservedObject var cardViewModel = CardViewModel()
+    @ObservedObject var audioRecorderManager: AudioRecorderManager
+    
+    
     
     var body: some View {
         ZStack {
             Color(.homeBack).edgesIgnoringSafeArea(.all)
             
             VStack {
+                
+                
                 
                 Button(action: {
                     // "뒤로" 버튼의 액션: 현재 뷰를 종료
@@ -52,24 +59,22 @@ struct DailyView: View {
                     .padding(.bottom,10)
                 
                 // 항목 리스트
-                ScrollView(.vertical, showsIndicators: false) {
+                ScrollView {
                     LazyVStack(spacing: 10) {
                         ForEach(DailyViewModel.tripDailyFiles) { tripDailyItem in
-                            NavigationLink(destination: Text("\(tripDailyItem.totalCount) 상세 페이지")//이자리에 뷰를 넣고
-                                           //넘기면 됨
-                            ) {
-                                                       DailyItemViewCell(tripDailyItem: tripDailyItem) // ItemViewCell을 DailyItem에 맞게 수정
-                                                   }
+                            NavigationLink(destination: DailyCardView(tripFileId: tripDailyItem.id, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) {
+                                DailyItemViewCell(tripDailyItem: tripDailyItem)
+                            }
                             CustomHomeSubDivider()
                         }
                     }
-                    
                 }
             }
         }.navigationBarBackButtonHidden()
             .onAppear{
                 DailyViewModel.fetchTripFiles()
             }
+        
     }
 }
 
