@@ -203,12 +203,14 @@ struct HeaderLikeView: View {
                     
                     
                 }
-                Text("\(cardItemLike.recordedAt)") // 타이틀 예시
+                let (date,time) =
+                cardViewModel.formatDateAndTime(dateString: cardItemLike.recordedAt)
+                Text("\(date)") // 타이틀 예시
                     .foregroundColor(.black)
                     .font(.pretendardExtrabold14)
                 Spacer()
                 
-                Text("\(cardItemLike.id)")
+                Text("_00\(cardItemLike.id)")
                     .font(.pretendardExtrabold14)
                     .foregroundColor(.black)
             }
