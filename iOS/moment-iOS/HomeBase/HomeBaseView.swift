@@ -57,7 +57,7 @@ struct HomeBaseView: View {
                         VoiceRecorderView()
                           //  .environmentObject(sharedViewModel)
                     case .Like:
-                        LikeView(day: Date(), item: Item(id: 1, tripName: "선유도", startdate: "0305", enddate: "0315"), audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
+                        LikeView( audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
                            // .environmentObject(sharedViewModel)
 
                     case .setting:

@@ -144,7 +144,7 @@ class CardViewModel: ObservableObject {
         let formattedDate = dateFormatter.string(from: date)
 
         let timeFormatter = DateFormatter()
-        timeFormatter.dateFormat = "HH:mm"  // 시간 형식
+        timeFormatter.dateFormat = "HH-mm"  // 시간 형식
         let formattedTime = timeFormatter.string(from: date)
 
         return (formattedDate, formattedTime)
@@ -180,6 +180,7 @@ class CardViewModel: ObservableObject {
            }
        }
     
+    
     func fetchLikedCardViews() {
             let urlString = "http://211.205.171.117:8000/core/cardView/like"  // 서버 URL에 맞게 수정하세요.
             let headers: HTTPHeaders = [
@@ -188,17 +189,40 @@ class CardViewModel: ObservableObject {
             ]
 
             AF.request(urlString, headers: headers).responseDecodable(of: StateCardLike.self) { response in
+                if let statusCode = response.response?.statusCode{
+                    print("즐겨찾기 상태코드 연결 되었어??: \(statusCode)")
+                    
+                }
                 switch response.result {
                 case .success(let responseData):
                     DispatchQueue.main.async {
-                        self.cardItemsLike = responseData.data.cardViewsLike
+                        self.cardItemsLike = responseData.data.cardViews
                         print("Liked card views fetched successfully.")
+                        responseData.data.cardViews.forEach { cardView in
+                                         print("""
+                                               ID: \(cardView.id),
+                                               Trip File ID: \(cardView.tripFileId),
+                                               Recorded At: \(cardView.recordedAt),
+                                               Record File Name: \(cardView.recordFileName),
+                                               Location: \(cardView.location),
+                                               Weather: \(cardView.weather),
+                                               Temperature: \(cardView.temperature),
+                                               Happiness: \(cardView.happy),
+                                               Sadness: \(cardView.sad),
+                                               Anger: \(cardView.angry),
+                                               Neutral: \(cardView.neutral),
+                                               Disgust: \(cardView.disgust),
+                                               STT: \(cardView.stt),
+                                               Loved Status: \(cardView.loved)
+                                               """)
+                                     }
                     }
                 case .failure(let error):
                     print("Failed to fetch liked card views: \(error.localizedDescription)")
                 }
             }
         }
+    
 }
 
 
@@ -210,14 +234,14 @@ struct StateCardLike: Codable {
 
 // MARK: - DataClass
 struct LikeClass: Codable {
-    let cardViewsLike: [LikeCardViewData]
+    let cardViews: [LikeCardViewData]
 }
 
 // MARK: - CardView
-struct LikeCardViewData: Codable {
-    let tripFileID: Int
+struct LikeCardViewData: Codable,Identifiable {
+    let tripFileId: Int
     let recordedAt, recordFileName: String
-    let recordFileURL: String
+    let recordFileUrl: String
     let location: String
     let recordFileLength: Int
     let weather, temperature, stt: String
