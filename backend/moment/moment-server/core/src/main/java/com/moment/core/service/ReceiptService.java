@@ -9,7 +9,6 @@ import com.moment.core.domain.trip.TripRepository;
 import com.moment.core.domain.tripFile.TripFile;
 import com.moment.core.domain.tripFile.TripFileRepository;
 import com.moment.core.domain.user.User;
-import com.moment.core.domain.user.UserRepository;
 import com.moment.core.dto.Pagination;
 import com.moment.core.dto.request.ReceiptRequestDTO;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,11 +34,11 @@ public class ReceiptService {
 
     public Integer getReceiptCount(Long userId) {
         // 유저의 총 영수증 개수 반환
-        return receiptRepository.countByTrip_User_Id(userId).intValue();
+        return receiptRepository.countByUser_Id(userId).intValue();
     }
 
     public ReceiptRequestDTO.getReceiptAll getAllReceipt(Long userId, Pageable pageable) {
-        Page<Receipt> receiptList = receiptRepository.findAllByTrip_User_IdOrderByStDate(userId, pageable);
+        Page<Receipt> receiptList = receiptRepository.findAllByUser_IdOrderByStDate(userId, pageable);
 
         Page<ReceiptRequestDTO.getReceipt> receiptDTOPage = receiptList.map(receipt -> mapToReceiptDTO(receipt));
 
@@ -59,7 +56,7 @@ public class ReceiptService {
     private ReceiptRequestDTO.getReceipt mapToReceiptDTO(Receipt receipt) {
         return ReceiptRequestDTO.getReceipt.builder()
                 .id(receipt.getId())
-                .tripId(receipt.getTrip().getId())
+//                .tripId(receipt.getTrip().getId())
                 .mainDeparture(receipt.getMainDeparture())
                 .subDeparture(receipt.getSubDeparture())
                 .mainDestination(receipt.getMainDestination())
@@ -68,7 +65,7 @@ public class ReceiptService {
                 .numOfCard(receipt.getNumOfCard())
                 .stDate(receipt.getStDate())
                 .edDate(receipt.getEdDate())
-                .tripName(receipt.getTrip().getTripName())
+                .tripName(receipt.getTripName())
                 .happy(receipt.getHappy())
                 .sad(receipt.getSad())
                 .angry(receipt.getAngry())
@@ -162,6 +159,7 @@ public class ReceiptService {
         // 영수증 생성
         Receipt receipt = Receipt.builder()
                 .trip(trip)
+                .user(user)
                 .mainDeparture(createReceipt.getMainDeparture())
                 .subDeparture(createReceipt.getSubDeparture())
                 .mainDestination(createReceipt.getMainDestination())
@@ -196,8 +194,7 @@ public class ReceiptService {
 
     public void validateUserWithReceipt(Long userId, Long id) {
         Receipt receipt = receiptRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 영수증이 존재하지 않습니다."));
-        Trip trip = receipt.getTrip();
-        User user = trip.getUser();
+        User user = receipt.getUser();
         if (!user.getId().equals(userId)) {
             throw new IllegalArgumentException("해당 영수증을 수정할 권한이 없습니다.");
         }

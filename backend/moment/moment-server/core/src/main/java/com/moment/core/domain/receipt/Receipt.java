@@ -3,6 +3,7 @@ package com.moment.core.domain.receipt;
 import com.moment.core.domain.BaseEntity;
 import com.moment.core.domain.trip.Trip;
 import com.moment.core.domain.tripFile.TripFile;
+import com.moment.core.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,9 +23,13 @@ public class Receipt extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "trip_id", nullable = true)
     private Trip trip;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     // 최대 길이 7
     @Column(name = "main_departure", nullable = false, length = 7)
