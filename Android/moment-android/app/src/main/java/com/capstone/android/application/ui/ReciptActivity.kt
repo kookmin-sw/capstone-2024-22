@@ -3,6 +3,8 @@ package com.capstone.android.application.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Picture
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -41,18 +43,27 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.draw
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -99,6 +110,11 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.time.LocalDate
 
 
@@ -1324,6 +1340,18 @@ class ReciptActivity : ComponentActivity() {
         var Theme = 0
         Theme = if (theme == "A") 0 else 1
 
+        val coroutineScope = rememberCoroutineScope()
+        val context = androidx.compose.ui.platform.LocalContext.current
+
+        val picture = CaptureComposableAsImage {
+            if (Theme == 0) {
+                SaveTheme1(receiptcontent)
+            }
+            if(Theme == 1){
+                SaveTheme2(receiptcontent)
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -1340,7 +1368,13 @@ class ReciptActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
-                        .clickable { }) {
+                        .clickable {
+                            coroutineScope.launch {
+                                val capturedImageBitmap = createBitmapFromPicture(picture).asImageBitmap()
+
+                                ShareImage(capturedImageBitmap.toBitmap(),context)
+                            }
+                        }) {
                     YJ_Bold15("내보내기", black)
                 }
                 Column(
@@ -1874,6 +1908,19 @@ class ReciptActivity : ComponentActivity() {
             tripName, intro, depart_small, depart, arrive_small, arrive,
             cardnum, publicationdate, startdate, enddate, emotionList
         )
+
+        val coroutineScope = rememberCoroutineScope()
+        val context = androidx.compose.ui.platform.LocalContext.current
+
+        val picture = CaptureComposableAsImage {
+            if (theme == "A") {
+                SaveTheme1(receiptcontent)
+            }
+            if (theme == "B") {
+                SaveTheme2(receiptcontent)
+
+            }
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -1898,7 +1945,13 @@ class ReciptActivity : ComponentActivity() {
                         Column(
                             Modifier
                                 .padding(vertical = 10.dp, horizontal = 14.dp)
-                                .clickable { }) {
+                                .clickable {
+                                    coroutineScope.launch {
+                                        val capturedImageBitmap = createBitmapFromPicture(picture).asImageBitmap()
+
+                                        ShareImage(capturedImageBitmap.toBitmap(),context)
+                                    }
+                                }) {
                             YJ_Bold15("내보내기", black)
                         }
                         Spacer(modifier = Modifier.width(4.dp))
@@ -2066,6 +2119,18 @@ class ReciptActivity : ComponentActivity() {
         var Theme = 0
         Theme = if (theme == "A") 0 else 1
 
+        val coroutineScope = rememberCoroutineScope()
+        val context = androidx.compose.ui.platform.LocalContext.current
+
+        val picture = CaptureComposableAsImage {
+            if (Theme == 0) {
+                SaveTheme1(receiptcontent)
+            }
+            if(Theme == 1){
+                SaveTheme2(receiptcontent)
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -2082,7 +2147,13 @@ class ReciptActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
-                        .clickable { }) {
+                        .clickable {
+                            coroutineScope.launch {
+                                val capturedImageBitmap = createBitmapFromPicture(picture).asImageBitmap()
+
+                                ShareImage(capturedImageBitmap.toBitmap(),context)
+                            }
+                        }) {
                     YJ_Bold15("내보내기", black)
                 }
                 Column(
@@ -2200,6 +2271,84 @@ class ReciptActivity : ComponentActivity() {
             emotionList.sortByDescending { it.persent } }
         return emotionList
     }
+
+
+
+    @SuppressLint("CoroutineCreationDuringComposition")
+    @Composable
+    fun CaptureComposableAsImage(content: @Composable () -> Unit): Picture {
+        val picture = remember { Picture() }
+        Column {
+            // Content to be captured
+            Box(
+                modifier = Modifier
+                    .drawWithCache {
+                        val width = this.size.width.toInt()
+                        val height = this.size.height.toInt()
+
+                        onDrawWithContent {
+                            val pictureCanvas = androidx.compose.ui.graphics.Canvas(picture.beginRecording(width, height))
+                            draw(this, this.layoutDirection, pictureCanvas, this.size) {
+                                this@onDrawWithContent.drawContent()
+                            }
+                            picture.endRecording()
+
+                            drawIntoCanvas { canvas -> canvas.nativeCanvas.drawPicture(picture) }
+                        }
+                    }
+            ) {
+                content()
+            }
+        }
+        return picture
+    }
+
+
+    private suspend fun createBitmapFromPicture(picture: Picture): Bitmap {
+        return withContext(Dispatchers.Default) {
+            val width = picture.width
+            val height = picture.height
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val canvas = android.graphics.Canvas(bitmap)
+            picture.draw(canvas)
+            bitmap
+        }
+    }
+    fun ImageBitmap.toBitmap(): Bitmap {
+        return this.asAndroidBitmap()
+    }
+    fun ShareImage(bitmap: Bitmap, context: Context) {
+
+
+        // 이미지를 저장할 파일 생성
+        val cachePath = File(context.cacheDir, "images")
+        if (!cachePath.exists()) {
+            cachePath.mkdirs()
+        }
+        val imageFile = File(cachePath, "shared_image.png")
+
+        // 이미지를 파일로 저장
+        FileOutputStream(imageFile).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        }
+        // 파일 URI 생성
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider",
+            imageFile
+        )
+        // 이미지를 공유하는 Intent 생성
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "image/png"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        // 이미지를 공유하기 위한 Intent 실행
+        context.startActivity(Intent.createChooser(shareIntent, "Share Image"))
+
+    }
+
+
 
     @SuppressLint("UnrememberedMutableState")
     @Preview(apiLevel = 33)
