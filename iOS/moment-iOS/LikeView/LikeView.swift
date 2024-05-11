@@ -37,7 +37,7 @@ struct LikeView: View {
                 ZStack {
                     
                     VStack {
-                        Spacer().frame(height: 70)
+                        Spacer().frame(height: 30)
                         
                         
                         CustomTitleMainDivider()
@@ -119,11 +119,9 @@ struct AccordionLikeView: View {
                 DisclosureGroup(isExpanded: $isExpanded) {
                     contentVStack
                 } label: {
-                    HeaderLikeView(isExpanded: $isExpanded, cardItemLike: cardItemLike)
+                    HeaderLikeView(isExpanded: $isExpanded, cardItemLike: cardItemLike, cardViewModel: cardViewModel)
                 }
                 .accentColor(.black)
-                
-                //                .padding(.horizontal, isEditing ? 15 : 5) // 편집 모드일 때의 패딩 조정
                 .padding()
                 
                 
@@ -164,20 +162,21 @@ struct AccordionLikeView: View {
     private var locationAndTimeInfo: some View {
         HStack {
             Image("Location")
-            Text("선유도 공영주차장")
+            Text("\(cardItemLike.location)")
                 .font(.pretendardMedium11)
             Spacer()
-            Text("해가 쨍쨍한날")
+            Text("\(cardItemLike.weather)")
                 .font(.pretendardMedium11)
             Image("Weather_Sunny")
         }
         HStack {
+            let (date, time) = cardViewModel.formatDateAndTime(dateString: cardItemLike.recordedAt)
             Image("CardTime")
-            Text("01:20").font(.pretendardMedium11)
+            Text("\(date)").font(.pretendardMedium11)
             //cardItem.recordedAt
             Spacer()
             CustomCarbarDivider()
-            Text("01:20").font(.pretendardMedium11)
+            Text("\(time)").font(.pretendardMedium11)
             //cardItem.recordedAt
         }
     }
@@ -191,13 +190,14 @@ struct HeaderLikeView: View {
     @Binding var isExpanded: Bool
     @State private var isHeartFilled = true // 하트가 채워졌는지 여부
     var cardItemLike: LikeCardViewData
+    @ObservedObject var cardViewModel: CardViewModel
     var body: some View {
         VStack{
             HStack {
                 Button(action: {
                     // 하트 버튼을 눌렀을 때의 액션
                     isHeartFilled.toggle()
-                    //updateHeartStatus(isHeartFilled: isHeartFilled) 네트워크 통신로직
+                    cardViewModel.updateCardViewLikeStatus(cardViewId: cardItemLike.id)
                 }) {
                     Image(isHeartFilled ? "HeartFill" : "HeartEmpty")
                     

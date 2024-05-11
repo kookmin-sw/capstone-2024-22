@@ -144,7 +144,7 @@ class CardViewModel: ObservableObject {
         let formattedDate = dateFormatter.string(from: date)
 
         let timeFormatter = DateFormatter()
-        timeFormatter.dateFormat = "HH-mm"  // 시간 형식
+        timeFormatter.dateFormat = "HH:mm"  // 시간 형식
         let formattedTime = timeFormatter.string(from: date)
 
         return (formattedDate, formattedTime)
