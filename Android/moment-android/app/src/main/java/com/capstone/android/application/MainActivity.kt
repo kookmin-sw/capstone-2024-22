@@ -834,6 +834,8 @@ class MainActivity : ComponentActivity() {
                                                     }
 
                                                     "영수증 모아보기" -> {
+                                                        EditCheckState.value = false
+                                                        DeleteReceipt.clear()
                                                         navController.navigate(MainScreen.ReceiptPost.screenRoute)
                                                         val size = 10000
                                                         receiptViewModel.getReceiptAll(0, size)
