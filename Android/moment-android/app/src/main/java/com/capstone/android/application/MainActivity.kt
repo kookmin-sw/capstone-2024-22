@@ -390,19 +390,6 @@ class MainActivity : ComponentActivity() {
             val showDeleteDialog = remember { mutableStateOf(false) }
             val deleteyes = remember { mutableStateOf(false) }
 
-            if (showDeleteDialog.value){
-                //dialog 띄우기
-                deleteDialog(showDeleteDialog = showDeleteDialog, Deletesize = DeleteReceipt.size, deleteyes = deleteyes )
-            }
-            if(deleteyes.value){
-                deleteyes.value = false
-                receiptViewModel.deleteReceiptDelete(
-                    body = deleteReceiptDeleteRequest(receiptIds = DeleteReceipt))
-                DeleteReceipt.clear()
-                receiptViewModel.getReceiptAll(0, 10000)
-            }
-
-
             tripViewModel.getTripAll()
             cardViewModel.getCardLiked()
             tripFileViewModel.getTripFileUntitled()
@@ -572,9 +559,9 @@ class MainActivity : ComponentActivity() {
 
             // 영수증 삭제 성공
             receiptViewModel.deleteReceiptDeleteSuccess.observe(this@MainActivity) { response ->
-                Log.d("seohyun", "MainRoot: 영수증 삭제 성공")
-                deleteyes.value = false
                 EditCheckState.value = false
+                DeleteReceipt.clear()
+                receiptViewModel.getReceiptAll(0, 10000)
             }
             // 영수증 삭제 실패
             receiptViewModel.deleteReceiptDeleteFailure.observe(this@MainActivity) { response ->
@@ -864,8 +851,11 @@ class MainActivity : ComponentActivity() {
                                                     }
 
                                                     "삭제" -> {
-                                                        showDeleteDialog.value = true
+                                                        if (DeleteReceipt.size != 0){
+                                                            showDeleteDialog.value = true
+                                                        }else{
 
+                                                        }
                                                     }
                                                 }
                                             },
@@ -885,6 +875,10 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             ) { innerPadding ->
+                if (showDeleteDialog.value){
+                    //dialog 띄우기
+                    deleteDialog(showDeleteDialog = showDeleteDialog,  DeleteReceipt = DeleteReceipt )
+                }
                 NavHost(
                     navController,
                     startDestination =
@@ -2950,16 +2944,17 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun deleteDialog(showDeleteDialog : MutableState<Boolean>, Deletesize : Int, deleteyes : MutableState<Boolean>){
+    fun deleteDialog(showDeleteDialog : MutableState<Boolean>, DeleteReceipt : MutableList<ReceiptId>){
 
         CustomTitleCheckDialog(
-            title = "$Deletesize 개의 영수증을 정말 삭제 할까요?",
+            title = "${DeleteReceipt.size} 개의 영수증을 정말 삭제 할까요?",
             description = "삭제된 영수증은 복구할 수 없어요",
             checkleft = "네",
             checkright = "아니요",
             onClickCancel = { showDeleteDialog.value = false },
             onClickleft = {
-                deleteyes.value = true
+                receiptViewModel.deleteReceiptDelete(
+                    body = deleteReceiptDeleteRequest(receiptIds = DeleteReceipt))
                 showDeleteDialog.value = false },
             onClickright = { showDeleteDialog.value = false }
         )
