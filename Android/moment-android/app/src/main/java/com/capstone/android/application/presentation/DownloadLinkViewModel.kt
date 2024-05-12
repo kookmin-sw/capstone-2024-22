@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import retrofit2.HttpException
+import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
@@ -50,7 +51,12 @@ class DownloadLinkViewModel @Inject constructor(private val downloadLinkReposito
         if (body==null)
             return ""
         var input: InputStream? = null
+
         try {
+            val newFolder: File = File(pathWhereYouWantToSaveFile)
+            if(!newFolder.exists()){
+                newFolder.mkdir()
+            }
 
             input = body.byteStream()
             //val file = File(getCacheDir(), "cacheFileAppeal.srl")
