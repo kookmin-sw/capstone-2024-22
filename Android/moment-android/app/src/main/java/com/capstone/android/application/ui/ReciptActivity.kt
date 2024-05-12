@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -191,7 +192,7 @@ class ReciptActivity : ComponentActivity() {
             // 영수증 전체 받기 실패
             tripViewModel.getTripDetailFailure.observe(this@ReciptActivity) { response ->
                 Log.d("qwerqwerqwer", response.toString())
-                setResult(3,mainIntent)
+                setResult(1,mainIntent)
             }
 
 
@@ -360,7 +361,7 @@ class ReciptActivity : ComponentActivity() {
                             tripname, Intro, Depart_small, Depart, Arrive_small, Arrive,
                             cardnum,publicationdate,startdate,enddate, emotionList)
                         EditReceipt(data,neutral.toString().toDouble()/100,happy.toString().toDouble()/100,
-                            sad.toString().toDouble()/100,angry.toString().toDouble()/100,receiptid.toString().toInt())
+                            sad.toString().toDouble()/100,angry.toString().toDouble()/100,receiptid.toString().toInt(), mainIntent)
                     }
                     composable(route = ReciptScreen.SaveEditReceipt.name  +
                             "/{tripName}/{intro.value}/{depart_small.value}/{depart.value}" +
@@ -407,8 +408,7 @@ class ReciptActivity : ComponentActivity() {
 
                         SaveEditReceipt(theme,ReceiptContent_string(
                             tripName, intro, depart_small, depart, arrive_small, arrive,
-                            cardnum,publicationdate,startdate,enddate, emotionList)
-                        )
+                            cardnum,publicationdate,startdate,enddate, emotionList),mainIntent)
                     }
                 }
             }
@@ -445,7 +445,8 @@ class ReciptActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun MakeTripChoice(tripList: MutableList<ReceiptTrip>, mainIntent: Intent) {
+    fun MakeTripChoice(tripList: MutableList<ReceiptTrip>, mainIntent: Intent)
+    {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -505,6 +506,7 @@ class ReciptActivity : ComponentActivity() {
 
     @Composable
     fun ItemTrip(trip: Trip, index : Int) {
+        BackHandler { finish() }
         Column(
             modifier = Modifier
                 .background(color = tertiary_500)
@@ -564,11 +566,12 @@ class ReciptActivity : ComponentActivity() {
     @OptIn(ExperimentalPagerApi::class)
     @Composable
     fun MakeTrip(trip: TripDetail){
+        val viewModel: CustomNoTitleCheckViewModel = viewModel()
+        BackHandler { viewModel.showCustomNoTitleCheckDialog() }
 
         val page = 2
         val state = rememberPagerState()
 
-        val viewModel: CustomNoTitleCheckViewModel = viewModel()
         val CustomNoTitleCheckDialogState = viewModel.CustomNoTitleCheckDialogState.value
 
         val receiptIntent = Intent(this@ReciptActivity, MainActivity::class.java)
@@ -613,7 +616,7 @@ class ReciptActivity : ComponentActivity() {
                         description = CustomNoTitleCheckDialogState.description,
                         checkleft = CustomNoTitleCheckDialogState.checkleft,
                         checkright = CustomNoTitleCheckDialogState.checkright,
-                        onClickleft = { startActivity( receiptIntent ) },
+                        onClickleft = { finish() },
                         onClickright = {CustomNoTitleCheckDialogState.onClickright()},
                         onClickCancel = {CustomNoTitleCheckDialogState.onClickCancel()},
 
@@ -1342,6 +1345,12 @@ class ReciptActivity : ComponentActivity() {
     @Composable
     fun SaveRecipt(theme: String, receiptcontent: ReceiptContent_string){
 
+        BackHandler {
+            startActivity(Intent(this@ReciptActivity, MainActivity::class.java)
+                .putExtra("MoveScreen", "ReceiptPost"))
+            finish()
+        }
+
         var Theme = 0
         Theme = if (theme == "A") 0 else 1
 
@@ -1386,9 +1395,9 @@ class ReciptActivity : ComponentActivity() {
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
                         .clickable {
-                            var intent = Intent(this@ReciptActivity, MainActivity::class.java)
-                            intent.putExtra("MoveScreen", "Receipt")
-                            startActivity(intent)
+                            startActivity(Intent(this@ReciptActivity, MainActivity::class.java)
+                                .putExtra("MoveScreen", "ReceiptPost"))
+                            finish()
                         }) {
                     YJ_Bold15("완료", primary_500)
                 }
@@ -1940,9 +1949,8 @@ class ReciptActivity : ComponentActivity() {
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
                         .clickable {
-                            setResult(2, mainIntent)
+                            setResult(1, mainIntent)
                             finish()
-
                            }) {
                     YJ_Bold15("뒤로", black)
                 }
@@ -2006,12 +2014,15 @@ class ReciptActivity : ComponentActivity() {
     @OptIn(ExperimentalPagerApi::class)
     @Composable
     fun EditReceipt(receiptContent: ReceiptContent,
-                    neutral:Double ,happy:Double ,angry:Double ,sad:Double, receiptid : Int){
+                    neutral:Double ,happy:Double ,angry:Double ,sad:Double, receiptid : Int, mainIntent :Intent){
 
+        val viewModel: CustomNoTitleCheckViewModel = viewModel()
+        BackHandler {
+            viewModel.showCustomNoTitleCheckDialog()
+        }
         val page = 2
         val state = rememberPagerState()
 
-        val viewModel: CustomNoTitleCheckViewModel = viewModel()
         val CustomNoTitleCheckDialogState = viewModel.CustomNoTitleCheckDialogState.value
 
         val receiptIntent = Intent(this@ReciptActivity, MainActivity::class.java)
@@ -2041,7 +2052,10 @@ class ReciptActivity : ComponentActivity() {
                             description = CustomNoTitleCheckDialogState.description,
                             checkleft = CustomNoTitleCheckDialogState.checkleft,
                             checkright = CustomNoTitleCheckDialogState.checkright,
-                            onClickleft = { startActivity( receiptIntent ) },
+                            onClickleft = {
+                                //영수증 모아보기로 이동
+                                setResult(1, mainIntent)
+                                finish() },
                             onClickright = {CustomNoTitleCheckDialogState.onClickright()},
                             onClickCancel = {CustomNoTitleCheckDialogState.onClickCancel()},
 
@@ -2114,7 +2128,14 @@ class ReciptActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun SaveEditReceipt(theme: String, receiptcontent: ReceiptContent_string){
+    fun SaveEditReceipt(theme: String, receiptcontent: ReceiptContent_string, mainIntent: Intent){
+
+        BackHandler {
+            //영수증 모아보기로 이동
+            setResult(1, mainIntent)
+            finish()
+        }
+
 
         var Theme = 0
         Theme = if (theme == "A") 0 else 1
@@ -2160,9 +2181,9 @@ class ReciptActivity : ComponentActivity() {
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
                         .clickable {
-                            var intent = Intent(this@ReciptActivity, MainActivity::class.java)
-                            intent.putExtra("MoveScreen", "Receipt")
-                            startActivity(intent)
+                            //영수증 모아보기로 이동
+                            setResult(1, mainIntent)
+                            finish()
                         }) {
                     YJ_Bold15("완료", primary_500)
                 }

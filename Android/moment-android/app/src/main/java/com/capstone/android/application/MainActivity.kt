@@ -242,6 +242,14 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MainRoot() {
+
+        var movenav = try {
+            intent.getStringExtra("MoveScreen")
+        } catch (e: Exception) {
+            "Basic"
+        }
+        if (movenav == "ReceiptPost") receiptViewModel.getReceiptAll(0,10000)
+
         val postTrip =
             rememberLauncherForActivityResult(
                 ActivityResultContracts.StartActivityForResult()
@@ -264,8 +272,7 @@ class MainActivity : ComponentActivity() {
                 ActivityResultContracts.StartActivityForResult()
             ) { result ->
                 if (result.resultCode == 1) {
-                }
-                if (result.resultCode == 2) {
+                    receiptViewModel.getReceiptAll(0,10000)
                 }
             }
 
@@ -393,7 +400,7 @@ class MainActivity : ComponentActivity() {
             tripViewModel.getTripAll()
             cardViewModel.getCardLiked()
             tripFileViewModel.getTripFileUntitled()
-
+            receiptViewModel.getReceiptAll(0,10000)
 
 
             tripViewModel.getTripAllSuccess.observe(this@MainActivity) { response ->
@@ -598,10 +605,10 @@ class MainActivity : ComponentActivity() {
                             .onFailure {  }.getOrNull()
                     }.forEach {
                         receiptList.add(it)
-                        if (response.data.receiptList.size == receiptList.size) {
-                            navController.navigate(MainScreen.ReceiptPost.screenRoute)
+                        /*if (response.data.receiptList.size == receiptList.size) {
+
                         } else {
-                        }
+                        }*/
                     }
             }
             // 영수증 전체 받기 실패
@@ -629,17 +636,7 @@ class MainActivity : ComponentActivity() {
 
 
             }
-
-
-            val movenav = try {
-                intent.getStringExtra("MoveScreen")
-            } catch (e: Exception) {
-                "Basic"
-            }
-
             navController = rememberNavController()
-
-
 
             Scaffold(
                 modifier = Modifier
@@ -793,7 +790,7 @@ class MainActivity : ComponentActivity() {
                                                     navController.navigate(
                                                         BottomNavItem.Receipt.screenRoute
                                                     ){
-                                                        popUpTo(MainScreen.ReceiptPost.screenRoute) { inclusive = true }
+                                                        popUpTo(BottomNavItem.Receipt.screenRoute) { inclusive = true }
                                                     }
                                                 }) {
                                                     Text(
@@ -837,6 +834,7 @@ class MainActivity : ComponentActivity() {
                                                     }
 
                                                     "영수증 모아보기" -> {
+                                                        navController.navigate(MainScreen.ReceiptPost.screenRoute)
                                                         val size = 10000
                                                         receiptViewModel.getReceiptAll(0, size)
                                                     }
@@ -917,7 +915,6 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(MainScreen.ReceiptPost.screenRoute) {
                         currentSelectedBottomRoute.value = MainScreen.ReceiptPost.rootRoute
-                        Log.d("MainRootMainRoot", "컴포즈에 왔다 ${receiptList.size}")
                         ReceiptPost(makeReceipt, receiptList, EditCheckState, DeleteReceipt)
                         if (EditCheckState.value) title.value = "삭제" else title.value = "편집"
                     }
