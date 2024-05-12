@@ -155,7 +155,7 @@ struct AccordionLikeView: View {
             DynamicGradientRectangleLikeView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItemLike.stt)", cardItemsLike: cardItemLike)
             DynamicGradientImagePicker(cardViewModel: cardViewModel, cardViewId: cardItemLike.id)
             Spacer().frame(height: 30)
-            EmotionView(cardViewModel: cardViewModel)
+            EmotionLikeView1(cardViewModel: cardViewModel, cardItemLike: cardItemLike)
         }
     }
     
@@ -183,6 +183,66 @@ struct AccordionLikeView: View {
         }
     }
 }
+
+struct EmotionLikeView1: View {
+    @ObservedObject var cardViewModel: CardViewModel
+    var cardItemLike: LikeCardViewData
+    
+    var body: some View {
+        VStack {
+            HStack{
+                Text("꽤나 즐거운 대화였어요")
+                    .font(.pretendardMedium11)
+                    .padding(.horizontal,20)
+                Spacer()
+                Text("감정분석")
+                    .font(.pretendardMedium11)
+                    .padding(.horizontal,10)
+                
+            }
+            CustomEmotionViewDivider()
+ 
+            ForEach(cardViewModel.emotions, id: \.name) { emotion in
+                        emotionRow(emotion: emotion)
+                    }
+        }
+        .padding(.horizontal, 1) // HStack에 패딩을 적용하여 내용이 화면 가장자리에 붙지 않도록 합니다.
+        .onAppear{
+            cardViewModel.updateEmotions(happy: cardItemLike.happy, sad: cardItemLike.sad, angry: cardItemLike.angry, neutral: cardItemLike.neutral, disgust: cardItemLike.disgust)
+        }
+    }
+ 
+    
+    
+    @ViewBuilder
+      private func emotionRow(emotion: EmotionDataCard) -> some View {
+          HStack {
+              Image(emotion.image)
+                  .resizable()
+                  .scaledToFit()
+                  .frame(width: 12, height: 12)
+
+              Text(emotion.name)
+                  .font(.pretendardMedium11)
+                  .frame(width: 50, alignment: .leading)
+              
+              Spacer().frame(width:35)
+              
+              ProgressView(value: emotion.score, total: 1.0)
+                  .progressViewStyle(LinearProgressViewStyle(tint: emotion.color))
+                  .frame(width: 136)
+
+              Spacer().frame(width:35)
+              
+              Text("\(Int(emotion.score * 100))%")
+                  .font(.pretendardMedium11)
+                  .frame(width: 27, alignment: .trailing)
+          }
+      }
+    
+   
+}
+ 
 
 
 

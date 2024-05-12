@@ -69,15 +69,16 @@ class CardViewModel: ObservableObject {
     @Published var emotions: [EmotionDataCard] = []
     @Published var cardItemsLike: [LikeCardViewData] = []
     
-    init() {
-        updateEmotions(happy: 24.09, sad: 15.9, angry: 14.95, neutral: 21.14, disgust: 23.91)
-    }
+//    init() {
+//        updateEmotions(happy: 24.09, sad: 15.9, angry: 14.95, neutral: 21.14, disgust: 23.91)
+//    }
     
     
     var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTQyNDgzMiwiZXhwIjoxNzU4NjI0ODMyfQ.iHg2ACmOB_hzoSlwsTfzGc_1gn6OHYmAxD0b2wgqNJg"
     
     
-    private func updateEmotions(happy: Double, sad: Double, angry: Double, neutral: Double, disgust: Double) {
+    
+     func updateEmotions(happy: Double, sad: Double, angry: Double, neutral: Double, disgust: Double) {
         let total = happy + sad + angry + neutral + disgust
         emotions = [
             EmotionDataCard(name: "Happy", score: happy / total, color: .Basic, image: "fun"),

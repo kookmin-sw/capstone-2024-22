@@ -212,7 +212,7 @@ struct AccordionView: View {
             DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItem.stt)", cardItem: cardItem)
             DynamicGradientImagePicker(cardViewModel: cardViewModel, cardViewId: cardItem.id)
             Spacer().frame(height: 30)
-            EmotionView(cardViewModel: cardViewModel)
+            EmotionView(cardViewModel: cardViewModel, cardItem: cardItem)
         }
         
     }
@@ -500,6 +500,8 @@ struct DynamicGradientImagePicker: View {
 
 struct EmotionView: View {
     @ObservedObject var cardViewModel: CardViewModel
+    var cardItem: cardViews
+    
     var body: some View {
         VStack {
             HStack{
@@ -519,7 +521,9 @@ struct EmotionView: View {
                     }
         }
         .padding(.horizontal, 1) // HStack에 패딩을 적용하여 내용이 화면 가장자리에 붙지 않도록 합니다.
-        
+        .onAppear{
+            cardViewModel.updateEmotions(happy: cardItem.happy, sad: cardItem.sad, angry: cardItem.angry, neutral: cardItem.neutral, disgust: cardItem.disgust)
+        }
     }
  
     
