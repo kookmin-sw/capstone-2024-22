@@ -104,6 +104,10 @@
 		8EDC94E02BED3FB900B646AB /* ReceiptcompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94DF2BED3FB900B646AB /* ReceiptcompleteView.swift */; };
 		8EDC94E22BEE881700B646AB /* ReceiptCompleteviewB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94E12BEE881700B646AB /* ReceiptCompleteviewB.swift */; };
 		8EDC94E42BEEAFA400B646AB /* CustomSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94E32BEEAFA400B646AB /* CustomSlider.swift */; };
+		8EDC94E62BF06DF100B646AB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8EDC94E52BF06DF100B646AB /* GoogleService-Info.plist */; };
+		8EDC94E72BF06DF100B646AB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8EDC94E52BF06DF100B646AB /* GoogleService-Info.plist */; };
+		8EDC94E82BF06DF100B646AB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8EDC94E52BF06DF100B646AB /* GoogleService-Info.plist */; };
+		8EDC94EB2BF06F8000B646AB /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 8EDC94EA2BF06F8000B646AB /* FirebaseMessaging */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -223,6 +227,8 @@
 		8EDC94DF2BED3FB900B646AB /* ReceiptcompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptcompleteView.swift; sourceTree = "<group>"; };
 		8EDC94E12BEE881700B646AB /* ReceiptCompleteviewB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptCompleteviewB.swift; sourceTree = "<group>"; };
 		8EDC94E32BEEAFA400B646AB /* CustomSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSlider.swift; sourceTree = "<group>"; };
+		8EDC94E52BF06DF100B646AB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		8EDC94EC2BF0738400B646AB /* moment-iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "moment-iOS.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -230,6 +236,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8EDC94EB2BF06F8000B646AB /* FirebaseMessaging in Frameworks */,
 				8E3E7D502BC97AF5004C6AD1 /* PopupView in Frameworks */,
 				8E747AFC2B860E3C00D9302D /* FSCalendar in Frameworks */,
 				8E3E7D4D2BC97A63004C6AD1 /* Alamofire in Frameworks */,
@@ -256,12 +263,14 @@
 		8E15C8642B6527E3001468C7 = {
 			isa = PBXGroup;
 			children = (
+				8EDC94EC2BF0738400B646AB /* moment-iOS.entitlements */,
 				8E3E7D5F2BCD7C50004C6AD1 /* Model */,
 				8ECCFBD42BB93AEC00C39125 /* moment-iOS-Info.plist */,
 				8ECCFBB52BB93A4800C39125 /* Font */,
 				8ECCFBB12BB804B900C39125 /* ImagePicker.swift */,
 				8E970E152BC3E05B003476C4 /* DailyView */,
 				8ECCFA992BAFE4A300C39125 /* VoiceRecorder_EX */,
+				8EDC94E52BF06DF100B646AB /* GoogleService-Info.plist */,
 				8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */,
 				8E15C8702B6527E3001468C7 /* moment_iOSApp.swift */,
 				8E5CAE712B970EE700A483B4 /* AppDelegate.swift */,
@@ -590,6 +599,7 @@
 				8E747AFB2B860E3C00D9302D /* FSCalendar */,
 				8E3E7D4C2BC97A63004C6AD1 /* Alamofire */,
 				8E3E7D4F2BC97AF5004C6AD1 /* PopupView */,
+				8EDC94EA2BF06F8000B646AB /* FirebaseMessaging */,
 			);
 			productName = "moment-iOS";
 			productReference = 8E15C86D2B6527E3001468C7 /* moment-iOS.app */;
@@ -667,6 +677,7 @@
 				8E747AFA2B860E3C00D9302D /* XCRemoteSwiftPackageReference "FSCalendar" */,
 				8E3E7D4B2BC97A63004C6AD1 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				8E3E7D4E2BC97AF5004C6AD1 /* XCRemoteSwiftPackageReference "PopupView" */,
+				8EDC94E92BF06F8000B646AB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 8E15C86E2B6527E3001468C7 /* Products */;
 			projectDirPath = "";
@@ -688,6 +699,7 @@
 				8E8C17CA2BABF1A800BF1E1C /* Assets.xcassets in Resources */,
 				8ECCFBCD2BB93A6D00C39125 /* Pretendard-Thin.otf in Resources */,
 				8ECCFBC32BB93A6D00C39125 /* Pretendard-Medium.otf in Resources */,
+				8EDC94E62BF06DF100B646AB /* GoogleService-Info.plist in Resources */,
 				8ECCFBC92BB93A6D00C39125 /* Pretendard-ExtraLight.otf in Resources */,
 				8ECCFBC12BB93A6D00C39125 /* Pretendard-Regular.otf in Resources */,
 				8E5CAE362B970C4500A483B4 /* Assets.xcassets in Resources */,
@@ -703,6 +715,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8EDC94E72BF06DF100B646AB /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -720,6 +733,7 @@
 				8ECCFBC82BB93A6D00C39125 /* Pretendard-Light.otf in Resources */,
 				8ECCFBD02BB93A6D00C39125 /* Pretendard-Bold.otf in Resources */,
 				8ECCFBC42BB93A6D00C39125 /* Pretendard-Medium.otf in Resources */,
+				8EDC94E82BF06DF100B646AB /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -959,6 +973,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "moment-iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9GGZWXBXQ6;
@@ -993,6 +1008,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "moment-iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9GGZWXBXQ6;
@@ -1164,6 +1180,14 @@
 				minimumVersion = 2.8.4;
 			};
 		};
+		8EDC94E92BF06F8000B646AB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.25.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1181,6 +1205,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8E747AFA2B860E3C00D9302D /* XCRemoteSwiftPackageReference "FSCalendar" */;
 			productName = FSCalendar;
+		};
+		8EDC94EA2BF06F8000B646AB /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8EDC94E92BF06F8000B646AB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

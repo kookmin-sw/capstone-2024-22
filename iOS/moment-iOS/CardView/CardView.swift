@@ -343,6 +343,8 @@ struct DynamicGradientRectangleView: View {
     
 }
 
+
+
 struct DynamicGradientImagePicker: View {
     @State private var showingImagePicker = false
     @State private var showingAddButton = false // 처음에는 추가 버튼이 보이지 않음
@@ -427,8 +429,6 @@ struct DynamicGradientImagePicker: View {
         }
     }
 }
-//CustomEmotionViewDivider()
-
 
 
 
