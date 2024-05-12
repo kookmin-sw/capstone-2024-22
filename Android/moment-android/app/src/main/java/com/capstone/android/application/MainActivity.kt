@@ -119,7 +119,6 @@ import com.capstone.android.application.data.remote.receipt.model.receipt_delete
 import com.capstone.android.application.data.remote.receipt.model.receipt_delete.deleteReceiptDeleteRequest
 import com.capstone.android.application.domain.Card
 import com.capstone.android.application.domain.ReceiptAll
-import com.capstone.android.application.domain.CustomTitleCheckViewModel
 import com.capstone.android.application.domain.Emotion
 import com.capstone.android.application.domain.Trip
 import com.capstone.android.application.domain.TripFile
@@ -300,7 +299,6 @@ class MainActivity : ComponentActivity() {
             mutableStateListOf<Card>()
         }
 
-        val receiptList = remember { mutableStateListOf<ReceiptAll>() }
         val DeleteReceipt = remember { mutableListOf<ReceiptId>() }
         val test: Int = 4
         val colorName: Result<String> = runCatching {
@@ -349,9 +347,8 @@ class MainActivity : ComponentActivity() {
             var EditCheckState = remember { mutableStateOf(false) }
             var ReceiptCheckState = remember { mutableStateOf(true) }
 
-            val viewModel: CustomTitleCheckViewModel = viewModel()
-            val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
-            val coroutineScope = rememberCoroutineScope()
+
+        val coroutineScope = rememberCoroutineScope()
             val emotionList = remember {
                 mutableStateListOf<Emotion>()
             }
@@ -389,6 +386,21 @@ class MainActivity : ComponentActivity() {
                 )
             )
 
+            // 영수증 삭제 dialog
+            val showDeleteDialog = remember { mutableStateOf(false) }
+            val deleteyes = remember { mutableStateOf(false) }
+
+            if (showDeleteDialog.value){
+                //dialog 띄우기
+                deleteDialog(showDeleteDialog = showDeleteDialog, Deletesize = DeleteReceipt.size, deleteyes = deleteyes )
+            }
+            if(deleteyes.value){
+                deleteyes.value = false
+                receiptViewModel.deleteReceiptDelete(
+                    body = deleteReceiptDeleteRequest(receiptIds = DeleteReceipt))
+                DeleteReceipt.clear()
+                receiptViewModel.getReceiptAll(0, 10000)
+            }
 
 
             tripViewModel.getTripAll()
@@ -799,14 +811,9 @@ class MainActivity : ComponentActivity() {
                                                     }
 
                                                     "삭제" -> {
-                                                        viewModel.showCustomTitleCheckDialog()
+                                                        showDeleteDialog.value = true
 
-                                                        Log.d(
-                                                            "Delete",
-                                                            "DeleteReceipt: $DeleteReceipt"
-                                                        )
                                                     }
-
                                                 }
                                             },
                                         text = title.value,
@@ -817,49 +824,7 @@ class MainActivity : ComponentActivity() {
                                             if (ReceiptCheckState.value) primary_500 else neutral_500
                                         } else black
                                     )
-                                    if (CustomTitleCheckDialogState.title.isNotBlank()) {
-                                        CustomTitleCheckDialog(
-                                            title = DeleteReceipt.size.toString() + CustomTitleCheckDialogState.title,
-                                            description = CustomTitleCheckDialogState.description,
-                                            checkleft = CustomTitleCheckDialogState.checkleft,
-                                            checkright = CustomTitleCheckDialogState.checkright,
-                                            onClickleft = {
-
-                                                receiptViewModel.deleteReceiptDelete(
-                                                    body = deleteReceiptDeleteRequest(receiptIds = DeleteReceipt)
-                                                )
-
-                                                // 영수증 삭제 성공
-                                                receiptViewModel.deleteReceiptDeleteSuccess.observe(
-                                                    this@MainActivity
-                                                ) { response ->
-                                                    Log.d(
-                                                        "receiptViewModel_deleteReceiptDeleteSuccess",
-                                                        response.toString()
-                                                    )
-
-                                                }
-
-                                                // 영수증 삭제 실패
-                                                receiptViewModel.deleteReceiptDeleteFailure.observe(
-                                                    this@MainActivity
-                                                ) { response ->
-                                                    Log.d(
-                                                        "receiptViewModel_deleteReceiptDeleteFailure",
-                                                        response.toString()
-                                                    )
-                                                }
-                                                DeleteReceipt.clear()
-                                                EditCheckState.value = false
-                                                CustomTitleCheckDialogState.onClickleft()
-                                            },
-                                            onClickright = { CustomTitleCheckDialogState.onClickright() },
-                                            onClickCancel = { CustomTitleCheckDialogState.onClickCancel() },
-                                        )
-                                    }
                                 }
-
-
                             }
 
                         }
@@ -2929,6 +2894,22 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    @Composable
+    fun deleteDialog(showDeleteDialog : MutableState<Boolean>, Deletesize : Int, deleteyes : MutableState<Boolean>){
+
+        CustomTitleCheckDialog(
+            title = "$Deletesize 개의 영수증을 정말 삭제 할까요?",
+            description = "삭제된 영수증은 복구할 수 없어요",
+            checkleft = "네",
+            checkright = "아니요",
+            onClickCancel = { showDeleteDialog.value = false },
+            onClickleft = {
+                deleteyes.value = true
+                showDeleteDialog.value = false },
+            onClickright = { showDeleteDialog.value = false }
+        )
     }
 
     fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double): SnapshotStateList<com.capstone.android.application.data.local.Emotion> {
