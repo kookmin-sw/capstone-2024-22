@@ -678,7 +678,7 @@ class ReciptActivity : ComponentActivity() {
                                 )
                             }
                         }) {
-                    YJ_Bold15("완료", black)
+                    YJ_Bold15("저장", black)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -2115,7 +2115,7 @@ class ReciptActivity : ComponentActivity() {
                                 )
                             }
                         }) {
-                    YJ_Bold15("완료", black)
+                    YJ_Bold15("저장", black)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
