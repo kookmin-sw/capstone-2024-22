@@ -7,8 +7,10 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -116,7 +118,7 @@ import com.capstone.android.application.data.remote.card.model.card_post.request
 import com.capstone.android.application.data.remote.receipt.model.receipt_delete.ReceiptId
 import com.capstone.android.application.data.remote.receipt.model.receipt_delete.deleteReceiptDeleteRequest
 import com.capstone.android.application.domain.Card
-import com.capstone.android.application.domain.CustomTitleCheckViewModel
+import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.Emotion
 import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.Trip
@@ -257,6 +259,17 @@ class MainActivity : ComponentActivity() {
                     //do something here
                 }
             }
+
+        val makeReceipt =
+            rememberLauncherForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == 1) {
+                }
+                if (result.resultCode == 2) {
+                }
+            }
+
         val tripList = remember {
             mutableStateListOf<Trip>()
         }
@@ -287,7 +300,6 @@ class MainActivity : ComponentActivity() {
             mutableStateListOf<Card>()
         }
 
-        val receiptList = remember { mutableStateListOf<ReceiptAll>() }
         val DeleteReceipt = remember { mutableListOf<ReceiptId>() }
         val test: Int = 4
         val colorName: Result<String> = runCatching {
@@ -336,9 +348,8 @@ class MainActivity : ComponentActivity() {
             var EditCheckState = remember { mutableStateOf(false) }
             var ReceiptCheckState = remember { mutableStateOf(true) }
 
-            val viewModel: CustomTitleCheckViewModel = viewModel()
-            val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
-            val coroutineScope = rememberCoroutineScope()
+
+        val coroutineScope = rememberCoroutineScope()
             val emotionList = remember {
                 mutableStateListOf<Emotion>()
             }
@@ -376,6 +387,21 @@ class MainActivity : ComponentActivity() {
                 )
             )
 
+            // 영수증 삭제 dialog
+            val showDeleteDialog = remember { mutableStateOf(false) }
+            val deleteyes = remember { mutableStateOf(false) }
+
+            if (showDeleteDialog.value){
+                //dialog 띄우기
+                deleteDialog(showDeleteDialog = showDeleteDialog, Deletesize = DeleteReceipt.size, deleteyes = deleteyes )
+            }
+            if(deleteyes.value){
+                deleteyes.value = false
+                receiptViewModel.deleteReceiptDelete(
+                    body = deleteReceiptDeleteRequest(receiptIds = DeleteReceipt))
+                DeleteReceipt.clear()
+                receiptViewModel.getReceiptAll(0, 10000)
+            }
 
 
             tripViewModel.getTripAll()
@@ -544,6 +570,64 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+
+            // 영수증 삭제 성공
+            receiptViewModel.deleteReceiptDeleteSuccess.observe(this@MainActivity) { response ->
+                Log.d("seohyun", "MainRoot: 영수증 삭제 성공")
+                deleteyes.value = false
+                EditCheckState.value = false
+            }
+            // 영수증 삭제 실패
+            receiptViewModel.deleteReceiptDeleteFailure.observe(this@MainActivity) { response ->
+            }
+
+            val receiptList = remember { mutableStateListOf<ReceiptAll>() }
+            // 영수증 전체 받기 성공
+            receiptViewModel.getReceiptAllSuccess.observe(this@MainActivity) { response ->
+                Log.d("seohyun", "MainRoot: 영수증 전체 받기 성공")
+                    receiptList.clear()
+                    Log.d("MainRootMainRoot", "clear:")
+                    response.data.receiptList.mapNotNull { receiptAll ->
+                        runCatching {
+                            Log.d("MainRootMainRoot", "running")
+                            ReceiptAll(
+                                receiptAll.id,
+                                receiptAll.tripId,
+                                receiptAll.tripName,
+                                receiptAll.angry,
+                                receiptAll.disgust,
+                                receiptAll.happy,
+                                receiptAll.sad,
+                                receiptAll.neutral,
+                                receiptAll.stDate,
+                                receiptAll.edDate,
+                                receiptAll.numOfCard,
+                                receiptAll.mainDeparture,
+                                receiptAll.subDeparture,
+                                receiptAll.mainDestination,
+                                receiptAll.subDestination,
+                                receiptAll.oneLineMemo,
+                                receiptAll.receiptThemeType,
+                                receiptAll.createdAt
+                            )
+                        }
+                            .onSuccess { Log.d("MainRootMainRoot", "onSuccess") }
+                            .onFailure { Log.d("MainRootMainRoot", "onFailure") }.getOrNull()
+                    }.forEach {
+                        Log.d("MainRootMainRoot", "MainRoot: ${it}")
+                        receiptList.add(it)
+                        if (response.data.receiptList.size == receiptList.size) {
+                            Log.d("MainRootMainRoot", ": 사이즈 ,다채움")
+                            navController.navigate(MainScreen.ReceiptPost.screenRoute)
+                        } else {
+                            Log.d("MainRootMainRoot", "MainRootMainRoot: 사이즈 아직 아님 ")
+                        }
+                    }
+            }
+            // 영수증 전체 받기 실패
+            receiptViewModel.getReceiptAllFailure.observe(this@MainActivity) { response ->
+                Log.d("receiptViewModel_getReceiptAllFailure", response.toString())
+            }
 
 //        val recordOpen = remember { mutableStateOf(false)}
 //        val EditCheckState = remember { mutableStateOf(false) }
@@ -771,13 +855,8 @@ class MainActivity : ComponentActivity() {
                                                     }
 
                                                     "영수증 모아보기" -> {
-                                                        startActivity(
-                                                            Intent(
-                                                                this@MainActivity,
-                                                                MainActivity::class.java
-                                                            ).putExtra("MoveScreen", "ReceiptPost")
-                                                        )
-                                                        /*navController.navigate(MainScreen.ReceiptPost.rootRoute)*/
+                                                        val size = 10000
+                                                        receiptViewModel.getReceiptAll(0, size)
                                                     }
 
                                                     "작게보기" -> {}
@@ -786,14 +865,9 @@ class MainActivity : ComponentActivity() {
                                                     }
 
                                                     "삭제" -> {
-                                                        viewModel.showCustomTitleCheckDialog()
+                                                        showDeleteDialog.value = true
 
-                                                        Log.d(
-                                                            "Delete",
-                                                            "DeleteReceipt: $DeleteReceipt"
-                                                        )
                                                     }
-
                                                 }
                                             },
                                         text = title.value,
@@ -804,49 +878,7 @@ class MainActivity : ComponentActivity() {
                                             if (ReceiptCheckState.value) primary_500 else neutral_500
                                         } else black
                                     )
-                                    if (CustomTitleCheckDialogState.title.isNotBlank()) {
-                                        CustomTitleCheckDialog(
-                                            title = DeleteReceipt.size.toString() + CustomTitleCheckDialogState.title,
-                                            description = CustomTitleCheckDialogState.description,
-                                            checkleft = CustomTitleCheckDialogState.checkleft,
-                                            checkright = CustomTitleCheckDialogState.checkright,
-                                            onClickleft = {
-
-                                                receiptViewModel.deleteReceiptDelete(
-                                                    body = deleteReceiptDeleteRequest(receiptIds = DeleteReceipt)
-                                                )
-
-                                                // 영수증 삭제 성공
-                                                receiptViewModel.deleteReceiptDeleteSuccess.observe(
-                                                    this@MainActivity
-                                                ) { response ->
-                                                    Log.d(
-                                                        "receiptViewModel_deleteReceiptDeleteSuccess",
-                                                        response.toString()
-                                                    )
-
-                                                }
-
-                                                // 영수증 삭제 실패
-                                                receiptViewModel.deleteReceiptDeleteFailure.observe(
-                                                    this@MainActivity
-                                                ) { response ->
-                                                    Log.d(
-                                                        "receiptViewModel_deleteReceiptDeleteFailure",
-                                                        response.toString()
-                                                    )
-                                                }
-                                                DeleteReceipt.clear()
-                                                EditCheckState.value = false
-                                                CustomTitleCheckDialogState.onClickleft()
-                                            },
-                                            onClickright = { CustomTitleCheckDialogState.onClickright() },
-                                            onClickCancel = { CustomTitleCheckDialogState.onClickCancel() },
-                                        )
-                                    }
                                 }
-
-
                             }
 
                         }
@@ -878,7 +910,7 @@ class MainActivity : ComponentActivity() {
                         title.value = "추가"
                         currentSelectedBottomRoute.value = "Receipt"
 
-                        Receipt()
+                        Receipt(makeReceipt)
                         title.value = "영수증 모아보기"
                     }
                     composable(BottomNavItem.Record.screenRoute) {
@@ -900,56 +932,8 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(MainScreen.ReceiptPost.screenRoute) {
                         currentSelectedBottomRoute.value = MainScreen.ReceiptPost.rootRoute
-
-                        val page = remember { mutableStateOf(0) }
-                        page.value = 0
-                        val size = 4
-                        var totalpage = 0
-                        var currentpage = 0
-
-                        receiptViewModel.getReceiptAll(page.value, size)
-                        // 영수증 전체 받기 성공
-                        receiptViewModel.getReceiptAllSuccess.observe(this@MainActivity) { response ->
-                            Log.d("receiptViewModel_getReceiptAllSuccess", response.toString())
-                            totalpage = response.data.pagination.totalPages
-                            currentpage = response.data.pagination.currentPage
-
-                            response.data.receiptList.mapNotNull { receiptAll ->
-                                runCatching {
-                                    ReceiptAll(
-                                        receiptAll.id,
-                                        receiptAll.tripId,
-                                        receiptAll.tripName,
-                                        receiptAll.angry,
-                                        receiptAll.disgust,
-                                        receiptAll.happy,
-                                        receiptAll.sad,
-                                        receiptAll.neutral,
-                                        receiptAll.stDate,
-                                        receiptAll.edDate,
-                                        receiptAll.numOfCard,
-                                        receiptAll.mainDeparture,
-                                        receiptAll.subDeparture,
-                                        receiptAll.mainDestination,
-                                        receiptAll.subDestination,
-                                        receiptAll.oneLineMemo,
-                                        receiptAll.receiptThemeType,
-                                        receiptAll.createdAt
-                                    )
-                                }
-                                    .onSuccess { receiptList.clear() }
-                                    .onFailure {}.getOrNull()
-                            }.forEach {
-                                receiptList.add(it)
-                            }
-                        }
-
-                        // 영수증 전체 받기 실패
-                        receiptViewModel.getReceiptAllFailure.observe(this@MainActivity) { response ->
-                            Log.d("receiptViewModel_getReceiptAllFailure", response.toString())
-                        }
-
-                        ReceiptPost(receiptList, EditCheckState, DeleteReceipt)
+                        Log.d("MainRootMainRoot", "컴포즈에 왔다 ${receiptList.size}")
+                        ReceiptPost(makeReceipt, receiptList, EditCheckState, DeleteReceipt)
                         if (EditCheckState.value) title.value = "삭제" else title.value = "편집"
                     }
 
@@ -1503,7 +1487,9 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Receipt(){
+    fun Receipt(makeReceipt :
+                ManagedActivityResultLauncher<Intent, ActivityResult>
+    ){
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -1516,24 +1502,30 @@ class MainActivity : ComponentActivity() {
             )
             Spacer(modifier = Modifier.height(70.dp))
             BigButton("만들기", true,
-                onClick = {startActivity(Intent(this@MainActivity, ReciptActivity::class.java))})
-
+                onClick = { makeReceipt.launch(
+                    Intent(
+                        this@MainActivity,
+                        ReciptActivity::class.java
+                    )
+                ) })
         }
     }
 
     @Composable
-    fun ReceiptPost(receiptList: MutableList<ReceiptAll>,EditCheckState: MutableState<Boolean>, DeleteReceipt :MutableList<ReceiptId> ) {
+    fun ReceiptPost(makeReceipt : ManagedActivityResultLauncher<Intent, ActivityResult>,
+                    receiptList: MutableList<ReceiptAll>,EditCheckState: MutableState<Boolean>, DeleteReceipt :MutableList<ReceiptId> ) {
         //영수증 게시
         Column(
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp)) {
-            MyGrid(receiptList, 2, EditCheckState, DeleteReceipt)
+            MyGrid(makeReceipt, receiptList, 2, EditCheckState, DeleteReceipt)
 
         }
     }
     @Composable
     fun MyGrid(
+        makeReceipt : ManagedActivityResultLauncher<Intent, ActivityResult>,
         receiptList: MutableList<ReceiptAll>,
         columnSize: Int,
         EditCheckState: MutableState<Boolean>,
@@ -1548,7 +1540,7 @@ class MainActivity : ComponentActivity() {
                     val rangeStart = rowIndex*columnSize
                     var rangeEnd = rangeStart + columnSize -1
                     if (rangeEnd > receiptList.lastIndex) rangeEnd = receiptList.lastIndex // row로 표현될 list의 range를 계산, slice하여 row 생성
-                    RowOfGrid(receiptList.slice(rangeStart..rangeEnd), maxWidth/columnSize,
+                    RowOfGrid(makeReceipt, receiptList.slice(rangeStart..rangeEnd), maxWidth/columnSize,
                         EditCheckState, DeleteReceipt)
                 }
             }
@@ -1558,6 +1550,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
     @Composable
     fun RowOfGrid(
+        makeReceipt : ManagedActivityResultLauncher<Intent, ActivityResult>,
         rowList: List<ReceiptAll>,
         columnWidth: Dp,
         EditCheckState: MutableState<Boolean>,
@@ -1584,8 +1577,14 @@ class MainActivity : ComponentActivity() {
                     .background(Color.Gray)
                     .clickable {
                         if (!EditCheckState.value) {
-                            intent.putExtra("BigReceipt", item)
-                            startActivity(intent)
+
+                            makeReceipt.launch(
+                                Intent(
+                                    this@MainActivity,
+                                    ReciptActivity::class.java
+                                ).putExtra("MoveScreen", "ReceiptPost_Big")
+                                    .putExtra("BigReceipt", item)
+                            )
                         } else {
                             if (checkState.value) {
                                 checkState.value = false
@@ -2953,6 +2952,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @Composable
+    fun deleteDialog(showDeleteDialog : MutableState<Boolean>, Deletesize : Int, deleteyes : MutableState<Boolean>){
+
+        CustomTitleCheckDialog(
+            title = "$Deletesize 개의 영수증을 정말 삭제 할까요?",
+            description = "삭제된 영수증은 복구할 수 없어요",
+            checkleft = "네",
+            checkright = "아니요",
+            onClickCancel = { showDeleteDialog.value = false },
+            onClickleft = {
+                deleteyes.value = true
+                showDeleteDialog.value = false },
+            onClickright = { showDeleteDialog.value = false }
+        )
+    }
+
     fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double): SnapshotStateList<com.capstone.android.application.data.local.Emotion> {
         val emotionList = mutableStateListOf<com.capstone.android.application.data.local.Emotion>()
         emotionList.add(
@@ -3045,7 +3060,7 @@ class MainActivity : ComponentActivity() {
 //            RecordDaily()
 //            Setting()
 //            ItemTrip()
-            Receipt()
+            //Receipt()
         }
     }
 

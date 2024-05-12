@@ -3,6 +3,8 @@ package com.capstone.android.application.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Picture
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -41,18 +43,27 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.draw
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -99,6 +110,11 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.time.LocalDate
 
 
@@ -121,10 +137,10 @@ class ReciptActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val mainIntent = intent
+
         setContent {
             navController = rememberNavController()
-            initApi()
-
 
             val movenav = try {
                 intent.getStringExtra("MoveScreen")
@@ -150,6 +166,54 @@ class ReciptActivity : ComponentActivity() {
                 Log.d("tripListtripList", "fail")
             }
 
+            // 영수증 전체 받기 성공
+            tripViewModel.getTripDetailSuccess.observe(this@ReciptActivity) { response ->
+                Log.d("qwerqwerqwer", "success" +response.toString())
+                tripDetailList.clear()
+
+                tripDetailList.add(TripDetail(
+                    tripName =response.data.tripName,
+                    startDate =response.data.startDate,
+                    endDate =response.data.endDate,
+                    id =response.data.id,
+                    happy =response.data.happy,
+                    disgust =response.data.disgust,
+                    angry =response.data.angry,
+                    neutral =response.data.neutral,
+                    sad =response.data.sad,
+                    numOfCard =response.data.numOfCard,
+                    analyzingCount =response.data.analyzingCount
+                ))
+
+                Log.d("qwerqwerqwer", "tripDetailList: ${tripDetailList[0]}")
+            }
+
+            // 영수증 전체 받기 실패
+            tripViewModel.getTripDetailFailure.observe(this@ReciptActivity) { response ->
+                Log.d("qwerqwerqwer", response.toString())
+                setResult(3,mainIntent)
+            }
+
+
+            // 영수증 생성 성공
+            receiptViewModel.postReceiptCreateSuccess.observe(this@ReciptActivity) { response ->
+                Log.d("receiptViewModel_postReceiptCreateSuccess", response.toString())
+            }
+            // 영수증 생성 실패
+            receiptViewModel.postReceiptCreateFailure.observe(this@ReciptActivity) { response ->
+                Log.d("receiptViewModel_postReceiptCreateFailure", response.toString())
+            }
+
+
+            // 영수증 전체 받기 성공
+            receiptViewModel.putReceiptCreateSuccess.observe(this@ReciptActivity) { response ->
+                Log.d("putReceiptCreateSuccess", "success" + response.toString())
+            }
+            // 영수증 전체 받기 실패
+            receiptViewModel.putReceiptCreateFailure.observe(this@ReciptActivity) { response ->
+                Log.d("putReceiptCreateFailure", response.toString())
+            }
+
 
 
             Scaffold(
@@ -165,39 +229,12 @@ class ReciptActivity : ComponentActivity() {
                     if(movenav == "ReceiptPost_Big") ReciptScreen.ReceiptPost_Big.name
                     else ReciptScreen.MakeTripChoice.name
                 ) {
-                    composable(route = ReciptScreen.MakeTripChoice.name) { MakeTripChoice(tripList) }
+                    composable(route = ReciptScreen.MakeTripChoice.name) {
+                        MakeTripChoice(tripList, mainIntent) }
                     composable(route = ReciptScreen.MakeTrip.name){
-
-                        // 영수증 전체 받기 성공
-                        tripViewModel.getTripDetailSuccess.observe(this@ReciptActivity) { response ->
-                            Log.d("qwerqwerqwer", "success" +response.toString())
-                            tripDetailList.clear()
-
-                            tripDetailList.add(TripDetail(
-                                tripName =response.data.tripName,
-                                startDate =response.data.startDate,
-                                endDate =response.data.endDate,
-                                id =response.data.id,
-                                happy =response.data.happy,
-                                disgust =response.data.disgust,
-                                angry =response.data.angry,
-                                neutral =response.data.neutral,
-                                sad =response.data.sad,
-                                numOfCard =response.data.numOfCard,
-                                analyzingCount =response.data.analyzingCount
-                            ))
-
-                            Log.d("qwerqwerqwer", "tripDetailList: ${tripDetailList[0]}")
-                        }
-
-                        // 영수증 전체 받기 실패
-                        tripViewModel.getTripDetailFailure.observe(this@ReciptActivity) { response ->
-                            Log.d("qwerqwerqwer", response.toString())
-                        }
 
                         if(tripDetailList.size == 1) {
                             MakeTrip(tripDetailList[0])
-                            Log.d("qwerqwerqwer", "onCreate: 1개라고 임마")
                         }
                     }
                     composable(route = ReciptScreen.SaveRecipt.name +
@@ -258,7 +295,7 @@ class ReciptActivity : ComponentActivity() {
                         val created = data.created.take(10)
                         val receiptcontent = ReceiptContent_string(data.tripName,data.oneLineMemo, data.subDeparture,data.mainDeparture,
                             data.subDestination,data.mainDestination,data.numOfCard,created,data.stDate,data.edDate,emotionList)
-                        ReceiptPost_Big(receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad, data.id)
+                        ReceiptPost_Big(mainIntent, receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad, data.id)
                     }
                     composable(route = ReciptScreen.EditReceipt.name +
                             "/{tripName}/{intro}/{depart_small}/{depart}" +
@@ -378,13 +415,6 @@ class ReciptActivity : ComponentActivity() {
         }
     }
 
-    private fun initApi() {
-        // 영수증 생성 실패
-        receiptViewModel.postReceiptCreateFailure.observe(this@ReciptActivity) { response ->
-            Log.d("receiptViewModel_postReceiptCreateFailure", response.toString())
-        }
-    }
-
     data class ReceiptContent(
         val tripName: String,
         val intro: MutableState<String>,
@@ -415,7 +445,7 @@ class ReciptActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun MakeTripChoice(tripList:MutableList<ReceiptTrip>) {
+    fun MakeTripChoice(tripList: MutableList<ReceiptTrip>, mainIntent: Intent) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -434,7 +464,11 @@ class ReciptActivity : ComponentActivity() {
                         .padding(top = 23.dp)
                         .wrapContentSize()
                 ) {
-                    ImgBackButton(onClick = {startActivity(Intent(this@ReciptActivity, MainActivity::class.java).putExtra("MoveScreen","Receipt"))}, "여행 선택하기")
+                    ImgBackButton(
+                        onClick = {
+                            setResult(1, mainIntent)
+                            finish()
+                        }, "")
                 }
                 LazyColumn(
                     modifier = Modifier
@@ -617,33 +651,28 @@ class ReciptActivity : ComponentActivity() {
                                     tripName, intro, depart_small, depart, arrive_small, arrive,
                                     cardnum, publicationdate, startdate, enddate, emotionList
                                 )
+                                if (intro.value == "") intro.value = " "
+                                if (depart_small.value == "") depart_small.value = " "
+                                if (arrive_small.value == "") arrive_small.value = " "
 
-                                // 영수증 생성 성공
-                                receiptViewModel.postReceiptCreateSuccess.observe(this@ReciptActivity) { response ->
-
-                                    if (intro.value == "") intro.value = " "
-                                    if (depart_small.value == "") depart_small.value = " "
-                                    if (arrive_small.value == "") arrive_small.value = " "
-
-                                    navController.navigate(
-                                        ReciptScreen.SaveRecipt.name +
-                                                "/${receiptData.tripName}" +
-                                                "/${receiptData.intro.value}" +
-                                                "/${receiptData.depart_small.value}" +
-                                                "/${receiptData.depart.value}" +
-                                                "/${receiptData.arrive_small.value}" +
-                                                "/${receiptData.arrive.value}" +
-                                                "/${receiptData.cardnum}" +
-                                                "/${receiptData.publicationdate}" +
-                                                "/${receiptData.startdate}" +
-                                                "/${receiptData.enddate}" +
-                                                "/${theme}" +
-                                                "/${trip.happy}" +
-                                                "/${trip.sad}" +
-                                                "/${trip.neutral}" +
-                                                "/${trip.angry}"
-                                    )
-                                }
+                                navController.navigate(
+                                    ReciptScreen.SaveRecipt.name +
+                                            "/${receiptData.tripName}" +
+                                            "/${receiptData.intro.value}" +
+                                            "/${receiptData.depart_small.value}" +
+                                            "/${receiptData.depart.value}" +
+                                            "/${receiptData.arrive_small.value}" +
+                                            "/${receiptData.arrive.value}" +
+                                            "/${receiptData.cardnum}" +
+                                            "/${receiptData.publicationdate}" +
+                                            "/${receiptData.startdate}" +
+                                            "/${receiptData.enddate}" +
+                                            "/${theme}" +
+                                            "/${trip.happy}" +
+                                            "/${trip.sad}" +
+                                            "/${trip.neutral}" +
+                                            "/${trip.angry}"
+                                )
                             }
                         }) {
                     YJ_Bold15("완료", black)
@@ -1316,6 +1345,18 @@ class ReciptActivity : ComponentActivity() {
         var Theme = 0
         Theme = if (theme == "A") 0 else 1
 
+        val coroutineScope = rememberCoroutineScope()
+        val context = androidx.compose.ui.platform.LocalContext.current
+
+        val picture = CaptureComposableAsImage {
+            if (Theme == 0) {
+                SaveTheme1(receiptcontent)
+            }
+            if(Theme == 1){
+                SaveTheme2(receiptcontent)
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -1332,7 +1373,13 @@ class ReciptActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
-                        .clickable { }) {
+                        .clickable {
+                            coroutineScope.launch {
+                                val capturedImageBitmap = createBitmapFromPicture(picture).asImageBitmap()
+
+                                ShareImage(capturedImageBitmap.toBitmap(),context)
+                            }
+                        }) {
                     YJ_Bold15("내보내기", black)
                 }
                 Column(
@@ -1844,11 +1891,8 @@ class ReciptActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun ReceiptPost_Big(content: ReceiptContent_string, theme : String,
+    fun ReceiptPost_Big(mainIntent: Intent, content: ReceiptContent_string, theme : String,
                         neutral:Double ,happy:Double ,angry:Double ,sad:Double, receiptid : Int){
-
-        var intent = Intent(this@ReciptActivity, MainActivity::class.java)
-        intent.putExtra("MoveScreen", "ReceiptPost")
 
         val tripName = content.tripName
         val intro = if(content.intro?.isEmpty() == true) " "  else content.intro
@@ -1866,6 +1910,19 @@ class ReciptActivity : ComponentActivity() {
             tripName, intro, depart_small, depart, arrive_small, arrive,
             cardnum, publicationdate, startdate, enddate, emotionList
         )
+
+        val coroutineScope = rememberCoroutineScope()
+        val context = androidx.compose.ui.platform.LocalContext.current
+
+        val picture = CaptureComposableAsImage {
+            if (theme == "A") {
+                SaveTheme1(receiptcontent)
+            }
+            if (theme == "B") {
+                SaveTheme2(receiptcontent)
+
+            }
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -1882,7 +1939,11 @@ class ReciptActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
-                        .clickable { startActivity(intent) }) {
+                        .clickable {
+                            setResult(2, mainIntent)
+                            finish()
+
+                           }) {
                     YJ_Bold15("뒤로", black)
                 }
                 Column() {
@@ -1890,7 +1951,13 @@ class ReciptActivity : ComponentActivity() {
                         Column(
                             Modifier
                                 .padding(vertical = 10.dp, horizontal = 14.dp)
-                                .clickable { }) {
+                                .clickable {
+                                    coroutineScope.launch {
+                                        val capturedImageBitmap = createBitmapFromPicture(picture).asImageBitmap()
+
+                                        ShareImage(capturedImageBitmap.toBitmap(),context)
+                                    }
+                                }) {
                             YJ_Bold15("내보내기", black)
                         }
                         Spacer(modifier = Modifier.width(4.dp))
@@ -2004,41 +2071,35 @@ class ReciptActivity : ComponentActivity() {
                                     id =  receiptid
                                     )
                                 )
-                                // 영수증 전체 받기 성공
-                                receiptViewModel.putReceiptCreateSuccess .observe(this@ReciptActivity) { response ->
-                                    Log.d("putReceiptCreateSuccess", "success" +response.toString())
 
-                                    var theme = "A"
-                                    if (receiptContent.intro.value == "") receiptContent.intro.value = " "
-                                    if (receiptContent.depart_small.value == "") receiptContent.depart_small.value = " "
-                                    if (receiptContent.arrive_small.value == "") receiptContent.arrive_small.value = " "
-                                    theme = if (state.currentPage == 0) "A" else "B"
+                                var theme = "A"
+                                if (receiptContent.intro.value == "") receiptContent.intro.value =
+                                    " "
+                                if (receiptContent.depart_small.value == "") receiptContent.depart_small.value =
+                                    " "
+                                if (receiptContent.arrive_small.value == "") receiptContent.arrive_small.value =
+                                    " "
+                                theme = if (state.currentPage == 0) "A" else "B"
 
-                                    navController.navigate(
-                                        ReciptScreen.SaveEditReceipt.name +
-                                                "/${receiptContent.tripName}" +
-                                                "/${receiptContent.intro.value}" +
-                                                "/${receiptContent.depart_small.value}" +
-                                                "/${receiptContent.depart.value}" +
-                                                "/${receiptContent.arrive_small.value}" +
-                                                "/${receiptContent.arrive.value}" +
-                                                "/${receiptContent.cardnum}" +
-                                                "/${receiptContent.publicationdate}" +
-                                                "/${receiptContent.startdate}" +
-                                                "/${receiptContent.enddate}" +
-                                                "/${theme}" +
-                                                "/${happy}" +
-                                                "/${sad}" +
-                                                "/${neutral}" +
-                                                "/${angry}"
-                                    )
-                                }
-                                }
-
-                                // 영수증 전체 받기 실패
-                                receiptViewModel.putReceiptCreateFailure.observe(this@ReciptActivity) { response ->
-                                    Log.d("putReceiptCreateFailure", response.toString())
-                                }
+                                navController.navigate(
+                                    ReciptScreen.SaveEditReceipt.name +
+                                            "/${receiptContent.tripName}" +
+                                            "/${receiptContent.intro.value}" +
+                                            "/${receiptContent.depart_small.value}" +
+                                            "/${receiptContent.depart.value}" +
+                                            "/${receiptContent.arrive_small.value}" +
+                                            "/${receiptContent.arrive.value}" +
+                                            "/${receiptContent.cardnum}" +
+                                            "/${receiptContent.publicationdate}" +
+                                            "/${receiptContent.startdate}" +
+                                            "/${receiptContent.enddate}" +
+                                            "/${theme}" +
+                                            "/${happy}" +
+                                            "/${sad}" +
+                                            "/${neutral}" +
+                                            "/${angry}"
+                                )
+                            }
                         }) {
                     YJ_Bold15("완료", black)
                 }
@@ -2058,6 +2119,18 @@ class ReciptActivity : ComponentActivity() {
         var Theme = 0
         Theme = if (theme == "A") 0 else 1
 
+        val coroutineScope = rememberCoroutineScope()
+        val context = androidx.compose.ui.platform.LocalContext.current
+
+        val picture = CaptureComposableAsImage {
+            if (Theme == 0) {
+                SaveTheme1(receiptcontent)
+            }
+            if(Theme == 1){
+                SaveTheme2(receiptcontent)
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -2074,7 +2147,13 @@ class ReciptActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
-                        .clickable { }) {
+                        .clickable {
+                            coroutineScope.launch {
+                                val capturedImageBitmap = createBitmapFromPicture(picture).asImageBitmap()
+
+                                ShareImage(capturedImageBitmap.toBitmap(),context)
+                            }
+                        }) {
                     YJ_Bold15("내보내기", black)
                 }
                 Column(
@@ -2192,6 +2271,84 @@ class ReciptActivity : ComponentActivity() {
             emotionList.sortByDescending { it.persent } }
         return emotionList
     }
+
+
+
+    @SuppressLint("CoroutineCreationDuringComposition")
+    @Composable
+    fun CaptureComposableAsImage(content: @Composable () -> Unit): Picture {
+        val picture = remember { Picture() }
+        Column {
+            // Content to be captured
+            Box(
+                modifier = Modifier
+                    .drawWithCache {
+                        val width = this.size.width.toInt()
+                        val height = this.size.height.toInt()
+
+                        onDrawWithContent {
+                            val pictureCanvas = androidx.compose.ui.graphics.Canvas(picture.beginRecording(width, height))
+                            draw(this, this.layoutDirection, pictureCanvas, this.size) {
+                                this@onDrawWithContent.drawContent()
+                            }
+                            picture.endRecording()
+
+                            drawIntoCanvas { canvas -> canvas.nativeCanvas.drawPicture(picture) }
+                        }
+                    }
+            ) {
+                content()
+            }
+        }
+        return picture
+    }
+
+
+    private suspend fun createBitmapFromPicture(picture: Picture): Bitmap {
+        return withContext(Dispatchers.Default) {
+            val width = picture.width
+            val height = picture.height
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val canvas = android.graphics.Canvas(bitmap)
+            picture.draw(canvas)
+            bitmap
+        }
+    }
+    fun ImageBitmap.toBitmap(): Bitmap {
+        return this.asAndroidBitmap()
+    }
+    fun ShareImage(bitmap: Bitmap, context: Context) {
+
+
+        // 이미지를 저장할 파일 생성
+        val cachePath = File(context.cacheDir, "images")
+        if (!cachePath.exists()) {
+            cachePath.mkdirs()
+        }
+        val imageFile = File(cachePath, "shared_image.png")
+
+        // 이미지를 파일로 저장
+        FileOutputStream(imageFile).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        }
+        // 파일 URI 생성
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider",
+            imageFile
+        )
+        // 이미지를 공유하는 Intent 생성
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "image/png"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        // 이미지를 공유하기 위한 Intent 실행
+        context.startActivity(Intent.createChooser(shareIntent, "Share Image"))
+
+    }
+
+
 
     @SuppressLint("UnrememberedMutableState")
     @Preview(apiLevel = 33)
