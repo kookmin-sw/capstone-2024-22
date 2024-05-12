@@ -2304,15 +2304,13 @@ class ReciptActivity : ComponentActivity() {
     }
 
 
-    private suspend fun createBitmapFromPicture(picture: Picture): Bitmap {
-        return withContext(Dispatchers.Default) {
-            val width = picture.width
-            val height = picture.height
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            val canvas = android.graphics.Canvas(bitmap)
-            picture.draw(canvas)
-            bitmap
-        }
+    private fun createBitmapFromPicture(picture: Picture): Bitmap {
+        val width = picture.width
+        val height = picture.height
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(bitmap)
+        picture.draw(canvas)
+        return bitmap
     }
     fun ImageBitmap.toBitmap(): Bitmap {
         return this.asAndroidBitmap()
