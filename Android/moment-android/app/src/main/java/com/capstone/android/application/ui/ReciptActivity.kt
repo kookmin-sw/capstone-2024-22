@@ -141,8 +141,6 @@ class ReciptActivity : ComponentActivity() {
 
         setContent {
             navController = rememberNavController()
-            initApi()
-
 
             val movenav = try {
                 intent.getStringExtra("MoveScreen")
@@ -168,6 +166,54 @@ class ReciptActivity : ComponentActivity() {
                 Log.d("tripListtripList", "fail")
             }
 
+            // 영수증 전체 받기 성공
+            tripViewModel.getTripDetailSuccess.observe(this@ReciptActivity) { response ->
+                Log.d("qwerqwerqwer", "success" +response.toString())
+                tripDetailList.clear()
+
+                tripDetailList.add(TripDetail(
+                    tripName =response.data.tripName,
+                    startDate =response.data.startDate,
+                    endDate =response.data.endDate,
+                    id =response.data.id,
+                    happy =response.data.happy,
+                    disgust =response.data.disgust,
+                    angry =response.data.angry,
+                    neutral =response.data.neutral,
+                    sad =response.data.sad,
+                    numOfCard =response.data.numOfCard,
+                    analyzingCount =response.data.analyzingCount
+                ))
+
+                Log.d("qwerqwerqwer", "tripDetailList: ${tripDetailList[0]}")
+            }
+
+            // 영수증 전체 받기 실패
+            tripViewModel.getTripDetailFailure.observe(this@ReciptActivity) { response ->
+                Log.d("qwerqwerqwer", response.toString())
+                setResult(3,mainIntent)
+            }
+
+
+            // 영수증 생성 성공
+            receiptViewModel.postReceiptCreateSuccess.observe(this@ReciptActivity) { response ->
+                Log.d("receiptViewModel_postReceiptCreateSuccess", response.toString())
+            }
+            // 영수증 생성 실패
+            receiptViewModel.postReceiptCreateFailure.observe(this@ReciptActivity) { response ->
+                Log.d("receiptViewModel_postReceiptCreateFailure", response.toString())
+            }
+
+
+            // 영수증 전체 받기 성공
+            receiptViewModel.putReceiptCreateSuccess.observe(this@ReciptActivity) { response ->
+                Log.d("putReceiptCreateSuccess", "success" + response.toString())
+            }
+            // 영수증 전체 받기 실패
+            receiptViewModel.putReceiptCreateFailure.observe(this@ReciptActivity) { response ->
+                Log.d("putReceiptCreateFailure", response.toString())
+            }
+
 
 
             Scaffold(
@@ -187,37 +233,8 @@ class ReciptActivity : ComponentActivity() {
                         MakeTripChoice(tripList, mainIntent) }
                     composable(route = ReciptScreen.MakeTrip.name){
 
-                        // 영수증 전체 받기 성공
-                        tripViewModel.getTripDetailSuccess.observe(this@ReciptActivity) { response ->
-                            Log.d("qwerqwerqwer", "success" +response.toString())
-                            tripDetailList.clear()
-
-                            tripDetailList.add(TripDetail(
-                                tripName =response.data.tripName,
-                                startDate =response.data.startDate,
-                                endDate =response.data.endDate,
-                                id =response.data.id,
-                                happy =response.data.happy,
-                                disgust =response.data.disgust,
-                                angry =response.data.angry,
-                                neutral =response.data.neutral,
-                                sad =response.data.sad,
-                                numOfCard =response.data.numOfCard,
-                                analyzingCount =response.data.analyzingCount
-                            ))
-
-                            Log.d("qwerqwerqwer", "tripDetailList: ${tripDetailList[0]}")
-                        }
-
-                        // 영수증 전체 받기 실패
-                        tripViewModel.getTripDetailFailure.observe(this@ReciptActivity) { response ->
-                            Log.d("qwerqwerqwer", response.toString())
-                            setResult(3,mainIntent)
-                        }
-
                         if(tripDetailList.size == 1) {
                             MakeTrip(tripDetailList[0])
-                            Log.d("qwerqwerqwer", "onCreate: 1개라고 임마")
                         }
                     }
                     composable(route = ReciptScreen.SaveRecipt.name +
@@ -395,13 +412,6 @@ class ReciptActivity : ComponentActivity() {
                     }
                 }
             }
-        }
-    }
-
-    private fun initApi() {
-        // 영수증 생성 실패
-        receiptViewModel.postReceiptCreateFailure.observe(this@ReciptActivity) { response ->
-            Log.d("receiptViewModel_postReceiptCreateFailure", response.toString())
         }
     }
 
