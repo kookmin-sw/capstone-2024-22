@@ -854,13 +854,8 @@ class MainActivity : ComponentActivity() {
                                                     }
 
                                                     "영수증 모아보기" -> {
-                                                        startActivity(
-                                                            Intent(
-                                                                this@MainActivity,
-                                                                MainActivity::class.java
-                                                            ).putExtra("MoveScreen", "ReceiptPost")
-                                                        )
-                                                        /*navController.navigate(MainScreen.ReceiptPost.rootRoute)*/
+                                                        val size = 10000
+                                                        receiptViewModel.getReceiptAll(0, size)
                                                     }
 
                                                     "작게보기" -> {}
@@ -3062,7 +3057,7 @@ class MainActivity : ComponentActivity() {
 //            RecordDaily()
 //            Setting()
 //            ItemTrip()
-            Receipt()
+            //Receipt()
         }
     }
 
