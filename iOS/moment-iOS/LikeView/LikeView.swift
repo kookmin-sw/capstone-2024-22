@@ -28,7 +28,7 @@ struct LikeView: View {
     @ObservedObject var cardViewModel : CardViewModel
     @State private var isEditing = false // 편집 모드 상태
     @State private var selectedCardIDs = Set<Int>() // 선택된 카드의 ID 저장
-    
+   
     
     var body: some View {
         ZStack{
@@ -59,6 +59,7 @@ struct LikeView: View {
                             // ForEach를 사용하여 cardViewModel의 cardItems 배열을 반복 처리
                             ForEach(cardViewModel.cardItemsLike) { cardItemLike in
                                 // 각 cardItem에 대한 AccordionView 인스턴스를 생성
+                               
                                 AccordionLikeView(audioRecorderManager: audioRecorderManager, isEditing: $isEditing, selectedCardIDs: $selectedCardIDs, cardViewModel: cardViewModel, cardItemLike: cardItemLike)
                                 
                             }
@@ -110,6 +111,7 @@ struct AccordionLikeView: View {
     @ObservedObject var cardViewModel: CardViewModel
     var cardItemLike: LikeCardViewData
     
+    
     var body: some View {
         HStack { // 체크박스와 카드 컨텐츠 사이의 간격을 없애기 위해 spacing을 0으로 설정
             // 편집 모드일 때만 체크박스 표시
@@ -151,7 +153,7 @@ struct AccordionLikeView: View {
             Spacer().frame(height: 40)
             locationAndTimeInfo
             DynamicGradientRectangleLikeView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItemLike.stt)", cardItemsLike: cardItemLike)
-            DynamicGradientImagePicker(cardViewModel: cardViewModel)
+            DynamicGradientImagePicker(cardViewModel: cardViewModel, cardViewId: cardItemLike.id)
             Spacer().frame(height: 30)
             EmotionView(cardViewModel: cardViewModel)
         }

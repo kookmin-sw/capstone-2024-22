@@ -223,6 +223,31 @@ class CardViewModel: ObservableObject {
         }
     }
     
+    func uploadImages(_ images: [UIImage], to cardViewId: Int) {
+        let url = "http://wasuphj.synology.me:8000/core/cardView/image/\(cardViewId)"
+        let headers: HTTPHeaders = [
+            "Authorization": authToken,
+            "Content-Type": "multipart/form-data"
+        ]
+
+        AF.upload(multipartFormData: { multipartFormData in
+            // Loop through the image array
+            images.enumerated().forEach { index, image in
+                if let imageData = image.jpegData(compressionQuality: 0.5) {
+                    multipartFormData.append(imageData, withName: "images", fileName: "image\(index).jpg", mimeType: "image/jpeg")
+                }
+            }
+        }, to: url, method: .post, headers: headers).responseJSON { response in
+            switch response.result {
+            case .success(let value):
+                print("Image upload success: \(value)")
+            case .failure(let error):
+                print("Image upload failed: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    
 }
 
 

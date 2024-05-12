@@ -284,7 +284,7 @@ struct AccordionDailyView: View {
             Spacer().frame(height: 40)
             locationAndTimeInfo
             DynamicGradientRectangleDailyView(audioRecorderManager: audioRecorderManager,cardViewModel: cardViewModel, longText: "\(cardItem.stt)", cardItem:  cardItem)
-            DynamicGradientImagePicker(cardViewModel: cardViewModel)
+            DynamicGradientImagePicker(cardViewModel: cardViewModel, cardViewId: cardItem.id)
             Spacer().frame(height: 30)
             EmotionView(cardViewModel: cardViewModel)
         }

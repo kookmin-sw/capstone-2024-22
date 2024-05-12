@@ -210,7 +210,7 @@ struct AccordionView: View {
             Spacer().frame(height: 40)
             locationAndTimeInfo
             DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItem.stt)", cardItem: cardItem)
-            DynamicGradientImagePicker(cardViewModel: cardViewModel)
+            DynamicGradientImagePicker(cardViewModel: cardViewModel, cardViewId: cardItem.id)
             Spacer().frame(height: 30)
             EmotionView(cardViewModel: cardViewModel)
         }
@@ -344,78 +344,142 @@ struct DynamicGradientRectangleView: View {
 }
 
 
+//
+//struct DynamicGradientImagePicker: View {
+//    @State private var showingImagePicker = false
+//    @State private var showingAddButton = false // 처음에는 추가 버튼이 보이지 않음
+//    @State private var selectedImages: [UIImage] = []
+//    @ObservedObject var cardViewModel: CardViewModel
+//    
+//
+//    var body: some View {
+//        VStack {
+//            HStack {
+//                Spacer() // HStack의 왼쪽에 Spacer를 추가하여 오른쪽으로 요소를 밀어냄
+//                Button(action: {
+//                    showingAddButton.toggle() // '이미지 추가하기' 버튼을 토글
+//                }) {
+//                    HStack {
+//                        Text("사진 추가")
+//                            .font(.pretendardMedium11)
+//                            .foregroundColor(.black)
+//                        Image("Imageadd")
+//                            .foregroundColor(.white)
+//                    }
+//                    .padding(.horizontal,10)
+//                }
+//            }
+//            
+//            if showingAddButton {
+//                // 이미지들과 추가 버튼을 보여주는 스크롤 뷰
+//                CustomDividerCardView()
+//                ScrollView(.horizontal, showsIndicators: false) {
+//                    HStack(spacing: 10) {
+//                        ForEach(selectedImages.indices, id: \.self) { index in
+//                            Image(uiImage: selectedImages[index])
+//                                .resizable()
+//                                .frame(width: 66, height: 77)
+//                                .cornerRadius(3)
+//                                .aspectRatio(contentMode: .fill)
+//                        }
+//                        addButton()
+//                    }
+//                }
+//                .background(Color.homeBack)
+//                .cornerRadius(3)
+//                .frame(width: 340) // 가로 크기 고정
+//            }
+//        }
+//        .sheet(isPresented: $showingImagePicker, onDismiss: loadImage) {
+//            ImagePicker(selectedImage: $selectedImage)
+//        }
+//    }
+//    
+//    private func addButton() -> some View {
+//        Button(action: {
+//            showingImagePicker = true
+//        }) {
+//            RoundedRectangle(cornerRadius: 3)
+//                .fill(Color.gray)
+//                .frame(width: 66, height: 77)
+//                .overlay(
+//                    Image(systemName: "plus")
+//                        .foregroundColor(.white)
+//                )
+//        }
+//    }
+//    
+//    @State private var selectedImage: UIImage?
+//    
+//    func loadImage() {
+//        guard let selectedImage = selectedImage else { return }
+//        selectedImages.append(selectedImage)
+//      
+//    }
+//}
 
 struct DynamicGradientImagePicker: View {
     @State private var showingImagePicker = false
-    @State private var showingAddButton = false // 처음에는 추가 버튼이 보이지 않음
-    @State private var selectedImages: [UIImage?] = []
+    @State private var showingAddButton = false
+    @State private var selectedImages: [UIImage] = [] // 옵셔널이 아닌 UIImage 배열로 변경
     @ObservedObject var cardViewModel: CardViewModel
+    var cardViewId: Int // 이 ID는 이 뷰로 전달되어야 합니다
+
     var body: some View {
         VStack {
-            
             HStack {
-                Spacer() // HStack의 왼쪽에 Spacer를 추가하여 오른쪽으로 요소를 밀어냄
+                Spacer()
                 if !showingAddButton {
-                    // '이미지 추가하기' 텍스트 버튼
-                    Group{
-                        Button(action: {
-                            showingAddButton = true // '이미지 추가하기' 버튼을 누르면 추가 버튼 생성
-                            selectedImages.append(nil) // 추가 버튼에 해당하는 nil 추가
-                        }) {
-                            HStack {
-                                Text("사진 추가")
-                                    .font(.pretendardMedium11)
-                                    .foregroundColor(.black)
-                                Image("Imageadd")
-                                    .foregroundColor(.white)
-                            }
-                            .padding(.horizontal,10)
-                            
-                            
+                    Button(action: {
+                        showingAddButton = true
+                    }) {
+                        HStack {
+                            Text("사진 추가")
+                                .font(.pretendardMedium11)
+                                .foregroundColor(.black)
+                            Image("Imageadd")
+                                .foregroundColor(.white)
                         }
-                        
+                        .padding(.horizontal,10)
                     }
                 }
             }
-            
+
             if showingAddButton {
-                // 이미지들과 추가 버튼을 보여주는 스크롤 뷰
                 CustomDividerCardView()
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
-                        ForEach(0..<selectedImages.count, id: \.self) { index in
-                            if let image = selectedImages[index] {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .frame(width: 66, height: 77)
-                                    .cornerRadius(3)
-                                    .aspectRatio(contentMode: .fill)
-                            } else {
-                                addButton(index: index)
-                            }
+                        ForEach(selectedImages.indices, id: \.self) { index in
+                            Image(uiImage: selectedImages[index])
+                                .resizable()
+                                .frame(width: 66, height: 77)
+                                .cornerRadius(3)
+                                .aspectRatio(contentMode: .fill)
                         }
+                        addButton() // 맨 끝에 추가 버튼
                     }
                 }
                 .background(Color.homeBack)
                 .cornerRadius(3)
-                .frame(width: 340) // 가로 크기 고정
+                .frame(width: 340)
             }
         }
         .sheet(isPresented: $showingImagePicker) {
             ImagePicker(selectedImage: Binding(
                 get: { UIImage() },
                 set: { image in
-                    if let image = image, let index = selectedImages.lastIndex(where: { $0 == nil }) {
-                        selectedImages[index] = image // 이미지 추가
-                        selectedImages.append(nil) // 새로운 추가 버튼 생성
+                    if let image = image {
+                        selectedImages.append(image)
+                        cardViewModel.uploadImages([image], to: cardViewId)
                     }
                 }
             ))
         }
     }
     
+    
     @ViewBuilder
-    private func addButton(index: Int) -> some View {
+    private func addButton() -> some View {
         Button(action: {
             showingImagePicker = true
         }) {
@@ -429,7 +493,6 @@ struct DynamicGradientImagePicker: View {
         }
     }
 }
-
 
 
 

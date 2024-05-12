@@ -21,6 +21,7 @@ struct OnboardingView: View {
    // @ObservedObject private var sharedViewModel = SharedViewModel()
     @State private var currentPage = 0
    // @State var cardItem : CardItem1
+   
     
     var body: some View {
         
@@ -115,6 +116,7 @@ struct OnboardingView: View {
                     PathType in
                     switch PathType {
                     case .homeBaseView :
+                    
                         HomeBaseView( audioRecorderManager: audioRecorderManager, cardViewModel: cardviewModel)
                             .navigationBarBackButtonHidden()
                             .environmentObject(homeViewModel)// 이렇게. environment 를 달아놧다는것은 해당뷰에서도
