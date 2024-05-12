@@ -651,33 +651,28 @@ class ReciptActivity : ComponentActivity() {
                                     tripName, intro, depart_small, depart, arrive_small, arrive,
                                     cardnum, publicationdate, startdate, enddate, emotionList
                                 )
+                                if (intro.value == "") intro.value = " "
+                                if (depart_small.value == "") depart_small.value = " "
+                                if (arrive_small.value == "") arrive_small.value = " "
 
-                                // 영수증 생성 성공
-                                receiptViewModel.postReceiptCreateSuccess.observe(this@ReciptActivity) { response ->
-
-                                    if (intro.value == "") intro.value = " "
-                                    if (depart_small.value == "") depart_small.value = " "
-                                    if (arrive_small.value == "") arrive_small.value = " "
-
-                                    navController.navigate(
-                                        ReciptScreen.SaveRecipt.name +
-                                                "/${receiptData.tripName}" +
-                                                "/${receiptData.intro.value}" +
-                                                "/${receiptData.depart_small.value}" +
-                                                "/${receiptData.depart.value}" +
-                                                "/${receiptData.arrive_small.value}" +
-                                                "/${receiptData.arrive.value}" +
-                                                "/${receiptData.cardnum}" +
-                                                "/${receiptData.publicationdate}" +
-                                                "/${receiptData.startdate}" +
-                                                "/${receiptData.enddate}" +
-                                                "/${theme}" +
-                                                "/${trip.happy}" +
-                                                "/${trip.sad}" +
-                                                "/${trip.neutral}" +
-                                                "/${trip.angry}"
-                                    )
-                                }
+                                navController.navigate(
+                                    ReciptScreen.SaveRecipt.name +
+                                            "/${receiptData.tripName}" +
+                                            "/${receiptData.intro.value}" +
+                                            "/${receiptData.depart_small.value}" +
+                                            "/${receiptData.depart.value}" +
+                                            "/${receiptData.arrive_small.value}" +
+                                            "/${receiptData.arrive.value}" +
+                                            "/${receiptData.cardnum}" +
+                                            "/${receiptData.publicationdate}" +
+                                            "/${receiptData.startdate}" +
+                                            "/${receiptData.enddate}" +
+                                            "/${theme}" +
+                                            "/${trip.happy}" +
+                                            "/${trip.sad}" +
+                                            "/${trip.neutral}" +
+                                            "/${trip.angry}"
+                                )
                             }
                         }) {
                     YJ_Bold15("완료", black)
@@ -2076,41 +2071,35 @@ class ReciptActivity : ComponentActivity() {
                                     id =  receiptid
                                     )
                                 )
-                                // 영수증 전체 받기 성공
-                                receiptViewModel.putReceiptCreateSuccess .observe(this@ReciptActivity) { response ->
-                                    Log.d("putReceiptCreateSuccess", "success" +response.toString())
 
-                                    var theme = "A"
-                                    if (receiptContent.intro.value == "") receiptContent.intro.value = " "
-                                    if (receiptContent.depart_small.value == "") receiptContent.depart_small.value = " "
-                                    if (receiptContent.arrive_small.value == "") receiptContent.arrive_small.value = " "
-                                    theme = if (state.currentPage == 0) "A" else "B"
+                                var theme = "A"
+                                if (receiptContent.intro.value == "") receiptContent.intro.value =
+                                    " "
+                                if (receiptContent.depart_small.value == "") receiptContent.depart_small.value =
+                                    " "
+                                if (receiptContent.arrive_small.value == "") receiptContent.arrive_small.value =
+                                    " "
+                                theme = if (state.currentPage == 0) "A" else "B"
 
-                                    navController.navigate(
-                                        ReciptScreen.SaveEditReceipt.name +
-                                                "/${receiptContent.tripName}" +
-                                                "/${receiptContent.intro.value}" +
-                                                "/${receiptContent.depart_small.value}" +
-                                                "/${receiptContent.depart.value}" +
-                                                "/${receiptContent.arrive_small.value}" +
-                                                "/${receiptContent.arrive.value}" +
-                                                "/${receiptContent.cardnum}" +
-                                                "/${receiptContent.publicationdate}" +
-                                                "/${receiptContent.startdate}" +
-                                                "/${receiptContent.enddate}" +
-                                                "/${theme}" +
-                                                "/${happy}" +
-                                                "/${sad}" +
-                                                "/${neutral}" +
-                                                "/${angry}"
-                                    )
-                                }
-                                }
-
-                                // 영수증 전체 받기 실패
-                                receiptViewModel.putReceiptCreateFailure.observe(this@ReciptActivity) { response ->
-                                    Log.d("putReceiptCreateFailure", response.toString())
-                                }
+                                navController.navigate(
+                                    ReciptScreen.SaveEditReceipt.name +
+                                            "/${receiptContent.tripName}" +
+                                            "/${receiptContent.intro.value}" +
+                                            "/${receiptContent.depart_small.value}" +
+                                            "/${receiptContent.depart.value}" +
+                                            "/${receiptContent.arrive_small.value}" +
+                                            "/${receiptContent.arrive.value}" +
+                                            "/${receiptContent.cardnum}" +
+                                            "/${receiptContent.publicationdate}" +
+                                            "/${receiptContent.startdate}" +
+                                            "/${receiptContent.enddate}" +
+                                            "/${theme}" +
+                                            "/${happy}" +
+                                            "/${sad}" +
+                                            "/${neutral}" +
+                                            "/${angry}"
+                                )
+                            }
                         }) {
                     YJ_Bold15("완료", black)
                 }
