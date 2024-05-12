@@ -570,6 +570,64 @@ class MainActivity : ComponentActivity() {
             }
 
 
+            // 영수증 삭제 성공
+            receiptViewModel.deleteReceiptDeleteSuccess.observe(this@MainActivity) { response ->
+                Log.d("seohyun", "MainRoot: 영수증 삭제 성공")
+                deleteyes.value = false
+                EditCheckState.value = false
+            }
+            // 영수증 삭제 실패
+            receiptViewModel.deleteReceiptDeleteFailure.observe(this@MainActivity) { response ->
+            }
+
+            val receiptList = remember { mutableStateListOf<ReceiptAll>() }
+            // 영수증 전체 받기 성공
+            receiptViewModel.getReceiptAllSuccess.observe(this@MainActivity) { response ->
+                Log.d("seohyun", "MainRoot: 영수증 전체 받기 성공")
+                    receiptList.clear()
+                    Log.d("MainRootMainRoot", "clear:")
+                    response.data.receiptList.mapNotNull { receiptAll ->
+                        runCatching {
+                            Log.d("MainRootMainRoot", "running")
+                            ReceiptAll(
+                                receiptAll.id,
+                                receiptAll.tripId,
+                                receiptAll.tripName,
+                                receiptAll.angry,
+                                receiptAll.disgust,
+                                receiptAll.happy,
+                                receiptAll.sad,
+                                receiptAll.neutral,
+                                receiptAll.stDate,
+                                receiptAll.edDate,
+                                receiptAll.numOfCard,
+                                receiptAll.mainDeparture,
+                                receiptAll.subDeparture,
+                                receiptAll.mainDestination,
+                                receiptAll.subDestination,
+                                receiptAll.oneLineMemo,
+                                receiptAll.receiptThemeType,
+                                receiptAll.createdAt
+                            )
+                        }
+                            .onSuccess { Log.d("MainRootMainRoot", "onSuccess") }
+                            .onFailure { Log.d("MainRootMainRoot", "onFailure") }.getOrNull()
+                    }.forEach {
+                        Log.d("MainRootMainRoot", "MainRoot: ${it}")
+                        receiptList.add(it)
+                        if (response.data.receiptList.size == receiptList.size) {
+                            Log.d("MainRootMainRoot", ": 사이즈 ,다채움")
+                            navController.navigate(MainScreen.ReceiptPost.screenRoute)
+                        } else {
+                            Log.d("MainRootMainRoot", "MainRootMainRoot: 사이즈 아직 아님 ")
+                        }
+                    }
+            }
+            // 영수증 전체 받기 실패
+            receiptViewModel.getReceiptAllFailure.observe(this@MainActivity) { response ->
+                Log.d("receiptViewModel_getReceiptAllFailure", response.toString())
+            }
+
 //        val recordOpen = remember { mutableStateOf(false)}
 //        val EditCheckState = remember { mutableStateOf(false) }
 //        val ReceiptCheckState = remember { mutableStateOf(true) }
