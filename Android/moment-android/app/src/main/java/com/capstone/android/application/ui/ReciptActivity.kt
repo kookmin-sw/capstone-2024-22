@@ -466,7 +466,7 @@ class ReciptActivity : ComponentActivity() {
                 ) {
                     ImgBackButton(
                         onClick = {
-                            setResult(3, mainIntent)
+                            setResult(1, mainIntent)
                             finish()
                         }, "")
                 }
