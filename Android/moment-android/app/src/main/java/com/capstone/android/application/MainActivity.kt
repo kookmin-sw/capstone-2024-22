@@ -570,12 +570,9 @@ class MainActivity : ComponentActivity() {
             val receiptList = remember { mutableStateListOf<ReceiptAll>() }
             // 영수증 전체 받기 성공
             receiptViewModel.getReceiptAllSuccess.observe(this@MainActivity) { response ->
-                Log.d("seohyun", "MainRoot: 영수증 전체 받기 성공")
                     receiptList.clear()
-                    Log.d("MainRootMainRoot", "clear:")
                     response.data.receiptList.mapNotNull { receiptAll ->
                         runCatching {
-                            Log.d("MainRootMainRoot", "running")
                             ReceiptAll(
                                 receiptAll.id,
                                 receiptAll.tripId,
@@ -597,16 +594,13 @@ class MainActivity : ComponentActivity() {
                                 receiptAll.createdAt
                             )
                         }
-                            .onSuccess { Log.d("MainRootMainRoot", "onSuccess") }
-                            .onFailure { Log.d("MainRootMainRoot", "onFailure") }.getOrNull()
+                            .onSuccess { }
+                            .onFailure {  }.getOrNull()
                     }.forEach {
-                        Log.d("MainRootMainRoot", "MainRoot: ${it}")
                         receiptList.add(it)
                         if (response.data.receiptList.size == receiptList.size) {
-                            Log.d("MainRootMainRoot", ": 사이즈 ,다채움")
                             navController.navigate(MainScreen.ReceiptPost.screenRoute)
                         } else {
-                            Log.d("MainRootMainRoot", "MainRootMainRoot: 사이즈 아직 아님 ")
                         }
                     }
             }
@@ -896,10 +890,6 @@ class MainActivity : ComponentActivity() {
                         title.value = "추가"
                     }
                     composable(BottomNavItem.Receipt.screenRoute) {
-                        /*Toast.makeText(this@MainActivity, "추후 공개될 예정입니다.", Toast.LENGTH_SHORT)
-                            .show()
-                        Log.d("waegwagewa", tripList.toString())
-                        Home(tripList, mainTrip)*/
                         title.value = "추가"
                         currentSelectedBottomRoute.value = "Receipt"
 
