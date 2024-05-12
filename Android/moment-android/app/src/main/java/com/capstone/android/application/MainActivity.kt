@@ -792,7 +792,9 @@ class MainActivity : ComponentActivity() {
                                                 Column(Modifier.clickable {
                                                     navController.navigate(
                                                         BottomNavItem.Receipt.screenRoute
-                                                    )
+                                                    ){
+                                                        popUpTo(MainScreen.ReceiptPost.screenRoute) { inclusive = true }
+                                                    }
                                                 }) {
                                                     Text(
                                                         text = "뒤로",
