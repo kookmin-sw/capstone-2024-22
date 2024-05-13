@@ -23,7 +23,7 @@ public class CardView extends BaseEntity {
     private Long id;
 
     // tripfile_id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_file_id", nullable = false)
     private TripFile tripFile;
 
