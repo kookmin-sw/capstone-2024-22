@@ -27,6 +27,7 @@ struct HomeBaseView: View {
     @State private var showPartialSheet = false // 커스텀 시트 표시 여부
     @ObservedObject  var audioRecorderManager: AudioRecorderManager
     @State var isPresentedFloating: Bool = false
+    @State var isPresentedFloatingDelete: Bool = false
     @State private var wasDeleted = false
     @State private var wasLoad = false
     @State private var showingCustomAlertInHome = false
@@ -129,15 +130,15 @@ struct HomeBaseView: View {
             if newValue {
                 // 토스트 메시지를 표시하는 로직
                 withAnimation {
-                    isPresentedFloating = true
+                    isPresentedFloatingDelete = true
                 }
                 // 3초 후 토스트 메시지 숨김
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    isPresentedFloating = false
+                    isPresentedFloatingDelete = false
                     wasDeleted = false // 상태 초기화
                 }
             }
-        }.popup(isPresented: $isPresentedFloating) {
+        }.popup(isPresented: $isPresentedFloatingDelete) {
             FloatingToastDeleteView() // 사용자 정의 토스트 뷰
         } customize: {
             $0.type(.floater())
@@ -182,7 +183,7 @@ struct BottomSheetView1: View {
     @State var isPresentedFloating : Bool = false
     @Binding var wasDeleted: Bool
     @Binding var wasLoad : Bool
-    
+    @State private var listeningText = "열심히 듣고 있어요"
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     //test
@@ -211,7 +212,7 @@ struct BottomSheetView1: View {
                 .opacity(tooltipOpacity)  // 투명도 적용
                 .onAppear {
                     // 5초 후에 투명도를 0으로 변경하여 툴팁을 서서히 사라지게 함
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         withAnimation(.easeOut(duration: 2.0)) {
                             tooltipOpacity = 0
                         }
@@ -243,12 +244,14 @@ struct BottomSheetView1: View {
                         
                     }
                 
+                
                 // 추가 텍스트
-                Text("열심히 듣고 있어요")
+                Text(listeningText)
                     .font(.pretendardMedium18)
                     .frame(height: 44)
                     .overlay(Rectangle().frame(height: 1), alignment: .bottom)
                     .padding(.horizontal,20)
+                    .padding(.bottom,20)
                 
                 // 녹음 및 취소/저장 버튼
                 HStack {
@@ -277,7 +280,7 @@ struct BottomSheetView1: View {
                         : audioRecorderManager.startRecording()
                         timeElapsed = 0
                         
-                        
+                        listeningText = audioRecorderManager.isRecording ? "받아적을 준비 완료" : "열심히 듣고 있어요"
                     }) {
                         Image( audioRecorderManager.isRecording ? "RecordPress" : "RecordStop")
                             .resizable()

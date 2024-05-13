@@ -987,7 +987,6 @@ struct CustomDialogBill: View {
 }
 
 
-
 struct CustomDialogBillComplete: View {
     @Binding var isActive: Bool
     
@@ -1003,11 +1002,8 @@ struct CustomDialogBillComplete: View {
     var body: some View {
         
         ZStack{
-            
-            Color(showingCustomAlert ? .black : .black)
-                .opacity(showingCustomAlert ? 1.0 : 0.5)
-            
-            
+            Color.black
+                .opacity(showingCustomAlert ? 1.0 : 0.5) // 투명도 조정
                 .onTapGesture {
                     close() // 배경 탭 시 다이얼로그 닫기
                 }
@@ -1022,35 +1018,31 @@ struct CustomDialogBillComplete: View {
                     .padding(.bottom)
                 
                 Text(message)
-                
                     .font(.pretendardMedium14)
                     .multilineTextAlignment(.center)
                     .foregroundColor(.gray500)
                     .padding(.bottom)
-                
-                
-                
             }
-            
             .frame(width: 280, height: 144) // 다이얼로그의 크기 조절
-            
-            .background(.homeBack)
+            .background(Color.homeBack)
             .clipShape(RoundedRectangle(cornerRadius: 0))
-            
+            .offset(y: offset) // 다이얼로그의 Y축 위치 조정
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { // 2초 후 실행
+                    close() // 다이얼로그 닫기
+                }
+            }
         }
-        
-        
     }
-    
-    
     
     func close() {
         withAnimation(.spring()) {
-            offset = 1000  // 다이얼로그가 아래로 이동하며 사라짐
+            offset = 1000 // 다이얼로그가 아래로 이동하며 사라짐
             isActive = false  // 다이얼로그 비활성화
         }
     }
 }
+
 
 
 struct ReceiptView: View {

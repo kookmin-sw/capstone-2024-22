@@ -224,7 +224,7 @@ struct AccordionView: View {
     private var locationAndTimeInfo: some View {
         
         HStack {
-            Image("Location").padding(.bottom,1)
+            Image("Location").padding(.bottom,3)
             ScrollingTextView(text: "\(cardItem.location)", maxWidth: 130)
                         
             Spacer()
