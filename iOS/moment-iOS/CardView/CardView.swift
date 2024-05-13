@@ -222,9 +222,9 @@ struct AccordionView: View {
     private var locationAndTimeInfo: some View {
         
         HStack {
-            Image("Location")
-            Text("\(cardItem.location)")
-                .font(.pretendardMedium11)
+            Image("Location").padding(.bottom,1)
+            ScrollingTextView(text: "\(cardItem.location)", maxWidth: 130)
+                        
             Spacer()
             Text("\(cardItem.weather)")
                 .font(.pretendardMedium11)
@@ -246,6 +246,49 @@ struct AccordionView: View {
         
     }
 }
+import SwiftUI
+
+struct ScrollingTextView: View {
+    var text: String
+    var maxWidth: CGFloat
+    @State private var animateText = false
+    @State private var textWidth: CGFloat = 0
+    
+    var body: some View {
+        GeometryReader { geometry in
+            HStack(spacing: 0) {
+                ForEach(0..<2) { _ in  // 텍스트를 두 번 복제
+                    Text(text)
+                        .font(.pretendardMedium11)
+                        .lineLimit(1)
+                        .background(GeometryReader {
+                            Color.clear.preference(key: TextWidthPreferenceKey.self,
+                                                   value: $0.frame(in: .local).size.width)
+                        })
+                        .fixedSize(horizontal: true, vertical: false)
+                }
+            }
+            .offset(x: animateText ? -2 * textWidth : 0, y: 0)  // 시작 위치에서 두 배의 텍스트 너비만큼 이동
+            .onPreferenceChange(TextWidthPreferenceKey.self) { width in
+                self.textWidth = width / 2  // 하나의 텍스트 너비 계산
+                withAnimation(Animation.linear(duration: Double(textWidth) * 2 / 30).repeatForever(autoreverses: false)) {
+                    animateText = true
+                }
+            }
+        }
+        .frame(width: maxWidth, height: 20)  // 텍스트 뷰의 너비와 높이 제한
+        .clipped()  // 프레임 밖의 내용을 잘라냄
+    }
+}
+
+// Preference key to pass the text width
+struct TextWidthPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 
 
 
@@ -268,7 +311,7 @@ struct HeaderView: View {
                     
                 }
                 let (date, time) = cardViewModel.formatDateAndTime(dateString: cardItem.recordedAt)
-                Text("\(date)") // 타이틀 예시
+                Text("\(time)") // 타이틀 예시
                     .foregroundColor(.black)
                     .font(.pretendardExtrabold14)
                 Spacer()
@@ -278,6 +321,7 @@ struct HeaderView: View {
                     .foregroundColor(.black)
             }
             .padding(.horizontal,10)
+            .padding(.bottom,10)
             .background(Color.homeBack) // 헤더 배경색
             .cornerRadius(10)
             CustomHomeVDividerCard()

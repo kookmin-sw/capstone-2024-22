@@ -164,7 +164,7 @@ struct AccordionLikeView: View {
     private var locationAndTimeInfo: some View {
         HStack {
             Image("Location")
-            Text("\(cardItemLike.location)")
+            ScrollingTextView(text: "\(cardItemLike.location)", maxWidth: 130)
                 .font(.pretendardMedium11)
             Spacer()
             Text("\(cardItemLike.weather)")
@@ -267,7 +267,7 @@ struct HeaderLikeView: View {
                 }
                 let (date,time) =
                 cardViewModel.formatDateAndTime(dateString: cardItemLike.recordedAt)
-                Text("\(date)") // 타이틀 예시
+                Text("\(time)") // 타이틀 예시
                     .foregroundColor(.black)
                     .font(.pretendardExtrabold14)
                 Spacer()
@@ -277,6 +277,7 @@ struct HeaderLikeView: View {
                     .foregroundColor(.black)
             }
             .padding(.horizontal,10)
+            .padding(.bottom,10)
             .background(Color.homeBack) // 헤더 배경색
             .cornerRadius(10)
             CustomHomeVDividerCard()

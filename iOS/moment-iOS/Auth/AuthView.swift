@@ -28,9 +28,16 @@ struct AuthView: View {
         isShowingBottom ? 0 : UIScreen.main.bounds.height / heightFactor
     }
     
+    
     var body: some View {
         NavigationView {
+            
             ZStack {
+              
+                    Color(.homeBack).edgesIgnoringSafeArea(.all)
+                        .onTapGesture {
+                                   hideKeyboard()
+                               }
                 VStack {
                     Button(action: {
                         // "뒤로" 버튼의 액션: 현재 뷰를 종료
@@ -183,6 +190,9 @@ struct AuthView: View {
             isAutoLogin = false
         }
     }
+    private func hideKeyboard() {
+          UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+      }
 }
 
 struct BottomSheetView: View {

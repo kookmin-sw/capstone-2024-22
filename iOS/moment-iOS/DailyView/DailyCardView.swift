@@ -250,7 +250,7 @@ struct AccordionDailyView: View {
                 DisclosureGroup(isExpanded: $isExpanded) {
                     contentVStack
                 } label: {
-                    HeaderDailyView(isExpanded: $isExpanded, cardItem: cardItem)
+                    HeaderDailyView(cardViewModel: cardViewModel, isExpanded: $isExpanded, cardItem: cardItem)
                 }
                 .accentColor(.black)
                 
@@ -295,20 +295,22 @@ struct AccordionDailyView: View {
     private var locationAndTimeInfo: some View {
         HStack {
             Image("Location")
-            Text("선유도 공영주차장")
+            ScrollingTextView(text: "\(cardItem.location)", maxWidth: 130)
                 .font(.pretendardMedium11)
             Spacer()
-            Text("해가 쨍쨍한날")
+            Text("\(cardItem.weather)")
                 .font(.pretendardMedium11)
             Image("Weather_Sunny")
         }
         HStack {
+            let (date, time) = cardViewModel.formatDateAndTime(dateString: cardItem.recordedAt)
+            
             Image("CardTime")
-            Text(cardItem.location)
+            Text("\(date)")
                 .font(.pretendardMedium11)
             Spacer()
             CustomCarbarDivider()
-            Text(cardItem.location).font(.pretendardMedium11)
+            Text("\(time)").font(.pretendardMedium11)
         }
     }
 }
@@ -318,6 +320,7 @@ struct AccordionDailyView: View {
 
 
 struct HeaderDailyView: View {
+    @ObservedObject var cardViewModel: CardViewModel
     @Binding var isExpanded: Bool
     @State private var isHeartFilled = false // 하트가 채워졌는지 여부
     var cardItem: cardViews
@@ -331,7 +334,8 @@ struct HeaderDailyView: View {
                     Image(isHeartFilled ? "HeartFill" : "HeartEmpty")
                     
                 }
-                Text("\(cardItem.recordedAt)") // 타이틀 예시
+                let (date, time) = cardViewModel.formatDateAndTime(dateString: cardItem.recordedAt)
+                Text("\(time)") // 타이틀 예시
                     .foregroundColor(.black)
                     .font(.pretendardExtrabold14)
                 Spacer()
@@ -341,6 +345,7 @@ struct HeaderDailyView: View {
                     .foregroundColor(.black)
             }
             .padding(.horizontal,10)
+            .padding(.bottom,10)
             .background(Color.homeBack) // 헤더 배경색
             .cornerRadius(10)
             CustomHomeVDividerCard()
