@@ -773,18 +773,6 @@ class ReciptActivity : ComponentActivity() {
                     )
                 }
 
-                Column(
-                    modifier = Modifier.height(12.dp),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Spacer(modifier = Modifier.height(1.dp))
-                    P_Medium8(
-                        " 티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다." +
-                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다." +
-                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다." +
-                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다.", primary_200
-                    )
-                }
                 Spacer(modifier = Modifier.height(26.dp))
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -1050,20 +1038,6 @@ class ReciptActivity : ComponentActivity() {
 
             Column(Modifier.padding(top = 51.dp)) {
                 Divider(color = primary_500, thickness = 2.dp)
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 54.dp, start = 30.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                P_Medium8(
-                    " 티켓이 발행된 날짜는"+ receiptcontent.publicationdate +"입니다. " +
-                            "티켓이 발행된 날짜는"+ receiptcontent.publicationdate +"입니다. " +
-                            "티켓이 발행된 날짜는"+ receiptcontent.publicationdate +"입니다. " +
-                            "티켓이 발행된 날짜는"+ receiptcontent.publicationdate +"입니다. ", primary_200
-                )
             }
 
             Column(
@@ -1449,19 +1423,6 @@ class ReciptActivity : ComponentActivity() {
                         contentDescription = "로고 화이트"
                     )
                 }
-
-                Column(
-                    modifier = Modifier.height(12.dp),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Spacer(modifier = Modifier.height(1.dp))
-                    P_Medium8(
-                        " 티켓이 발행된 날짜는" + receiptcontent.publicationdate+ "입니다. " +
-                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate+ "입니다. " +
-                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다. " +
-                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다. ", primary_200
-                    )
-                }
                 Spacer(modifier = Modifier.height(26.dp))
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -1666,20 +1627,6 @@ class ReciptActivity : ComponentActivity() {
 
             Column(Modifier.padding(top = 51.dp)) {
                 Divider(color = primary_500, thickness = 2.dp)
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 54.dp, start = 30.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                P_Medium8(
-                    " 티켓이 발행된 날짜는"+receiptcontent.publicationdate+ "입니다. " +
-                            "티켓이 발행된 날짜는"+receiptcontent.publicationdate+ "입니다. " +
-                            "티켓이 발행된 날짜는"+receiptcontent.publicationdate+ "입니다. " +
-                            "티켓이 발행된 날짜는"+receiptcontent.publicationdate+ "입니다. ", primary_200
-                )
             }
 
             Column(

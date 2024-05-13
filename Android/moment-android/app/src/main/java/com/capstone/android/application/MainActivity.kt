@@ -2728,12 +2728,6 @@ class MainActivity : ComponentActivity() {
                 }
                 Spacer(modifier = Modifier.height(2.dp))
                 Divider(color = primary_500, thickness = 1.dp)
-                P_Medium_Oneline(
-                    " 티켓이 발행된 날짜는 "+ receiptAll.created + "입니다. " +
-                            " 티켓이 발행된 날짜는 "+ receiptAll.created + "입니다. " +
-                            " 티켓이 발행된 날짜는 "+ receiptAll.created + "입니다. " +
-                            " 티켓이 발행된 날짜는 "+ receiptAll.created + "입니다. ", primary_200, 3.sp
-                )
                 Spacer(modifier = Modifier.height(15.dp))
                 Column {
                     Row(
