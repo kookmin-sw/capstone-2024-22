@@ -690,56 +690,79 @@ struct ReceiptBillView1 : View {
         
     }
 }
-
 struct ReceiptsView: View {
-    @EnvironmentObject var homeViewModel: HomeViewModel // HomeViewModel 인스턴스
-    // @EnvironmentObject var billListViewModel: BillListViewModel
+    @EnvironmentObject var homeViewModel: HomeViewModel
     @StateObject var billListViewModel = BillListViewModel()
-    // @EnvironmentObject var sharedViewModel: SharedViewModel
     @Environment(\.presentationMode) var presentationMode
+    @State private var isLoading = false // 로딩 상태 관리
+    @State private var selectedItem: Item? // 선택한 아이템 저장
+
     var body: some View {
-        ZStack{
-            VStack{
+        ZStack {
+            // 로딩 뷰 조건부 표시
+            if isLoading {
+                LoadingViewBill()
+            }
+
+            VStack {
                 Button(action: {
-                    // "뒤로" 버튼의 액션: 현재 뷰를 종료
                     self.presentationMode.wrappedValue.dismiss()
-                    
                 }) {
                     HStack {
-                        
-                        
                         Text("뒤로")
-                            .padding(.horizontal,20)
+                            .padding(.horizontal, 20)
                             .padding()
                             .font(.yjObangBold15)
                             .tint(Color.black)
                         Spacer()
                     }
                 }
-                ScrollView{
-                    LazyVStack(spacing:5){
+                
+                ScrollView {
+                    LazyVStack(spacing: 5) {
                         ForEach(homeViewModel.items) { item in
-                            NavigationLink(destination: ReceiptDetailView(item: item)
-                                .environmentObject(billListViewModel)) {
-                                    ReceiptCell(item: item)
-                                }
-                                .padding(.vertical, 10)
-                                .environmentObject(HomeViewModel())
+                            Button(action: {
+                                selectedItem = item
+                                triggerLoading()
+                            }) {
+                                ReceiptCell(item: item)
+                            }
+                            .padding(.vertical, 10)
                             CustomHomeSubDivider()
-                            
                         }
                     }
                 }
-                
-            }.onAppear {
-                homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
+            }
+            .onAppear {
+                homeViewModel.fetchTrips()
             }
             
-            
+            // 자동 이동 로직
+            if let selectedItem = selectedItem {
+                NavigationLink("", destination: ReceiptDetailView(item: selectedItem)
+                    .environmentObject(billListViewModel), isActive: $isLoading)
+            }
         }
         .navigationBarBackButtonHidden()
-        // .environmentObject(billListViewModel)
-        //.environmentObject(billListViewModel)
+    }
+
+    // 로딩 트리거 함수
+    func triggerLoading() {
+        isLoading = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+            isLoading = false // 이 부분에서 NavigationLink가 활성화됩니다.
+        }
+    }
+}
+
+struct LoadingViewBill: View {
+    var body: some View {
+        VStack {
+ 
+            ProgressView()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.black.opacity(0.5))
     }
 }
 
