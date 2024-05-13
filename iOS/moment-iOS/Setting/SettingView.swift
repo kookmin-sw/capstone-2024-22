@@ -113,6 +113,10 @@ struct SettingView: View {
                                 Spacer().frame(width: 12)
                                 Text("kookmin@gmail.com")
                                     .font(.pretendardMedium14)
+                                   
+                                                   .padding(5) // 패딩 추가
+                                                   .background(Color.customSky) // 배경색을 파란색으로 설정
+                                                   .cornerRadius(5) // 모서리를 둥글게 처리
                                     .tint(.black)
                                 Spacer()
                                 
