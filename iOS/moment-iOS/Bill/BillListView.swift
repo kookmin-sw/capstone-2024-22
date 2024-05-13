@@ -1302,18 +1302,34 @@ struct SentimentTrackerView: View {
                 }
                 Spacer().frame(width: 48)
                 VStack {
-                    Spacer()
+                    Spacer().frame(height: 27)
                     Text("27")
                         .foregroundColor(.homeRed)
                         .font(.yjObangBold20)
                         .frame(width: 60,height: 60)
                         .background(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 2))
-                    Spacer()
+                    Spacer().frame(height: 25)
+                    HStack{
+                       
+                        Text("2024 .03 .05/2024 .03 .06")
+                            .frame(width: 150)
+                            .font(.pretendardMedium11)
+                            .tint(.natural500)
+                            .padding(.horizontal,10)
+                        Spacer()
+                        
+                    }
+                    
                 }
                 .frame(width: 60, height: 60)
                 .padding(.trailing,50)
+      
                 
             }
+            
+            
+            
+           
         }
         Spacer().frame(height: 30)
     }

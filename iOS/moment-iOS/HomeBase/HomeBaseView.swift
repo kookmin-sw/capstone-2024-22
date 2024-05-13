@@ -279,7 +279,7 @@ struct BottomSheetView1: View {
                         
                         
                     }) {
-                        Image(systemName: audioRecorderManager.isRecording ? "record.circle" : "stop.fill")
+                        Image( audioRecorderManager.isRecording ? "RecordPress" : "RecordStop")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 50, height: 50)
@@ -321,7 +321,7 @@ struct BottomSheetView1: View {
                 
                 
             }
-            .frame(maxWidth: .infinity, maxHeight: 284)
+            .frame(maxWidth: .infinity, maxHeight: 350)
             .background(Color.homeBack)
             
         }

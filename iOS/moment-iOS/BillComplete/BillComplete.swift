@@ -678,7 +678,7 @@ struct ReceiptCompleteDetailView: View {
                         presentationMode.wrappedValue.dismiss()
                     }) {
                         Text("수정")
-                            .padding(.horizontal, 20)
+                            .padding(.leading, 20)
                             .padding()
                             .font(.yjObangBold15)
                             .foregroundColor(.black)
@@ -726,10 +726,12 @@ struct ReceiptCompleteDetailView: View {
                         }
                     }) {
                         HStack {
+                            
                             Text(backButtonTitle)
+                            
                         }
-                        .padding(.horizontal, 20)
-                        .padding()
+                        .padding(.horizontal, 10)
+                       
                         .font(.yjObangBold15)
                         .tint(Color.black)
                     }
@@ -743,6 +745,7 @@ struct ReceiptCompleteDetailView: View {
                             print(sharedViewModel.isSaved)
                             
                             if sharedViewModel.isSaved {
+                                
                                 saveButtonTitle = "완료"
                                 backButtonTitle = "내보내기"
                                 isDialogActiveBillCom = true
@@ -777,7 +780,9 @@ struct ReceiptCompleteDetailView: View {
                         }
                     }) {
                         HStack {
+             
                             Text(saveButtonTitle)
+                    
                         }
                         .padding(.horizontal, 20)
                         .padding()
@@ -785,6 +790,8 @@ struct ReceiptCompleteDetailView: View {
                         .foregroundColor(saveButtonTitle == "완료" ? .homeRed : .black)
                     }
                 }
+                
+                
                 Spacer()
             }
             .zIndex(1)
