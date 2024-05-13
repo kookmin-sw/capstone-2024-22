@@ -460,7 +460,7 @@ struct DateRangeView1: View {
                        
                             
                             ForEach(Array(homeviewModel.tripFiles.enumerated()), id: \.element.id) { index, tripFile in
-                                NavigationLink(destination: CardView(item: item, tripFile: tripFile, tripFileId: tripFile.id, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) {
+                                NavigationLink(destination: CardView(item: item, tripFile: tripFile, tripFileId: tripFile.id, index: index, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) {
                                                             
                                                             
                                                             DayView(dayIndex: index, item: item, tripFile: tripFile)

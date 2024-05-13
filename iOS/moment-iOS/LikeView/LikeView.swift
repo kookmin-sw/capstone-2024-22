@@ -48,6 +48,7 @@ struct LikeView: View {
                             Spacer()
                             Text("즐겨찾은 녹음 파일")
                                 .font(.pretendardBold22)
+                                .padding(.horizontal,16)
                                 .foregroundColor(.black)
                         }
                         .padding(.horizontal, 20)

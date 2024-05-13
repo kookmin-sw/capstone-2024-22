@@ -8,53 +8,15 @@
 import Foundation
 import SwiftUI
 import UIKit
-//
-//struct CustomSlider: UIViewRepresentable {
-//    @Binding var value: Float
-//    var range: (Double, Double)
-//
-//    func makeUIView(context: Context) -> UISlider {
-//        let slider = UISlider(frame: .zero)
-//        slider.minimumValue = Float(range.0)
-//        slider.maximumValue = Float(range.1)
-//        slider.value = Float(value)
-//        slider.addTarget(
-//            context.coordinator,
-//            action: #selector(Coordinator.valueChanged(_:)),
-//            for: .valueChanged
-//        )
-//        slider.tintColor = .blue
-//        slider.thumbTintColor = .red
-//        slider.maximumTrackTintColor = .gray
-//        slider.minimumTrackTintColor = .purple
-//
-//        return slider
-//    }
-//
-//    func updateUIView(_ uiView: UISlider, context: Context) {
-//        uiView.value = Float(value)
-//    }
-//
-//    func makeCoordinator() -> Coordinator {
-//        Coordinator(self)
-//    }
-//
-//    class Coordinator: NSObject {
-//        var slider: CustomSlider
-//
-//        init(_ slider: CustomSlider) {
-//            self.slider = slider
-//        }
-//
-//        @objc func valueChanged(_ sender: UISlider) {
-//            slider.value = Float(sender.value)
-//        }
-//    }
-//}
+
+
+import SwiftUI
+import UIKit
+
 struct CustomSlider: UIViewRepresentable {
     @Binding var value: Float
     var range: (Double, Double)
-    var thumbImageName: String  // 이미지 파일 이름을 저장하는 String 타입
+    var thumbImageName: String
 
     func makeUIView(context: Context) -> UISlider {
         let slider = UISlider(frame: .zero)
@@ -68,6 +30,17 @@ struct CustomSlider: UIViewRepresentable {
         } else {
             print("Failed to load thumb image")
         }
+
+        // 회색 트랙 설정
+        let trackTintColor = UIColor.systemGray
+        slider.minimumTrackTintColor = trackTintColor
+        slider.maximumTrackTintColor = trackTintColor
+
+        // 트랙 이미지 설정 (선택적)
+        let minTrackImage = UIImage(named: "play")?.stretchableImage(withLeftCapWidth: 0, topCapHeight: 0)
+        let maxTrackImage = UIImage(named: "play")?.stretchableImage(withLeftCapWidth: 0, topCapHeight: 0)
+        slider.setMinimumTrackImage(minTrackImage, for: .normal)
+        slider.setMaximumTrackImage(maxTrackImage, for: .normal)
 
         slider.addTarget(
             context.coordinator,

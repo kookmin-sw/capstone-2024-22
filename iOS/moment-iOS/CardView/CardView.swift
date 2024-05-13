@@ -14,8 +14,9 @@ struct CardView: View {
     var tripFile: TripFile
     var tripFileId: Int
     var player: AVPlayer?
+    var index: Int
 
-   // var cardView: CardViews
+    
     
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioRecorderManager: AudioRecorderManager
@@ -87,8 +88,9 @@ struct CardView: View {
                         
                         HStack {
                             Spacer()
-                            Text(item.tripName)
+                            Text(item.tripName + "여행" + " \(index + 1)일차")
                                 .font(.pretendardBold22)
+                                .padding(.horizontal,16)
                                 .foregroundColor(.black)
                         }
                         .padding(.horizontal, 20)
