@@ -809,7 +809,7 @@ struct ReceiptCompleteDetailView: View {
                     VStack {
                         Spacer()
                         CustomTabIndicator(
-                            numberOfTabs: 4,
+                            numberOfTabs: 2,
                             selectedTab: selectedTab,
                             accentColor: .gray500,
                             inactiveColor: .Natural100

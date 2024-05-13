@@ -25,6 +25,10 @@ struct BillListView: View {
         
         ZStack{
             Color(.homeBack).edgesIgnoringSafeArea(.all)
+                .onTapGesture {
+                                 hideKeyboard()
+                             }
+            
             VStack{
                 
                 AnnouncementView( homeBaseViewModel: homeBaseViewModel)
@@ -37,6 +41,9 @@ struct BillListView: View {
         }
         
     }
+    private func hideKeyboard() {
+          UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+      }
 }
 
 
@@ -385,7 +392,7 @@ struct ReceiptDetailView: View {
             
             
             TabView(selection: $selectedTab) {
-                ForEach(0..<4) { index in
+                ForEach(0..<1) { index in
                     ReceiptBillView1(item: item)
                         .tag(0)
                     // .environmentObject(SharedViewModel())
@@ -405,7 +412,7 @@ struct ReceiptDetailView: View {
                     VStack {
                         Spacer()
                         CustomTabIndicator(
-                            numberOfTabs: 4,
+                            numberOfTabs: 2,
                             selectedTab: selectedTab,
                             accentColor: .gray500,
                             inactiveColor: .Natural100
