@@ -79,10 +79,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
+import com.capstone.android.application.app.composable.CustomNoCheckDialog
 import com.capstone.android.application.app.composable.CustomNoTitleCheckDialog
 import com.capstone.android.application.data.local.Emotion
 import com.capstone.android.application.data.remote.receipt.model.receipt_post.PostReceiptCreateRequest
 import com.capstone.android.application.data.remote.receipt.model.receipt_put.PutReceiptCreateRequest
+import com.capstone.android.application.domain.CustomNoCheckViewModel
 import com.capstone.android.application.domain.CustomNoTitleCheckViewModel
 import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.ReceiptTrip
@@ -157,7 +159,7 @@ class ReciptActivity : ComponentActivity() {
                 "Basic"
             }
             val tripDetailList = remember { mutableStateListOf<TripDetail>() }
-
+            val receiptendDialogState = remember{ mutableStateOf(true) }
             //여행 부르기
             tripViewModel.getTripAll()
             val tripList = remember { mutableStateListOf<ReceiptTrip>()}
@@ -243,7 +245,7 @@ class ReciptActivity : ComponentActivity() {
                     composable(route = ReciptScreen.MakeTrip.name){
 
                         if(tripDetailList.size == 1) {
-                            MakeTrip(tripDetailList[0])
+                            MakeTrip(tripDetailList[0],receiptendDialogState)
                         }
                     }
                     composable(route = ReciptScreen.SaveRecipt.name +
@@ -296,7 +298,7 @@ class ReciptActivity : ComponentActivity() {
                         if (theme != null) {
                             SaveRecipt(theme,ReceiptContent_string(
                                 tripName, intro, depart_small, depart, arrive_small, arrive,
-                                cardnum,publicationdate,startdate,enddate, emotionList)
+                                cardnum,publicationdate,startdate,enddate, emotionList),receiptendDialogState
                             )
                         }
                     }
@@ -602,7 +604,7 @@ class ReciptActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalPagerApi::class)
     @Composable
-    fun MakeTrip(trip: TripDetail){
+    fun MakeTrip(trip: TripDetail,receiptendDialogState : MutableState<Boolean>){
         val viewModel: CustomNoTitleCheckViewModel = viewModel()
         BackHandler { viewModel.showCustomNoTitleCheckDialog() }
 
@@ -663,7 +665,7 @@ class ReciptActivity : ComponentActivity() {
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
                         .clickable() {
-
+                            receiptendDialogState.value = true
                             if (arrive.value == "" || depart.value == "") {
                                 showToastMessage(
                                     context = this@ReciptActivity,
@@ -1359,7 +1361,7 @@ class ReciptActivity : ComponentActivity() {
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun SaveRecipt(theme: String, receiptcontent: ReceiptContent_string){
+    fun SaveRecipt(theme: String, receiptcontent: ReceiptContent_string, receiptendDialogState: MutableState<Boolean>){
 
         BackHandler {
             startActivity(Intent(this@ReciptActivity, MainActivity::class.java)
@@ -1380,6 +1382,27 @@ class ReciptActivity : ComponentActivity() {
             if(Theme == 1){
                 SaveTheme2(receiptcontent)
             }
+        }
+
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            receiptendDialogState.value = false
+        }, 3500)
+        val viewModel: CustomNoCheckViewModel = viewModel()
+        val CustomNoCheckDialogState = viewModel.CustomNoCheckDialogState.value
+
+        if(receiptendDialogState.value){
+            //다이얼로그 띄우기
+            viewModel.showCustomNoCheckDialog()
+            if (CustomNoCheckDialogState.description.isNotBlank()){
+                CustomNoCheckDialog(
+                    title = "축하해요!",
+                    description = "영수증이 만들어졌어요\n" + "나도 이제 여행자 !",
+                    num = 1
+                    )
+            }
+        }else{
+
         }
 
         Column(

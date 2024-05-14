@@ -29,6 +29,12 @@ data class CustomTitleCheckDialogState(
     val onClickCancel: () -> Unit = {},
 )
 
+data class CustomNoCheckDialogState(
+    val title: String = "",
+    val description: String = "",
+    val num :Int = 0
+)
+
 
 //제목없는 선택형 다이얼로그
 @HiltViewModel
@@ -75,5 +81,23 @@ class CustomTitleCheckViewModel @Inject constructor() : ViewModel(){
 
     fun resetDialogState() {
         CustomTitleCheckDialogState.value = CustomTitleCheckDialogState()
+    }
+}
+
+
+//제목없는 선택형 다이얼로그
+@HiltViewModel
+class CustomNoCheckViewModel @Inject constructor() : ViewModel(){
+    val CustomNoCheckDialogState : MutableState<CustomNoCheckDialogState> =
+        mutableStateOf<CustomNoCheckDialogState>(
+            CustomNoCheckDialogState()
+        )
+    fun showCustomNoCheckDialog(){
+        CustomNoCheckDialogState.value = CustomNoCheckDialogState(
+            title = "축하해요",
+            description = "영수증이 만들어졌어요\n" +
+                    "나도 이제 여행자 !",
+            num = 1
+        )
     }
 }

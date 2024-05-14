@@ -84,6 +84,7 @@ import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
+import com.capstone.android.application.ui.theme.primary_500
 import com.capstone.android.application.ui.theme.tertiary_500
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -739,6 +740,46 @@ fun CustomTitleCheckDialog(
     }
 }
 
+// 제목 선택 없는 다이얼로그
+@Composable
+fun CustomNoCheckDialog(
+    title : String,
+    description: String,
+    num : Int
+){
+    Dialog(onDismissRequest = { },
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
+    ) {
+        Card(modifier = Modifier
+            .fillMaxSize()
+            .wrapContentHeight()
+            .padding(horizontal = 40.dp)){
+            Column(modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .background(tertiary_500)) {
+
+                Column(
+                    Modifier
+                        .wrapContentSize()
+                        .padding(top = 20.dp, bottom = 16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    P_ExtraBold16(content = title, color = primary_500)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(){
+                        /*P_Medium14_center(content = num.toString()+ " ", color = black, TextAlign.Center)*/
+                        P_Medium14_center(content = description, color = black, TextAlign.Center)
+                    }
+
+                }
+            }
+        }
+    }
+}
 @Preview(apiLevel = 33)
 @Composable
 fun ReciptPreview() {
