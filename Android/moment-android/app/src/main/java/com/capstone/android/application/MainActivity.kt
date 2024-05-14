@@ -392,6 +392,14 @@ class MainActivity : ComponentActivity() {
                     color = "#1F9854"
                 )
             )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_receipt2_emotion_disgust,
+                text = "불쾌해요 ",
+                persent = 0f,
+                color = "#1F9854"
+            )
+        )
 
             // 영수증 삭제 dialog
             val showDeleteDialog = remember { mutableStateOf(false) }
@@ -2466,7 +2474,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MiniTheme1(receiptAll:ReceiptAll){
-        val emotionList = emotionPercent(receiptAll.neutral,receiptAll.happy,receiptAll.angry,receiptAll.sad)
+        val emotionList = emotionPercent(receiptAll.neutral,receiptAll.happy,receiptAll.angry,receiptAll.sad, receiptAll.disgust)
 
         Box(
             modifier = Modifier
@@ -2604,13 +2612,14 @@ class MainActivity : ComponentActivity() {
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 14.dp, top = 160.dp)
-                    .align(Alignment.BottomCenter)
+                    .padding(top = 160.dp)
+                    .align(Alignment.BottomCenter),
+                horizontalArrangement = Arrangement.Center
             ) {
                 Column(
                     Modifier
-                        .height(50.dp)
-                        .padding(end = 20.dp),
+                        .wrapContentWidth()
+                        .height(50.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     P_Medium(content = "여행 카드", color = neutral_500, 4.sp)
@@ -2622,62 +2631,61 @@ class MainActivity : ComponentActivity() {
                     P_Medium(content = receiptAll.stDate, color = primary_500, 4.sp)
                     P_Medium(content = receiptAll.edDate, color = primary_500, 4.sp)
                 }
-                Spacer(modifier = Modifier.width(15.dp))
+                Spacer(modifier = Modifier.width(10.dp))
                 Column() {
                     P_Medium(content = "여행 감정", color = neutral_500, 4.sp)
                     Spacer(modifier = Modifier.height(3.8.dp))
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .wrapContentWidth()
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            emotionList.forEachIndexed { index, item ->
-                                Row(
-                                    modifier = Modifier.height(8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(
-                                        modifier = Modifier.width(40.dp)
-                                    )  {
-                                        LinearProgressIndicator(
-                                            progress = { item.persent.toFloat() / 100 },
-                                            modifier = Modifier.height(3.dp),
-                                            color = when (index) {
-                                                0 -> primary_500
-                                                1 -> neutral_600
-                                                2 -> neutral_400
-                                                3 -> neutral_200
-                                                else -> primary_500
-                                            },
-                                            strokeCap = StrokeCap.Round
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(4.2.dp))
-                                    Image(
-                                        modifier = Modifier.size(5.dp),
-                                        painter = painterResource(
-                                            id = Theme1_Emotion(
-                                                item.text,
-                                                index
-                                            )
-                                        ),
-                                        contentDescription = ""
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    P_Medium(
-                                        content = item.persent.toString() + "%",
+                        emotionList.forEachIndexed { index, item ->
+                            Row(
+                                modifier = Modifier
+                                    .height(6.dp)
+                                    .wrapContentWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(
+                                    modifier = Modifier.width(40.dp)
+                                )  {
+                                    LinearProgressIndicator(
+                                        progress = { item.persent.toFloat() / 100 },
+                                        modifier = Modifier.height(3.dp),
                                         color = when (index) {
                                             0 -> primary_500
                                             1 -> neutral_600
                                             2 -> neutral_400
                                             3 -> neutral_200
+                                            4 -> neutral_100
                                             else -> primary_500
-                                        }, 4.sp
+                                        },
+                                        strokeCap = StrokeCap.Round
                                     )
                                 }
+                                Spacer(modifier = Modifier.width(4.2.dp))
+                                Image(
+                                    modifier = Modifier.size(5.dp),
+                                    painter = painterResource(
+                                        id = Theme1_Emotion(
+                                            item.text,
+                                            index
+                                        )
+                                    ),
+                                    contentDescription = ""
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                P_Medium(
+                                    content = item.persent.toString() + "%",
+                                    color = when (index) {
+                                        0 -> primary_500
+                                        1 -> neutral_600
+                                        2 -> neutral_400
+                                        3 -> neutral_200
+                                        4 -> neutral_100
+                                        else -> primary_500
+                                    }, 4.sp
+                                )
                             }
                         }
                     }
@@ -2688,7 +2696,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MiniTheme2(receiptAll:ReceiptAll){
-        val emotionList = emotionPercent(receiptAll.neutral,receiptAll.happy,receiptAll.angry,receiptAll.sad)
+        val emotionList = emotionPercent(receiptAll.neutral,receiptAll.happy,receiptAll.angry,receiptAll.sad, receiptAll.disgust)
 
         Box(
             modifier = Modifier
@@ -2803,8 +2811,7 @@ class MainActivity : ComponentActivity() {
 
                         Row(
                             Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp),
+                                .fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Column(
@@ -2813,45 +2820,40 @@ class MainActivity : ComponentActivity() {
                                 P_Medium(content = "여행 감정", color = neutral_500, 4.sp)
                                 Spacer(modifier = Modifier.height(3.8.dp))
                                 Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
+                                    modifier = Modifier.wrapContentWidth()
                                 ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                    ) {
-                                        emotionList.forEachIndexed { index, item ->
-                                            Row(
-                                                modifier = Modifier.height(6.dp),
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
+                                    emotionList.forEachIndexed { index, item ->
+                                        Row(
+                                            modifier = Modifier.height(5.5.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
 
-                                                Image(
-                                                    modifier = Modifier.size(5.dp),
-                                                    painter = painterResource(
-                                                        id = Theme2_Emotion(
-                                                            kind = item.text
-                                                        )
-                                                    ),
-                                                    contentDescription = ""
-                                                )
-                                                Spacer(modifier = Modifier.width(3.dp))
-                                                Column(
-                                                    modifier = Modifier.width(32.dp)
-                                                ) {
-                                                    LinearProgressIndicator(
-                                                        progress = { item.persent.toFloat() / 100 },
-                                                        modifier = Modifier.height(1.5.dp),
-                                                        color = when (index) {
-                                                            0 -> primary_500
-                                                            1 -> neutral_600
-                                                            2 -> neutral_400
-                                                            3 -> neutral_200
-                                                            else -> primary_500
-                                                        },
-                                                        strokeCap = StrokeCap.Round
+                                            Image(
+                                                modifier = Modifier.size(5.dp),
+                                                painter = painterResource(
+                                                    id = Theme2_Emotion(
+                                                        kind = item.text
                                                     )
-                                                }
+                                                ),
+                                                contentDescription = ""
+                                            )
+                                            Spacer(modifier = Modifier.width(3.dp))
+                                            Column(
+                                                modifier = Modifier.width(32.dp)
+                                            ) {
+                                                LinearProgressIndicator(
+                                                    progress = { item.persent.toFloat() / 100 },
+                                                    modifier = Modifier.height(1.5.dp),
+                                                    color = when (index) {
+                                                        0 -> primary_500
+                                                        1 -> neutral_600
+                                                        2 -> neutral_400
+                                                        3 -> neutral_200
+                                                        4 -> neutral_100
+                                                        else -> primary_500
+                                                    },
+                                                    strokeCap = StrokeCap.Round
+                                                )
                                             }
                                         }
                                     }
@@ -2945,7 +2947,7 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double): SnapshotStateList<com.capstone.android.application.data.local.Emotion> {
+    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double, disgust : Double): SnapshotStateList<com.capstone.android.application.data.local.Emotion> {
         val emotionList = mutableStateListOf<com.capstone.android.application.data.local.Emotion>()
         emotionList.add(
             com.capstone.android.application.data.local.Emotion(
@@ -2975,7 +2977,14 @@ class MainActivity : ComponentActivity() {
                 persent = (sad).toInt()
             )
         )
-        //emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = emotion5.toInt()))
+        emotionList.add(
+            com.capstone.android.application.data.local.Emotion(
+                icon = R.drawable.ic_receipt2_emotion_disgust,
+                text = "불쾌해요",
+                persent = (disgust).toInt()
+                )
+        )
+
         emotionList.sortByDescending { it.persent }
         return emotionList
     }
@@ -3011,6 +3020,13 @@ class MainActivity : ComponentActivity() {
                 3 -> R.drawable.ic_receipt1_emotion_sad_4
                 else -> R.drawable.ic_receipt1_emotion_sad_1
             }
+            "불쾌해요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_disgust1
+                1 -> R.drawable.ic_receipt1_emotion_disgust2
+                2 -> R.drawable.ic_receipt1_emotion_disgust3
+                3 -> R.drawable.ic_receipt1_emotion_disgust4
+                else -> R.drawable.ic_receipt1_emotion_disgust5
+            }
             else -> return R.drawable.ic_emotion_angry
         }
     }
@@ -3021,7 +3037,8 @@ class MainActivity : ComponentActivity() {
             "평범해요" -> R.drawable.ic_receipt2_emotion_common
             "화가나요" -> R.drawable.ic_receipt2_emotion_angry
             "즐거워요" -> R.drawable.ic_receipt2_emotion_happy
-            "슬퍼요" -> R.drawable.ic_receipt2_emotions_sad
+            "슬퍼요" -> R.drawable.ic_receipt2_emotion_sad
+            "불쾌해요" -> R.drawable.ic_receipt2_emotion_disgust
             else -> R.drawable.ic_receipt2_emotion_common
         }
     }
