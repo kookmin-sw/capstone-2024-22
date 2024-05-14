@@ -4,8 +4,10 @@ import com.moment.auth.client.CoreClient;
 import com.moment.auth.domain.user.User;
 import com.moment.auth.domain.user.UserRepository;
 import com.moment.auth.dto.request.UserRequestDTO;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,5 +37,19 @@ public class UserService {
             throw new RuntimeException("Core 서버에 유저 등록에 실패했습니다.");
         }
 
+    }
+    @Transactional
+    public void deleteAccount(Long userId) {
+        try{
+            log.info("Core 서버에 유저 삭제를 시도합니다.");
+            HttpStatusCode statusCode = coreClient.deleteUser(userId).getStatusCode();
+            if(!statusCode.is2xxSuccessful()){
+                throw new RuntimeException("Core 서버에 유저 삭제에 실패했습니다.");
+            }
+            userRepository.deleteById(userId);
+
+        }catch (Exception e){
+            throw new RuntimeException("Core 서버에 유저 삭제에 실패했습니다.");
+        }
     }
 }

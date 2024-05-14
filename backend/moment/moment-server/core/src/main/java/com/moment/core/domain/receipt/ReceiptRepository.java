@@ -1,6 +1,7 @@
 package com.moment.core.domain.receipt;
 
 import com.moment.core.domain.trip.Trip;
+import com.moment.core.domain.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,4 +27,6 @@ public interface ReceiptRepository extends PagingAndSortingRepository<Receipt, L
     Number countByUser_Id(Long userId);
 
     List<Receipt> findAllByTrip(Trip trip);
+
+    void deleteAllByUser(User user);
 }

@@ -63,4 +63,20 @@ public class UserController {
         userService.updateUserSetting(request, userId);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.UPDATE_SUCCESS));
     }
+
+    // 유저 탈퇴
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<APIResponse> deleteUser(
+            @PathVariable Long userId
+            ) {
+        log.info("delete userId : {}", userId);
+        userService.deleteUser(userId);
+        return ResponseEntity.ok(APIResponse.of(SuccessCode.DELETE_SUCCESS));
+    }
+    // 테스트
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        log.info("test");
+        return new ResponseEntity<>("test", HttpStatus.OK);
+    }
 }

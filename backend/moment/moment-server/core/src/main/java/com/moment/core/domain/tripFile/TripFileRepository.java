@@ -20,4 +20,6 @@ public interface TripFileRepository extends JpaRepository<TripFile, Long> {
     List<TripFile> findByTrip(Trip trip);
 
     List<TripFile> findAllByTrip(Trip trip);
+
+    void deleteAllByUser(User user);
 }
