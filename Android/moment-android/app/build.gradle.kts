@@ -1,3 +1,5 @@
+
+
 plugins {
     kotlin("plugin.serialization") version "1.5.0"
     kotlin("kapt")
@@ -15,11 +17,22 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+
+
+    signingConfigs {
+        create("release") {
+            keyAlias = "moment-release-key2"
+            keyPassword = "rlaalswnd1"
+            storeFile = file("/Users/kimminjung/AndroidStudioProjects/moment-key-manage/release/moment-releasekeystore2")
+            storePassword = "rlaalswnd1"
         }
     }
 
@@ -33,7 +46,9 @@ android {
 //        }
 
         release {
+
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
