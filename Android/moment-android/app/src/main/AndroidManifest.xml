@@ -6,11 +6,16 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <!-- 녹음 권한 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <!-- 위치 권한 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <!-- 알람 권한 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:usesCleartextTraffic="true"
@@ -36,7 +41,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity"/>
+        <activity
+            android:name=".MainActivity"
+            />
         <activity android:name=".ui.OnboardingActivity"/>
         <activity android:name=".ui.PostTripActivity"/>
         <activity android:name=".ui.CardActivity"/>
@@ -53,6 +60,8 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+
     </application>
 
 </manifest>
