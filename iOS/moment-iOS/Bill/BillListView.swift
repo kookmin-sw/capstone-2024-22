@@ -556,6 +556,12 @@ struct ReceiptBillView1 : View {
                         .font(.pretendardMedium14)
                         .padding(.bottom,30)
                         .multilineTextAlignment(.center)
+                        .onChange(of: sharedViewModel.text) { newValue in
+                                        // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                        if newValue.count > 14 {
+                                            sharedViewModel.text = String(newValue.prefix(14))
+                                        }
+                                    }
                         
                         
                         
@@ -585,6 +591,12 @@ struct ReceiptBillView1 : View {
                                 
                                 .font(.pretendardMedium14)
                                 .foregroundColor(.homeRed)
+                                .onChange(of: sharedViewModel.inputText) { newValue in
+                                                // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                                if newValue.count > 14 {
+                                                    sharedViewModel.inputText = String(newValue.prefix(14))
+                                                }
+                                            }
                                 
                                 
                                 
@@ -603,6 +615,12 @@ struct ReceiptBillView1 : View {
                                 .font(.pretendardExtrabold45)
                                 
                                 .multilineTextAlignment(.center)
+                                .onChange(of: sharedViewModel.StartLocatio) { newValue in
+                                                // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                                if newValue.count > 7 {
+                                                    sharedViewModel.StartLocatio = String(newValue.prefix(7))
+                                                }
+                                            }
                             }
                         }
                         
@@ -625,6 +643,12 @@ struct ReceiptBillView1 : View {
                                 })
                                 .font(.pretendardMedium14)
                                 .foregroundColor(.homeRed)
+                                .onChange(of: sharedViewModel.EndLocationend) { newValue in
+                                                // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                                if newValue.count > 14 {
+                                                    sharedViewModel.EndLocationend = String(newValue.prefix(14))
+                                                }
+                                            }
                             }
                             
                             
@@ -636,6 +660,13 @@ struct ReceiptBillView1 : View {
                                 .font(.pretendardExtrabold45)
                                 .foregroundColor(.homeRed)  // 글씨
                                 .multilineTextAlignment(.center)
+                                .onChange(of: sharedViewModel.EndLocation) { newValue in
+                                                // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                                if newValue.count > 7 {
+                                                    sharedViewModel.EndLocation = String(newValue.prefix(7))
+                                                }
+                                            }
+                                
                             }
                         }
                         
@@ -1110,6 +1141,12 @@ struct ReceiptView: View {
                 TextField("출발지",text:$sharedViewModel.tripRecord,prompt: Text("여행의 기록을 한줄로 기록하세요 :)").foregroundColor(.gray500))
                     .font(.pretendardMedium14)
                     .foregroundColor(.gray500)  // 글씨
+                    .onChange(of: sharedViewModel.tripRecord) { newValue in
+                                   // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                   if newValue.count > 14 {
+                                       sharedViewModel.tripRecord = String(newValue.prefix(14))
+                                   }
+                               }
                 
                 Spacer()
             }
@@ -1133,6 +1170,12 @@ struct ReceiptView: View {
                     })
                     .font(.pretendardMedium14)
                     .foregroundColor(.gray600)
+                    .onChange(of: sharedViewModel.tripExplaneStart) { newValue in
+                                   // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                   if newValue.count > 14 {
+                                       sharedViewModel.tripExplaneStart = String(newValue.prefix(14))
+                                   }
+                               }
                 }.frame(maxWidth: .infinity)
                     .padding(.bottom,8)
                 
@@ -1142,6 +1185,12 @@ struct ReceiptView: View {
                         .font(.pretendardExtrabold45)
                         .foregroundColor(.black)  // 글씨
                         .multilineTextAlignment(.center)
+                        .onChange(of: sharedViewModel.tripnameStart) { newValue in
+                                       // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                       if newValue.count > 7 {
+                                           sharedViewModel.tripnameStart = String(newValue.prefix(7))
+                                       }
+                                   }
                 }
                 .padding(.bottom,20)
             }
@@ -1171,6 +1220,12 @@ struct ReceiptView: View {
                     })
                     .font(.pretendardMedium14)
                     .foregroundColor(.gray600)
+                    .onChange(of: sharedViewModel.tripExplaneEnd) { newValue in
+                                   // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                   if newValue.count > 14 {
+                                       sharedViewModel.tripExplaneEnd = String(newValue.prefix(14))
+                                   }
+                               }
                 }  .padding(.bottom,8)
                 
                 
@@ -1181,6 +1236,12 @@ struct ReceiptView: View {
                         .font(.pretendardExtrabold45)
                         .foregroundColor(.black)  // 글씨
                         .multilineTextAlignment(.center)
+                        .onChange(of: sharedViewModel.tripnameEnd) { newValue in
+                                       // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                       if newValue.count > 7 {
+                                           sharedViewModel.tripnameEnd = String(newValue.prefix(7))
+                                       }
+                                   }
                 }
                 .padding(.bottom,20)
                 Spacer()
