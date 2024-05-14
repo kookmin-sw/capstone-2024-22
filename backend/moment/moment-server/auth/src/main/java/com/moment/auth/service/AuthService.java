@@ -1,5 +1,6 @@
 package com.moment.auth.service;
 
+import com.moment.auth.client.CoreClient;
 import com.moment.auth.domain.Role;
 import com.moment.auth.domain.user.User;
 import com.moment.auth.domain.user.UserRepository;
@@ -120,4 +121,5 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
         userService.save(user);
     }
+
 }

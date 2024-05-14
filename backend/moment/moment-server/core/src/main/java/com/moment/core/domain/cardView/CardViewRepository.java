@@ -1,6 +1,7 @@
 package com.moment.core.domain.cardView;
 
 import com.moment.core.domain.tripFile.TripFile;
+import com.moment.core.domain.user.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -23,4 +24,6 @@ public interface CardViewRepository extends JpaRepository<CardView, Long> {
     @Override
     @EntityGraph(attributePaths = {"tripFile"})
     Optional<CardView> findById(Long id);
+
+    void deleteAllByTripFile_User(User user);
 }

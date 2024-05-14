@@ -1,16 +1,20 @@
 package com.moment.auth.controller;
 
+import com.moment.auth.client.CoreClient;
 import com.moment.auth.common.APIResponse;
 import com.moment.auth.common.code.SuccessCode;
 import com.moment.auth.dto.request.AuthRequest;
 import com.moment.auth.dto.response.TokenResponseDTO;
 import com.moment.auth.service.AuthService;
+import com.moment.auth.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +22,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
+@Slf4j
 public class AuthController {
     private final AuthService authService;
+    private final UserService userService;
+    private final CoreClient coreClient;
     // 로그인
     @PostMapping("/login")
     public ResponseEntity<APIResponse<TokenResponseDTO.GetToken>> login(
@@ -65,5 +72,22 @@ public class AuthController {
             ) {
         authService.changePassword(changePassword, userId);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.UPDATE_SUCCESS));
+    }
+
+    // 회원 탈퇴
+    @DeleteMapping("/delete")
+    public ResponseEntity<APIResponse> deleteAccount(
+            @RequestHeader Long userId
+            ) {
+        userService.deleteAccount(userId);
+        return ResponseEntity.ok(APIResponse.of(SuccessCode.DELETE_SUCCESS));
+    }
+
+    // 테스트
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        log.info("test");
+        coreClient.test();
+        return new ResponseEntity<>("test", HttpStatus.OK);
     }
 }

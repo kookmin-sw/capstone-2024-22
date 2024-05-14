@@ -1,7 +1,10 @@
 package com.moment.core.service;
 
+import com.moment.core.domain.alreadyBookedDate.AlreadyBookedDateRepository;
 import com.moment.core.domain.cardView.CardView;
 import com.moment.core.domain.cardView.CardViewRepository;
+import com.moment.core.domain.imageFile.ImageFileRepository;
+import com.moment.core.domain.receipt.ReceiptRepository;
 import com.moment.core.domain.trip.Trip;
 import com.moment.core.domain.trip.TripRepository;
 import com.moment.core.domain.tripFile.TripFile;
@@ -29,6 +32,11 @@ public class UserService {
     private final EntityManager em;
     private final TripFileRepository tripFileRepository;
     private final CardViewRepository cardViewRepository;
+    private final S3Service s3Service;
+    private final ReceiptRepository receiptRepository;
+    private final ImageFileRepository imageFileRepository;
+    private final AlreadyBookedDateRepository alreadyBookedDateRepository;
+
 
     @Transactional
     public User save(UserRequestDTO.registerUser request) {
@@ -81,5 +89,26 @@ public class UserService {
         user.setDataUsage(request.isDataUsage());
         user.setFirebaseToken(request.getFirebaseToken());
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+        // S3 먼저 전부 삭제
+//        s3Service.deleteFile("", String.valueOf(userId));
+        // 유저의 영수증 전부 삭제
+        receiptRepository.deleteAllByUser(user);
+        // 유저의 imageFile 전부 삭제
+        imageFileRepository.deleteAllByCardView_TripFile_User(user);
+        // 카드뷰 전부 삭제
+        cardViewRepository.deleteAllByTripFile_User(user);
+        // 여행파일 전부 삭제
+        tripFileRepository.deleteAllByUser(user);
+        // 여행 삭제
+        tripRepository.deleteAllByUser(user);
+        // alreadyBookedDate 삭제
+        alreadyBookedDateRepository.deleteAllByUser(user);
+        // 유저 삭제
+        userRepository.delete(user);
     }
 }

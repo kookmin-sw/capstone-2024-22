@@ -46,6 +46,7 @@ public class FcmService {
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(message,
                 MediaType.get("application/json; charset=utf-8"));
+        log.info("fcm requestBody : {}", message);
         Request request = new Request.Builder()
                 .url(API_URL)
                 .post(requestBody)
@@ -64,7 +65,8 @@ public class FcmService {
         FcmMessageDto fcmMessageDto = FcmMessageDto.builder()
                 .message(FcmMessageDto.Message.builder()
                         .token(fcmSendDto.getToken())
-                        .data(FcmMessageDto.Data.builder()
+                        .data(
+                                FcmMessageDto.Data.builder()
                                 .title(fcmSendDto.getTitle())
                                 .body(fcmSendDto.getBody())
                                 .image(null)

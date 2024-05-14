@@ -4,6 +4,7 @@ import com.moment.auth.domain.Role;
 import com.moment.auth.dto.request.AuthRequest;
 import com.moment.auth.dto.response.TokenResponseDTO;
 import com.moment.auth.service.AuthService;
+import com.moment.auth.service.UserService;
 import io.swagger.v3.core.util.Json;
 import jakarta.ws.rs.core.MediaType;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,9 @@ class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
+
+    @MockBean
+    private UserService userService;
 
     @InjectMocks
     private AuthController authController;
@@ -191,6 +195,31 @@ class AuthControllerTest {
                         requestFields(
                                 fieldWithPath("code").type(JsonFieldType.STRING).description("인증 코드"),
                                 fieldWithPath("newPassword").type(JsonFieldType.STRING).description("새로운 비밀번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("status").type(JsonFieldType.NUMBER).description("응답 상태 코드"),
+                                fieldWithPath("code").type(JsonFieldType.STRING).description("응답 코드"),
+                                fieldWithPath("msg").type(JsonFieldType.STRING).description("응답 메시지"),
+                                fieldWithPath("detailMsg").type(JsonFieldType.STRING).description("상세 메시지"),
+                                fieldWithPath("data").type(JsonFieldType.OBJECT).description("데이터 없음")
+                        )
+                ))
+                .andDo(print());
+    }
+
+    @Test
+    void deleteAccount() throws Exception {
+
+        Mockito.doNothing().when(userService).deleteAccount(any());
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/auth/delete")
+                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andDo(document("auth/deleteAccount",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestHeaders(
+                                headerWithName("userId").description("Bearer Token")
                         ),
                         responseFields(
                                 fieldWithPath("status").type(JsonFieldType.NUMBER).description("응답 상태 코드"),
