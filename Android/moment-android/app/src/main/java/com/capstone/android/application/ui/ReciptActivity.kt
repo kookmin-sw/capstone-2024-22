@@ -7,6 +7,8 @@ import android.graphics.Bitmap
 import android.graphics.Picture
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -39,6 +41,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
@@ -128,7 +131,8 @@ enum class ReciptScreen(){
     SaveRecipt,
     ReceiptPost_Big,
     EditReceipt,
-    SaveEditReceipt
+    SaveEditReceipt,
+    Loading
 }
 @AndroidEntryPoint
 class ReciptActivity : ComponentActivity() {
@@ -423,6 +427,9 @@ class ReciptActivity : ComponentActivity() {
                             tripName, intro, depart_small, depart, arrive_small, arrive,
                             cardnum,publicationdate,startdate,enddate, emotionList),mainIntent)
                     }
+                    composable(route = ReciptScreen.Loading.name){
+                        Loading()
+                    }
                 }
             }
         }
@@ -525,12 +532,7 @@ class ReciptActivity : ComponentActivity() {
                 .background(color = tertiary_500)
                 .clickable {
                     tripViewModel.getTripDetail(tripId = trip.id)
-
-                    navController.currentBackStackEntry?.savedStateHandle?.set(
-                        key = "ItemData",
-                        value = trip.id
-                    )
-                    navController.navigate(ReciptScreen.MakeTrip.name)
+                    navController.navigate(ReciptScreen.Loading.name)
                 },
         ) {
             Box(
@@ -573,6 +575,24 @@ class ReciptActivity : ComponentActivity() {
             }
         }
     }
+    @Composable
+    fun Loading() {
+        CircularProgress()
+        Handler(Looper.getMainLooper()).postDelayed({
+
+            navController.navigate(ReciptScreen.MakeTrip.name)
+        }, 700)
+    }
+    @Composable
+    fun CircularProgress() {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = primary_500)
+        }
+    }
+
 
     @SuppressLint("UnrememberedMutableState")
     @RequiresApi(Build.VERSION_CODES.O)
