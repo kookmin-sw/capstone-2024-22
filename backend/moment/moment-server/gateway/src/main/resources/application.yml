@@ -65,6 +65,10 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - AuthorizedUserJwtFilter
+        - id: noti-service
+          uri: lb://noti-service
+          predicates:
+            - Path=/noti/**
 
 
   application:

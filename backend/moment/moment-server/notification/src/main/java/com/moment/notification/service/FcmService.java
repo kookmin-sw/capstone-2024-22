@@ -54,7 +54,7 @@ public class FcmService {
                 .build();
 
         Response response = client.newCall(request).execute();
-        log.info("response : {}", response.body().string());
+        log.info("fcm response : {}", response.body().string());
         return response.code();
     }
 
@@ -64,7 +64,7 @@ public class FcmService {
         FcmMessageDto fcmMessageDto = FcmMessageDto.builder()
                 .message(FcmMessageDto.Message.builder()
                         .token(fcmSendDto.getToken())
-                        .notification(FcmMessageDto.Notification.builder()
+                        .data(FcmMessageDto.Data.builder()
                                 .title(fcmSendDto.getTitle())
                                 .body(fcmSendDto.getBody())
                                 .image(null)
