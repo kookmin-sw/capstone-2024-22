@@ -6,6 +6,9 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("dagger.hilt.android.plugin")
+    id("com.google.gms.google-services")
+
+
 }
 
 android {
@@ -146,5 +149,8 @@ dependencies {
 
     // Glide-Compose
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+
+    // firebase
+    implementation("com.google.firebase:firebase-messaging:21.1.0")
 
 }
