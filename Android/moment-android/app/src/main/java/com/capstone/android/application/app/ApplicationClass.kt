@@ -1,7 +1,11 @@
 package com.capstone.android.application.app
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.SharedPreferences
+import android.os.Build
+import androidx.annotation.RequiresApi
 
 import dagger.hilt.android.HiltAndroidApp
 import okhttp3.Interceptor
@@ -30,8 +34,18 @@ class ApplicationClass: Application() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
+
+        val notificationChannel= NotificationChannel(
+            "moment_notification",
+            "Moment",
+            NotificationManager.IMPORTANCE_HIGH
+        )
+        val notificationManager=getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(notificationChannel)
+
         tokenSharedPreferences =
             applicationContext.getSharedPreferences("TOKEN", MODE_PRIVATE)
 
