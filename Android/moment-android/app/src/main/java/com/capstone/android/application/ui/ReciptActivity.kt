@@ -35,7 +35,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
@@ -694,9 +696,10 @@ class ReciptActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-
-            Horizontal_Theme(page,state,ReceiptContent(tripName, intro, depart_small, depart, arrive_small, arrive,
-                cardnum,publicationdate,startdate,enddate, emotionList))
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())){
+                Horizontal_Theme(page,state,ReceiptContent(tripName, intro, depart_small, depart, arrive_small, arrive,
+                    cardnum,publicationdate,startdate,enddate, emotionList))
+            }
         }
     }
 
@@ -1387,11 +1390,13 @@ class ReciptActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (Theme == 0) {
-                SaveTheme1(receiptcontent)
-            }
-            if(Theme == 1){
-                SaveTheme2(receiptcontent)
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                if (Theme == 0) {
+                    SaveTheme1(receiptcontent)
+                }
+                if(Theme == 1){
+                    SaveTheme2(receiptcontent)
+                }
             }
         }
     }
@@ -1959,13 +1964,13 @@ class ReciptActivity : ComponentActivity() {
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-
-            if (theme == "A") {
-                SaveTheme1(receiptcontent)
-            }
-            if (theme == "B") {
-                SaveTheme2(receiptcontent)
-
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())){
+                if (theme == "A") {
+                    SaveTheme1(receiptcontent)
+                }
+                if (theme == "B") {
+                    SaveTheme2(receiptcontent)
+                }
             }
         }
 
@@ -2081,8 +2086,9 @@ class ReciptActivity : ComponentActivity() {
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())){
             Horizontal_Theme(page,state,receiptContent)
+            }
         }
     }
 
@@ -2150,12 +2156,13 @@ class ReciptActivity : ComponentActivity() {
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-
-            if (Theme == 0) {
-                SaveTheme1(receiptcontent)
-            }
-            if(Theme == 1){
-                SaveTheme2(receiptcontent)
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                if (Theme == 0) {
+                    SaveTheme1(receiptcontent)
+                }
+                if (Theme == 1) {
+                    SaveTheme2(receiptcontent)
+                }
             }
         }
     }
