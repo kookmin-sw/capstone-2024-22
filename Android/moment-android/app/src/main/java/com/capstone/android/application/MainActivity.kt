@@ -244,13 +244,16 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MainRoot() {
-
-        var movenav = try {
-            intent.getStringExtra("MoveScreen")
+        var movenav = "Basic"
+         try {
+             movenav = intent.getStringExtra("MoveScreen").toString()
+             if (movenav == "ReceiptPost") {
+                 receiptViewModel.getReceiptAll(0,10000)
+                 Log.d("ReceiptPost", "MainRoot: ")
+             }
         } catch (e: Exception) {
-            "Basic"
+             movenav = "Basic"
         }
-        if (movenav == "ReceiptPost") receiptViewModel.getReceiptAll(0,10000)
 
         val postTrip =
             rememberLauncherForActivityResult(
