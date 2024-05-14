@@ -241,7 +241,7 @@ class ReciptActivity : ComponentActivity() {
                     composable(route = ReciptScreen.SaveRecipt.name +
                             "/{tripName}/{intro.value}/{depart_small.value}/{depart.value}" +
                             "/{arrive_small.value}/{arrive.value}/{cardnum}" +
-                            "/{publicationdate}/{startdate}/{enddate}/{theme}/{happy}/{sad}/{neutral}/{angry}",
+                            "/{publicationdate}/{startdate}/{enddate}/{theme}/{happy}/{sad}/{neutral}/{angry}/{disgust}",
                         arguments = listOf(
                             navArgument("tripName"){  defaultValue = "defaultValue" },
                             navArgument("intro"){  defaultValue = "" },
@@ -257,7 +257,8 @@ class ReciptActivity : ComponentActivity() {
                             navArgument("happy"){  defaultValue = "0.0" },
                             navArgument("sad"){  defaultValue = "0.0" },
                             navArgument("neutral"){  defaultValue = "0.0" },
-                            navArgument("angry"){  defaultValue = "0.0" }
+                            navArgument("angry"){  defaultValue = "0.0" },
+                            navArgument("disgust"){  defaultValue = "0.0" }
                         )) { navBackStackEntry ->
                         val tripName = navBackStackEntry.arguments?.getString("tripName")
                         val intro = navBackStackEntry.arguments?.getString("intro.value")?:" "
@@ -274,12 +275,14 @@ class ReciptActivity : ComponentActivity() {
                         val sad = navBackStackEntry.arguments?.getString("sad")?:0.0
                         val neutral = navBackStackEntry.arguments?.getString("neutral")?:0.0
                         val angry = navBackStackEntry.arguments?.getString("angry")?:0.0
+                        val disgust = navBackStackEntry.arguments?.getString("disgust")?:0.0
 
                         val emotionList = emotionPercent(
                             happy.toString().toDouble(),
                             sad.toString().toDouble(),
                             neutral.toString().toDouble(),
-                            angry.toString().toDouble(), theme)
+                            angry.toString().toDouble(),
+                            disgust.toString().toDouble(), theme)
 
 
                         if (theme != null) {
@@ -292,16 +295,16 @@ class ReciptActivity : ComponentActivity() {
                     composable(route = ReciptScreen.ReceiptPost_Big.name) {
 
                         val data = intent.getSerializableExtra("BigReceipt") as ReceiptAll
-                        val emotionList = emotionPercent(data.neutral/100,data.happy/100,data.angry/100,data.sad/100, data.receiptThemeType)
+                        val emotionList = emotionPercent(data.neutral/100,data.happy/100,data.angry/100,data.sad/100, data.disgust/100, data.receiptThemeType)
                         val created = data.created.take(10)
                         val receiptcontent = ReceiptContent_string(data.tripName,data.oneLineMemo, data.subDeparture,data.mainDeparture,
                             data.subDestination,data.mainDestination,data.numOfCard,created,data.stDate,data.edDate,emotionList)
-                        ReceiptPost_Big(mainIntent, receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad, data.id)
+                        ReceiptPost_Big(mainIntent, receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad, data.disgust, data.id)
                     }
                     composable(route = ReciptScreen.EditReceipt.name +
                             "/{tripName}/{intro}/{depart_small}/{depart}" +
                             "/{arrive_small}/{arrive}/{cardnum}" +
-                            "/{publicationdate}/{startdate}/{enddate}/{happy}/{sad}/{neutral}/{angry}/{receiptid}",
+                            "/{publicationdate}/{startdate}/{enddate}/{happy}/{sad}/{neutral}/{angry}/{disgust}/{receiptid}",
                         arguments = listOf(
                             navArgument("tripName"){  defaultValue = "defaultValue" },
                             navArgument("intro"){  defaultValue = "" },
@@ -317,6 +320,7 @@ class ReciptActivity : ComponentActivity() {
                             navArgument("sad"){  defaultValue = "0.0" },
                             navArgument("neutral"){  defaultValue = "0.0" },
                             navArgument("angry"){  defaultValue = "0.0" },
+                            navArgument("disgust"){  defaultValue = "0.0" },
                             navArgument("receiptid"){  defaultValue = "0" }
                         )) { navBackStackEntry ->
                         val tripname = navBackStackEntry.arguments?.getString("tripName")?:" "
@@ -333,13 +337,15 @@ class ReciptActivity : ComponentActivity() {
                         val sad = navBackStackEntry.arguments?.getString("sad")?:0.0
                         val neutral = navBackStackEntry.arguments?.getString("neutral")?:0.0
                         val angry = navBackStackEntry.arguments?.getString("angry")?:0.0
+                        val disgust = navBackStackEntry.arguments?.getString("disgust")?:0.0
                         val receiptid = navBackStackEntry.arguments?.getString("receiptid")?:0
 
                         val emotionList = emotionPercent(
                             happy.toString().toDouble()/100,
                             sad.toString().toDouble()/100,
                             neutral.toString().toDouble()/100,
-                            angry.toString().toDouble()/100, "notheme")
+                            angry.toString().toDouble()/100,
+                            disgust.toString().toDouble()/100, "notheme")
 
                         val Intro = mutableStateOf("")
                         val Depart_small = mutableStateOf("")
@@ -361,12 +367,13 @@ class ReciptActivity : ComponentActivity() {
                             tripname, Intro, Depart_small, Depart, Arrive_small, Arrive,
                             cardnum,publicationdate,startdate,enddate, emotionList)
                         EditReceipt(data,neutral.toString().toDouble()/100,happy.toString().toDouble()/100,
-                            sad.toString().toDouble()/100,angry.toString().toDouble()/100,receiptid.toString().toInt(), mainIntent)
+                            sad.toString().toDouble()/100,angry.toString().toDouble()/100,
+                            disgust.toString().toDouble()/100 ,receiptid.toString().toInt(), mainIntent)
                     }
                     composable(route = ReciptScreen.SaveEditReceipt.name  +
                             "/{tripName}/{intro.value}/{depart_small.value}/{depart.value}" +
                             "/{arrive_small.value}/{arrive.value}/{cardnum}" +
-                            "/{publicationdate}/{startdate}/{enddate}/{theme}/{happy}/{sad}/{neutral}/{angry}",
+                            "/{publicationdate}/{startdate}/{enddate}/{theme}/{happy}/{sad}/{neutral}/{angry}/{disgust}",
                         arguments = listOf(
                             navArgument("tripName"){  defaultValue = "defaultValue" },
                             navArgument("intro"){  defaultValue = "" },
@@ -382,7 +389,8 @@ class ReciptActivity : ComponentActivity() {
                             navArgument("happy"){  defaultValue = "0.0" },
                             navArgument("sad"){  defaultValue = "0.0" },
                             navArgument("neutral"){  defaultValue = "0.0" },
-                            navArgument("angry"){  defaultValue = "0.0" }
+                            navArgument("angry"){  defaultValue = "0.0" },
+                            navArgument("disgust"){  defaultValue = "0.0" }
                         )) { navBackStackEntry ->
                         val tripName = navBackStackEntry.arguments?.getString("tripName")
                         val intro = navBackStackEntry.arguments?.getString("intro.value")?:" "
@@ -399,12 +407,14 @@ class ReciptActivity : ComponentActivity() {
                         val sad = navBackStackEntry.arguments?.getString("sad")?:0.0
                         val neutral = navBackStackEntry.arguments?.getString("neutral")?:0.0
                         val angry = navBackStackEntry.arguments?.getString("angry")?:0.0
+                        val disgust = navBackStackEntry.arguments?.getString("disgust")?:0.0
 
                         val emotionList = emotionPercent(
                             happy.toString().toDouble(),
                             sad.toString().toDouble(),
                             neutral.toString().toDouble(),
-                            angry.toString().toDouble(), theme)
+                            angry.toString().toDouble(),
+                            disgust.toString().toDouble(), theme)
 
                         SaveEditReceipt(theme,ReceiptContent_string(
                             tripName, intro, depart_small, depart, arrive_small, arrive,
@@ -590,7 +600,7 @@ class ReciptActivity : ComponentActivity() {
         val tripid = trip.id
         val cardnum = trip.numOfCard
         var theme = if (state.currentPage == 0) "A" else "B"
-        var emotionList = emotionPercent(trip.neutral, trip.happy, trip.angry, trip.sad, theme)
+        var emotionList = emotionPercent(trip.neutral, trip.happy, trip.angry, trip.sad, trip.disgust, theme)
 
         Column(
             modifier = Modifier
@@ -674,7 +684,8 @@ class ReciptActivity : ComponentActivity() {
                                             "/${trip.happy}" +
                                             "/${trip.sad}" +
                                             "/${trip.neutral}" +
-                                            "/${trip.angry}"
+                                            "/${trip.angry}"+
+                                            "/${trip.disgust}"
                                 )
                             }
                         }) {
@@ -937,48 +948,45 @@ class ReciptActivity : ComponentActivity() {
                             .fillMaxWidth()
                     ) {
 
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            receiptcontent.emotionList.forEachIndexed { index, item ->
-                                Row(
-                                    modifier = Modifier.height(25.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(
-                                        modifier = Modifier.width(109.dp)
-                                    )  {
-                                        LinearProgressIndicator(
-                                            progress = { item.persent.toFloat()/100 },
-                                            modifier = Modifier.height(8.dp),
-                                            color = when(index)
-                                            {
-                                                0 -> primary_500
-                                                1 -> neutral_600
-                                                2 -> neutral_400
-                                                3 -> neutral_200
-                                                else -> primary_500
-                                            },
-                                            strokeCap = StrokeCap.Round
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Image(
-                                        modifier = Modifier.size(12.dp),
-                                        painter = painterResource(id =Theme1_Emotion(item.text,index)),
-                                        contentDescription = ""
+                        receiptcontent.emotionList.forEachIndexed { index, item ->
+                            Row(
+                                modifier = Modifier.height(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(
+                                    modifier = Modifier.width(109.dp)
+                                )  {
+                                    LinearProgressIndicator(
+                                        progress = { item.persent.toFloat()/100 },
+                                        modifier = Modifier.height(8.dp),
+                                        color = when(index)
+                                        {
+                                            0 -> primary_500
+                                            1 -> neutral_600
+                                            2 -> neutral_400
+                                            3 -> neutral_200
+                                            4 -> neutral_100
+                                            else -> primary_500
+                                        },
+                                        strokeCap = StrokeCap.Round
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    P_Medium11(content = item.persent.toString()+"%",
-                                        color = when(index) {
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Image(
+                                    modifier = Modifier.size(12.dp),
+                                    painter = painterResource(id =Theme1_Emotion(item.text,index)),
+                                    contentDescription = ""
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                P_Medium11(content = item.persent.toString()+"%",
+                                    color = when(index) {
                                         0 -> primary_500
                                         1 -> neutral_600
                                         2 -> neutral_400
                                         3 -> neutral_200
+                                        4 -> neutral_100
                                         else -> primary_500
                                     })
-                                }
                             }
                         }
                     }
@@ -1204,6 +1212,7 @@ class ReciptActivity : ComponentActivity() {
                                             1 -> neutral_600
                                             2 -> neutral_400
                                             3 -> neutral_200
+                                            4 -> neutral_100
                                             else -> primary_500
                                         },
                                         strokeCap = StrokeCap.Round
@@ -1571,6 +1580,7 @@ class ReciptActivity : ComponentActivity() {
                                             1 -> neutral_600
                                             2 -> neutral_400
                                             3 -> neutral_200
+                                            4 -> neutral_100
                                             else -> primary_500
                                         },
                                         strokeCap = StrokeCap.Round
@@ -1585,13 +1595,14 @@ class ReciptActivity : ComponentActivity() {
                                 Spacer(modifier = Modifier.width(4.dp))
                                 P_Medium11(content = item.persent.toString()+"%",
                                     color = when(index)
-                                {
-                                    0 -> primary_500
-                                    1 -> neutral_600
-                                    2 -> neutral_400
-                                    3 -> neutral_200
-                                    else -> primary_500
-                                })
+                                    {
+                                        0 -> primary_500
+                                        1 -> neutral_600
+                                        2 -> neutral_400
+                                        3 -> neutral_200
+                                        4 -> neutral_100
+                                        else -> primary_500
+                                    })
                             }
                         }
                     }
@@ -1766,6 +1777,7 @@ class ReciptActivity : ComponentActivity() {
                                             1 -> neutral_600
                                             2 -> neutral_400
                                             3 -> neutral_200
+                                            4 -> neutral_100
                                             else -> primary_500
                                         },
                                         strokeCap = StrokeCap.Round
@@ -1848,7 +1860,7 @@ class ReciptActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
     @Composable
     fun ReceiptPost_Big(mainIntent: Intent, content: ReceiptContent_string, theme : String,
-                        neutral:Double ,happy:Double ,angry:Double ,sad:Double, receiptid : Int){
+                        neutral:Double ,happy:Double ,angry:Double ,sad:Double, disgust:Double,receiptid : Int){
 
         val tripName = content.tripName
         val intro = if(content.intro?.isEmpty() == true) " "  else content.intro
@@ -1936,6 +1948,7 @@ class ReciptActivity : ComponentActivity() {
                                                 "/${sad}" +
                                                 "/${neutral}" +
                                                 "/${angry}" +
+                                                "/${disgust}" +
                                                 "/${receiptid}"
                                     )
                                 }) {
@@ -1961,7 +1974,7 @@ class ReciptActivity : ComponentActivity() {
     @OptIn(ExperimentalPagerApi::class)
     @Composable
     fun EditReceipt(receiptContent: ReceiptContent,
-                    neutral:Double ,happy:Double ,angry:Double ,sad:Double, receiptid : Int, mainIntent :Intent){
+                    neutral:Double ,happy:Double ,angry:Double ,sad:Double, disgust:Double ,receiptid : Int, mainIntent :Intent){
 
         val viewModel: CustomNoTitleCheckViewModel = viewModel()
         BackHandler {
@@ -1975,7 +1988,7 @@ class ReciptActivity : ComponentActivity() {
         val receiptIntent = Intent(this@ReciptActivity, MainActivity::class.java)
         receiptIntent.putExtra("MoveScreen", "ReceiptPost")
 
-        receiptContent.emotionList = emotionPercent(neutral,happy,angry,sad, if(state.currentPage == 0) "A" else "B")
+        receiptContent.emotionList = emotionPercent(neutral,happy,angry,sad, disgust, if(state.currentPage == 0) "A" else "B")
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -2058,7 +2071,8 @@ class ReciptActivity : ComponentActivity() {
                                             "/${happy}" +
                                             "/${sad}" +
                                             "/${neutral}" +
-                                            "/${angry}"
+                                            "/${angry}"+
+                                            "/${disgust}"
                                 )
                             }
                         }) {
@@ -2179,6 +2193,13 @@ class ReciptActivity : ComponentActivity() {
                 3 -> R.drawable.ic_receipt1_emotion_sad_4
                 else -> R.drawable.ic_receipt1_emotion_sad_1
             }
+            "불쾌해요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_disgust1
+                1 -> R.drawable.ic_receipt1_emotion_disgust2
+                2 -> R.drawable.ic_receipt1_emotion_disgust3
+                3 -> R.drawable.ic_receipt1_emotion_disgust4
+                else -> R.drawable.ic_receipt1_emotion_disgust5
+            }
             else -> return R.drawable.ic_emotion_angry
         }
     }
@@ -2189,7 +2210,8 @@ class ReciptActivity : ComponentActivity() {
             "평범해요" -> R.drawable.ic_receipt2_emotion_common
             "화가나요" -> R.drawable.ic_receipt2_emotion_angry
             "즐거워요" -> R.drawable.ic_receipt2_emotion_happy
-            "슬퍼요" -> R.drawable.ic_receipt2_emotions_sad
+            "슬퍼요" -> R.drawable.ic_receipt2_emotion_sad
+            "불쾌해요" -> R.drawable.ic_receipt2_emotion_disgust
             else -> R.drawable.ic_receipt2_emotion_common
         }
     }
@@ -2211,7 +2233,7 @@ class ReciptActivity : ComponentActivity() {
         return currentDate.isAfter(targetDate) || currentDate.isEqual(targetDate)
     }
 
-    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double, theme : String): SnapshotStateList<Emotion> {
+    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double, disgust :Double, theme : String): SnapshotStateList<Emotion> {
         val emotionList = mutableStateListOf<Emotion>()
 
         if(theme == "A") {
@@ -2220,7 +2242,7 @@ class ReciptActivity : ComponentActivity() {
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (angry*100).toInt()))
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
-            //emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = emotion5.toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = (disgust*100).toInt()))
             emotionList.sortByDescending { it.persent }
         }
         if(theme == "B") {
@@ -2229,6 +2251,7 @@ class ReciptActivity : ComponentActivity() {
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "평범해요", persent = (common*100).toInt()))
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = (disgust*100).toInt()))
         }
         else {
             emotionList.clear()
@@ -2236,6 +2259,7 @@ class ReciptActivity : ComponentActivity() {
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (angry*100).toInt()))
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = (disgust*100).toInt()))
             emotionList.sortByDescending { it.persent } }
         return emotionList
     }
