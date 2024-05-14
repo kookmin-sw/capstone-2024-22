@@ -26,13 +26,17 @@ class MomentPermission @Inject constructor(@ActivityContext private val context 
     private val permissionsLocationUpApi29Impl = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.WAKE_LOCK
     )
 
     /** 위치 권한 SDK 버전 29 이하**/
     @TargetApi(VERSION_CODES.P)
     private val permissionsLocationDownApi29Impl = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.WAKE_LOCK
     )
 
     fun checkPermission():Boolean{
@@ -60,7 +64,14 @@ class MomentPermission @Inject constructor(@ActivityContext private val context 
                     context,
                     permissionsLocationUpApi29Impl[1]
                 ) != PackageManager.PERMISSION_GRANTED
-
+                || ActivityCompat.checkSelfPermission(
+                    context,
+                    permissionsLocationUpApi29Impl[2]
+                ) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(
+                    context,
+                    permissionsLocationUpApi29Impl[3]
+                ) != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
                     context as Activity,
@@ -76,6 +87,14 @@ class MomentPermission @Inject constructor(@ActivityContext private val context 
                 || ActivityCompat.checkSelfPermission(
                     context,
                     permissionsLocationDownApi29Impl[1]
+                ) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(
+                    context,
+                    permissionsLocationDownApi29Impl[2]
+                ) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(
+                    context,
+                    permissionsLocationDownApi29Impl[3]
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
