@@ -98,6 +98,7 @@ import com.capstone.android.application.ui.theme.P_ExtraBold14
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
 import com.capstone.android.application.ui.theme.P_Medium8
+import com.capstone.android.application.ui.theme.P_SemiBold18
 import com.capstone.android.application.ui.theme.ReciptTextField
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.YJ_Bold20
@@ -480,7 +481,7 @@ class ReciptActivity : ComponentActivity() {
                     .align(Alignment.Center)
                     .background(color = tertiary_500)
             ) {
-                Column(
+                Row(
                     modifier = Modifier
                         .padding(top = 23.dp)
                         .wrapContentSize()
@@ -490,6 +491,9 @@ class ReciptActivity : ComponentActivity() {
                             setResult(1, mainIntent)
                             finish()
                         }, "")
+                    
+                    Spacer(modifier = Modifier.width(8.dp))
+                    P_SemiBold18(content = "여행 선택하기", color = black)
                 }
                 LazyColumn(
                     modifier = Modifier
