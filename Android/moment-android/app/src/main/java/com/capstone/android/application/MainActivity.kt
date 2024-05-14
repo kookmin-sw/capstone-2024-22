@@ -110,6 +110,7 @@ import com.capstone.android.application.app.screen.BottomNavItem
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.utile.MomentPath
 import com.capstone.android.application.app.utile.common.GetWeatherType
+import com.capstone.android.application.app.utile.firebase.MyFirebaseMessagingService
 import com.capstone.android.application.app.utile.location.MomentLocation
 import com.capstone.android.application.app.utile.permission.MomentPermission
 import com.capstone.android.application.app.utile.recorder.MomentAudioPlayer
@@ -120,7 +121,6 @@ import com.capstone.android.application.data.remote.receipt.model.receipt_delete
 import com.capstone.android.application.domain.Card
 import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.Emotion
-import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.Trip
 import com.capstone.android.application.domain.TripFile
 import com.capstone.android.application.presentation.CardViewModel
@@ -160,6 +160,9 @@ import com.capstone.android.application.ui.theme.white
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -212,11 +215,29 @@ class MainActivity : ComponentActivity() {
     private var audioFile: File? = null
 
 
+    private fun MyFirebaseMessaging() {
+        val token: Task<String> = FirebaseMessaging.getInstance().token
+        token.addOnCompleteListener(OnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("FCMToken",task.result)
+//                registerFCMToken(task.result)
+            }
+        })
+    }
+
+
+    private fun registerFCMToken(FCMToken:String){
+        val fcm = Intent(applicationContext, MyFirebaseMessagingService::class.java)
+        startService(fcm)
+    }
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var currentDate:String=""
         momentPermission.requestPermission()
+        MyFirebaseMessaging()
 
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
