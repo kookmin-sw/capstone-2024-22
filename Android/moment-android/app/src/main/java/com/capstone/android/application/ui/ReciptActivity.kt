@@ -1053,7 +1053,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 484.dp, start = 28.dp, end = 10.dp),
+                    .padding(top = 470.dp, start = 28.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 P_Medium14(content = receiptcontent.tripName, color = black)
@@ -1179,20 +1179,27 @@ class ReciptActivity : ComponentActivity() {
             Row(
                 Modifier
                     .padding(bottom = 41.dp)
-                    .align(Alignment.BottomCenter)
+                    .wrapContentWidth()
+                    .align(Alignment.BottomCenter),
+                horizontalArrangement = Arrangement.Center
             ) {
 
                 Column(
                     Modifier.width(107.dp)
                 ) {
-                    P_Medium11(content = "여행 감정", color = neutral_500)
+                    Row(modifier = Modifier.width(107.dp),
+                        horizontalArrangement = Arrangement.Absolute.SpaceBetween) {
+                        P_Medium11(content = " ", color = neutral_500)
+                        P_Medium11(content = "여행 감정", color = neutral_500)
+                    }
+                    Spacer(modifier = Modifier.height(2.dp))
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .wrapContentWidth()
                     ) {
                         receiptcontent.emotionList.forEachIndexed { index, item ->
                             Row(
-                                modifier = Modifier.height(16.dp),
+                                modifier = Modifier.height(15.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
 
@@ -1207,7 +1214,7 @@ class ReciptActivity : ComponentActivity() {
                                 ) {
                                     LinearProgressIndicator(
                                         progress = { item.persent.toFloat()/100 },
-                                        modifier = Modifier.height(8.dp),
+                                        modifier = Modifier.height(4.dp),
                                         color = when(index)
                                         {
                                             0 -> primary_500
@@ -1251,7 +1258,7 @@ class ReciptActivity : ComponentActivity() {
             }
             Row(
                 Modifier
-                    .padding(bottom = 1.dp, end = 18.dp)
+                    .padding(bottom = 6.dp, end = 18.dp)
                     .align(Alignment.BottomEnd)
             ) {
                 P_Medium11(content = receiptcontent.startdate, color = neutral_500)
