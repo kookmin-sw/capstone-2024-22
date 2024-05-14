@@ -27,7 +27,8 @@ class MomentPermission @Inject constructor(@ActivityContext private val context 
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.POST_NOTIFICATIONS,
-        Manifest.permission.WAKE_LOCK
+        Manifest.permission.WAKE_LOCK,
+        Manifest.permission.RECORD_AUDIO
     )
 
     /** 위치 권한 SDK 버전 29 이하**/
@@ -36,7 +37,8 @@ class MomentPermission @Inject constructor(@ActivityContext private val context 
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.POST_NOTIFICATIONS,
-        Manifest.permission.WAKE_LOCK
+        Manifest.permission.WAKE_LOCK,
+        Manifest.permission.RECORD_AUDIO
     )
 
     fun checkPermission():Boolean{
@@ -72,6 +74,10 @@ class MomentPermission @Inject constructor(@ActivityContext private val context 
                     context,
                     permissionsLocationUpApi29Impl[3]
                 ) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(
+                    context,
+                    permissionsLocationUpApi29Impl[4]
+                ) != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
                     context as Activity,
@@ -95,6 +101,10 @@ class MomentPermission @Inject constructor(@ActivityContext private val context 
                 || ActivityCompat.checkSelfPermission(
                     context,
                     permissionsLocationDownApi29Impl[3]
+                ) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(
+                    context,
+                    permissionsLocationDownApi29Impl[4]
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
