@@ -1025,7 +1025,7 @@ struct ReceiptCompleteView : View {
                         Image("cut")
                             .padding(.bottom,10)
                         
-                        StatsView()
+                        StatsView( item: item)
                         Spacer()
                     }
                 )

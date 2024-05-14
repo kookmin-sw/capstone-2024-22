@@ -30,8 +30,9 @@ class SharedViewModel: ObservableObject {
     
     @Published var receipts = [Receipt]()
     //@Published var pagination : Pagination?
-   
-
+    @Published var receiptsBillData : [TripData] = []
+    @Published var tripData : TripData?
+    
     
     var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTQyNDgzMiwiZXhwIjoxNzU4NjI0ODMyfQ.iHg2ACmOB_hzoSlwsTfzGc_1gn6OHYmAxD0b2wgqNJg"
     
@@ -131,7 +132,49 @@ class SharedViewModel: ObservableObject {
            }
        }
     
+    
+    func fetchTripDetails(tripId: Int) {
+        let url = "http://211.205.171.117:8000/core/trip/\(tripId)"
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json;charset=UTF-8",
+            "Authorization": authToken
+           
+        ]
+        
+        AF.request(url, method: .get, headers: headers).responseDecodable(of: TripDetail.self) { response in
+            switch response.result {
+            case .success(let tripDetail):
+                print("Trip Details: \(tripDetail)")
+            case .failure(let error):
+                print("Error fetching trip details: \(error)")
+            }
+        }
+    }
+    
 
+}
+
+struct TripDetail: Decodable {// 영수증 만드는 페이지에 대한 데이터모델
+    let status: Int
+    let code: String
+    let msg: String
+    let detailMsg: String
+    let data: TripData
+}
+
+struct TripData: Decodable,Identifiable { // 영수증 만드는 페이지에 대한 데이터모델
+    let id: Int
+    let email: String
+    let startDate: String
+    let endDate: String
+    let analyzingCount: Int
+    let tripName: String
+    let numOfCard: Int
+    let happy: Double
+    let sad: Double
+    let angry: Double
+    let neutral: Double
+    let disgust: Double
 }
 
 struct Receipt: Identifiable, Decodable {

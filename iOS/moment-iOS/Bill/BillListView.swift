@@ -20,7 +20,7 @@ struct BillListView: View {
     @EnvironmentObject var homeViewModel: HomeViewModel
     // @EnvironmentObject var sharedViewModel: SharedViewModel
     
-    
+   
     var body: some View {
         
         ZStack{
@@ -39,6 +39,10 @@ struct BillListView: View {
             }
             
         }
+        
+        
+        
+        
         
     }
     private func hideKeyboard() {
@@ -59,6 +63,7 @@ struct BillListView: View {
     // NavigationLink 활성화를 위한 State 변수들
     @State private var isShowingCreateView = false
     @State private var isShowingReceiptsView = false
+     
     
     var body: some View {
         NavigationView {
@@ -302,7 +307,7 @@ struct ReceiptDetailView: View {
     
     
     var snapshotManager: SnapshotManager?
-    
+   
     
     
     var body: some View {
@@ -505,7 +510,7 @@ struct ReceiptBillView1 : View {
     @State private var selectedTab = 0
     @State private var forceUpdate = ""
     
-    
+   
     
     var body: some View{
         VStack(spacing: 0) {
@@ -516,7 +521,7 @@ struct ReceiptBillView1 : View {
                 .frame(height: 50) // 상단 바의 높이를 설정합니다.
                 .overlay(
                     HStack{
-                        Text("암스테르담 성당 여행") // 여기에 원하는 텍스트를 입력합니다.
+                        Text("\(item.tripName)") // 여기에 원하는 텍스트를 입력합니다.
                             .foregroundColor(textColor) // 텍스트 색상 설정
                         
                             .font(.pretendardMedium14)
@@ -536,9 +541,7 @@ struct ReceiptBillView1 : View {
                 .overlay(
                     VStack(alignment:.center){
                         
-                        Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이 ")
-                            .font(.pretendardMedium8)
-                            .foregroundColor(.homeRed)
+                       
                         
                         
                         
@@ -640,7 +643,7 @@ struct ReceiptBillView1 : View {
                         Image("cut")
                             .padding(.bottom,10)
                         
-                        StatsView()
+                        StatsView( item: item)
                         Spacer()
                     }
                 )
@@ -654,6 +657,9 @@ struct ReceiptBillView1 : View {
             RoundedRectangle(cornerRadius: 3)
                 .stroke(Color.Secondary50, lineWidth: 1)
         )
+        .onAppear{
+            sharedViewModel.fetchTripDetails(tripId: item.id)
+        }
         
     }
     private func showShareSheet(_ image: UIImage) {
@@ -689,14 +695,18 @@ struct ReceiptBillView1 : View {
         }
         
     }
+    
 }
+
+
 struct ReceiptsView: View {
     @EnvironmentObject var homeViewModel: HomeViewModel
     @StateObject var billListViewModel = BillListViewModel()
     @Environment(\.presentationMode) var presentationMode
     @State private var isLoading = false // 로딩 상태 관리
     @State private var selectedItem: Item? // 선택한 아이템 저장
-
+    
+    
     var body: some View {
         ZStack {
             // 로딩 뷰 조건부 표시
@@ -739,8 +749,10 @@ struct ReceiptsView: View {
             
             // 자동 이동 로직
             if let selectedItem = selectedItem {
-                NavigationLink("", destination: ReceiptDetailView(item: selectedItem)
-                    .environmentObject(billListViewModel), isActive: $isLoading)
+               
+                    NavigationLink("", destination: ReceiptDetailView(item: selectedItem)
+                        .environmentObject(billListViewModel), isActive: $isLoading)
+                
             }
         }
         .navigationBarBackButtonHidden()
@@ -827,8 +839,12 @@ struct GlobalGeometryGetter: View {
 }
 
 
+
+
 struct StatsView: View {
     //  @EnvironmentObject var sharedViewModel: SharedViewModel
+    @ObservedObject var viewModel = SharedViewModel()
+    var item : Item
     var body: some View {
         
         HStack(spacing:30) {
@@ -837,20 +853,22 @@ struct StatsView: View {
                     .font(.pretendardMedium11)
                     .foregroundColor(.gray500)
                     .multilineTextAlignment(.center)
-                Text("27")
-                    .font(.pretendardExtrabold14)
-                    .foregroundColor(.homeRed)
-                    .multilineTextAlignment(.center)
+               
+                    Text("1")
+                        .font(.pretendardExtrabold14)
+                        .foregroundColor(.homeRed)
+                        .multilineTextAlignment(.center)
+                
                 
                 Text("여행 날짜")
                     .font(.pretendardMedium11)
                     .foregroundColor(.gray500)
                     .multilineTextAlignment(.center)
-                Text("2024. 03. 05")
+                Text("2024. 05. 05")
                     .font(.pretendardMedium11)
                     .foregroundColor(.homeRed)
                     .multilineTextAlignment(.center)
-                Text("2024. 03. 13")
+                Text("2024. 05. 06")
                     .font(.pretendardMedium11)
                     .foregroundColor(.homeRed)
                     .multilineTextAlignment(.center)
@@ -865,14 +883,14 @@ struct StatsView: View {
                     .padding(.bottom,5)
                 
                 HStack{
-                    ProgressView(value: 0.6).frame(width: 109,height: 15)
+                    ProgressView(value: 0.99).frame(width: 109,height: 15)
                         .cornerRadius(3)
                         .scaleEffect(x: 1, y: 2, anchor: .center)
                         .tint(.homeRed)
                     
                     Image("netral")
                     
-                    Text("60%")
+                    Text("99%")
                         .font(.pretendardMedium11)
                         .foregroundColor(.homeRed)
                         .frame(width: 30)
@@ -880,34 +898,34 @@ struct StatsView: View {
                 }
                 
                 HStack{
-                    ProgressView(value: 0.3).frame(width: 109,height: 15)
+                    ProgressView(value: 0.0).frame(width: 109,height: 15)
                         .scaleEffect(x: 1, y: 2, anchor: .center)
                         .tint(.Natural300)
                     Image("sad")
-                    Text("30%")
+                    Text("0%")
                         .font(.pretendardMedium11)
                         .frame(width: 30)
                     
                 }
                 
                 HStack{
-                    ProgressView(value: 0.5).frame(width: 109,height: 15)
+                    ProgressView(value: 0.0).frame(width: 109,height: 15)
                         .scaleEffect(x: 1, y: 2, anchor: .center)
                         .cornerRadius(3)
                         .tint(.Natural300)
                     Image("fun")
-                    Text("50%")
+                    Text("0%")
                         .font(.pretendardMedium11)
                         .frame(width: 30)
                     
                 }
                 HStack{
-                    ProgressView(value: 0.2).frame(width: 109,height: 15)
+                    ProgressView(value: 0.0).frame(width: 109,height: 15)
                         .scaleEffect(x: 1, y: 2, anchor: .center)
                         .cornerRadius(3)
                         .tint(.Natural300)
                     Image("angry")
-                    Text("20%")
+                    Text("0%")
                         .font(.pretendardMedium11)
                         .frame(width: 30)
                     
@@ -918,10 +936,13 @@ struct StatsView: View {
         }
         
         
-        
+        .onAppear{
+            viewModel.fetchTripDetails(tripId: item.id)
+        }
         
         
     }
+       
 }
 
 
