@@ -1652,7 +1652,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 484.dp, start = 28.dp, end = 10.dp),
+                    .padding(top = 470.dp, start = 28.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 receiptcontent.tripName?.let { P_Medium14(content = it, color = black)
@@ -1760,14 +1760,13 @@ class ReciptActivity : ComponentActivity() {
                     P_Medium11(content = "여행 감정", color = neutral_500)
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .wrapContentWidth()
                     ) {
                         receiptcontent.emotionList.forEachIndexed { index, item ->
                             Row(
-                                modifier = Modifier.height(16.dp),
+                                modifier = Modifier.height(15.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-
                                 Image(
                                     modifier = Modifier.size(14.dp),
                                     painter = painterResource(id = Theme2_Emotion(kind = item.text)),
@@ -1779,7 +1778,7 @@ class ReciptActivity : ComponentActivity() {
                                 ) {
                                     LinearProgressIndicator(
                                         progress = { item.persent.toFloat()/100 },
-                                        modifier = Modifier.height(8.dp),
+                                        modifier = Modifier.height(4.dp),
                                         color = when(index)
                                         {
                                             0 -> primary_500
@@ -1823,7 +1822,7 @@ class ReciptActivity : ComponentActivity() {
             }
             Row(
                 Modifier
-                    .padding(bottom = 1.dp, end = 18.dp)
+                    .padding(bottom = 6.dp, end = 18.dp)
                     .align(Alignment.BottomEnd)
             ) {
                 receiptcontent.startdate?.let { P_Medium11(content = "$it / ", color = neutral_500)
@@ -1919,7 +1918,7 @@ class ReciptActivity : ComponentActivity() {
                         .clickable {
                             setResult(1, mainIntent)
                             finish()
-                           }) {
+                        }) {
                     YJ_Bold15("뒤로", black)
                 }
                 Column() {
@@ -1929,9 +1928,10 @@ class ReciptActivity : ComponentActivity() {
                                 .padding(vertical = 10.dp, horizontal = 14.dp)
                                 .clickable {
                                     coroutineScope.launch {
-                                        val capturedImageBitmap = createBitmapFromPicture(picture).asImageBitmap()
+                                        val capturedImageBitmap =
+                                            createBitmapFromPicture(picture).asImageBitmap()
 
-                                        ShareImage(capturedImageBitmap.toBitmap(),context)
+                                        ShareImage(capturedImageBitmap.toBitmap(), context)
                                     }
                                 }) {
                             YJ_Bold15("내보내기", black)
