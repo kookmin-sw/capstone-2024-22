@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
@@ -776,7 +777,7 @@ class ReciptActivity : ComponentActivity() {
                             color = primary_500,
                             shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
                         )
-                        .padding(start = 8.dp),
+                        .padding(start = 8.dp, end = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -923,13 +924,12 @@ class ReciptActivity : ComponentActivity() {
                 Modifier
                     .fillMaxWidth()
                     .height(150.dp)
-                    .padding(start = 41.dp)
-                    .align(Alignment.BottomCenter)
+                    .align(Alignment.BottomCenter),
+                horizontalArrangement = Arrangement.Center
             ) {
                 Column(
                     Modifier
-                        .height(150.dp)
-                        .padding(end = 36.dp),
+                        .height(150.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     P_Medium11(content = "여행 카드", color = neutral_500)
@@ -942,13 +942,12 @@ class ReciptActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(5.dp))
                     P_Medium11(content = receiptcontent.enddate, color = primary_500)
                 }
-                Spacer(modifier = Modifier.width(50.dp))
+                Spacer(modifier = Modifier.width(30.dp))
                 Column() {
                     P_Medium11(content = "여행 감정", color = neutral_500)
                     Spacer(modifier = Modifier.height(8.dp))
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
+                        modifier = Modifier.wrapContentWidth()
                     ) {
 
                         receiptcontent.emotionList.forEachIndexed { index, item ->
