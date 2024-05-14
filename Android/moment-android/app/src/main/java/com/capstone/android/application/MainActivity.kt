@@ -44,6 +44,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -146,6 +147,7 @@ import com.capstone.android.application.ui.theme.P_Medium_Oneline
 import com.capstone.android.application.ui.theme.YJ_Bold
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
+import com.capstone.android.application.ui.theme.neutral_100
 import com.capstone.android.application.ui.theme.neutral_200
 import com.capstone.android.application.ui.theme.neutral_300
 import com.capstone.android.application.ui.theme.neutral_400
@@ -1490,7 +1492,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.img_receipt_preview), contentDescription = "영수증미리보기"
             )
-            Spacer(modifier = Modifier.height(70.dp))
+            Spacer(modifier = Modifier.height(55.dp))
             BigButton("만들기", true,
                 onClick = { makeReceipt.launch(
                     Intent(
