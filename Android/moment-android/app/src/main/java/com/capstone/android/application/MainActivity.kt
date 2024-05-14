@@ -44,6 +44,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -147,6 +148,7 @@ import com.capstone.android.application.ui.theme.P_Medium_Oneline
 import com.capstone.android.application.ui.theme.YJ_Bold
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
+import com.capstone.android.application.ui.theme.neutral_100
 import com.capstone.android.application.ui.theme.neutral_200
 import com.capstone.android.application.ui.theme.neutral_300
 import com.capstone.android.application.ui.theme.neutral_400
@@ -264,6 +266,17 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MainRoot() {
+        var movenav = "Basic"
+         try {
+             movenav = intent.getStringExtra("MoveScreen").toString()
+             if (movenav == "ReceiptPost") {
+                 receiptViewModel.getReceiptAll(0,10000)
+                 Log.d("ReceiptPost", "MainRoot: ")
+             }
+        } catch (e: Exception) {
+             movenav = "Basic"
+        }
+
         val postTrip =
             rememberLauncherForActivityResult(
                 ActivityResultContracts.StartActivityForResult()
@@ -286,8 +299,7 @@ class MainActivity : ComponentActivity() {
                 ActivityResultContracts.StartActivityForResult()
             ) { result ->
                 if (result.resultCode == 1) {
-                }
-                if (result.resultCode == 2) {
+                    receiptViewModel.getReceiptAll(0,10000)
                 }
             }
 
@@ -407,28 +419,23 @@ class MainActivity : ComponentActivity() {
                     color = "#1F9854"
                 )
             )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_receipt2_emotion_disgust,
+                text = "불쾌해요 ",
+                persent = 0f,
+                color = "#1F9854"
+            )
+        )
 
             // 영수증 삭제 dialog
             val showDeleteDialog = remember { mutableStateOf(false) }
             val deleteyes = remember { mutableStateOf(false) }
 
-            if (showDeleteDialog.value){
-                //dialog 띄우기
-                deleteDialog(showDeleteDialog = showDeleteDialog, Deletesize = DeleteReceipt.size, deleteyes = deleteyes )
-            }
-            if(deleteyes.value){
-                deleteyes.value = false
-                receiptViewModel.deleteReceiptDelete(
-                    body = deleteReceiptDeleteRequest(receiptIds = DeleteReceipt))
-                DeleteReceipt.clear()
-                receiptViewModel.getReceiptAll(0, 10000)
-            }
-
-
             tripViewModel.getTripAll()
             cardViewModel.getCardLiked()
             tripFileViewModel.getTripFileUntitled()
-
+            receiptViewModel.getReceiptAll(0,10000)
 
 
             tripViewModel.getTripAllSuccess.observe(this@MainActivity) { response ->
@@ -594,9 +601,9 @@ class MainActivity : ComponentActivity() {
 
             // 영수증 삭제 성공
             receiptViewModel.deleteReceiptDeleteSuccess.observe(this@MainActivity) { response ->
-                Log.d("seohyun", "MainRoot: 영수증 삭제 성공")
-                deleteyes.value = false
                 EditCheckState.value = false
+                DeleteReceipt.clear()
+                receiptViewModel.getReceiptAll(0, 10000)
             }
             // 영수증 삭제 실패
             receiptViewModel.deleteReceiptDeleteFailure.observe(this@MainActivity) { response ->
@@ -605,12 +612,9 @@ class MainActivity : ComponentActivity() {
             val receiptList = remember { mutableStateListOf<ReceiptAll>() }
             // 영수증 전체 받기 성공
             receiptViewModel.getReceiptAllSuccess.observe(this@MainActivity) { response ->
-                Log.d("seohyun", "MainRoot: 영수증 전체 받기 성공")
                     receiptList.clear()
-                    Log.d("MainRootMainRoot", "clear:")
                     response.data.receiptList.mapNotNull { receiptAll ->
                         runCatching {
-                            Log.d("MainRootMainRoot", "running")
                             ReceiptAll(
                                 receiptAll.id,
                                 receiptAll.tripId,
@@ -632,17 +636,14 @@ class MainActivity : ComponentActivity() {
                                 receiptAll.createdAt
                             )
                         }
-                            .onSuccess { Log.d("MainRootMainRoot", "onSuccess") }
-                            .onFailure { Log.d("MainRootMainRoot", "onFailure") }.getOrNull()
+                            .onSuccess { }
+                            .onFailure {  }.getOrNull()
                     }.forEach {
-                        Log.d("MainRootMainRoot", "MainRoot: ${it}")
                         receiptList.add(it)
-                        if (response.data.receiptList.size == receiptList.size) {
-                            Log.d("MainRootMainRoot", ": 사이즈 ,다채움")
-                            navController.navigate(MainScreen.ReceiptPost.screenRoute)
+                        /*if (response.data.receiptList.size == receiptList.size) {
+
                         } else {
-                            Log.d("MainRootMainRoot", "MainRootMainRoot: 사이즈 아직 아님 ")
-                        }
+                        }*/
                     }
             }
             // 영수증 전체 받기 실패
@@ -670,17 +671,7 @@ class MainActivity : ComponentActivity() {
 
 
             }
-
-
-            val movenav = try {
-                intent.getStringExtra("MoveScreen")
-            } catch (e: Exception) {
-                "Basic"
-            }
-
             navController = rememberNavController()
-
-
 
             Scaffold(
                 modifier = Modifier
@@ -833,7 +824,9 @@ class MainActivity : ComponentActivity() {
                                                 Column(Modifier.clickable {
                                                     navController.navigate(
                                                         BottomNavItem.Receipt.screenRoute
-                                                    )
+                                                    ){
+                                                        popUpTo(BottomNavItem.Receipt.screenRoute) { inclusive = true }
+                                                    }
                                                 }) {
                                                     Text(
                                                         text = "뒤로",
@@ -876,6 +869,9 @@ class MainActivity : ComponentActivity() {
                                                     }
 
                                                     "영수증 모아보기" -> {
+                                                        EditCheckState.value = false
+                                                        DeleteReceipt.clear()
+                                                        navController.navigate(MainScreen.ReceiptPost.screenRoute)
                                                         val size = 10000
                                                         receiptViewModel.getReceiptAll(0, size)
                                                     }
@@ -886,8 +882,11 @@ class MainActivity : ComponentActivity() {
                                                     }
 
                                                     "삭제" -> {
-                                                        showDeleteDialog.value = true
+                                                        if (DeleteReceipt.size != 0){
+                                                            showDeleteDialog.value = true
+                                                        }else{
 
+                                                        }
                                                     }
                                                 }
                                             },
@@ -907,6 +906,10 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             ) { innerPadding ->
+                if (showDeleteDialog.value){
+                    //dialog 띄우기
+                    deleteDialog(showDeleteDialog = showDeleteDialog,  DeleteReceipt = DeleteReceipt )
+                }
                 NavHost(
                     navController,
                     startDestination =
@@ -924,10 +927,6 @@ class MainActivity : ComponentActivity() {
                         title.value = "추가"
                     }
                     composable(BottomNavItem.Receipt.screenRoute) {
-                        /*Toast.makeText(this@MainActivity, "추후 공개될 예정입니다.", Toast.LENGTH_SHORT)
-                            .show()
-                        Log.d("waegwagewa", tripList.toString())
-                        Home(tripList, mainTrip)*/
                         title.value = "추가"
                         currentSelectedBottomRoute.value = "Receipt"
 
@@ -953,7 +952,6 @@ class MainActivity : ComponentActivity() {
                     }
                     composable(MainScreen.ReceiptPost.screenRoute) {
                         currentSelectedBottomRoute.value = MainScreen.ReceiptPost.rootRoute
-                        Log.d("MainRootMainRoot", "컴포즈에 왔다 ${receiptList.size}")
                         ReceiptPost(makeReceipt, receiptList, EditCheckState, DeleteReceipt)
                         if (EditCheckState.value) title.value = "삭제" else title.value = "편집"
                     }
@@ -1521,7 +1519,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxWidth(),
                 painter = painterResource(id = R.drawable.img_receipt_preview), contentDescription = "영수증미리보기"
             )
-            Spacer(modifier = Modifier.height(70.dp))
+            Spacer(modifier = Modifier.height(55.dp))
             BigButton("만들기", true,
                 onClick = { makeReceipt.launch(
                     Intent(
@@ -2505,7 +2503,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MiniTheme1(receiptAll:ReceiptAll){
-        val emotionList = emotionPercent(receiptAll.neutral,receiptAll.happy,receiptAll.angry,receiptAll.sad)
+        val emotionList = emotionPercent(receiptAll.neutral,receiptAll.happy,receiptAll.angry,receiptAll.sad, receiptAll.disgust)
 
         Box(
             modifier = Modifier
@@ -2643,13 +2641,14 @@ class MainActivity : ComponentActivity() {
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 14.dp, top = 160.dp)
-                    .align(Alignment.BottomCenter)
+                    .padding(top = 160.dp)
+                    .align(Alignment.BottomCenter),
+                horizontalArrangement = Arrangement.Center
             ) {
                 Column(
                     Modifier
-                        .height(50.dp)
-                        .padding(end = 20.dp),
+                        .wrapContentWidth()
+                        .height(50.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     P_Medium(content = "여행 카드", color = neutral_500, 4.sp)
@@ -2661,62 +2660,61 @@ class MainActivity : ComponentActivity() {
                     P_Medium(content = receiptAll.stDate, color = primary_500, 4.sp)
                     P_Medium(content = receiptAll.edDate, color = primary_500, 4.sp)
                 }
-                Spacer(modifier = Modifier.width(15.dp))
+                Spacer(modifier = Modifier.width(10.dp))
                 Column() {
                     P_Medium(content = "여행 감정", color = neutral_500, 4.sp)
                     Spacer(modifier = Modifier.height(3.8.dp))
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .wrapContentWidth()
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            emotionList.forEachIndexed { index, item ->
-                                Row(
-                                    modifier = Modifier.height(8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(
-                                        modifier = Modifier.width(40.dp)
-                                    )  {
-                                        LinearProgressIndicator(
-                                            progress = { item.persent.toFloat() / 100 },
-                                            modifier = Modifier.height(3.dp),
-                                            color = when (index) {
-                                                0 -> primary_500
-                                                1 -> neutral_600
-                                                2 -> neutral_400
-                                                3 -> neutral_200
-                                                else -> primary_500
-                                            },
-                                            strokeCap = StrokeCap.Round
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(4.2.dp))
-                                    Image(
-                                        modifier = Modifier.size(5.dp),
-                                        painter = painterResource(
-                                            id = Theme1_Emotion(
-                                                item.text,
-                                                index
-                                            )
-                                        ),
-                                        contentDescription = ""
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    P_Medium(
-                                        content = item.persent.toString() + "%",
+                        emotionList.forEachIndexed { index, item ->
+                            Row(
+                                modifier = Modifier
+                                    .height(6.dp)
+                                    .wrapContentWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(
+                                    modifier = Modifier.width(40.dp)
+                                )  {
+                                    LinearProgressIndicator(
+                                        progress = { item.persent.toFloat() / 100 },
+                                        modifier = Modifier.height(3.dp),
                                         color = when (index) {
                                             0 -> primary_500
                                             1 -> neutral_600
                                             2 -> neutral_400
                                             3 -> neutral_200
+                                            4 -> neutral_100
                                             else -> primary_500
-                                        }, 4.sp
+                                        },
+                                        strokeCap = StrokeCap.Round
                                     )
                                 }
+                                Spacer(modifier = Modifier.width(4.2.dp))
+                                Image(
+                                    modifier = Modifier.size(5.dp),
+                                    painter = painterResource(
+                                        id = Theme1_Emotion(
+                                            item.text,
+                                            index
+                                        )
+                                    ),
+                                    contentDescription = ""
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                P_Medium(
+                                    content = item.persent.toString() + "%",
+                                    color = when (index) {
+                                        0 -> primary_500
+                                        1 -> neutral_600
+                                        2 -> neutral_400
+                                        3 -> neutral_200
+                                        4 -> neutral_100
+                                        else -> primary_500
+                                    }, 4.sp
+                                )
                             }
                         }
                     }
@@ -2727,7 +2725,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MiniTheme2(receiptAll:ReceiptAll){
-        val emotionList = emotionPercent(receiptAll.neutral,receiptAll.happy,receiptAll.angry,receiptAll.sad)
+        val emotionList = emotionPercent(receiptAll.neutral,receiptAll.happy,receiptAll.angry,receiptAll.sad, receiptAll.disgust)
 
         Box(
             modifier = Modifier
@@ -2767,12 +2765,6 @@ class MainActivity : ComponentActivity() {
                 }
                 Spacer(modifier = Modifier.height(2.dp))
                 Divider(color = primary_500, thickness = 1.dp)
-                P_Medium_Oneline(
-                    " 티켓이 발행된 날짜는 "+ receiptAll.created + "입니다. " +
-                            " 티켓이 발행된 날짜는 "+ receiptAll.created + "입니다. " +
-                            " 티켓이 발행된 날짜는 "+ receiptAll.created + "입니다. " +
-                            " 티켓이 발행된 날짜는 "+ receiptAll.created + "입니다. ", primary_200, 3.sp
-                )
                 Spacer(modifier = Modifier.height(15.dp))
                 Column {
                     Row(
@@ -2848,8 +2840,7 @@ class MainActivity : ComponentActivity() {
 
                         Row(
                             Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp),
+                                .fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Column(
@@ -2858,45 +2849,40 @@ class MainActivity : ComponentActivity() {
                                 P_Medium(content = "여행 감정", color = neutral_500, 4.sp)
                                 Spacer(modifier = Modifier.height(3.8.dp))
                                 Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
+                                    modifier = Modifier.wrapContentWidth()
                                 ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                    ) {
-                                        emotionList.forEachIndexed { index, item ->
-                                            Row(
-                                                modifier = Modifier.height(6.dp),
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
+                                    emotionList.forEachIndexed { index, item ->
+                                        Row(
+                                            modifier = Modifier.height(5.5.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
 
-                                                Image(
-                                                    modifier = Modifier.size(5.dp),
-                                                    painter = painterResource(
-                                                        id = Theme2_Emotion(
-                                                            kind = item.text
-                                                        )
-                                                    ),
-                                                    contentDescription = ""
-                                                )
-                                                Spacer(modifier = Modifier.width(3.dp))
-                                                Column(
-                                                    modifier = Modifier.width(32.dp)
-                                                ) {
-                                                    LinearProgressIndicator(
-                                                        progress = { item.persent.toFloat() / 100 },
-                                                        modifier = Modifier.height(1.5.dp),
-                                                        color = when (index) {
-                                                            0 -> primary_500
-                                                            1 -> neutral_600
-                                                            2 -> neutral_400
-                                                            3 -> neutral_200
-                                                            else -> primary_500
-                                                        },
-                                                        strokeCap = StrokeCap.Round
+                                            Image(
+                                                modifier = Modifier.size(5.dp),
+                                                painter = painterResource(
+                                                    id = Theme2_Emotion(
+                                                        kind = item.text
                                                     )
-                                                }
+                                                ),
+                                                contentDescription = ""
+                                            )
+                                            Spacer(modifier = Modifier.width(3.dp))
+                                            Column(
+                                                modifier = Modifier.width(32.dp)
+                                            ) {
+                                                LinearProgressIndicator(
+                                                    progress = { item.persent.toFloat() / 100 },
+                                                    modifier = Modifier.height(1.5.dp),
+                                                    color = when (index) {
+                                                        0 -> primary_500
+                                                        1 -> neutral_600
+                                                        2 -> neutral_400
+                                                        3 -> neutral_200
+                                                        4 -> neutral_100
+                                                        else -> primary_500
+                                                    },
+                                                    strokeCap = StrokeCap.Round
+                                                )
                                             }
                                         }
                                     }
@@ -2974,22 +2960,23 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun deleteDialog(showDeleteDialog : MutableState<Boolean>, Deletesize : Int, deleteyes : MutableState<Boolean>){
+    fun deleteDialog(showDeleteDialog : MutableState<Boolean>, DeleteReceipt : MutableList<ReceiptId>){
 
         CustomTitleCheckDialog(
-            title = "$Deletesize 개의 영수증을 정말 삭제 할까요?",
+            title = "${DeleteReceipt.size} 개의 영수증을 정말 삭제 할까요?",
             description = "삭제된 영수증은 복구할 수 없어요",
             checkleft = "네",
             checkright = "아니요",
             onClickCancel = { showDeleteDialog.value = false },
             onClickleft = {
-                deleteyes.value = true
+                receiptViewModel.deleteReceiptDelete(
+                    body = deleteReceiptDeleteRequest(receiptIds = DeleteReceipt))
                 showDeleteDialog.value = false },
             onClickright = { showDeleteDialog.value = false }
         )
     }
 
-    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double): SnapshotStateList<com.capstone.android.application.data.local.Emotion> {
+    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double, disgust : Double): SnapshotStateList<com.capstone.android.application.data.local.Emotion> {
         val emotionList = mutableStateListOf<com.capstone.android.application.data.local.Emotion>()
         emotionList.add(
             com.capstone.android.application.data.local.Emotion(
@@ -3019,7 +3006,14 @@ class MainActivity : ComponentActivity() {
                 persent = (sad).toInt()
             )
         )
-        //emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = emotion5.toInt()))
+        emotionList.add(
+            com.capstone.android.application.data.local.Emotion(
+                icon = R.drawable.ic_receipt2_emotion_disgust,
+                text = "불쾌해요",
+                persent = (disgust).toInt()
+                )
+        )
+
         emotionList.sortByDescending { it.persent }
         return emotionList
     }
@@ -3055,6 +3049,13 @@ class MainActivity : ComponentActivity() {
                 3 -> R.drawable.ic_receipt1_emotion_sad_4
                 else -> R.drawable.ic_receipt1_emotion_sad_1
             }
+            "불쾌해요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_disgust1
+                1 -> R.drawable.ic_receipt1_emotion_disgust2
+                2 -> R.drawable.ic_receipt1_emotion_disgust3
+                3 -> R.drawable.ic_receipt1_emotion_disgust4
+                else -> R.drawable.ic_receipt1_emotion_disgust5
+            }
             else -> return R.drawable.ic_emotion_angry
         }
     }
@@ -3065,7 +3066,8 @@ class MainActivity : ComponentActivity() {
             "평범해요" -> R.drawable.ic_receipt2_emotion_common
             "화가나요" -> R.drawable.ic_receipt2_emotion_angry
             "즐거워요" -> R.drawable.ic_receipt2_emotion_happy
-            "슬퍼요" -> R.drawable.ic_receipt2_emotions_sad
+            "슬퍼요" -> R.drawable.ic_receipt2_emotion_sad
+            "불쾌해요" -> R.drawable.ic_receipt2_emotion_disgust
             else -> R.drawable.ic_receipt2_emotion_common
         }
     }

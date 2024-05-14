@@ -7,9 +7,12 @@ import android.graphics.Bitmap
 import android.graphics.Picture
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -32,9 +35,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
@@ -91,6 +98,7 @@ import com.capstone.android.application.ui.theme.P_ExtraBold14
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
 import com.capstone.android.application.ui.theme.P_Medium8
+import com.capstone.android.application.ui.theme.P_SemiBold18
 import com.capstone.android.application.ui.theme.ReciptTextField
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.YJ_Bold20
@@ -124,7 +132,8 @@ enum class ReciptScreen(){
     SaveRecipt,
     ReceiptPost_Big,
     EditReceipt,
-    SaveEditReceipt
+    SaveEditReceipt,
+    Loading
 }
 @AndroidEntryPoint
 class ReciptActivity : ComponentActivity() {
@@ -191,7 +200,7 @@ class ReciptActivity : ComponentActivity() {
             // 영수증 전체 받기 실패
             tripViewModel.getTripDetailFailure.observe(this@ReciptActivity) { response ->
                 Log.d("qwerqwerqwer", response.toString())
-                setResult(3,mainIntent)
+                setResult(1,mainIntent)
             }
 
 
@@ -240,7 +249,7 @@ class ReciptActivity : ComponentActivity() {
                     composable(route = ReciptScreen.SaveRecipt.name +
                             "/{tripName}/{intro.value}/{depart_small.value}/{depart.value}" +
                             "/{arrive_small.value}/{arrive.value}/{cardnum}" +
-                            "/{publicationdate}/{startdate}/{enddate}/{theme}/{happy}/{sad}/{neutral}/{angry}",
+                            "/{publicationdate}/{startdate}/{enddate}/{theme}/{happy}/{sad}/{neutral}/{angry}/{disgust}",
                         arguments = listOf(
                             navArgument("tripName"){  defaultValue = "defaultValue" },
                             navArgument("intro"){  defaultValue = "" },
@@ -256,7 +265,8 @@ class ReciptActivity : ComponentActivity() {
                             navArgument("happy"){  defaultValue = "0.0" },
                             navArgument("sad"){  defaultValue = "0.0" },
                             navArgument("neutral"){  defaultValue = "0.0" },
-                            navArgument("angry"){  defaultValue = "0.0" }
+                            navArgument("angry"){  defaultValue = "0.0" },
+                            navArgument("disgust"){  defaultValue = "0.0" }
                         )) { navBackStackEntry ->
                         val tripName = navBackStackEntry.arguments?.getString("tripName")
                         val intro = navBackStackEntry.arguments?.getString("intro.value")?:" "
@@ -273,12 +283,14 @@ class ReciptActivity : ComponentActivity() {
                         val sad = navBackStackEntry.arguments?.getString("sad")?:0.0
                         val neutral = navBackStackEntry.arguments?.getString("neutral")?:0.0
                         val angry = navBackStackEntry.arguments?.getString("angry")?:0.0
+                        val disgust = navBackStackEntry.arguments?.getString("disgust")?:0.0
 
                         val emotionList = emotionPercent(
                             happy.toString().toDouble(),
                             sad.toString().toDouble(),
                             neutral.toString().toDouble(),
-                            angry.toString().toDouble(), theme)
+                            angry.toString().toDouble(),
+                            disgust.toString().toDouble(), theme)
 
 
                         if (theme != null) {
@@ -291,16 +303,16 @@ class ReciptActivity : ComponentActivity() {
                     composable(route = ReciptScreen.ReceiptPost_Big.name) {
 
                         val data = intent.getSerializableExtra("BigReceipt") as ReceiptAll
-                        val emotionList = emotionPercent(data.neutral/100,data.happy/100,data.angry/100,data.sad/100, data.receiptThemeType)
+                        val emotionList = emotionPercent(data.neutral/100,data.happy/100,data.angry/100,data.sad/100, data.disgust/100, data.receiptThemeType)
                         val created = data.created.take(10)
                         val receiptcontent = ReceiptContent_string(data.tripName,data.oneLineMemo, data.subDeparture,data.mainDeparture,
                             data.subDestination,data.mainDestination,data.numOfCard,created,data.stDate,data.edDate,emotionList)
-                        ReceiptPost_Big(mainIntent, receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad, data.id)
+                        ReceiptPost_Big(mainIntent, receiptcontent, data.receiptThemeType,data.neutral,data.happy,data.angry,data.sad, data.disgust, data.id)
                     }
                     composable(route = ReciptScreen.EditReceipt.name +
                             "/{tripName}/{intro}/{depart_small}/{depart}" +
                             "/{arrive_small}/{arrive}/{cardnum}" +
-                            "/{publicationdate}/{startdate}/{enddate}/{happy}/{sad}/{neutral}/{angry}/{receiptid}",
+                            "/{publicationdate}/{startdate}/{enddate}/{happy}/{sad}/{neutral}/{angry}/{disgust}/{receiptid}",
                         arguments = listOf(
                             navArgument("tripName"){  defaultValue = "defaultValue" },
                             navArgument("intro"){  defaultValue = "" },
@@ -316,6 +328,7 @@ class ReciptActivity : ComponentActivity() {
                             navArgument("sad"){  defaultValue = "0.0" },
                             navArgument("neutral"){  defaultValue = "0.0" },
                             navArgument("angry"){  defaultValue = "0.0" },
+                            navArgument("disgust"){  defaultValue = "0.0" },
                             navArgument("receiptid"){  defaultValue = "0" }
                         )) { navBackStackEntry ->
                         val tripname = navBackStackEntry.arguments?.getString("tripName")?:" "
@@ -332,13 +345,15 @@ class ReciptActivity : ComponentActivity() {
                         val sad = navBackStackEntry.arguments?.getString("sad")?:0.0
                         val neutral = navBackStackEntry.arguments?.getString("neutral")?:0.0
                         val angry = navBackStackEntry.arguments?.getString("angry")?:0.0
+                        val disgust = navBackStackEntry.arguments?.getString("disgust")?:0.0
                         val receiptid = navBackStackEntry.arguments?.getString("receiptid")?:0
 
                         val emotionList = emotionPercent(
                             happy.toString().toDouble()/100,
                             sad.toString().toDouble()/100,
                             neutral.toString().toDouble()/100,
-                            angry.toString().toDouble()/100, "notheme")
+                            angry.toString().toDouble()/100,
+                            disgust.toString().toDouble()/100, "notheme")
 
                         val Intro = mutableStateOf("")
                         val Depart_small = mutableStateOf("")
@@ -360,12 +375,13 @@ class ReciptActivity : ComponentActivity() {
                             tripname, Intro, Depart_small, Depart, Arrive_small, Arrive,
                             cardnum,publicationdate,startdate,enddate, emotionList)
                         EditReceipt(data,neutral.toString().toDouble()/100,happy.toString().toDouble()/100,
-                            sad.toString().toDouble()/100,angry.toString().toDouble()/100,receiptid.toString().toInt())
+                            sad.toString().toDouble()/100,angry.toString().toDouble()/100,
+                            disgust.toString().toDouble()/100 ,receiptid.toString().toInt(), mainIntent)
                     }
                     composable(route = ReciptScreen.SaveEditReceipt.name  +
                             "/{tripName}/{intro.value}/{depart_small.value}/{depart.value}" +
                             "/{arrive_small.value}/{arrive.value}/{cardnum}" +
-                            "/{publicationdate}/{startdate}/{enddate}/{theme}/{happy}/{sad}/{neutral}/{angry}",
+                            "/{publicationdate}/{startdate}/{enddate}/{theme}/{happy}/{sad}/{neutral}/{angry}/{disgust}",
                         arguments = listOf(
                             navArgument("tripName"){  defaultValue = "defaultValue" },
                             navArgument("intro"){  defaultValue = "" },
@@ -381,7 +397,8 @@ class ReciptActivity : ComponentActivity() {
                             navArgument("happy"){  defaultValue = "0.0" },
                             navArgument("sad"){  defaultValue = "0.0" },
                             navArgument("neutral"){  defaultValue = "0.0" },
-                            navArgument("angry"){  defaultValue = "0.0" }
+                            navArgument("angry"){  defaultValue = "0.0" },
+                            navArgument("disgust"){  defaultValue = "0.0" }
                         )) { navBackStackEntry ->
                         val tripName = navBackStackEntry.arguments?.getString("tripName")
                         val intro = navBackStackEntry.arguments?.getString("intro.value")?:" "
@@ -398,17 +415,21 @@ class ReciptActivity : ComponentActivity() {
                         val sad = navBackStackEntry.arguments?.getString("sad")?:0.0
                         val neutral = navBackStackEntry.arguments?.getString("neutral")?:0.0
                         val angry = navBackStackEntry.arguments?.getString("angry")?:0.0
+                        val disgust = navBackStackEntry.arguments?.getString("disgust")?:0.0
 
                         val emotionList = emotionPercent(
                             happy.toString().toDouble(),
                             sad.toString().toDouble(),
                             neutral.toString().toDouble(),
-                            angry.toString().toDouble(), theme)
+                            angry.toString().toDouble(),
+                            disgust.toString().toDouble(), theme)
 
                         SaveEditReceipt(theme,ReceiptContent_string(
                             tripName, intro, depart_small, depart, arrive_small, arrive,
-                            cardnum,publicationdate,startdate,enddate, emotionList)
-                        )
+                            cardnum,publicationdate,startdate,enddate, emotionList),mainIntent)
+                    }
+                    composable(route = ReciptScreen.Loading.name){
+                        Loading()
                     }
                 }
             }
@@ -445,7 +466,8 @@ class ReciptActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun MakeTripChoice(tripList: MutableList<ReceiptTrip>, mainIntent: Intent) {
+    fun MakeTripChoice(tripList: MutableList<ReceiptTrip>, mainIntent: Intent)
+    {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -459,7 +481,7 @@ class ReciptActivity : ComponentActivity() {
                     .align(Alignment.Center)
                     .background(color = tertiary_500)
             ) {
-                Column(
+                Row(
                     modifier = Modifier
                         .padding(top = 23.dp)
                         .wrapContentSize()
@@ -469,6 +491,9 @@ class ReciptActivity : ComponentActivity() {
                             setResult(1, mainIntent)
                             finish()
                         }, "")
+                    
+                    Spacer(modifier = Modifier.width(8.dp))
+                    P_SemiBold18(content = "여행 선택하기", color = black)
                 }
                 LazyColumn(
                     modifier = Modifier
@@ -505,17 +530,13 @@ class ReciptActivity : ComponentActivity() {
 
     @Composable
     fun ItemTrip(trip: Trip, index : Int) {
+        BackHandler { finish() }
         Column(
             modifier = Modifier
                 .background(color = tertiary_500)
                 .clickable {
                     tripViewModel.getTripDetail(tripId = trip.id)
-
-                    navController.currentBackStackEntry?.savedStateHandle?.set(
-                        key = "ItemData",
-                        value = trip.id
-                    )
-                    navController.navigate(ReciptScreen.MakeTrip.name)
+                    navController.navigate(ReciptScreen.Loading.name)
                 },
         ) {
             Box(
@@ -558,17 +579,36 @@ class ReciptActivity : ComponentActivity() {
             }
         }
     }
+    @Composable
+    fun Loading() {
+        CircularProgress()
+        Handler(Looper.getMainLooper()).postDelayed({
+
+            navController.navigate(ReciptScreen.MakeTrip.name)
+        }, 700)
+    }
+    @Composable
+    fun CircularProgress() {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = primary_500)
+        }
+    }
+
 
     @SuppressLint("UnrememberedMutableState")
     @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalPagerApi::class)
     @Composable
     fun MakeTrip(trip: TripDetail){
+        val viewModel: CustomNoTitleCheckViewModel = viewModel()
+        BackHandler { viewModel.showCustomNoTitleCheckDialog() }
 
         val page = 2
         val state = rememberPagerState()
 
-        val viewModel: CustomNoTitleCheckViewModel = viewModel()
         val CustomNoTitleCheckDialogState = viewModel.CustomNoTitleCheckDialogState.value
 
         val receiptIntent = Intent(this@ReciptActivity, MainActivity::class.java)
@@ -587,7 +627,7 @@ class ReciptActivity : ComponentActivity() {
         val tripid = trip.id
         val cardnum = trip.numOfCard
         var theme = if (state.currentPage == 0) "A" else "B"
-        var emotionList = emotionPercent(trip.neutral, trip.happy, trip.angry, trip.sad, theme)
+        var emotionList = emotionPercent(trip.neutral, trip.happy, trip.angry, trip.sad, trip.disgust, theme)
 
         Column(
             modifier = Modifier
@@ -613,7 +653,7 @@ class ReciptActivity : ComponentActivity() {
                         description = CustomNoTitleCheckDialogState.description,
                         checkleft = CustomNoTitleCheckDialogState.checkleft,
                         checkright = CustomNoTitleCheckDialogState.checkright,
-                        onClickleft = { startActivity( receiptIntent ) },
+                        onClickleft = { finish() },
                         onClickright = {CustomNoTitleCheckDialogState.onClickright()},
                         onClickCancel = {CustomNoTitleCheckDialogState.onClickCancel()},
 
@@ -671,18 +711,20 @@ class ReciptActivity : ComponentActivity() {
                                             "/${trip.happy}" +
                                             "/${trip.sad}" +
                                             "/${trip.neutral}" +
-                                            "/${trip.angry}"
+                                            "/${trip.angry}"+
+                                            "/${trip.disgust}"
                                 )
                             }
                         }) {
-                    YJ_Bold15("완료", black)
+                    YJ_Bold15("저장", black)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-
-            Horizontal_Theme(page,state,ReceiptContent(tripName, intro, depart_small, depart, arrive_small, arrive,
-                cardnum,publicationdate,startdate,enddate, emotionList))
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())){
+                Horizontal_Theme(page,state,ReceiptContent(tripName, intro, depart_small, depart, arrive_small, arrive,
+                    cardnum,publicationdate,startdate,enddate, emotionList))
+            }
         }
     }
 
@@ -759,7 +801,7 @@ class ReciptActivity : ComponentActivity() {
                             color = primary_500,
                             shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
                         )
-                        .padding(start = 8.dp),
+                        .padding(start = 8.dp, end = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -770,18 +812,6 @@ class ReciptActivity : ComponentActivity() {
                     )
                 }
 
-                Column(
-                    modifier = Modifier.height(12.dp),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Spacer(modifier = Modifier.height(1.dp))
-                    P_Medium8(
-                        " 티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다." +
-                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다." +
-                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다." +
-                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다.", primary_200
-                    )
-                }
                 Spacer(modifier = Modifier.height(26.dp))
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -918,13 +948,12 @@ class ReciptActivity : ComponentActivity() {
                 Modifier
                     .fillMaxWidth()
                     .height(150.dp)
-                    .padding(start = 41.dp)
-                    .align(Alignment.BottomCenter)
+                    .align(Alignment.BottomCenter),
+                horizontalArrangement = Arrangement.Center
             ) {
                 Column(
                     Modifier
-                        .height(150.dp)
-                        .padding(end = 36.dp),
+                        .height(150.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     P_Medium11(content = "여행 카드", color = neutral_500)
@@ -937,57 +966,53 @@ class ReciptActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(5.dp))
                     P_Medium11(content = receiptcontent.enddate, color = primary_500)
                 }
-                Spacer(modifier = Modifier.width(50.dp))
+                Spacer(modifier = Modifier.width(30.dp))
                 Column() {
                     P_Medium11(content = "여행 감정", color = neutral_500)
                     Spacer(modifier = Modifier.height(8.dp))
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
+                        modifier = Modifier.wrapContentWidth()
                     ) {
 
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            receiptcontent.emotionList.forEachIndexed { index, item ->
-                                Row(
-                                    modifier = Modifier.height(25.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(
-                                        modifier = Modifier.width(109.dp)
-                                    )  {
-                                        LinearProgressIndicator(
-                                            progress = { item.persent.toFloat()/100 },
-                                            modifier = Modifier.height(8.dp),
-                                            color = when(index)
-                                            {
-                                                0 -> primary_500
-                                                1 -> neutral_600
-                                                2 -> neutral_400
-                                                3 -> neutral_200
-                                                else -> primary_500
-                                            },
-                                            strokeCap = StrokeCap.Round
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Image(
-                                        modifier = Modifier.size(12.dp),
-                                        painter = painterResource(id =Theme1_Emotion(item.text,index)),
-                                        contentDescription = ""
+                        receiptcontent.emotionList.forEachIndexed { index, item ->
+                            Row(
+                                modifier = Modifier.height(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(
+                                    modifier = Modifier.width(109.dp)
+                                )  {
+                                    LinearProgressIndicator(
+                                        progress = { item.persent.toFloat()/100 },
+                                        modifier = Modifier.height(8.dp),
+                                        color = when(index)
+                                        {
+                                            0 -> primary_500
+                                            1 -> neutral_600
+                                            2 -> neutral_400
+                                            3 -> neutral_200
+                                            4 -> neutral_100
+                                            else -> primary_500
+                                        },
+                                        strokeCap = StrokeCap.Round
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    P_Medium11(content = item.persent.toString()+"%",
-                                        color = when(index) {
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Image(
+                                    modifier = Modifier.size(12.dp),
+                                    painter = painterResource(id =Theme1_Emotion(item.text,index)),
+                                    contentDescription = ""
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                P_Medium11(content = item.persent.toString()+"%",
+                                    color = when(index) {
                                         0 -> primary_500
                                         1 -> neutral_600
                                         2 -> neutral_400
                                         3 -> neutral_200
+                                        4 -> neutral_100
                                         else -> primary_500
                                     })
-                                }
                             }
                         }
                     }
@@ -1052,21 +1077,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 54.dp, start = 30.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                P_Medium8(
-                    " 티켓이 발행된 날짜는"+ receiptcontent.publicationdate +"입니다. " +
-                            "티켓이 발행된 날짜는"+ receiptcontent.publicationdate +"입니다. " +
-                            "티켓이 발행된 날짜는"+ receiptcontent.publicationdate +"입니다. " +
-                            "티켓이 발행된 날짜는"+ receiptcontent.publicationdate +"입니다. ", primary_200
-                )
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 484.dp, start = 28.dp, end = 10.dp),
+                    .padding(top = 470.dp, start = 28.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 P_Medium14(content = receiptcontent.tripName, color = black)
@@ -1192,20 +1203,27 @@ class ReciptActivity : ComponentActivity() {
             Row(
                 Modifier
                     .padding(bottom = 41.dp)
-                    .align(Alignment.BottomCenter)
+                    .wrapContentWidth()
+                    .align(Alignment.BottomCenter),
+                horizontalArrangement = Arrangement.Center
             ) {
 
                 Column(
                     Modifier.width(107.dp)
                 ) {
-                    P_Medium11(content = "여행 감정", color = neutral_500)
+                    Row(modifier = Modifier.width(107.dp),
+                        horizontalArrangement = Arrangement.Absolute.SpaceBetween) {
+                        P_Medium11(content = " ", color = neutral_500)
+                        P_Medium11(content = "여행 감정", color = neutral_500)
+                    }
+                    Spacer(modifier = Modifier.height(2.dp))
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .wrapContentWidth()
                     ) {
                         receiptcontent.emotionList.forEachIndexed { index, item ->
                             Row(
-                                modifier = Modifier.height(16.dp),
+                                modifier = Modifier.height(15.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
 
@@ -1220,13 +1238,14 @@ class ReciptActivity : ComponentActivity() {
                                 ) {
                                     LinearProgressIndicator(
                                         progress = { item.persent.toFloat()/100 },
-                                        modifier = Modifier.height(8.dp),
+                                        modifier = Modifier.height(4.dp),
                                         color = when(index)
                                         {
                                             0 -> primary_500
                                             1 -> neutral_600
                                             2 -> neutral_400
                                             3 -> neutral_200
+                                            4 -> neutral_100
                                             else -> primary_500
                                         },
                                         strokeCap = StrokeCap.Round
@@ -1263,7 +1282,7 @@ class ReciptActivity : ComponentActivity() {
             }
             Row(
                 Modifier
-                    .padding(bottom = 1.dp, end = 18.dp)
+                    .padding(bottom = 6.dp, end = 18.dp)
                     .align(Alignment.BottomEnd)
             ) {
                 P_Medium11(content = receiptcontent.startdate, color = neutral_500)
@@ -1342,6 +1361,12 @@ class ReciptActivity : ComponentActivity() {
     @Composable
     fun SaveRecipt(theme: String, receiptcontent: ReceiptContent_string){
 
+        BackHandler {
+            startActivity(Intent(this@ReciptActivity, MainActivity::class.java)
+                .putExtra("MoveScreen", "ReceiptPost"))
+            finish()
+        }
+
         var Theme = 0
         Theme = if (theme == "A") 0 else 1
 
@@ -1386,20 +1411,22 @@ class ReciptActivity : ComponentActivity() {
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
                         .clickable {
-                            var intent = Intent(this@ReciptActivity, MainActivity::class.java)
-                            intent.putExtra("MoveScreen", "Receipt")
-                            startActivity(intent)
+                            startActivity(Intent(this@ReciptActivity, MainActivity::class.java)
+                                .putExtra("MoveScreen", "ReceiptPost"))
+                            finish()
                         }) {
                     YJ_Bold15("완료", primary_500)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (Theme == 0) {
-                SaveTheme1(receiptcontent)
-            }
-            if(Theme == 1){
-                SaveTheme2(receiptcontent)
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                if (Theme == 0) {
+                    SaveTheme1(receiptcontent)
+                }
+                if(Theme == 1){
+                    SaveTheme2(receiptcontent)
+                }
             }
         }
     }
@@ -1429,7 +1456,7 @@ class ReciptActivity : ComponentActivity() {
                             color = primary_500,
                             shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
                         )
-                        .padding(start = 8.dp),
+                        .padding(start = 8.dp, end = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -1438,19 +1465,6 @@ class ReciptActivity : ComponentActivity() {
                     Image(
                         painter = painterResource(R.drawable.img_logo_white),
                         contentDescription = "로고 화이트"
-                    )
-                }
-
-                Column(
-                    modifier = Modifier.height(12.dp),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Spacer(modifier = Modifier.height(1.dp))
-                    P_Medium8(
-                        " 티켓이 발행된 날짜는" + receiptcontent.publicationdate+ "입니다. " +
-                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate+ "입니다. " +
-                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다. " +
-                                "티켓이 발행된 날짜는" + receiptcontent.publicationdate +"입니다. ", primary_200
                     )
                 }
                 Spacer(modifier = Modifier.height(26.dp))
@@ -1553,15 +1567,13 @@ class ReciptActivity : ComponentActivity() {
             }
             Row(
                 Modifier
-                    .fillMaxWidth()
+                    .wrapContentWidth()
                     .height(150.dp)
-                    .padding(start = 41.dp)
                     .align(Alignment.BottomCenter)
             ) {
                 Column(
                     Modifier
-                        .height(150.dp)
-                        .padding(end = 36.dp),
+                        .height(150.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     P_Medium11(content = "여행 카드", color = neutral_500)
@@ -1576,17 +1588,17 @@ class ReciptActivity : ComponentActivity() {
                     receiptcontent.enddate?.let { P_Medium11(content = it, color = primary_500)
                     }?: P_Medium14(content = "", color = white)
                 }
-                Spacer(modifier = Modifier.width(50.dp))
+                Spacer(modifier = Modifier.width(30.dp))
                 Column() {
                     P_Medium11(content = "여행 감정", color = neutral_500)
                     Spacer(modifier = Modifier.height(8.dp))
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .wrapContentWidth()
                     ) {
                         receiptcontent.emotionList.forEachIndexed { index, item ->
                             Row(
-                                modifier = Modifier.height(25.dp),
+                                modifier = Modifier.height(16.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column(
@@ -1601,6 +1613,7 @@ class ReciptActivity : ComponentActivity() {
                                             1 -> neutral_600
                                             2 -> neutral_400
                                             3 -> neutral_200
+                                            4 -> neutral_100
                                             else -> primary_500
                                         },
                                         strokeCap = StrokeCap.Round
@@ -1615,13 +1628,14 @@ class ReciptActivity : ComponentActivity() {
                                 Spacer(modifier = Modifier.width(4.dp))
                                 P_Medium11(content = item.persent.toString()+"%",
                                     color = when(index)
-                                {
-                                    0 -> primary_500
-                                    1 -> neutral_600
-                                    2 -> neutral_400
-                                    3 -> neutral_200
-                                    else -> primary_500
-                                })
+                                    {
+                                        0 -> primary_500
+                                        1 -> neutral_600
+                                        2 -> neutral_400
+                                        3 -> neutral_200
+                                        4 -> neutral_100
+                                        else -> primary_500
+                                    })
                             }
                         }
                     }
@@ -1662,21 +1676,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 54.dp, start = 30.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                P_Medium8(
-                    " 티켓이 발행된 날짜는"+receiptcontent.publicationdate+ "입니다. " +
-                            "티켓이 발행된 날짜는"+receiptcontent.publicationdate+ "입니다. " +
-                            "티켓이 발행된 날짜는"+receiptcontent.publicationdate+ "입니다. " +
-                            "티켓이 발행된 날짜는"+receiptcontent.publicationdate+ "입니다. ", primary_200
-                )
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 484.dp, start = 28.dp, end = 10.dp),
+                    .padding(top = 470.dp, start = 28.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 receiptcontent.tripName?.let { P_Medium14(content = it, color = black)
@@ -1784,14 +1784,13 @@ class ReciptActivity : ComponentActivity() {
                     P_Medium11(content = "여행 감정", color = neutral_500)
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .wrapContentWidth()
                     ) {
                         receiptcontent.emotionList.forEachIndexed { index, item ->
                             Row(
-                                modifier = Modifier.height(16.dp),
+                                modifier = Modifier.height(15.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-
                                 Image(
                                     modifier = Modifier.size(14.dp),
                                     painter = painterResource(id = Theme2_Emotion(kind = item.text)),
@@ -1803,13 +1802,14 @@ class ReciptActivity : ComponentActivity() {
                                 ) {
                                     LinearProgressIndicator(
                                         progress = { item.persent.toFloat()/100 },
-                                        modifier = Modifier.height(8.dp),
+                                        modifier = Modifier.height(4.dp),
                                         color = when(index)
                                         {
                                             0 -> primary_500
                                             1 -> neutral_600
                                             2 -> neutral_400
                                             3 -> neutral_200
+                                            4 -> neutral_100
                                             else -> primary_500
                                         },
                                         strokeCap = StrokeCap.Round
@@ -1846,7 +1846,7 @@ class ReciptActivity : ComponentActivity() {
             }
             Row(
                 Modifier
-                    .padding(bottom = 1.dp, end = 18.dp)
+                    .padding(bottom = 6.dp, end = 18.dp)
                     .align(Alignment.BottomEnd)
             ) {
                 receiptcontent.startdate?.let { P_Medium11(content = "$it / ", color = neutral_500)
@@ -1892,7 +1892,7 @@ class ReciptActivity : ComponentActivity() {
     @SuppressLint("UnrememberedMutableState")
     @Composable
     fun ReceiptPost_Big(mainIntent: Intent, content: ReceiptContent_string, theme : String,
-                        neutral:Double ,happy:Double ,angry:Double ,sad:Double, receiptid : Int){
+                        neutral:Double ,happy:Double ,angry:Double ,sad:Double, disgust:Double,receiptid : Int){
 
         val tripName = content.tripName
         val intro = if(content.intro?.isEmpty() == true) " "  else content.intro
@@ -1940,10 +1940,9 @@ class ReciptActivity : ComponentActivity() {
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
                         .clickable {
-                            setResult(2, mainIntent)
+                            setResult(1, mainIntent)
                             finish()
-
-                           }) {
+                        }) {
                     YJ_Bold15("뒤로", black)
                 }
                 Column() {
@@ -1953,9 +1952,10 @@ class ReciptActivity : ComponentActivity() {
                                 .padding(vertical = 10.dp, horizontal = 14.dp)
                                 .clickable {
                                     coroutineScope.launch {
-                                        val capturedImageBitmap = createBitmapFromPicture(picture).asImageBitmap()
+                                        val capturedImageBitmap =
+                                            createBitmapFromPicture(picture).asImageBitmap()
 
-                                        ShareImage(capturedImageBitmap.toBitmap(),context)
+                                        ShareImage(capturedImageBitmap.toBitmap(), context)
                                     }
                                 }) {
                             YJ_Bold15("내보내기", black)
@@ -1981,6 +1981,7 @@ class ReciptActivity : ComponentActivity() {
                                                 "/${sad}" +
                                                 "/${neutral}" +
                                                 "/${angry}" +
+                                                "/${disgust}" +
                                                 "/${receiptid}"
                                     )
                                 }) {
@@ -1991,13 +1992,13 @@ class ReciptActivity : ComponentActivity() {
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-
-            if (theme == "A") {
-                SaveTheme1(receiptcontent)
-            }
-            if (theme == "B") {
-                SaveTheme2(receiptcontent)
-
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())){
+                if (theme == "A") {
+                    SaveTheme1(receiptcontent)
+                }
+                if (theme == "B") {
+                    SaveTheme2(receiptcontent)
+                }
             }
         }
 
@@ -2006,18 +2007,21 @@ class ReciptActivity : ComponentActivity() {
     @OptIn(ExperimentalPagerApi::class)
     @Composable
     fun EditReceipt(receiptContent: ReceiptContent,
-                    neutral:Double ,happy:Double ,angry:Double ,sad:Double, receiptid : Int){
+                    neutral:Double ,happy:Double ,angry:Double ,sad:Double, disgust:Double ,receiptid : Int, mainIntent :Intent){
 
+        val viewModel: CustomNoTitleCheckViewModel = viewModel()
+        BackHandler {
+            viewModel.showCustomNoTitleCheckDialog()
+        }
         val page = 2
         val state = rememberPagerState()
 
-        val viewModel: CustomNoTitleCheckViewModel = viewModel()
         val CustomNoTitleCheckDialogState = viewModel.CustomNoTitleCheckDialogState.value
 
         val receiptIntent = Intent(this@ReciptActivity, MainActivity::class.java)
         receiptIntent.putExtra("MoveScreen", "ReceiptPost")
 
-        receiptContent.emotionList = emotionPercent(neutral,happy,angry,sad, if(state.currentPage == 0) "A" else "B")
+        receiptContent.emotionList = emotionPercent(neutral,happy,angry,sad, disgust, if(state.currentPage == 0) "A" else "B")
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -2041,7 +2045,10 @@ class ReciptActivity : ComponentActivity() {
                             description = CustomNoTitleCheckDialogState.description,
                             checkleft = CustomNoTitleCheckDialogState.checkleft,
                             checkright = CustomNoTitleCheckDialogState.checkright,
-                            onClickleft = { startActivity( receiptIntent ) },
+                            onClickleft = {
+                                //영수증 모아보기로 이동
+                                setResult(1, mainIntent)
+                                finish() },
                             onClickright = {CustomNoTitleCheckDialogState.onClickright()},
                             onClickCancel = {CustomNoTitleCheckDialogState.onClickCancel()},
 
@@ -2097,24 +2104,33 @@ class ReciptActivity : ComponentActivity() {
                                             "/${happy}" +
                                             "/${sad}" +
                                             "/${neutral}" +
-                                            "/${angry}"
+                                            "/${angry}"+
+                                            "/${disgust}"
                                 )
                             }
                         }) {
-                    YJ_Bold15("완료", black)
+                    YJ_Bold15("저장", black)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())){
             Horizontal_Theme(page,state,receiptContent)
+            }
         }
     }
 
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun SaveEditReceipt(theme: String, receiptcontent: ReceiptContent_string){
+    fun SaveEditReceipt(theme: String, receiptcontent: ReceiptContent_string, mainIntent: Intent){
+
+        BackHandler {
+            //영수증 모아보기로 이동
+            setResult(1, mainIntent)
+            finish()
+        }
+
 
         var Theme = 0
         Theme = if (theme == "A") 0 else 1
@@ -2160,20 +2176,21 @@ class ReciptActivity : ComponentActivity() {
                     Modifier
                         .padding(vertical = 10.dp, horizontal = 14.dp)
                         .clickable {
-                            var intent = Intent(this@ReciptActivity, MainActivity::class.java)
-                            intent.putExtra("MoveScreen", "Receipt")
-                            startActivity(intent)
+                            //영수증 모아보기로 이동
+                            setResult(1, mainIntent)
+                            finish()
                         }) {
                     YJ_Bold15("완료", primary_500)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-
-            if (Theme == 0) {
-                SaveTheme1(receiptcontent)
-            }
-            if(Theme == 1){
-                SaveTheme2(receiptcontent)
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                if (Theme == 0) {
+                    SaveTheme1(receiptcontent)
+                }
+                if (Theme == 1) {
+                    SaveTheme2(receiptcontent)
+                }
             }
         }
     }
@@ -2211,6 +2228,13 @@ class ReciptActivity : ComponentActivity() {
                 3 -> R.drawable.ic_receipt1_emotion_sad_4
                 else -> R.drawable.ic_receipt1_emotion_sad_1
             }
+            "불쾌해요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_disgust1
+                1 -> R.drawable.ic_receipt1_emotion_disgust2
+                2 -> R.drawable.ic_receipt1_emotion_disgust3
+                3 -> R.drawable.ic_receipt1_emotion_disgust4
+                else -> R.drawable.ic_receipt1_emotion_disgust5
+            }
             else -> return R.drawable.ic_emotion_angry
         }
     }
@@ -2221,7 +2245,8 @@ class ReciptActivity : ComponentActivity() {
             "평범해요" -> R.drawable.ic_receipt2_emotion_common
             "화가나요" -> R.drawable.ic_receipt2_emotion_angry
             "즐거워요" -> R.drawable.ic_receipt2_emotion_happy
-            "슬퍼요" -> R.drawable.ic_receipt2_emotions_sad
+            "슬퍼요" -> R.drawable.ic_receipt2_emotion_sad
+            "불쾌해요" -> R.drawable.ic_receipt2_emotion_disgust
             else -> R.drawable.ic_receipt2_emotion_common
         }
     }
@@ -2243,7 +2268,7 @@ class ReciptActivity : ComponentActivity() {
         return currentDate.isAfter(targetDate) || currentDate.isEqual(targetDate)
     }
 
-    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double, theme : String): SnapshotStateList<Emotion> {
+    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double, disgust :Double, theme : String): SnapshotStateList<Emotion> {
         val emotionList = mutableStateListOf<Emotion>()
 
         if(theme == "A") {
@@ -2252,7 +2277,7 @@ class ReciptActivity : ComponentActivity() {
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (angry*100).toInt()))
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
-            //emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = emotion5.toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = (disgust*100).toInt()))
             emotionList.sortByDescending { it.persent }
         }
         if(theme == "B") {
@@ -2261,6 +2286,7 @@ class ReciptActivity : ComponentActivity() {
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "평범해요", persent = (common*100).toInt()))
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = (disgust*100).toInt()))
         }
         else {
             emotionList.clear()
@@ -2268,6 +2294,7 @@ class ReciptActivity : ComponentActivity() {
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_happy, text = "즐거워요", persent =(happy*100).toInt()))
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_angry, text = "화가나요", persent = (angry*100).toInt()))
             emotionList.add( Emotion(icon = R.drawable.ic_emotion_sad, text = "슬퍼요", persent = (sad *100).toInt()))
+            emotionList.add( Emotion(icon = R.drawable.ic_emotion_common, text = "불쾌해요", persent = (disgust*100).toInt()))
             emotionList.sortByDescending { it.persent } }
         return emotionList
     }
@@ -2304,15 +2331,13 @@ class ReciptActivity : ComponentActivity() {
     }
 
 
-    private suspend fun createBitmapFromPicture(picture: Picture): Bitmap {
-        return withContext(Dispatchers.Default) {
-            val width = picture.width
-            val height = picture.height
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            val canvas = android.graphics.Canvas(bitmap)
-            picture.draw(canvas)
-            bitmap
-        }
+    private fun createBitmapFromPicture(picture: Picture): Bitmap {
+        val width = picture.width
+        val height = picture.height
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(bitmap)
+        picture.draw(canvas)
+        return bitmap
     }
     fun ImageBitmap.toBitmap(): Bitmap {
         return this.asAndroidBitmap()
