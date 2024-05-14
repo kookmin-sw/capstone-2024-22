@@ -79,9 +79,10 @@ struct BillListView: View {
                         .padding()
                     }
                 }
+                Spacer().frame(height: 65)
                 StatsCardView()
                 
-                Spacer().frame(height: 10)
+                Spacer().frame(height: 65)
                 
                 // "만들기" 버튼과 해당하는 NavigationLink
                 NavigationLink(destination: ReceiptsView(), isActive: $isShowingReceiptsView) {
@@ -127,81 +128,12 @@ struct StatsCardView: View {
         VStack(spacing: 0) {
             //ZStack{
             // 상단 색상 바
-            Rectangle()
-                .fill(topColor)
-                .frame(height: 50) // 상단 바의 높이를 설정합니다.
-                .overlay(
-                    HStack{
-                        Text("암스테르담 성당 여행") // 여기에 원하는 텍스트를 입력합니다.
-                            .foregroundColor(textColor) // 텍스트 색상 설정
-                        
-                            .font(.pretendardMedium14)
-                            .padding()
-                        Spacer()
-                        Image("Logo")
-                            .padding()
-                    }
-                )
+            Image("BillView")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 314.09,height: 379.52)
             
-            // }
-            // 나머지 카드 부분
-            Rectangle()
-                .fill(Color.Secondary50)
-                .frame(height: 450)
-                .overlay(
-                    VStack{
-                        Text("티켓이 발행된 날짜는 2024.04.08 입니다 이 티켓이 발행된 날짜는 2024 04 08 입니다 이 ")
-                            .font(.pretendardMedium8)
-                            .foregroundColor(.red)
-                        Spacer()
-                        Text("여행의 기록을 한줄로 기록하세요 :)")
-                            .font(.pretendardMedium14)
-                            .foregroundColor(.gray500)
-                            .padding(.top,30)
-                        
-                        HStack(alignment: .center)
-                        {
-                            Image("Locationred")
-                            
-                            Text("북촌 한옥마을")
-                                .font(.pretendardMedium14)
-                                .foregroundColor(.homeRed)
-                            
-                        }
-                        
-                        
-                        Text("서울")
-                            .font(.pretendardExtrabold45)
-                            .foregroundColor(.homeRed)
-                        Image("airplane")
-                        
-                        
-                        HStack(alignment: .center)
-                        {
-                            Image("Locationred")
-                            Text("암스테르담 공항")
-                                .font(.pretendardMedium14)
-                                .foregroundColor(.homeRed)
-                            
-                        }
-                        
-                        
-                        Text("암스테르담")
-                            .font(.pretendardExtrabold45)
-                            .foregroundColor(.homeRed)
-                        
-                        Image("cut")
-                        
-                    }
-                )
         }
-        .frame(width: 340, height: 500)
-        
-        .cornerRadius(5) // 모서리를 둥글게 처리합니다.
-        .overlay(
-            RoundedRectangle(cornerRadius: 3)
-                .stroke(Color.Secondary50, lineWidth: 1)
-        )
         .onAppear {
             homeViewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
         }

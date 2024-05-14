@@ -22,7 +22,7 @@ class OnboardingViewModel : ObservableObject{ // 이거는 뭐냐면 일단 클�
     
     init(
         onboardingContents: [OnboardingContent] = [
-            .init(imageFileName: "onboarding1", title: "언제", subTitle: "홈뷰에서 여행기록"),
+            .init(imageFileName: "OnBoardingfirst1", title: "언제", subTitle: "홈뷰에서 여행기록"),
             .init(imageFileName: "onboarding2", title: "왜?", subTitle: "여행가자!"), //배열로 타입을 넣어줬기 떄문에 밑에 init 부분인.초기화 부분에서 그 행동을 해주는거야
             .init(imageFileName: "onboarding3", title: "어쩌라고", subTitle: "여행가자!2"),
             .init(imageFileName: "onboarding4", title: "좋다", subTitle: "여행가자!3")
