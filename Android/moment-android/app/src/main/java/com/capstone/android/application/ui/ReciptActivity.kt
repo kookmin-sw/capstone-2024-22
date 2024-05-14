@@ -1432,7 +1432,7 @@ class ReciptActivity : ComponentActivity() {
                             color = primary_500,
                             shape = RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
                         )
-                        .padding(start = 8.dp),
+                        .padding(start = 8.dp, end = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -1543,15 +1543,13 @@ class ReciptActivity : ComponentActivity() {
             }
             Row(
                 Modifier
-                    .fillMaxWidth()
+                    .wrapContentWidth()
                     .height(150.dp)
-                    .padding(start = 41.dp)
                     .align(Alignment.BottomCenter)
             ) {
                 Column(
                     Modifier
-                        .height(150.dp)
-                        .padding(end = 36.dp),
+                        .height(150.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     P_Medium11(content = "여행 카드", color = neutral_500)
@@ -1566,17 +1564,17 @@ class ReciptActivity : ComponentActivity() {
                     receiptcontent.enddate?.let { P_Medium11(content = it, color = primary_500)
                     }?: P_Medium14(content = "", color = white)
                 }
-                Spacer(modifier = Modifier.width(50.dp))
+                Spacer(modifier = Modifier.width(30.dp))
                 Column() {
                     P_Medium11(content = "여행 감정", color = neutral_500)
                     Spacer(modifier = Modifier.height(8.dp))
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .wrapContentWidth()
                     ) {
                         receiptcontent.emotionList.forEachIndexed { index, item ->
                             Row(
-                                modifier = Modifier.height(25.dp),
+                                modifier = Modifier.height(16.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column(
