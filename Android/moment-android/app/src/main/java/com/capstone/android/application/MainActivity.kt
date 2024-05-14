@@ -1835,17 +1835,22 @@ class MainActivity : ComponentActivity() {
                         Image(modifier = Modifier
                             .size(50.dp)
                             .clickable {
-                                if (timerJob.isActive) {
-                                    isPasused.value = !isPasused.value
+                                if(!momentPermission.checkPermission()){
+                                    momentPermission.requestPermission()
+                                }else{
+                                    if (timerJob.isActive) {
+                                        isPasused.value = !isPasused.value
 
-                                } else {
-                                    File(cacheDir, "audio.mp3").also {
-                                        recorder.start(it)
-                                        audioFile = it
+                                    } else {
+                                        File(cacheDir, "audio.mp3").also {
+                                            recorder.start(it)
+                                            audioFile = it
+                                        }
+                                        timerJob.start()
+
                                     }
-                                    timerJob.start()
-
                                 }
+
 
 
                             },
