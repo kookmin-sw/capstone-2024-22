@@ -673,49 +673,54 @@ class ReciptActivity : ComponentActivity() {
                                 )
                             } else {
 
-                                if (intro.value == "") intro.value = " "
-                                if (depart_small.value == "") depart_small.value = " "
-                                if (arrive_small.value == "") arrive_small.value = " "
+                                if (checkTextSize(depart.value,depart_small.value,arrive.value,arrive_small.value,intro.value)){
+                                    if (intro.value == "") intro.value = " "
+                                    if (depart_small.value == "") depart_small.value = " "
+                                    if (arrive_small.value == "") arrive_small.value = " "
 
-                                receiptViewModel.postReceiptCreate(
-                                    body = PostReceiptCreateRequest(
-                                        mainDeparture = depart.value,
-                                        mainDestination = arrive.value,
-                                        oneLineMemo = intro.value,
-                                        receiptThemeType = if (state.currentPage == 0) "A" else "B",
-                                        subDeparture = depart_small.value,
-                                        subDestination = arrive_small.value,
-                                        tripId = tripid
+                                    receiptViewModel.postReceiptCreate(
+                                        body = PostReceiptCreateRequest(
+                                            mainDeparture = depart.value,
+                                            mainDestination = arrive.value,
+                                            oneLineMemo = intro.value,
+                                            receiptThemeType = if (state.currentPage == 0) "A" else "B",
+                                            subDeparture = depart_small.value,
+                                            subDestination = arrive_small.value,
+                                            tripId = tripid
+                                        )
                                     )
-                                )
 
-                                val receiptData = ReceiptContent(
-                                    tripName, intro, depart_small, depart, arrive_small, arrive,
-                                    cardnum, publicationdate, startdate, enddate, emotionList
-                                )
-                                if (intro.value == "") intro.value = " "
-                                if (depart_small.value == "") depart_small.value = " "
-                                if (arrive_small.value == "") arrive_small.value = " "
+                                    val receiptData = ReceiptContent(
+                                        tripName, intro, depart_small, depart, arrive_small, arrive,
+                                        cardnum, publicationdate, startdate, enddate, emotionList
+                                    )
+                                    if (intro.value == "") intro.value = " "
+                                    if (depart_small.value == "") depart_small.value = " "
+                                    if (arrive_small.value == "") arrive_small.value = " "
 
-                                navController.navigate(
-                                    ReciptScreen.SaveRecipt.name +
-                                            "/${receiptData.tripName}" +
-                                            "/${receiptData.intro.value}" +
-                                            "/${receiptData.depart_small.value}" +
-                                            "/${receiptData.depart.value}" +
-                                            "/${receiptData.arrive_small.value}" +
-                                            "/${receiptData.arrive.value}" +
-                                            "/${receiptData.cardnum}" +
-                                            "/${receiptData.publicationdate}" +
-                                            "/${receiptData.startdate}" +
-                                            "/${receiptData.enddate}" +
-                                            "/${theme}" +
-                                            "/${trip.happy}" +
-                                            "/${trip.sad}" +
-                                            "/${trip.neutral}" +
-                                            "/${trip.angry}"+
-                                            "/${trip.disgust}"
-                                )
+                                    navController.navigate(
+                                        ReciptScreen.SaveRecipt.name +
+                                                "/${receiptData.tripName}" +
+                                                "/${receiptData.intro.value}" +
+                                                "/${receiptData.depart_small.value}" +
+                                                "/${receiptData.depart.value}" +
+                                                "/${receiptData.arrive_small.value}" +
+                                                "/${receiptData.arrive.value}" +
+                                                "/${receiptData.cardnum}" +
+                                                "/${receiptData.publicationdate}" +
+                                                "/${receiptData.startdate}" +
+                                                "/${receiptData.enddate}" +
+                                                "/${theme}" +
+                                                "/${trip.happy}" +
+                                                "/${trip.sad}" +
+                                                "/${trip.neutral}" +
+                                                "/${trip.angry}"+
+                                                "/${trip.disgust}"
+                                    )
+                                }else{
+                                    showToastMessage(context = this@ReciptActivity,
+                                        "대제목은 7글자 이하 소제목은 24글자 이하 한줄평은 27글자 이하로 작성해주세요 !")
+                                }
                             }
                         }) {
                     YJ_Bold15("저장", black)
@@ -2090,46 +2095,61 @@ class ReciptActivity : ComponentActivity() {
                                 )
                             } else {
 
-                                receiptViewModel.putReceiptCreate(body =
-                                PutReceiptCreateRequest(
-                                    mainDeparture = receiptContent.depart.value,
-                                    mainDestination =  receiptContent.arrive.value,
-                                    oneLineMemo =  receiptContent.intro.value,
-                                    receiptThemeType = if (state.currentPage == 0) "A" else "B",
-                                    subDeparture =  receiptContent.depart_small.value,
-                                    subDestination =  receiptContent.arrive_small.value,
-                                    id =  receiptid
+
+                                if (checkTextSize(
+                                        receiptContent.depart.value,
+                                        receiptContent.depart_small.value,
+                                        receiptContent. arrive.value,
+                                        receiptContent.arrive_small.value,
+                                        receiptContent.intro.value
                                     )
-                                )
+                                ) {
 
-                                var theme = "A"
-                                if (receiptContent.intro.value == "") receiptContent.intro.value =
-                                    " "
-                                if (receiptContent.depart_small.value == "") receiptContent.depart_small.value =
-                                    " "
-                                if (receiptContent.arrive_small.value == "") receiptContent.arrive_small.value =
-                                    " "
-                                theme = if (state.currentPage == 0) "A" else "B"
+                                    receiptViewModel.putReceiptCreate(
+                                        body =
+                                        PutReceiptCreateRequest(
+                                            mainDeparture = receiptContent.depart.value,
+                                            mainDestination = receiptContent.arrive.value,
+                                            oneLineMemo = receiptContent.intro.value,
+                                            receiptThemeType = if (state.currentPage == 0) "A" else "B",
+                                            subDeparture = receiptContent.depart_small.value,
+                                            subDestination = receiptContent.arrive_small.value,
+                                            id = receiptid
+                                        )
+                                    )
 
-                                navController.navigate(
-                                    ReciptScreen.SaveEditReceipt.name +
-                                            "/${receiptContent.tripName}" +
-                                            "/${receiptContent.intro.value}" +
-                                            "/${receiptContent.depart_small.value}" +
-                                            "/${receiptContent.depart.value}" +
-                                            "/${receiptContent.arrive_small.value}" +
-                                            "/${receiptContent.arrive.value}" +
-                                            "/${receiptContent.cardnum}" +
-                                            "/${receiptContent.publicationdate}" +
-                                            "/${receiptContent.startdate}" +
-                                            "/${receiptContent.enddate}" +
-                                            "/${theme}" +
-                                            "/${happy}" +
-                                            "/${sad}" +
-                                            "/${neutral}" +
-                                            "/${angry}"+
-                                            "/${disgust}"
-                                )
+                                    var theme = "A"
+                                    if (receiptContent.intro.value == "") receiptContent.intro.value =
+                                        " "
+                                    if (receiptContent.depart_small.value == "") receiptContent.depart_small.value =
+                                        " "
+                                    if (receiptContent.arrive_small.value == "") receiptContent.arrive_small.value =
+                                        " "
+                                    theme = if (state.currentPage == 0) "A" else "B"
+
+                                    navController.navigate(
+                                        ReciptScreen.SaveEditReceipt.name +
+                                                "/${receiptContent.tripName}" +
+                                                "/${receiptContent.intro.value}" +
+                                                "/${receiptContent.depart_small.value}" +
+                                                "/${receiptContent.depart.value}" +
+                                                "/${receiptContent.arrive_small.value}" +
+                                                "/${receiptContent.arrive.value}" +
+                                                "/${receiptContent.cardnum}" +
+                                                "/${receiptContent.publicationdate}" +
+                                                "/${receiptContent.startdate}" +
+                                                "/${receiptContent.enddate}" +
+                                                "/${theme}" +
+                                                "/${happy}" +
+                                                "/${sad}" +
+                                                "/${neutral}" +
+                                                "/${angry}" +
+                                                "/${disgust}"
+                                    )
+                                }else{
+                                    showToastMessage(context = this@ReciptActivity,
+                                        "대제목은 7글자 이하 소제목은 24글자 이하 한줄평은 27글자 이하로 작성해주세요 !")
+                                }
                             }
                         }) {
                     YJ_Bold15("저장", black)
@@ -2278,6 +2298,16 @@ class ReciptActivity : ComponentActivity() {
 
     fun showToastMessage(context: Context, message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+    fun checkTextSize(mainDeparture:String, subDeparture:String, mainDestination:String,
+                      subDestination:String, oneLineMemo:String ): Boolean{
+        if (mainDeparture.length <= 7 && subDeparture.length <=24 &&
+            mainDestination.length<=7 && subDestination.length <=24 && oneLineMemo.length <= 27){
+            return true
+        }else{
+            return false
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
