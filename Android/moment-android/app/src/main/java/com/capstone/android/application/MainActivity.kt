@@ -120,7 +120,6 @@ import com.capstone.android.application.data.remote.card.model.card_post.request
 import com.capstone.android.application.data.remote.receipt.model.receipt_delete.ReceiptId
 import com.capstone.android.application.data.remote.receipt.model.receipt_delete.deleteReceiptDeleteRequest
 import com.capstone.android.application.domain.Card
-import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.Emotion
 import com.capstone.android.application.domain.Trip
 import com.capstone.android.application.domain.TripFile
