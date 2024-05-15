@@ -258,6 +258,9 @@ def main(file_name, file_path=None):
     with open(output_name, "wt") as fp:
       fp.write(json.dumps(output))
       fp.close()
+      
+  # finish pipeline
+  print("\n\nfinish model ------------------------------------------------------------------------------")
 
   return output
 
