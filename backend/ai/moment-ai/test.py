@@ -261,6 +261,7 @@ def main(file_name, file_path=None):
       
   # finish pipeline
   print("\n\nfinish model ------------------------------------------------------------------------------")
+  print(output)
 
   return output
 
