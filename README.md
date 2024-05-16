@@ -3,7 +3,8 @@
 2. [소개 영상](##-소개-영상)
 3. [팀 소개](##-팀-소개)
 4. [사용법](##-사용법)
-5. [기타](##-기타)
+5. [문서](##-문서)
+6. [기타](##-기타)
 
 ##  🛠 프로젝트 소개
 
@@ -105,7 +106,9 @@
 소스코드제출시 설치법이나 사용법을 작성하세요.
 
 
-
+## 문서
+- [중간발표](https://drive.google.com/file/d/1ELYTpvr5rwQeEEy5aQ8zkQpWVYD6Tc5h/view?usp=sharing)
+- [중간보고서](https://docs.google.com/document/d/15EEr-d8ANUgzv2IuLtTUmPRXQ-5MzV7M/edit?usp=drive_link&ouid=100333300987560322826&rtpof=true&sd=true)
 
 ## 기타
 ### 인공지능
