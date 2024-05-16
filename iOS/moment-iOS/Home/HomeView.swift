@@ -51,10 +51,57 @@ struct HomeView: View {
                 TabView(selection: $selectedSlideIndex) {
                     
                     // "여행 종료"의 경우
-                    Text("어디로 떠나면 좋을까요")
-                        .font(.pretendardMedium14)
-                        .foregroundColor(.gray600)
-                        .tag(0)
+               
+                        
+                   
+                          
+                            
+                          
+                        
+
+                                // 큰 숫자
+                    VStack{
+                        
+                      
+                            
+                                
+                                Text("전라도의 선유도")
+                                    .font(.pretendardExtrabold14)
+                                    .tint(.black)
+                                    .padding(.top,30)
+                                    .offset(x: -45, y: 15) // x축은 변화 없이 y축으로 20만큼 이동
+                                       
+                        
+                        HStack{
+                            Text("출발까지")
+                                .padding(.bottom,20)
+                                .font(.pretendardMedium16)
+                            
+                            Text("6")
+                                .foregroundColor(.homeRed)
+                                .font(.pretendardExtrabold45)
+                                
+                            
+                            Text("일 남았어요")
+                                .padding(.top,10)
+                                .font(.pretendardMedium16)
+                        }
+                        
+                    }
+                    .padding(.bottom,10)
+                            
+                            
+                            
+                           
+                            .font(.pretendardMedium14)
+                           
+                            .tag(0)
+                            
+                    
+                    
+                    
+                    
+                       
                     
                     
                     NavigationLink(destination: DailyView(audioRecorderManager: audioRecorderManager)) {

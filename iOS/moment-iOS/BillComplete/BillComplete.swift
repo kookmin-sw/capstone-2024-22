@@ -917,7 +917,7 @@ struct ReceiptCompleteView : View {
                 .frame(height: 50) // 상단 바의 높이를 설정합니다.
                 .overlay(
                     HStack{
-                        Text("암스테르담 성당 여행") // 여기에 원하는 텍스트를 입력합니다.
+                        Text("\(item.tripName)") // 여기에 원하는 텍스트를 입력합니다.
                             .foregroundColor(textColor) // 텍스트 색상 설정
                         
                             .font(.pretendardMedium14)

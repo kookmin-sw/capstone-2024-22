@@ -33,7 +33,7 @@ enum Tab: Int, CaseIterable, Identifiable, Comparable {
     var title: String {
         switch self {
         case .Home: return "홈"
-        case .Bill: return "영수증"
+        case .Bill: return "여행 티켓"
         case .voiceRecorder: return "녹음하기"
         case .Like: return "즐겨찾기"
         case .setting: return "설정"

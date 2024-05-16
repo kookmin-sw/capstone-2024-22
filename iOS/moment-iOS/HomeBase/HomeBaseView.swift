@@ -123,7 +123,7 @@ struct HomeBaseView: View {
         
         .onChange(of: homeBaseViewModel.isRecording) { newValue in
             withAnimation {
-                showPartialSheet = newValue
+                showPartialSheet = true
             }
         }
         .onChange(of: wasDeleted) { newValue in
@@ -280,7 +280,7 @@ struct BottomSheetView1: View {
                         : audioRecorderManager.startRecording()
                         timeElapsed = 0
                         
-                        listeningText = audioRecorderManager.isRecording ? "받아적을 준비 완료" : "열심히 듣고 있어요"
+                        listeningText = audioRecorderManager.isRecording ? "받아적을 준비 완료" : "받아적을 준비 완료"
                     }) {
                         Image( audioRecorderManager.isRecording ? "RecordPress" : "RecordStop")
                             .resizable()
@@ -298,7 +298,7 @@ struct BottomSheetView1: View {
                            
                             recordBtn = false  // 버튼 상태 업데이트
                             timerRunning = false  // 타이머 중지
-                            wasDeleted = true
+                            wasLoad = true
                             if let lastRecordedFile = audioRecorderManager.recordedFiles.last {
                                 print(lastRecordedFile.lastPathComponent) // 마지막으로 레코드된 녹음 파일의 이름 확인함
                             } else {

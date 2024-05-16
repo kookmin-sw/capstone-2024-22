@@ -10,13 +10,11 @@ import SwiftUI
 import UIKit
 
 
-import SwiftUI
-import UIKit
 
 struct CustomSlider: UIViewRepresentable {
     @Binding var value: Float
     var range: (Double, Double)
-    var thumbImageName: String
+    var thumbImageName: String  // 이미지 파일 이름을 저장하는 String 타입
 
     func makeUIView(context: Context) -> UISlider {
         let slider = UISlider(frame: .zero)
@@ -30,17 +28,6 @@ struct CustomSlider: UIViewRepresentable {
         } else {
             print("Failed to load thumb image")
         }
-
-        // 회색 트랙 설정
-        let trackTintColor = UIColor.systemGray
-        slider.minimumTrackTintColor = trackTintColor
-        slider.maximumTrackTintColor = trackTintColor
-
-        // 트랙 이미지 설정 (선택적)
-        let minTrackImage = UIImage(named: "play")?.stretchableImage(withLeftCapWidth: 0, topCapHeight: 0)
-        let maxTrackImage = UIImage(named: "play")?.stretchableImage(withLeftCapWidth: 0, topCapHeight: 0)
-        slider.setMinimumTrackImage(minTrackImage, for: .normal)
-        slider.setMaximumTrackImage(maxTrackImage, for: .normal)
 
         slider.addTarget(
             context.coordinator,
