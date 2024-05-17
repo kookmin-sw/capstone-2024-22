@@ -3,6 +3,7 @@ package com.capstone.android.application.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -62,12 +63,15 @@ import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
 import com.capstone.android.application.app.ApplicationClass.Companion.tokenSharedPreferences
 import com.capstone.android.application.app.composable.MomentTextField
+import com.capstone.android.application.app.utile.firebase.MyFirebaseMessagingService
 import com.capstone.android.application.data.remote.auth.auth_code.request.PostAuthAuthCodeRequest
 import com.capstone.android.application.data.remote.auth.auth_code_confirm.request.PatchAuthAuthCodeConfirmRequest
 import com.capstone.android.application.data.remote.auth.change_password.request.PatchAuthChangePasswordRequest
 import com.capstone.android.application.data.remote.auth.login.request.PostAuthLoginRequest
+import com.capstone.android.application.data.remote.setting.model.PatchFcmTokenRequest
 import com.capstone.android.application.presentation.AuthViewModel
 import com.capstone.android.application.presentation.CountViewModel
+import com.capstone.android.application.presentation.SettingViewModel
 import com.capstone.android.application.ui.theme.BigButton
 import com.capstone.android.application.ui.theme.CheckButton
 import com.capstone.android.application.ui.theme.CountText
@@ -86,8 +90,12 @@ import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.primary_500
 import com.capstone.android.application.ui.theme.tertiary_500
 import com.capstone.android.application.ui.theme.white
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 enum class OnboardingScreen(){
     Login,
@@ -106,7 +114,32 @@ enum class OnboardingScreen(){
 class OnboardingActivity:ComponentActivity() {
     lateinit var navController: NavHostController
     private val authViewModel : AuthViewModel by viewModels()
+    private val settingViewModel : SettingViewModel by viewModels()
     private var userId:Int=0
+
+    private fun MyFirebaseMessaging() {
+        val token: Task<String> = FirebaseMessaging.getInstance().token
+        token.addOnCompleteListener(OnCompleteListener { task ->
+            if (task.isSuccessful) {
+                settingViewModel.patchFcmToken(
+                    body = PatchFcmTokenRequest(
+                        notification = true,
+                        dataUsage = true,
+                        firebaseToken=  task.result
+                    )
+                )
+                Log.d("FCMToken",task.result)
+//                registerFCMToken(task.result)
+            }
+        })
+    }
+
+
+    private fun registerFCMToken(FCMToken:String){
+        val fcm = Intent(applicationContext, MyFirebaseMessagingService::class.java)
+        startService(fcm)
+    }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -179,7 +212,9 @@ class OnboardingActivity:ComponentActivity() {
     private fun initApi(){
         // 로그인 성공
         authViewModel.postAuthLoginSuccess.observe(this@OnboardingActivity){ response->
+            MyFirebaseMessaging()
             tokenSharedPreferences.edit().putString("accessToken",response.data.accessToken).apply()
+
             startActivity(Intent(this@OnboardingActivity,MainActivity::class.java))
             finish()
         }
@@ -235,6 +270,11 @@ class OnboardingActivity:ComponentActivity() {
         // 비밀번호 변경 실패
         authViewModel.patchAuthChangePasswordFailure.observe(this@OnboardingActivity){ response->
             Toast.makeText(this@OnboardingActivity,"서버오류.",Toast.LENGTH_SHORT).show()
+        }
+
+        settingViewModel.patchFcmTokenSuccess.observe(this@OnboardingActivity){
+            Log.d("awegaewg","hello")
+
         }
 
 
