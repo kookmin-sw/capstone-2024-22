@@ -434,7 +434,7 @@ class OnboardingActivity:ComponentActivity() {
                 .padding(bottom = 112.dp),
                 horizontalAlignment = Alignment.CenterHorizontally) {
                 P_Medium14(content = "반가워요!", color = black)
-                P_Medium14(content = "사용자이메일@naver.com", color = black)
+                //P_Medium14(content = "사용자이메일@naver.com", color = black)
             }
         }
     }
