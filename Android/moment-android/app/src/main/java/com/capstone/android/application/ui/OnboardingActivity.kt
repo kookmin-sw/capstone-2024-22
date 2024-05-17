@@ -719,73 +719,70 @@ class OnboardingActivity:ComponentActivity() {
                 }, "회원가입")
             }
 
-            //Toast.makeText(this@OnboardingActivity, R.drawable.img_alarm_grey , Toast.LENGTH_LONG).show()
-            //Toast.makeText(this@OnboardingActivity, "dfd", Toast.LENGTH_LONG).show()
-
-            Column(modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 298.dp)) {
-                Box(
-                    contentAlignment = Alignment.Center
-                ){
-                    Spacer(modifier = Modifier.width(18.dp))
-                    Image(
-                        modifier = Modifier
-                            .width(205.dp)
-                            .height(42.dp),
-                        painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
-                    )
-                    P_Medium11(content = "입력하신 이메일로 인증번호가 전송되었어요\n" +
-                            "메일함을 확인해 주세요", color = white)
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 344.dp)
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11("인증번호", if(signnumState.value) black else negative_600)
-                    CountText(timeLeft)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "인증번호를 입력해주세요",
-                    onValueChanged = { number.value = it },
-                    onClicked = {},
-                    text = number,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "onemove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color =  if(signnumState.value) black else negative_600)
-
-                if(signnumState.value){}else{
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Column(modifier = Modifier.padding(horizontal = 8.dp)
+            Column(modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center) {
+                Column(modifier = Modifier
+                    .padding(horizontal = 24.dp)) {
+                    Box(
+                        contentAlignment = Alignment.Center
                     ){
-                        P_Medium11(content = "인증번호를 다시한번 확인해 주세요", color = negative_600)
+                        Spacer(modifier = Modifier.width(18.dp))
+                        Image(
+                            modifier = Modifier
+                                .width(205.dp)
+                                .height(42.dp),
+                            painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
+                        )
+                        P_Medium11(content = "입력하신 이메일로 인증번호가 전송되었어요\n" +
+                                "메일함을 확인해 주세요", color = white)
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
+                        .padding(horizontal = 16.dp)
                 ) {
-                    P_Medium11(content = "받으신 인증 번호 6자리는 차후 복구코드와 동일하게 사용됩니다\n" +
-                            "인터넷 상태에 따라 소요시간이 발생할 수 있습니다", color = neutral_600 )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("인증번호", if(signnumState.value) black else negative_600)
+                        CountText(timeLeft)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "인증번호를 입력해주세요",
+                        onValueChanged = { number.value = it },
+                        onClicked = {},
+                        text = number,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "onemove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color =  if(signnumState.value) black else negative_600)
+
+                    if(signnumState.value){}else{
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Column(modifier = Modifier.padding(horizontal = 8.dp)
+                        ){
+                            P_Medium11(content = "인증번호를 다시한번 확인해 주세요", color = negative_600)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11(content = "받으신 인증 번호 6자리는 차후 복구코드와 동일하게 사용됩니다\n" +
+                                "인터넷 상태에 따라 소요시간이 발생할 수 있습니다", color = neutral_600 )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     Row(modifier = Modifier
                         .width(86.dp)
@@ -835,7 +832,7 @@ class OnboardingActivity:ComponentActivity() {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 45.dp)
             ) {
                 if ( number.value.isNotEmpty()){
                     BigButton("다음", true) {
