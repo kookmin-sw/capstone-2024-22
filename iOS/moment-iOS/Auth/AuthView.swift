@@ -18,7 +18,7 @@ struct AuthView: View {
     @State private var isAgreeRequired2: Bool = false
     @State private var isAgreeRequired3: Bool = false
     @Environment(\.presentationMode) var presentationMode
-    @StateObject private var authViewModel = AuthViewModel()
+    @ObservedObject var authViewModel: AuthViewModel
     
     var heightFactor: CGFloat {
         UIScreen.main.bounds.height > 800 ? 3.6 : 3
@@ -127,6 +127,9 @@ struct AuthView: View {
                         Button(
                             action: {
                                 authViewModel.email = email
+                                // 비동기 호출 후 성공 시 다음 뷰로 이동하도록 변경
+                                //authViewModel.requestAuthCode()
+                               
                                 authViewModel.requestAuthCode()
                                 pathModel.paths.append(.AuthNumView)
                             },
@@ -141,6 +144,8 @@ struct AuthView: View {
                             }
                         )
                     }.padding()
+                  
+
                 }
                 
                 // Dark Overlay
@@ -291,6 +296,3 @@ let termsContents = [
 
 
 
-#Preview {
-    AuthView()
-}

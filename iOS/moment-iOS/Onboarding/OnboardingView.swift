@@ -17,6 +17,7 @@ struct OnboardingView: View {
     @StateObject var audioRecorderManager = AudioRecorderManager()
     @State private var showingCustomAlert = false
     @StateObject private var cardviewModel = CardViewModel()
+    @StateObject var authViewModel = AuthViewModel()
     //@StateObject private var viewModel = OnboardingViewModel()
    // @ObservedObject private var sharedViewModel = SharedViewModel()
     @State private var currentPage = 0
@@ -130,11 +131,11 @@ struct OnboardingView: View {
                             .environmentObject(homeViewModel)
                         
                     case .AuthView:
-                        AuthView()
+                        AuthView(authViewModel: authViewModel)
                             .environmentObject(homeViewModel)
                         
                     case .AuthNumView:
-                        AuthNumView()
+                        AuthNumView(authViewModel: authViewModel)
                             .environmentObject(homeViewModel)
                     case .AddUser:
                         AddUser()
