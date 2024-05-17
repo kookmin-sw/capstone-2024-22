@@ -1,7 +1,6 @@
 package com.capstone.android.application.ui
 
 import android.content.Intent
-import com.capstone.android.application.MainActivity
 
 import android.os.Bundle
 import android.os.Handler
@@ -27,7 +26,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -45,8 +43,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
-import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.app.ApplicationClass.Companion.tokenSharedPreferences
 import com.capstone.android.application.ui.theme.BigButton
 import com.capstone.android.application.ui.theme.P_Bold
@@ -99,7 +97,6 @@ class SplashActivity:ComponentActivity() {
             }
         }
     }
-
     @Composable
     fun Splash() {
         LogoScreen()
