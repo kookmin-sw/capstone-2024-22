@@ -83,13 +83,13 @@ public class CardViewService {
                 card.setDisgust(ret.getEmotions().getDisgust());
 
                 // 분석도중 레이스컨디션 때문에 다시 여행을 불러오기
+                TripFile cTripFile = tripFileRepository.findById(tripFile.getId()).get();
                 tripFile.setAnalyzingCount(tripFile.getAnalyzingCount() - 1);
-                TripFile cTripFile = tripFileRepository.save(tripFile);
-
                 Trip trip = cTripFile.getTrip();
                 trip.setAnalyzingCount(trip.getAnalyzingCount() - 1);
-                tripRepository.save(trip);
 
+                tripRepository.save(trip);
+                tripFileRepository.save(tripFile);
                 cardViewRepository.save(card);
                 successRecordNum++;
                 // 유저가 없는경우 map에 추가 있으면 카운트 추가
