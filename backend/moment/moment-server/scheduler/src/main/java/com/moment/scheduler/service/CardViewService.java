@@ -11,6 +11,7 @@ import com.moment.scheduler.domain.user.User;
 
 import com.moment.scheduler.dto.response.AiModelRunResponseDTO;
 import com.moment.scheduler.dto.response.SchedulerResponseDTO;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class CardViewService {
     private final TripFileRepository tripFileRepository;
     private final AwsService awsService;
     private final NotiService notiService;
+    private final EntityManager em;
 
     public SchedulerResponseDTO.AIModelRunResponseDTO getIncompleteCardViews() throws InterruptedException {
         // ec2가 켜져있는지 확인
@@ -80,7 +82,8 @@ public class CardViewService {
                 card.setAngry(ret.getEmotions().getAngry());
                 card.setNeutral(ret.getEmotions().getNeutral());
                 card.setDisgust(ret.getEmotions().getDisgust());
-
+                cardViewRepository.save(card);
+                em.clear();
                 // 분석도중 레이스컨디션 때문에 다시 여행을 불러오기
                 TripFile cTripFile = tripFileRepository.findById(card.getTripFile().getId()).get();
                 cTripFile.setAnalyzingCount(cTripFile.getAnalyzingCount() - 1);
@@ -90,7 +93,7 @@ public class CardViewService {
                 tripRepository.save(trip);
                 log.info("tripfiles tripid : " + cTripFile.getTrip().getId());
                 tripFileRepository.save(cTripFile);
-                cardViewRepository.save(card);
+
                 successRecordNum++;
                 // 유저가 없는경우 map에 추가 있으면 카운트 추가
                 if (!userCardViewCount.containsKey(user)){
