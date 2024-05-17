@@ -282,7 +282,8 @@ class OnboardingActivity:ComponentActivity() {
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = 277.dp)){
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center){
 
                 Column( modifier = Modifier
                     .padding(horizontal = 8.dp)){
@@ -361,7 +362,7 @@ class OnboardingActivity:ComponentActivity() {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp),
+                    .padding(bottom = 45.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -1228,16 +1229,16 @@ class OnboardingActivity:ComponentActivity() {
 
                 ) {
 
-                    Box(
-                        contentAlignment = Alignment.Center
-                    ){
-                        Spacer(modifier = Modifier.width(18.dp))
-                        Image(
-                            modifier = Modifier
-                                .width(155.dp)
-                                .height(26.dp),
-                            painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
-                        )
+                        Box(
+                            contentAlignment = Alignment.Center
+                        ){
+                            Spacer(modifier = Modifier.width(18.dp))
+                            Image(
+                                modifier = Modifier
+                                    .width(155.dp)
+                                    .height(26.dp),
+                                painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
+                            )
 
                         P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
                     }
