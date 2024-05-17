@@ -154,10 +154,14 @@ import com.capstone.android.application.ui.theme.neutral_300
 import com.capstone.android.application.ui.theme.neutral_400
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
+import com.capstone.android.application.ui.theme.positive_800
 import com.capstone.android.application.ui.theme.primary_200
 import com.capstone.android.application.ui.theme.primary_500
+import com.capstone.android.application.ui.theme.secondary_400
 import com.capstone.android.application.ui.theme.secondary_50
 import com.capstone.android.application.ui.theme.tertiary_500
+import com.capstone.android.application.ui.theme.tertiary_600
+import com.capstone.android.application.ui.theme.warning_600
 import com.capstone.android.application.ui.theme.white
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -2880,10 +2884,10 @@ class MainActivity : ComponentActivity() {
                                                     modifier = Modifier.height(1.5.dp),
                                                     color = when (index) {
                                                         0 -> primary_500
-                                                        1 -> neutral_600
-                                                        2 -> neutral_400
-                                                        3 -> neutral_200
-                                                        4 -> neutral_100
+                                                        1 -> warning_600
+                                                        2 -> tertiary_600
+                                                        3 -> positive_800
+                                                        4 -> secondary_400
                                                         else -> primary_500
                                                     },
                                                     strokeCap = StrokeCap.Round
