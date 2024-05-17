@@ -71,6 +71,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -1624,8 +1625,22 @@ class MainActivity : ComponentActivity() {
                         }
                     }) {
 
-                    if(item.receiptThemeType == "A") MiniTheme1(item)
-                    else MiniTheme2(item)
+                    if(checkState.value){
+                        Column(Modifier
+                            .height(244.dp)
+                            .fillMaxWidth()
+                            .background(color = neutral_500,
+                                shape = RoundedCornerShape(2.dp))
+                            .alpha(0.5f)) {
+                            if(item.receiptThemeType == "A") MiniTheme1(item)
+                            else MiniTheme2(item)
+                        }
+                    }else{
+                        if(item.receiptThemeType == "A") MiniTheme1(item)
+                        else MiniTheme2(item)
+                    }
+
+
 
 
                     if (EditCheckState.value){
