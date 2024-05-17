@@ -89,7 +89,8 @@ public class CardViewService {
                 trip.setAnalyzingCount(trip.getAnalyzingCount() - 1);
 
                 tripRepository.save(trip);
-                tripFileRepository.save(tripFile);
+                log.info("tripfiles tripid : " + cTripFile.getTrip().getId());
+                tripFileRepository.save(cTripFile);
                 cardViewRepository.save(card);
                 successRecordNum++;
                 // 유저가 없는경우 map에 추가 있으면 카운트 추가
