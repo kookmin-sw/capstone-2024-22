@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -166,7 +167,7 @@ class OnboardingActivity:ComponentActivity() {
                     composable(route=OnboardingScreen.Signup.name){ Signup(authCodeInSignup,email) }
                     composable(route=OnboardingScreen.FindPassword.name){ FindPassword(FindPW_id) }
                     composable(route=OnboardingScreen.FindPasswordNumber.name){
-                        FindPasswordNumber(authCodeInFindPassword)
+                        FindPasswordNumber(authCodeInFindPassword, FindPW_id)
                     }
                     composable(route=OnboardingScreen.FindPasswordSignup.name){
                         FindPasswordSignup(code = authCodeInFindPassword.value)
@@ -1107,7 +1108,7 @@ class OnboardingActivity:ComponentActivity() {
 
     // 비밀번호 찾기에서 인증코드 확인
     @Composable
-    fun FindPasswordNumber(authCode:MutableState<String>){
+    fun FindPasswordNumber(authCode:MutableState<String>, id: MutableState<String>){
 
         val findpwnumState = remember{
             mutableStateOf(true)
@@ -1198,25 +1199,32 @@ class OnboardingActivity:ComponentActivity() {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(modifier = Modifier
-                    .width(86.dp)
-                    .align(Alignment.End)
-                    .clickable { /*인증번호 재전송 기능*/ }) {
-                    Column {
-                        Column(modifier = Modifier
-                            .padding(horizontal = 8.dp)) {
-                            P_Medium11(
-                                content = "복구코드 재전송",
-                                color = black
+                    Row(modifier = Modifier
+                        .width(86.dp)
+                        .align(Alignment.End)
+                        .clickable {
+                            authViewModel.postAuthAuthCode(
+                                body = PostAuthAuthCodeRequest(
+                                    email = id.value,
+                                    isSignUp = "false"
+                                )
                             )
+                        }) {
+                        Column {
+                            Column(modifier = Modifier
+                                .padding(horizontal = 8.dp)) {
+                                P_Medium11(
+                                    content = "복구코드 재전송",
+                                    color = black
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Divider(color = black)
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Divider(color = black)
                     }
-                }
-                Row(modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .align(Alignment.End)
+                    Row(modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .align(Alignment.End)
 
                 ) {
 
