@@ -142,6 +142,9 @@ class OnboardingActivity:ComponentActivity() {
                 mutableListOf(false)
             }
 
+            val email = remember{mutableStateOf("")}
+            val FindPW_id = remember{ mutableStateOf("") }
+
             navController = rememberNavController()
 
             Scaffold(
@@ -156,9 +159,9 @@ class OnboardingActivity:ComponentActivity() {
                 ){
                     composable(route=OnboardingScreen.Login.name){ Login() }
                     composable(route=OnboardingScreen.LoginComplete.name){ LoginComplete()}
-                    composable(route=OnboardingScreen.SignupEmail.name){ SignupEmail() }
+                    composable(route=OnboardingScreen.SignupEmail.name){ SignupEmail(email) }
                     composable(route=OnboardingScreen.SignupNumber.name){
-                        SignupNumber(authCode=authCodeInSignup)
+                        SignupNumber(authCode=authCodeInSignup, email = email)
                     }
                     composable(route=OnboardingScreen.Signup.name){ Signup(authCodeInSignup) }
                     composable(route=OnboardingScreen.FindPassword.name){ FindPassword() }
@@ -436,8 +439,7 @@ class OnboardingActivity:ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun SignupEmail(){
-        val email = remember{mutableStateOf("")}
+    fun SignupEmail(email : MutableState<String>){
         //keyboard
         val focusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
@@ -680,7 +682,8 @@ class OnboardingActivity:ComponentActivity() {
 
 
     @Composable
-    fun SignupNumber(countViewModel: CountViewModel = viewModel(),authCode:MutableState<String>){
+    fun SignupNumber(countViewModel: CountViewModel = viewModel(), authCode:MutableState<String>,
+                     email : MutableState<String>){
 
         val timeLeft by countViewModel.timeLeft.collectAsState()
         val number = remember{mutableStateOf("")}
@@ -782,40 +785,45 @@ class OnboardingActivity:ComponentActivity() {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(modifier = Modifier
-                    .width(86.dp)
-                    .align(Alignment.End)
-                    .clickable { countViewModel.restartCountdown() }) {
-                    Column {
-                        Column(modifier = Modifier
-                            .padding(horizontal = 8.dp)) {
-                            P_Medium11(
-                                content = "인증번호 재전송",
-                                color = black
-                            )
+                    Row(modifier = Modifier
+                        .width(86.dp)
+                        .align(Alignment.End)
+                        .clickable { countViewModel.restartCountdown() }) {
+                        Column {
+                            Column(modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .clickable {
+                                    authViewModel.postAuthAuthCode(
+                                        body = PostAuthAuthCodeRequest(
+                                            email = email.value,
+                                            isSignUp = "true"
+                                        )
+                                    )
+                                }) {
+                                P_Medium11(
+                                    content = "인증번호 재전송",
+                                    color = black
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Divider(color = black)
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Divider(color = black)
                     }
-                }
-                Row(modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .align(Alignment.End)
-
-                ) {
-
-                    Box(
-                        contentAlignment = Alignment.Center
-                    ){
-                        Spacer(modifier = Modifier.width(18.dp))
-                        Image(
-                            modifier = Modifier
-                                .width(155.dp)
-                                .height(26.dp),
-                            painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
-                        )
-
-                        P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
+                    Row(modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .align(Alignment.End)){
+                        Box(
+                            contentAlignment = Alignment.Center
+                        ){
+                            Spacer(modifier = Modifier.width(18.dp))
+                            Image(
+                                modifier = Modifier
+                                    .width(155.dp)
+                                    .height(26.dp),
+                                painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
+                            )
+                            P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
+                        }
                     }
                 }
             }
