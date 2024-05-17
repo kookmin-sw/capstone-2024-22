@@ -163,8 +163,8 @@ class OnboardingActivity:ComponentActivity() {
                     composable(route=OnboardingScreen.SignupNumber.name){
                         SignupNumber(authCode=authCodeInSignup, email = email)
                     }
-                    composable(route=OnboardingScreen.Signup.name){ Signup(authCodeInSignup) }
-                    composable(route=OnboardingScreen.FindPassword.name){ FindPassword() }
+                    composable(route=OnboardingScreen.Signup.name){ Signup(authCodeInSignup,email) }
+                    composable(route=OnboardingScreen.FindPassword.name){ FindPassword(FindPW_id) }
                     composable(route=OnboardingScreen.FindPasswordNumber.name){
                         FindPasswordNumber(authCodeInFindPassword)
                     }
@@ -854,10 +854,7 @@ class OnboardingActivity:ComponentActivity() {
     }
 
     @Composable
-    fun Signup(emailAuthCode:MutableState<String>){
-        val id = remember{
-            mutableStateOf("")
-        }
+    fun Signup(emailAuthCode:MutableState<String>, email : MutableState<String>){
         val password = remember{
             mutableStateOf("")
         }
@@ -871,7 +868,7 @@ class OnboardingActivity:ComponentActivity() {
         val focusManager = LocalFocusManager.current
         val focusRequester = remember { FocusRequester() }
 
-        LaunchedEffect(id) {
+        LaunchedEffect(password) {
             focusRequester.requestFocus()
         }
 
@@ -891,94 +888,87 @@ class OnboardingActivity:ComponentActivity() {
                 }, "회원가입")
             }
 
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 210.dp)
-            ) {
+            Column(modifier=Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center) {
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
+                        .padding(horizontal = 16.dp)
                 ) {
-                    P_Medium11("아이디", black)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "abcd1234@naver.com 자동입력하기",
-                    onValueChanged = { id.value = it },
-                    onClicked = {},
-                    text = id,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "manyfirstmove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color = black)
-                Spacer(modifier = Modifier.height(16.dp))
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11("비밀번호", black)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "비밀번호를 입력해주세요",
-                    onValueChanged = { password.value = it },
-                    onClicked = {},
-                    text = password,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "manynextmove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color = black)
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11("비밀번호 확인", if(pwequel.value)black else primary_500)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "비밀번호를 다시 한 번 입력해주세요",
-                    onValueChanged = { passwordcheck.value = it },
-                    onClicked = {},
-                    text = passwordcheck,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "manyendmove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color = if(pwequel.value)black else primary_500)
-
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End){
-                    Column(horizontalAlignment = Alignment.End) {
-                        P_Medium11(content = "와이파이가 없는 환경에서도 녹음 파일 저장하기",color = black)
-                        P_Medium11(content = "나중에 설정에서 바꿀 수 있어요",color = neutral_500)
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("아이디", black)
                     }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    P_Medium18(content = email.value, color = black)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color = black)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("비밀번호", black)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "비밀번호를 입력해주세요",
+                        onValueChanged = { password.value = it },
+                        onClicked = {},
+                        text = password,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "manynextmove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color = black)
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("비밀번호 확인", if(pwequel.value)black else primary_500)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "비밀번호를 다시 한 번 입력해주세요",
+                        onValueChanged = { passwordcheck.value = it },
+                        onClicked = {},
+                        text = passwordcheck,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "manyendmove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color = if(pwequel.value)black else primary_500)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(modifier = Modifier
+                        .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End){
+                        Column(horizontalAlignment = Alignment.End) {
+                            P_Medium11(content = "와이파이가 없는 환경에서도 녹음 파일 저장하기",color = black)
+                            P_Medium11(content = "나중에 설정에서 바꿀 수 있어요",color = neutral_500)
+                        }
                         Spacer(modifier = Modifier.width(8.dp))
                         CheckButton(wificheck)
                     }
+                }
             }
+
 
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 72.dp)
             ) {
-                if (id.value.isNotEmpty() && password.value.isNotEmpty() && passwordcheck.value.isNotEmpty()){
+                if ( password.value.isNotEmpty() && passwordcheck.value.isNotEmpty()){
                     BigButton("가입하기", true) {
                         if (password.value == passwordcheck.value) {
                             authViewModel.patchAuthChangePassword(
