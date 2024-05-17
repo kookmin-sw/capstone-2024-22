@@ -7,6 +7,7 @@ import com.capstone.android.application.data.remote.receipt.ReceiptRetrofitInter
 import com.capstone.android.application.data.remote.download_link.DownloadLinkRetrofitInterface
 import com.capstone.android.application.data.remote.kakao.KakaoRetrofitInterface
 import com.capstone.android.application.data.remote.open_weather.OpenWeatherRetrofitInterface
+import com.capstone.android.application.data.remote.setting.SettingRetrofitInterface
 import com.capstone.android.application.data.remote.trip.TripRetrofitInterface
 import com.capstone.android.application.data.remote.tripfile.TripFileRetrofitInterface
 import com.capstone.android.application.domain.response.ApiResponseCallAdapterFactory
@@ -205,6 +206,12 @@ object ApiModule {
     @Provides
     fun provideDownloadLinkService(@DownloadLinkRetrofit retrofit:Retrofit) : DownloadLinkRetrofitInterface {
         return retrofit.create(DownloadLinkRetrofitInterface::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSettingService(@BaseRetrofit retrofit: Retrofit): SettingRetrofitInterface {
+        return retrofit.create(SettingRetrofitInterface::class.java)
     }
 
 
