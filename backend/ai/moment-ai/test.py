@@ -25,7 +25,6 @@ import subprocess
 from emotion2vec.iemocap_downstream.model import BaseModel
 
 
-
 @dataclass
 class UserDirModule:
     user_dir: str
@@ -41,6 +40,7 @@ parser.add_argument('--granularity', type=str, default="utterance", help='which 
 
 args = parser.parse_args()
 
+hallucination_list = ["이 영상은 유료광고를 포함하고 있습니다. 구독과 좋아요를 눌러주세요. 감사합니다."]
 
 def run_model_on_gpu(models:dict, source_file, output):
   if torch.cuda.is_available():
@@ -56,6 +56,9 @@ def run_model_on_gpu(models:dict, source_file, output):
           model.to('cuda')
           result = model.transcribe(source_file)
           output["text"] = result["text"]
+          
+          for hallu in hallucination_list:
+            output["text"] = output["text"].replace(hallu, "")
           
         elif model_name == "emotion2vec":
           labels = ["neutral", "happy", "angry", "sad", "disgust"]
@@ -121,6 +124,9 @@ def run_model_on_cpu(models:dict, source_file, output):
         model.to('cpu')
         result = model.transcribe(source_file)
         output["text"] = result["text"]
+        
+        for hallu in hallucination_list:
+            output["text"] = output["text"].replace(hallu, "")
         
       elif model_name == "emotion2vec":
         labels = ["neutral", "happy", "angry", "sad", "disgust"]
