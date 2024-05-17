@@ -60,8 +60,8 @@ public class CardViewService {
         log.info("cards.size : " + cards.size());
         for (CardView card : cards) {
             TripFile tripFile = card.getTripFile();
-            Trip trip = tripFile.getTrip();
-            User user = trip.getUser();
+            Trip ptrip = tripFile.getTrip();
+            User user = ptrip.getUser();
             AiModelRunResponseDTO.RunModel ret = aiService.runAi(card.getRecordFileName(), user.getId());
             if (Objects.equals(ret.getStatus(), "200")){
                 log.info("ret.status : " + ret.getStatus());
@@ -82,10 +82,14 @@ public class CardViewService {
                 card.setNeutral(ret.getEmotions().getNeutral());
                 card.setDisgust(ret.getEmotions().getDisgust());
 
+                // 분석도중 레이스컨디션 때문에 다시 여행을 불러오기
                 tripFile.setAnalyzingCount(tripFile.getAnalyzingCount() - 1);
+                TripFile cTripFile = tripFileRepository.save(tripFile);
+
+                Trip trip = cTripFile.getTrip();
                 trip.setAnalyzingCount(trip.getAnalyzingCount() - 1);
                 tripRepository.save(trip);
-                tripFileRepository.save(tripFile);
+
                 cardViewRepository.save(card);
                 successRecordNum++;
                 // 유저가 없는경우 map에 추가 있으면 카운트 추가
