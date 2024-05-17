@@ -112,9 +112,9 @@ public class TripService {
 
         // 여행 파일들이 있는지 확인하고 생성
         for (LocalDate date = stDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            log.info("date: {}", date);
             // 이미 해당 날짜로 된 파일이 있는지 확인
             analyzingCount += tripFileService.findByDateAndUpdate(trip, date);
+            log.info("date: {}, add analyzingCount: {}", date, analyzingCount);
         }
 
         trip.setAnalyzingCount(analyzingCount);
