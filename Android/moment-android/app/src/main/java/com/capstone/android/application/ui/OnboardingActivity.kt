@@ -1132,70 +1132,67 @@ class OnboardingActivity:ComponentActivity() {
                 }, "비밀번호 찾기")
             }
 
-            //Toast.makeText(this@OnboardingActivity, R.drawable.img_alarm_grey , Toast.LENGTH_LONG).show()
-            //Toast.makeText(this@OnboardingActivity, "dfd", Toast.LENGTH_LONG).show()
-
-            Column(modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 298.dp)) {
-                Box(
-                    contentAlignment = Alignment.Center
-                ){
-                    Spacer(modifier = Modifier.width(18.dp))
-                    Image(
-                        modifier = Modifier
-                            .width(205.dp)
-                            .height(42.dp),
-                        painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
-                    )
-                    P_Medium11(content = "입력하신 이메일로 복구코드가 전송되었어요\n" +
-                            "메일함을 확인해 주세요", color = white
-                    )
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 344.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11("복구코드", if(findpwnumState.value)black else negative_600)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "복구코드 6자리를 입력해주세요",
-                    onValueChanged = { authCode.value = it },
-                    onClicked = {},
-                    text = authCode,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "onemove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color = if(findpwnumState.value)black else negative_600)
-
-                if(findpwnumState.value){ }else{
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Column(
-                        modifier = Modifier.padding(horizontal = 8.dp)
+            Column(modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center) {
+                Column(modifier = Modifier
+                    .padding(horizontal = 24.dp)) {
+                    Box(
+                        contentAlignment = Alignment.Center
                     ){
-                        P_Medium11("복구코드를 다시한번 확인해 주세요", negative_600)
-                    }}
+                        Spacer(modifier = Modifier.width(18.dp))
+                        Image(
+                            modifier = Modifier
+                                .width(205.dp)
+                                .height(42.dp),
+                            painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
+                        )
+                        P_Medium11(content = "입력하신 이메일로 복구코드가 전송되었어요\n" +
+                                "메일함을 확인해 주세요", color = white
+                        )
+                    }
+                }
 
-                Spacer(modifier = Modifier.height(8.dp))
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
+                        .padding(horizontal = 16.dp)
                 ) {
-                    P_Medium11(content = "인터넷 상태에 따라 소요시간이 발생할 수 있습니다.", color = neutral_600 )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("복구코드", if(findpwnumState.value)black else negative_600)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "복구코드 6자리를 입력해주세요",
+                        onValueChanged = { authCode.value = it },
+                        onClicked = {},
+                        text = authCode,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "onemove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color = if(findpwnumState.value)black else negative_600)
+
+                    if(findpwnumState.value){ }else{
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Column(
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ){
+                            P_Medium11("복구코드를 다시한번 확인해 주세요", negative_600)
+                        }}
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11(content = "인터넷 상태에 따라 소요시간이 발생할 수 있습니다.", color = neutral_600 )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     Row(modifier = Modifier
                         .width(86.dp)
@@ -1237,17 +1234,15 @@ class OnboardingActivity:ComponentActivity() {
                                 painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
                             )
 
-                        P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
+                            P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
+                        }
                     }
                 }
             }
-
-
-
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 45.dp)
             ) {
                 if ( authCode.value.isNotEmpty()){
                     BigButton("다음", true) {
