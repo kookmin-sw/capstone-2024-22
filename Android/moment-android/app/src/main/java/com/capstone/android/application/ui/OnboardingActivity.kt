@@ -1017,9 +1017,8 @@ class OnboardingActivity:ComponentActivity() {
 
     // 비밀번호 찾기
     @Composable
-    fun FindPassword(){
+    fun FindPassword(id: MutableState<String>){
 
-        val id = remember{ mutableStateOf("") }
         val idState = remember{ mutableStateOf(true) }
 
         val focusRequester = remember { FocusRequester() }
