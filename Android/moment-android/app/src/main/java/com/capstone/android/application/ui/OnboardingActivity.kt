@@ -489,7 +489,8 @@ class OnboardingActivity:ComponentActivity() {
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = 344.dp)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
             ) {
                 Column(
                     modifier = Modifier
@@ -558,7 +559,7 @@ class OnboardingActivity:ComponentActivity() {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp),
+                    .padding(bottom = 45.dp),
             ) {if (email.value.isNotEmpty() && agree.value){
                 BigButton(
                     "다음", true
@@ -592,78 +593,77 @@ class OnboardingActivity:ComponentActivity() {
             containerColor = tertiary_500,
             dragHandle = null
         ){
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(tertiary_500)
-                    .height(216.dp)
-                    .padding(start = 44.dp, end = 35.dp, top = 46.dp, bottom = 34.dp)
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.Absolute.SpaceBetween
-                ) {
-                    Row(modifier = Modifier
-                        .width(259.dp)
-                        .align(Alignment.CenterVertically)) {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .background(tertiary_500)
+                .padding(10.dp)
+                .height(250.dp)){
+
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 10.dp),
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.Center) {
+                    CheckButton(agree1)
+                    Spacer(modifier =Modifier.height(16.dp))
+                    CheckButton(agree2)
+                    Spacer(modifier =Modifier.height(16.dp))
+                    CheckButton(agree3)
+                }
+
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(end = 50.dp),
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.Center) {
+                    Column (
+                        Modifier.clickable { navController.navigate(OnboardingScreen.AgreeDetail.name) }){
+                        P_Medium11(content = "보기", color = neutral_600)
+                    }
+                    Spacer(modifier =Modifier.height(16.dp))
+                    Column (
+                        Modifier.clickable { navController.navigate(OnboardingScreen.AgreeDetail.name) }){
+                        P_Medium11(content = "보기", color = neutral_600)
+                    }
+                    Spacer(modifier =Modifier.height(16.dp))
+                    Column (
+                        Modifier.clickable { navController.navigate(OnboardingScreen.AgreeDetail.name) }){
+                        P_Medium11(content = "보기", color = neutral_600)
+                    }
+                }
+
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 10.dp),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center) {
+                    Row(modifier = Modifier.wrapContentWidth()) {
                         P_Medium11(content = "(필수) ", color = primary_500)
                         P_Medium11(content = "이용약관 동의", color = black)
                     }
-                    Column (
-                        Modifier
-                            .align(Alignment.CenterVertically)
-                            .clickable { navController.navigate(OnboardingScreen.AgreeDetail.name) }){
-                        P_Medium11(content = "보기", color = neutral_600)
-                    }
-                    Spacer(modifier =Modifier.width(20.dp))
-                    CheckButton(agree1)
-                }
-                Spacer(modifier =Modifier.height(16.dp))
-                Row(
-                    horizontalArrangement = Arrangement.Absolute.SpaceBetween
-                ) {
-                    Row(modifier = Modifier
-                        .width(259.dp)
-                        .align(Alignment.CenterVertically)) {
+                    Spacer(modifier =Modifier.height(16.dp))
+                    Row(modifier = Modifier.wrapContentWidth()) {
                         P_Medium11(content = "(필수) ", color = primary_500)
                         P_Medium11(content = "개인정보 수집 이용 및 조회 동의", color = black)
                     }
-                    Column (
-                        Modifier
-                            .align(Alignment.CenterVertically)
-                            .clickable { navController.navigate(OnboardingScreen.AgreeDetail.name) }){
-                        P_Medium11(content = "보기", color = neutral_600)
-                    }
-                    Spacer(modifier =Modifier.width(20.dp))
-                    CheckButton(agree2)
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    horizontalArrangement = Arrangement.Absolute.SpaceBetween
-                ) {
-                    Row(modifier = Modifier
-                        .width(259.dp)
-                        .align(Alignment.CenterVertically)) {
+                    Spacer(modifier =Modifier.height(16.dp))
+                    Row(modifier = Modifier.wrapContentWidth()) {
                         P_Medium11(content = "(선택) ", color = black)
                         P_Medium11(content = "E-mail 마케팅 정보 수신 동의", color = black)
                     }
-                    Column (
-                        Modifier
-                            .align(Alignment.CenterVertically)
-                            .clickable { navController.navigate(OnboardingScreen.AgreeDetail.name) }){
-                        P_Medium11(content = "보기", color = neutral_600)
-                    }
-                    Spacer(modifier =Modifier.width(20.dp))
-                    CheckButton(agree3)
                 }
-                Spacer(modifier =Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .align(Alignment.End)
-                ) {
+
+
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 14.dp)
+                        .padding(bottom = 45.dp),
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.Bottom) {
                     Column(
                         Modifier
-                            .padding(horizontal = 14.dp, vertical = 10.dp)
+                            .wrapContentSize()
                             .clickable {
                                 coroutineScope
                                     .launch {
