@@ -1297,69 +1297,72 @@ class OnboardingActivity:ComponentActivity() {
                 }, "비밀번호 찾기")
             }
 
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 277.dp)
-            ) {
+            Column(modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center) {
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
+                        .padding(horizontal = 16.dp)
                 ) {
-                    P_Medium11("비밀번호", black)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "비밀번호를 입력해주세요",
-                    onValueChanged = { password.value = it },
-                    onClicked = {},
-                    text = password,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "manyfirstmove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color = black)
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11("비밀번호 확인", if (pwequel.value) black else negative_600)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "비밀번호를 다시 한 번 입력해주세요",
-                    onValueChanged = { passwordcheck.value = it },
-                    onClicked = {},
-                    text = passwordcheck,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "manyendmove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color = if (pwequel.value) black else negative_600)
-
-                if (pwequel.value) {
-                } else {
-                    Spacer(modifier = Modifier.height(4.dp))
                     Column(
-                        modifier = Modifier.padding(horizontal = 8.dp)
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
                     ) {
-                        P_Medium11(content = "비밀번호가 동일하지 않습니다.", color = negative_600)
+                        P_Medium11("비밀번호", black)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "비밀번호를 입력해주세요",
+                        onValueChanged = { password.value = it },
+                        onClicked = {},
+                        text = password,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "manyfirstmove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color = black)
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("비밀번호 확인", if (pwequel.value) black else negative_600)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "비밀번호를 다시 한 번 입력해주세요",
+                        onValueChanged = { passwordcheck.value = it },
+                        onClicked = {},
+                        text = passwordcheck,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "manyendmove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color = if (pwequel.value) black else negative_600)
+
+                    if (pwequel.value) {
+                    } else {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Column(
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            P_Medium11(content = "비밀번호가 동일하지 않습니다.", color = negative_600)
+                        }
                     }
                 }
             }
 
+
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 45.dp)
             ) {
                 if (password.value.isNotEmpty() && passwordcheck.value.isNotEmpty()) {
                     BigButton("로그인하기", true) {
