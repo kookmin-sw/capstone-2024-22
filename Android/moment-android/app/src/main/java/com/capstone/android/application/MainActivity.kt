@@ -217,21 +217,6 @@ class MainActivity : ComponentActivity() {
     private var audioFile: File? = null
 
 
-    private fun MyFirebaseMessaging() {
-        val token: Task<String> = FirebaseMessaging.getInstance().token
-        token.addOnCompleteListener(OnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d("FCMToken",task.result)
-//                registerFCMToken(task.result)
-            }
-        })
-    }
-
-
-    private fun registerFCMToken(FCMToken:String){
-        val fcm = Intent(applicationContext, MyFirebaseMessagingService::class.java)
-        startService(fcm)
-    }
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -239,7 +224,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         var currentDate:String=""
         momentPermission.requestPermission()
-        MyFirebaseMessaging()
+
 
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -775,7 +760,6 @@ class MainActivity : ComponentActivity() {
                                 .clickable {
                                     recordOpen.value = true
                                     isRecorderIng.value = recorder.isActivity()
-
                                 }
                         ) {
                             Image(
@@ -1050,7 +1034,10 @@ class MainActivity : ComponentActivity() {
                         }
                     }else{
                         Text(
-                            modifier = Modifier.clickable { navController.navigate(MainScreen.RecordDaily.screenRoute) },
+                            modifier = Modifier.clickable {
+                                tripFileViewModel.getTripFileUntitled()
+                                navController.navigate(MainScreen.RecordDaily.screenRoute)
+                            },
                             text = "일상기록",
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold
@@ -1684,6 +1671,7 @@ class MainActivity : ComponentActivity() {
             momentPermission.requestPermission()
             closeSheet()
         }else{
+            Log.d("weagaewgewa","esf")
             momentLocation.getLocation().invoke().apply {
                 this.addOnSuccessListener {
 //                    x = "126.924776753718",
@@ -1697,7 +1685,7 @@ class MainActivity : ComponentActivity() {
                     openWeatherViewModel.getWeatherInCurrentLocation(
                         lat = lat.value,
                         lon = lon.value,
-                        appid = "750af8c3ad235147ce30452e8242d76f"
+                        appid = ApplicationClass.openWeartherAppId
                     )
                 }
             }
@@ -1933,7 +1921,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = 16.dp),
-                    text = ApplicationClass.tripName,
+                    text = "즐겨찾기",
                     textAlign = TextAlign.End,
                     fontSize = 22.sp,
                     fontFamily = FontMoment.preStandardFont,

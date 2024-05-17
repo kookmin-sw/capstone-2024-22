@@ -9,12 +9,13 @@ import com.google.android.gms.tasks.Task
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Inject
 
 @Module
 @InstallIn(SingletonComponent::class)
-class MomentLocation @Inject constructor(@ActivityContext private val context : Context){
+class MomentLocation @Inject constructor(@ApplicationContext private val context : Context){
     @SuppressLint("MissingPermission")
     fun getLocation():() -> Task<Location> {
         return {
