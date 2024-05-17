@@ -965,7 +965,7 @@ class OnboardingActivity:ComponentActivity() {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 45.dp)
             ) {
                 if ( password.value.isNotEmpty() && passwordcheck.value.isNotEmpty()){
                     BigButton("가입하기", true) {
@@ -1007,7 +1007,7 @@ class OnboardingActivity:ComponentActivity() {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 45.dp)
             ) {
                 BigButton("로그인하기", true) { navController.navigate(OnboardingScreen.Login.name) }
             }
