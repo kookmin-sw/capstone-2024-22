@@ -59,8 +59,7 @@ public class CardViewService {
 
         log.info("cards.size : " + cards.size());
         for (CardView card : cards) {
-            TripFile tripFile = card.getTripFile();
-            Trip ptrip = tripFile.getTrip();
+            Trip ptrip = card.getTripFile().getTrip();
             User user = ptrip.getUser();
             AiModelRunResponseDTO.RunModel ret = aiService.runAi(card.getRecordFileName(), user.getId());
             if (Objects.equals(ret.getStatus(), "200")){
@@ -83,8 +82,8 @@ public class CardViewService {
                 card.setDisgust(ret.getEmotions().getDisgust());
 
                 // 분석도중 레이스컨디션 때문에 다시 여행을 불러오기
-                TripFile cTripFile = tripFileRepository.findById(tripFile.getId()).get();
-                tripFile.setAnalyzingCount(tripFile.getAnalyzingCount() - 1);
+                TripFile cTripFile = tripFileRepository.findById(card.getTripFile().getId()).get();
+                cTripFile.setAnalyzingCount(cTripFile.getAnalyzingCount() - 1);
                 Trip trip = cTripFile.getTrip();
                 trip.setAnalyzingCount(trip.getAnalyzingCount() - 1);
 
