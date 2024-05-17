@@ -1042,51 +1042,53 @@ class OnboardingActivity:ComponentActivity() {
                 }, "비밀번호 찾기")
             }
 
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 344.dp)) {
+            Column(modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center) {
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11("아이디", if (idState.value) black else negative_600)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "가입한 이메일을 입력해주세요",
-                    onValueChanged = { id.value = it },
-                    onClicked = {},
-                    text = id,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "onemove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color =  if (idState.value) black else negative_600)
-
-                if(idState.value){ }else{
-                    Spacer(modifier = Modifier.height(4.dp))
+                        .padding(horizontal = 16.dp)) {
                     Column(
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    ){
-                        P_Medium11("앗 ! 올바른 이메일 형식이 아니에요", negative_600)
-                    }}
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("아이디", if (idState.value) black else negative_600)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "가입한 이메일을 입력해주세요",
+                        onValueChanged = { id.value = it },
+                        onClicked = {},
+                        text = id,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "onemove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color =  if (idState.value) black else negative_600)
 
-                Spacer(modifier = Modifier.height(8.dp))
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11(content = "해당 이메일로 비밀번호 초기화 코드가 발송됩니다", color = neutral_600 )
+                    if(idState.value){ }else{
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Column(
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ){
+                            P_Medium11("앗 ! 올바른 이메일 형식이 아니에요", negative_600)
+                        }}
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11(content = "해당 이메일로 비밀번호 초기화 코드가 발송됩니다", color = neutral_600 )
+                    }
                 }
             }
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp),
+                    .padding(bottom = 45.dp),
             ) {if (id.value.isNotEmpty()){
                 BigButton("다음", true) {
                     authViewModel.postAuthAuthCode(
@@ -1095,7 +1097,6 @@ class OnboardingActivity:ComponentActivity() {
                             isSignUp = "false"
                         )
                     )
-
                 }
             }else{
                 BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPasswordNumber.name) }            }
