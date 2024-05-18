@@ -27,3 +27,8 @@ val neutral_600 = Color(0xFF706969)
 val negative_600 = Color(0xFFE5102E)
 val secondary_50 = Color(0xFFF0F1EE)
 
+val warning_600 = Color(0xFFD69D00)
+val tertiary_600 = Color(0xFFDAD0B4)
+val positive_800 = Color(0xFF104C2A)
+val secondary_400 = Color(0xFF89937C)
+

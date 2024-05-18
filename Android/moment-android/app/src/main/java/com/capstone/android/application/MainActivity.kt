@@ -71,6 +71,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -144,6 +145,7 @@ import com.capstone.android.application.ui.theme.P_ExtraBold
 import com.capstone.android.application.ui.theme.P_Medium
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
+import com.capstone.android.application.ui.theme.P_Medium14_center
 import com.capstone.android.application.ui.theme.P_Medium18
 import com.capstone.android.application.ui.theme.P_Medium_Oneline
 import com.capstone.android.application.ui.theme.YJ_Bold
@@ -155,10 +157,14 @@ import com.capstone.android.application.ui.theme.neutral_300
 import com.capstone.android.application.ui.theme.neutral_400
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
+import com.capstone.android.application.ui.theme.positive_800
 import com.capstone.android.application.ui.theme.primary_200
 import com.capstone.android.application.ui.theme.primary_500
+import com.capstone.android.application.ui.theme.secondary_400
 import com.capstone.android.application.ui.theme.secondary_50
 import com.capstone.android.application.ui.theme.tertiary_500
+import com.capstone.android.application.ui.theme.tertiary_600
+import com.capstone.android.application.ui.theme.warning_600
 import com.capstone.android.application.ui.theme.white
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -1618,6 +1624,7 @@ class MainActivity : ComponentActivity() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(tertiary_500)
                 .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.Center
             ) {
@@ -1643,8 +1650,20 @@ class MainActivity : ComponentActivity() {
         Column(
             Modifier
                 .fillMaxWidth()
+                .background(tertiary_500)
                 .padding(horizontal = 12.dp)) {
-            MyGrid(makeReceipt, receiptList, 2, EditCheckState, DeleteReceipt)
+
+            if(receiptList.size == 0){
+                Column(modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center) {
+                    P_Medium14_center(content = "아직 만들어진 티켓이 없어요\n" +
+                            "여행 티켓으로 여행을 멋지게 마무리 해봐요 !", color = neutral_300, Align = TextAlign.Center)
+                }
+            }else{
+                MyGrid(makeReceipt, receiptList, 2, EditCheckState, DeleteReceipt)
+            }
+
 
         }
     }
@@ -1727,8 +1746,22 @@ class MainActivity : ComponentActivity() {
                         }
                     }) {
 
-                    if(item.receiptThemeType == "A") MiniTheme1(item)
-                    else MiniTheme2(item)
+                    if(checkState.value){
+                        Column(Modifier
+                            .height(244.dp)
+                            .fillMaxWidth()
+                            .background(color = neutral_500,
+                                shape = RoundedCornerShape(2.dp))
+                            .alpha(0.5f)) {
+                            if(item.receiptThemeType == "A") MiniTheme1(item)
+                            else MiniTheme2(item)
+                        }
+                    }else{
+                        if(item.receiptThemeType == "A") MiniTheme1(item)
+                        else MiniTheme2(item)
+                    }
+
+
 
 
                     if (EditCheckState.value){
@@ -3002,10 +3035,10 @@ class MainActivity : ComponentActivity() {
                                                     modifier = Modifier.height(1.5.dp),
                                                     color = when (index) {
                                                         0 -> primary_500
-                                                        1 -> neutral_600
-                                                        2 -> neutral_400
-                                                        3 -> neutral_200
-                                                        4 -> neutral_100
+                                                        1 -> warning_600
+                                                        2 -> tertiary_600
+                                                        3 -> positive_800
+                                                        4 -> secondary_400
                                                         else -> primary_500
                                                     },
                                                     strokeCap = StrokeCap.Round

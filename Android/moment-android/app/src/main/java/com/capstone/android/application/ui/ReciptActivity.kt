@@ -67,6 +67,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -99,6 +100,7 @@ import com.capstone.android.application.ui.theme.P_Black50
 import com.capstone.android.application.ui.theme.P_ExtraBold14
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
+import com.capstone.android.application.ui.theme.P_Medium14_center
 import com.capstone.android.application.ui.theme.P_Medium8
 import com.capstone.android.application.ui.theme.P_SemiBold18
 import com.capstone.android.application.ui.theme.ReciptTextField
@@ -111,9 +113,13 @@ import com.capstone.android.application.ui.theme.neutral_300
 import com.capstone.android.application.ui.theme.neutral_400
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
+import com.capstone.android.application.ui.theme.positive_800
 import com.capstone.android.application.ui.theme.primary_200
 import com.capstone.android.application.ui.theme.primary_500
+import com.capstone.android.application.ui.theme.secondary_400
 import com.capstone.android.application.ui.theme.tertiary_500
+import com.capstone.android.application.ui.theme.tertiary_600
+import com.capstone.android.application.ui.theme.warning_600
 import com.capstone.android.application.ui.theme.white
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -497,36 +503,71 @@ class ReciptActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(8.dp))
                     P_SemiBold18(content = "여행 선택하기", color = black)
                 }
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(top = 12.dp)
-                        .padding(horizontal = 0.dp)
-                        .wrapContentSize()
-                ) {
 
-                    items(
-                        count = tripList.size,
-                        itemContent = {index->
+                
+                if (tripList.size == 0){
+                    Column(Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center) {
+                        P_Medium14_center(content = "아직 티켓을 만들 여행이 없어요\n" +
+                                "여행 티켓은 이미 일정이 완료된 여행으로만 만들 수 있어요", color = neutral_300, Align = TextAlign.Center )
+                    }
+                }else{
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(top = 12.dp)
+                            .padding(horizontal = 0.dp)
+                            .wrapContentSize()
+                    ) {
+                        items(
+                            count = tripList.size,
+                            itemContent = {index->
+                                if(tripList[index].analyzingCount==0 &&
+                                    isDatePassed(LocalDate.parse(tripList[index].endDate)) &&
+                                    tripList[index].numOfCard != 0 ){
+                                    ItemTrip(
+                                        Trip(id=tripList[index].id,
+                                            tripName = tripList[index].tripName,
+                                            startDate=tripList[index].startDate,
+                                            endDate = tripList[index].endDate),
+                                        index = index)
+                                    Column(Modifier.padding(start = 16.dp, end = 9.dp)) {
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Divider(color = neutral_300)
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                    }
 
-                            if(tripList[index].analyzingCount==0 &&
-                                isDatePassed(LocalDate.parse(tripList[index].endDate)) &&
-                                tripList[index].numOfCard != 0 ){
-                                ItemTrip(
-                                    Trip(id=tripList[index].id,
-                                        tripName = tripList[index].tripName,
-                                        startDate=tripList[index].startDate,
-                                        endDate = tripList[index].endDate,
-                                        analyzingCount = tripList[index].analyzingCount
-                                        ),
-                                    index = index)
-                                Column(Modifier.padding(start = 16.dp, end = 9.dp)) {
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Divider(color = neutral_300)
-                                    Spacer(modifier = Modifier.height(4.dp))
+//                 LazyColumn(
+//                     modifier = Modifier
+//                         .padding(top = 12.dp)
+//                         .padding(horizontal = 0.dp)
+//                         .wrapContentSize()
+//                 ) {
+
+//                     items(
+//                         count = tripList.size,
+//                         itemContent = {index->
+
+//                             if(tripList[index].analyzingCount==0 &&
+//                                 isDatePassed(LocalDate.parse(tripList[index].endDate)) &&
+//                                 tripList[index].numOfCard != 0 ){
+//                                 ItemTrip(
+//                                     Trip(id=tripList[index].id,
+//                                         tripName = tripList[index].tripName,
+//                                         startDate=tripList[index].startDate,
+//                                         endDate = tripList[index].endDate,
+//                                         analyzingCount = tripList[index].analyzingCount
+//                                         ),
+//                                     index = index)
+//                                 Column(Modifier.padding(start = 16.dp, end = 9.dp)) {
+//                                     Spacer(modifier = Modifier.height(4.dp))
+//                                     Divider(color = neutral_300)
+//                                     Spacer(modifier = Modifier.height(4.dp))
+
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -1251,10 +1292,10 @@ class ReciptActivity : ComponentActivity() {
                                         color = when(index)
                                         {
                                             0 -> primary_500
-                                            1 -> neutral_600
-                                            2 -> neutral_400
-                                            3 -> neutral_200
-                                            4 -> neutral_100
+                                            1 -> warning_600
+                                            2 -> tertiary_600
+                                            3 -> positive_800
+                                            4 -> secondary_400
                                             else -> primary_500
                                         },
                                         strokeCap = StrokeCap.Round
@@ -1836,10 +1877,10 @@ class ReciptActivity : ComponentActivity() {
                                         color = when(index)
                                         {
                                             0 -> primary_500
-                                            1 -> neutral_600
-                                            2 -> neutral_400
-                                            3 -> neutral_200
-                                            4 -> neutral_100
+                                            1 -> warning_600
+                                            2 -> tertiary_600
+                                            3 -> positive_800
+                                            4 -> secondary_400
                                             else -> primary_500
                                         },
                                         strokeCap = StrokeCap.Round

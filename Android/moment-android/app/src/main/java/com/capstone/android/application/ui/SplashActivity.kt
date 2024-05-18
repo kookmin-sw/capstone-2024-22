@@ -138,55 +138,57 @@ class SplashActivity:ComponentActivity() {
         val ment4 = "소중한 추억들\n" +
                 "예쁘게 간직하기"
 
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(tertiary_500)) {
-            HorizontalPager(
-                verticalAlignment = Alignment.Top,
+        Box(modifier = Modifier.fillMaxSize()){
+            Column(
                 modifier = Modifier
-                    .padding(top = 75.dp)
-                    .height(587.dp)
-                    .fillMaxWidth(),
-                count = 4,
-                state = state
-            ) { page ->
-                if (page == 0) {
-                    Column{
-                        Intro_Screen(state,image1,"right",ment1)
+                    .fillMaxSize()
+                    .background(tertiary_500),
+                verticalArrangement = Arrangement.Center) {
+                HorizontalPager(
+                    verticalAlignment = Alignment.Top,
+                    modifier = Modifier
+                        .height(550.dp)
+                        .fillMaxWidth(),
+                    count = 4,
+                    state = state
+                ) { page ->
+                    if (page == 0) {
+                        Column{
+                            Intro_Screen(state,image1,"right",ment1)
+                        }
+                    }
+                    if (page == 1) {
+                        Column() {
+                            Intro_Screen(state, image2,"left",ment2)
+                        }
+                    }
+                    if (page == 2) {
+                        Column() {
+                            Intro_Screen(state, image3,"right",ment3)
+                        }
+                    }
+                    if (page == 3) {
+                        Column() {
+                            Intro_Screen(state, image4,"left",ment4)
+                        }
                     }
                 }
-                if (page == 1) {
-                    Column() {
-                        Intro_Screen(state, image2,"left",ment2)
+                if(state.currentPage == 3){
+                    DotsIndicator(totalDots = 4, selectedIndex = state.currentPage)
+                    Column(Modifier.padding(horizontal = 20.dp)){
+                        Spacer(modifier = Modifier.height(5.dp))
+                        BigButton("시작하기", true,
+                            onClick = {startActivity(Intent(this@SplashActivity, OnboardingActivity::class.java))}
+                        )
                     }
-                }
-                if (page == 2) {
-                    Column() {
-                        Intro_Screen(state, image3,"right",ment3)
+                }else{
+                    DotsIndicator(totalDots = 4, selectedIndex = state.currentPage)
+                    Column(Modifier
+                            .padding(horizontal = 20.dp)
+                            .align(Alignment.End)) {
+                        Spacer(modifier = Modifier.height(5.dp))
+                        SmallStartBtn()
                     }
-                }
-                if (page == 3) {
-                    Column() {
-                        Intro_Screen(state, image4,"left",ment4)
-                    }
-                }
-            }
-            if(state.currentPage == 3){
-                Column(Modifier.padding(horizontal = 20.dp)){
-                    Spacer(modifier = Modifier.height(28.dp))
-                    BigButton("시작하기", true,
-                        onClick = {startActivity(Intent(this@SplashActivity, OnboardingActivity::class.java))}
-                    )
-                }
-            }else{
-                Column(
-                    Modifier
-                        .padding(horizontal = 20.dp)
-                        .align(Alignment.End)) {
-                    Spacer(modifier = Modifier.height(28.dp))
-                    SmallStartBtn()
                 }
             }
         }
@@ -198,33 +200,33 @@ class SplashActivity:ComponentActivity() {
         Box( ) {
             Column(modifier = Modifier
                 .fillMaxWidth()
-                .height(574.dp)
                 .background(color = tertiary_500)) {
                 Image(painter = image,
                     contentDescription = "둘러보기 자료",
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight())
+                        .fillMaxWidth())
             }
             if(location == "left"){
             Column(modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 476.dp, start = 60.dp)) {
+                .fillMaxHeight()
+                .padding(start = 60.dp, bottom = 40.dp),
+                    verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.Start) {
                 P_Bold(ment, black, 22.sp, TextAlign.Start)
             }}
             else{
                 Column(modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 476.dp, end = 60.dp),
+                    .fillMaxHeight()
+                    .padding(end = 60.dp, bottom = 40.dp),
+                    verticalArrangement = Arrangement.Bottom,
                     horizontalAlignment = Alignment.End) {
                     P_Bold(ment, black, 22.sp, TextAlign.End)
                 }
             }
         }
-        Column {
-            Spacer(modifier = Modifier.height(10.dp))
-            DotsIndicator(totalDots = 4, selectedIndex = state.currentPage)
-        }
+
     }
 
     @Composable
