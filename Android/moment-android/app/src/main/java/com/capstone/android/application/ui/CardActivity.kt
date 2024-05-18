@@ -80,6 +80,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.capstone.android.application.R
 import com.capstone.android.application.app.ApplicationClass
+import com.capstone.android.application.app.composable.CustomTitleCheckDialog
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.composable.convertUrlLinkStringToRcorderNameString
 import com.capstone.android.application.app.utile.MomentPath
@@ -94,6 +95,7 @@ import com.capstone.android.application.presentation.DownloadLinkViewModel
 import com.capstone.android.application.ui.theme.FontMoment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -274,6 +276,7 @@ class CardActivity : ComponentActivity() {
 
                 var isEdit = remember { mutableStateOf(false) }
 
+                val isDeleteCard = remember { mutableStateOf(false) }
                 cardViewModel.getCardAll(
                     tripFileId = tripFileId.value
                 )
@@ -345,6 +348,32 @@ class CardActivity : ComponentActivity() {
                         .fillMaxWidth(),
                     topBar = {
                         GlobalLoadingDialog()
+                        if(isDeleteCard.value){
+                            CustomTitleCheckDialog(
+                                title = "${deleteCardIdList.size}개의 녹음 카드를 정말 삭제할까요?",
+                                description = "삭제된 녹음 카드는 복구할 수 없어요",
+                                checkleft = "네",
+                                checkright = "아니요",
+                                onClickCancel = { isDeleteCard.value = false },
+                                onClickleft = {
+                                    runBlocking {
+                                        deleteCardIdList.forEach {
+                                            cardViewModel.deleteCard(
+                                                cardViewId = it
+                                            )
+                                        }
+                                        isDeleteCard.value = false
+                                        isEdit.value = !isEdit.value
+                                    }
+
+                                },
+                                onClickright = {
+                                    isDeleteCard.value = false
+                                    deleteCardIdList.clear()
+                                    LoadingState.hide()
+                                }
+                            )
+                        }
                         TopAppBar(
                             actions = {
 
@@ -382,16 +411,19 @@ class CardActivity : ComponentActivity() {
                                                     deleteCardIdList.add(it.cardView.id)
                                                 }
                                                 if(isEdit.value && deleteCardIdList.isNotEmpty()){
+
                                                     LoadingState.show()
-                                                    deleteCardIdList.forEach {
-                                                        cardViewModel.deleteCard(
-                                                            cardViewId = it
-                                                        )
-                                                    }
+                                                    isDeleteCard.value = true
+//                                                    deleteCardIdList.forEach {
+//                                                        cardViewModel.deleteCard(
+//                                                            cardViewId = it
+//                                                        )
+//                                                    }
                                                 }else{
                                                     cardItems.map { it.isDelete.value = false }
+                                                    isEdit.value = !isEdit.value
                                                 }
-                                                isEdit.value = !isEdit.value
+
 
                                             },
                                         text = if(isEdit.value) "삭제" else "편집",
