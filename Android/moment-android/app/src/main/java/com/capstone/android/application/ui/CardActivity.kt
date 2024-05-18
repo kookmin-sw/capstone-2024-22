@@ -549,7 +549,7 @@ class CardActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(end = 16.dp),
-                        text = "일상기록",
+                        text = ApplicationClass.tripName,
                         textAlign = TextAlign.End,
                         fontSize = 22.sp,
                         fontFamily = FontMoment.preStandardFont,
