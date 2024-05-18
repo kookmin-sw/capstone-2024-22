@@ -988,7 +988,6 @@ class OnboardingActivity:ComponentActivity() {
                                 )
                             )
                             pwequel.value = true
-                            navController.navigate(OnboardingScreen.Login.name)
                         } else {
                             pwequel.value = false
                         }
