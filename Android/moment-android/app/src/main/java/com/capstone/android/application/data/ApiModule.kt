@@ -1,6 +1,7 @@
 package com.capstone.android.application.data
 
 import com.capstone.android.application.app.ApplicationClass
+import com.capstone.android.application.data.remote.already_booked_date.AlreadyBookedDateRetrofitInterface
 import com.capstone.android.application.data.remote.auth.AuthRetrofitInterface
 import com.capstone.android.application.data.remote.card.CardRetrofitInterface
 import com.capstone.android.application.data.remote.receipt.ReceiptRetrofitInterface
@@ -186,6 +187,12 @@ object ApiModule {
     @Provides
     fun provideReceiptService(@BaseRetrofit retrofit:Retrofit) : ReceiptRetrofitInterface {
         return retrofit.create(ReceiptRetrofitInterface::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideAlreadyBookedDateService(@BaseRetrofit retrofit:Retrofit) : AlreadyBookedDateRetrofitInterface {
+        return retrofit.create(AlreadyBookedDateRetrofitInterface::class.java)
     }
 
     @Singleton
