@@ -235,7 +235,13 @@ class OnboardingActivity:ComponentActivity() {
 
         // 비밀번호 변경
         authViewModel.patchAuthChangePasswordSuccess.observe(this@OnboardingActivity){ response->
-            navController.navigate(OnboardingScreen.Login.name)
+            Log.d("patchAuthChangePasswordSuccess", "initApi: ${navController.currentDestination?.route}")
+            if(navController.currentDestination?.route == OnboardingScreen.FindPasswordSignup.name){
+                navController.navigate(OnboardingScreen.Login.name)
+            }
+            if(navController.currentDestination?.route == OnboardingScreen.Signup.name){
+                navController.navigate(OnboardingScreen.SignupComplete.name)
+            }
         }
 
         // 비밀번호 변경 실패
