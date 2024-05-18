@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -49,6 +51,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -57,6 +60,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -176,7 +180,7 @@ class OnboardingActivity:ComponentActivity() {
                         FindPasswordSignup(code = authCodeInFindPassword.value)
                     }
                     composable(route=OnboardingScreen.SignupComplete.name){ SignupComplete() }
-                    composable(route=OnboardingScreen.AgreeDetail.name){ AgreeDetail() }
+                    composable(route=OnboardingScreen.AgreeDetail.name){ AgreeDetail("https://sites.google.com/view/tour-82/%ED%99%88") }
                 }
             }
         }
@@ -1402,34 +1406,19 @@ class OnboardingActivity:ComponentActivity() {
     }
 
     @Composable
-    fun AgreeDetail(){
-        //데이터 결정되면 디자인 작은 수정 있을 수 있음
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .background(color = tertiary_500)
-            .padding(horizontal = 27.dp)){
+    fun AgreeDetail(url: String) {
+        val context = LocalContext.current
 
-            P_ExtraBold16(content = "약관동의", color = black)
-
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 100.dp, bottom = 92.dp)
-                .verticalScroll(rememberScrollState())) {
-                P_Medium11(content = "(필수)약관동의\n\n\n\n\n\n\n약관동의\n\n\n\n\n\n\n약관동의\n\n\n\n\n\n\n\n\n약관동의\n\n\n\n\n약관동의\n\n\n\n\n약관동의\n\n\n\n\n약관동의\n\n\n\n\n약관동의\n\n\n\n\n약관동의약\n\n\n\n\n관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의", color = black)
-            }
-
-
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 50.dp),
-            ) { Column(modifier = Modifier
-                .padding(horizontal = 14.dp, vertical = 10.dp)
-                .clickable { navController.navigate(OnboardingScreen.SignupEmail.name) }) {
-                YJ_Bold15("확인",black)
-            }  }
-        }
+        AndroidView(factory = {
+            WebView(context).apply {
+                webViewClient = WebViewClient()
+                loadUrl(url)
+            }}, update = { webView ->
+            webView.loadUrl(url)
+        })
     }
+
+
 
     /*@Composable
     fun BackButton(onClick : () -> Unit, content : String){
