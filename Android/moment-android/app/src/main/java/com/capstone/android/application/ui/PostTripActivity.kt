@@ -1,6 +1,7 @@
 package com.capstone.android.application.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -12,12 +13,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import com.capstone.android.application.app.composable.MomentUiTripInfo
 import com.capstone.android.application.data.remote.trip.model.trip_register.request.PostTripRegisterRequest
+import com.capstone.android.application.presentation.AlreadyBookedDateViewModel
 import com.capstone.android.application.presentation.TripViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class PostTripActivity:ComponentActivity() {
     private val tripViewModel : TripViewModel by viewModels()
+    private val alreadyBookedDateViewModel : AlreadyBookedDateViewModel by viewModels()
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +28,12 @@ class PostTripActivity:ComponentActivity() {
         tripViewModel.postTripRegisterSuccess.observe(this@PostTripActivity){
             setResult(1,mainIntent)
             finish()
+        }
+        alreadyBookedDateViewModel.getAlreadyBookedDateAll()
+
+
+        alreadyBookedDateViewModel.getAlreadyBookedDateAllSuccess.observe(this@PostTripActivity){response->
+            Log.d("awegewagwae",response.toString())
         }
 
         setContent{

@@ -515,7 +515,9 @@ class ReciptActivity : ComponentActivity() {
                                     Trip(id=tripList[index].id,
                                         tripName = tripList[index].tripName,
                                         startDate=tripList[index].startDate,
-                                        endDate = tripList[index].endDate),
+                                        endDate = tripList[index].endDate,
+                                        analyzingCount = tripList[index].analyzingCount
+                                        ),
                                     index = index)
                                 Column(Modifier.padding(start = 16.dp, end = 9.dp)) {
                                     Spacer(modifier = Modifier.height(4.dp))
