@@ -100,6 +100,7 @@ import com.capstone.android.application.ui.theme.P_Black50
 import com.capstone.android.application.ui.theme.P_ExtraBold14
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
+import com.capstone.android.application.ui.theme.P_Medium14_center
 import com.capstone.android.application.ui.theme.P_Medium8
 import com.capstone.android.application.ui.theme.P_SemiBold18
 import com.capstone.android.application.ui.theme.ReciptTextField
