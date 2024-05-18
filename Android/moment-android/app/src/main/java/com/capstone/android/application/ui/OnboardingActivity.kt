@@ -3,6 +3,9 @@ package com.capstone.android.application.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -92,7 +95,7 @@ import kotlinx.coroutines.launch
 
 enum class OnboardingScreen(){
     Login,
-    LoginComplete,
+    LoginCompleteSplash,
     Signup,
     SignupEmail,
     SignupNumber,
@@ -159,7 +162,7 @@ class OnboardingActivity:ComponentActivity() {
                     navController = navController, startDestination = OnboardingScreen.Login.name
                 ){
                     composable(route=OnboardingScreen.Login.name){ Login() }
-                    composable(route=OnboardingScreen.LoginComplete.name){ LoginComplete()}
+                    composable(route=OnboardingScreen.LoginCompleteSplash.name){ LoginCompleteSplash()}
                     composable(route=OnboardingScreen.SignupEmail.name){ SignupEmail(email) }
                     composable(route=OnboardingScreen.SignupNumber.name){
                         SignupNumber(authCode=authCodeInSignup, email = email)
@@ -184,8 +187,7 @@ class OnboardingActivity:ComponentActivity() {
         // 로그인 성공
         authViewModel.postAuthLoginSuccess.observe(this@OnboardingActivity){ response->
             tokenSharedPreferences.edit().putString("accessToken",response.data.accessToken).apply()
-            startActivity(Intent(this@OnboardingActivity,MainActivity::class.java))
-            finish()
+            navController.navigate(OnboardingScreen.LoginCompleteSplash.name)
         }
 
         // 로그인 실패
@@ -407,6 +409,15 @@ class OnboardingActivity:ComponentActivity() {
     }
 
     @Composable
+    fun LoginCompleteSplash(){
+        LoginComplete()
+        Handler(Looper.getMainLooper()).postDelayed({
+            startActivity(Intent(this@OnboardingActivity,MainActivity::class.java))
+            finish()
+        }, 1000)
+    }
+
+    @Composable
     fun LoginComplete(){
         Box(
             modifier = Modifier
@@ -423,11 +434,6 @@ class OnboardingActivity:ComponentActivity() {
                 Image(modifier = Modifier.fillMaxSize(),
                     painter =  painterResource(R.drawable.img_logo),
                     contentDescription = "LOGO")
-            }
-
-            Column(Modifier.clickable {
-                startActivity(Intent(this@OnboardingActivity, MainActivity::class.java)) }) {
-                P_Medium18(content = "다음으로~", color = black)
             }
             Column(modifier = Modifier
                 .align(Alignment.BottomCenter)
