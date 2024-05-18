@@ -503,6 +503,7 @@ class ReciptActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(8.dp))
                     P_SemiBold18(content = "여행 선택하기", color = black)
                 }
+
                 
                 if (tripList.size == 0){
                     Column(Modifier.fillMaxSize(),
@@ -535,6 +536,34 @@ class ReciptActivity : ComponentActivity() {
                                         Divider(color = neutral_300)
                                         Spacer(modifier = Modifier.height(4.dp))
                                     }
+
+//                 LazyColumn(
+//                     modifier = Modifier
+//                         .padding(top = 12.dp)
+//                         .padding(horizontal = 0.dp)
+//                         .wrapContentSize()
+//                 ) {
+
+//                     items(
+//                         count = tripList.size,
+//                         itemContent = {index->
+
+//                             if(tripList[index].analyzingCount==0 &&
+//                                 isDatePassed(LocalDate.parse(tripList[index].endDate)) &&
+//                                 tripList[index].numOfCard != 0 ){
+//                                 ItemTrip(
+//                                     Trip(id=tripList[index].id,
+//                                         tripName = tripList[index].tripName,
+//                                         startDate=tripList[index].startDate,
+//                                         endDate = tripList[index].endDate,
+//                                         analyzingCount = tripList[index].analyzingCount
+//                                         ),
+//                                     index = index)
+//                                 Column(Modifier.padding(start = 16.dp, end = 9.dp)) {
+//                                     Spacer(modifier = Modifier.height(4.dp))
+//                                     Divider(color = neutral_300)
+//                                     Spacer(modifier = Modifier.height(4.dp))
+
                                 }
                             }
                         )

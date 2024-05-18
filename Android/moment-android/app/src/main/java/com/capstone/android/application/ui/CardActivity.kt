@@ -80,9 +80,11 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.capstone.android.application.R
 import com.capstone.android.application.app.ApplicationClass
+import com.capstone.android.application.app.composable.CustomTitleCheckDialog
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.composable.convertUrlLinkStringToRcorderNameString
 import com.capstone.android.application.app.utile.MomentPath
+import com.capstone.android.application.app.utile.common.GetWeatherIconDrawableCode
 import com.capstone.android.application.app.utile.loading.GlobalLoadingDialog
 import com.capstone.android.application.app.utile.loading.LoadingState
 import com.capstone.android.application.app.utile.recorder.MomentAudioPlayer
@@ -94,6 +96,7 @@ import com.capstone.android.application.presentation.DownloadLinkViewModel
 import com.capstone.android.application.ui.theme.FontMoment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -244,10 +247,10 @@ class CardActivity : ComponentActivity() {
 
             emotionList.add(
                 Emotion(
-                    icon = R.drawable.ic_emotion_sad,
+                    icon = R.drawable.ic_emotion_disgust,
                     text = "역겨워요",
                     persent = 0f,
-                    color = "#030712"
+                    color = "#89937C"
                 )
             )
 
@@ -274,6 +277,7 @@ class CardActivity : ComponentActivity() {
 
                 var isEdit = remember { mutableStateOf(false) }
 
+                val isDeleteCard = remember { mutableStateOf(false) }
                 cardViewModel.getCardAll(
                     tripFileId = tripFileId.value
                 )
@@ -345,6 +349,32 @@ class CardActivity : ComponentActivity() {
                         .fillMaxWidth(),
                     topBar = {
                         GlobalLoadingDialog()
+                        if(isDeleteCard.value){
+                            CustomTitleCheckDialog(
+                                title = "${deleteCardIdList.size}개의 녹음 카드를 정말 삭제할까요?",
+                                description = "삭제된 녹음 카드는 복구할 수 없어요",
+                                checkleft = "네",
+                                checkright = "아니요",
+                                onClickCancel = { isDeleteCard.value = false },
+                                onClickleft = {
+                                    runBlocking {
+                                        deleteCardIdList.forEach {
+                                            cardViewModel.deleteCard(
+                                                cardViewId = it
+                                            )
+                                        }
+                                        isDeleteCard.value = false
+                                        isEdit.value = !isEdit.value
+                                    }
+
+                                },
+                                onClickright = {
+                                    isDeleteCard.value = false
+                                    deleteCardIdList.clear()
+                                    LoadingState.hide()
+                                }
+                            )
+                        }
                         TopAppBar(
                             actions = {
 
@@ -382,16 +412,19 @@ class CardActivity : ComponentActivity() {
                                                     deleteCardIdList.add(it.cardView.id)
                                                 }
                                                 if(isEdit.value && deleteCardIdList.isNotEmpty()){
+
                                                     LoadingState.show()
-                                                    deleteCardIdList.forEach {
-                                                        cardViewModel.deleteCard(
-                                                            cardViewId = it
-                                                        )
-                                                    }
+                                                    isDeleteCard.value = true
+//                                                    deleteCardIdList.forEach {
+//                                                        cardViewModel.deleteCard(
+//                                                            cardViewId = it
+//                                                        )
+//                                                    }
                                                 }else{
                                                     cardItems.map { it.isDelete.value = false }
+                                                    isEdit.value = !isEdit.value
                                                 }
-                                                isEdit.value = !isEdit.value
+
 
                                             },
                                         text = if(isEdit.value) "삭제" else "편집",
@@ -642,7 +675,9 @@ class CardActivity : ComponentActivity() {
 
                                 if (cardItems[index].isExpand.value && !isEdit.value) {
                                     Spacer(modifier = Modifier.height(40.dp))
-                                    Column {
+                                    Column(
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
                                         Row(
                                             modifier = Modifier.padding(horizontal = 22.dp)
                                         ) {
@@ -657,351 +692,410 @@ class CardActivity : ComponentActivity() {
                                                 fontWeight = FontWeight.Medium
                                             )
                                             Spacer(modifier = Modifier.weight(1f))
-                                            Image(
-                                                painter = painterResource(id = R.drawable.ic_weather_black),
-                                                contentDescription = ""
-                                            )
-                                            Spacer(modifier = Modifier.width(8.dp))
                                             Text(
                                                 text = cardItems[index].cardView.weather,
                                                 fontFamily = FontMoment.preStandardFont,
                                                 fontWeight = FontWeight.Medium
                                             )
-                                        }
-
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 22.dp),
-                                            verticalAlignment = Alignment1.CenterVertically
-                                        ) {
+                                            Spacer(modifier = Modifier.width(8.dp))
                                             Image(
-                                                painter = painterResource(id = R.drawable.ic_clock_grey),
+                                                modifier = Modifier.size(18.dp),
+                                                painter = painterResource(id = GetWeatherIconDrawableCode(cardItems[index].cardView.weather)),
                                                 contentDescription = ""
                                             )
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Text(
-                                                text = cardItems[index].cardView.recordedAt.split("T")
-                                                    .first(),
-                                                fontFamily = FontMoment.preStandardFont,
-                                                fontWeight = FontWeight.Medium
-                                            )
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Divider(
-                                                modifier = Modifier
-                                                    .weight(1f)
-                                                    .height(1.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Text(
-                                                text = cardItems[index].cardView.recordedAt.split("T")
-                                                    .last(),
-                                                fontFamily = FontMoment.preStandardFont,
-                                                fontWeight = FontWeight.Medium
-                                            )
-                                        }
-                                        Spacer(modifier = Modifier.height(30.dp))
-
-//                                LinearDeterminateIndicator()
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 23.dp)
-                                                .background(
-                                                    brush = Brush.verticalGradient(
-                                                        listOf(
-                                                            Color("#FBFAF7".toColorInt()),
-                                                            Color("#C3C8BC".toColorInt())
-                                                        )
-                                                    ),
-                                                    shape = RoundedCornerShape(4.dp)
-                                                )
-                                        ) {
-                                            FancyProgressBar(
-                                                Modifier
-                                                    .height(12.dp)
-                                                    .fillMaxWidth(),
-                                                onDragEnd = { finalProgress ->
-                                                    Log.e(
-                                                        "finalProgress: ",
-                                                        "${
-                                                            String.format(
-                                                                "%.0f",
-                                                                (1 - finalProgress) * 100
-                                                            )
-                                                        }%"
-                                                    )
-
-
-                                                }, onDrag = { progress ->
-                                                    Log.d(
-                                                        "progress: ",
-                                                        "${
-                                                            String.format(
-                                                                "%.0f",
-                                                                (1 - progress) * 100
-                                                            )
-                                                        }%"
-                                                    )
-                                                })
-                                            Spacer(modifier = Modifier.height(10.dp))
-                                            Column(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(horizontal = 8.dp),
-                                                horizontalAlignment = Alignment.CenterHorizontally
-                                            ) {
-                                                Image(
-                                                    modifier = Modifier.clickable {
-                                                        val file = File(MomentPath.RECORDER_PATH+convertUrlLinkStringToRcorderNameString(cardItems[index].cardView.recordFileUrl))
-                                                        if(file.exists()){
-                                                            if(!momentAudioPlayer.checkSameFile(file.name)){
-                                                                momentAudioPlayer.playFile(file)
-                                                            }else if(momentAudioPlayer.isIng()){
-                                                                momentAudioPlayer.pause()
-                                                            }else{
-                                                                momentAudioPlayer.start()
-                                                            }
-                                                        }else{
-                                                            Toast.makeText(this@CardActivity,"녹음파일이 없습니다.",Toast.LENGTH_SHORT).show()
-                                                        }
-                                                    },
-                                                    painter = painterResource(id = R.drawable.ic_record_start),
-                                                    contentDescription = "seg"
-                                                )
-                                                Spacer(modifier = Modifier.height(10.dp))
-                                                Text(
-                                                    text = "질문리스트가 있다면 여기에 먼저 띄워질거에요",
-                                                    fontFamily = FontMoment.preStandardFont,
-                                                    fontWeight = FontWeight.Medium,
-                                                    fontSize = 11.sp,
-                                                    color = Color("#99342E".toColorInt())
-                                                )
-                                                Spacer(modifier = Modifier.height(8.dp))
-                                                Text(
-                                                    text = cardItems[index].cardView.stt ?: "",
-                                                    fontFamily = FontMoment.preStandardFont,
-                                                    fontWeight = FontWeight.Medium,
-                                                    fontSize = 12.sp
-                                                )
-                                                Spacer(modifier = Modifier.height(8.dp))
-                                                Image(
-                                                    painter = painterResource(id = R.drawable.ic_pencil),
-                                                    contentDescription = "edit"
-                                                )
-                                                Spacer(modifier = Modifier.height(18.dp))
-                                            }
 
                                         }
-                                        if(cardItems[index].cardView.imageUrls.isNullOrEmpty() && cardItems[index].imageNum.value==0) {
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        
 
-                                            Spacer(modifier = Modifier.height(8.dp))
-                                            Row(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(end = 24.dp)
-                                                    .clickable {
-                                                        focusedCardIndex.value = index
-                                                        pickMultipleMedia.launch(
-                                                            PickVisualMediaRequest(
-                                                                ActivityResultContracts.PickVisualMedia.ImageAndVideo
-                                                            )
-                                                        )
-                                                    },
-                                                horizontalArrangement = Arrangement.End,
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                Text(
-                                                    text = "사진추가",
-                                                    fontFamily = FontMoment.preStandardFont,
-                                                    fontWeight = FontWeight.Medium,
-                                                    fontSize = 12.sp
-                                                )
-                                                Image(
-                                                    painter = painterResource(R.drawable.ic_plus_image),
-                                                    contentDescription = "image plus"
-                                                )
-                                            }
-                                        } else {
-
-                                            Spacer(modifier = Modifier.height(8.dp))
-                                            Divider(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(horizontal = 23.dp),
-                                                color = Color("#C3C1C1".toColorInt())
-                                            )
-                                            Spacer(modifier = Modifier.height(8.dp))
-
-                                            LazyRow(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    ,
-                                                contentPadding = PaddingValues(horizontal = 32.dp),
-                                                horizontalArrangement = Arrangement.Start,
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                content = {
-                                                    items(cardItems[index].cardView.imageUrls.size) { imageUrlindex ->
-                                                        Box(
-                                                            modifier = Modifier
-                                                                .size(72.dp)
-                                                        ) {
-
-                                                            GlideImage(
-                                                                contentScale = ContentScale.Crop,
-                                                                modifier = Modifier
-                                                                    .size(70.dp)
-                                                                    .clip(RoundedCornerShape(6.dp)),
-                                                                model = cardItems[index].cardView.imageUrls[imageUrlindex],
-                                                                contentDescription = "Image",
-                                                            )
-
-
-                                                        }
-
-                                                        Spacer(modifier = Modifier.width(8.dp))
-                                                    }
-
-
-                                                    items(cardItems[index].imageNum.value){uploadImageIndex->
-                                                        AsyncImage(
-                                                                contentScale = ContentScale.Crop,
-                                                                modifier = Modifier
-                                                                    .size(70.dp)
-                                                                    .clip(RoundedCornerShape(6.dp)),
-                                                                model = ImageRequest.Builder(this@CardActivity)
-                                                                    .data(cardItems[index].uploadImage[uploadImageIndex])
-                                                                    .build(),
-                                                                contentDescription = "image"
-                                                            )
-                                                        Spacer(modifier = Modifier.width(8.dp))
-                                                    }
-
-                                                    if(cardItems[index].let { it.cardView.imageUrls.size + it.uploadImage.size } < 10){
-                                                        item {
-                                                            Image(
-                                                                modifier = Modifier.clickable {
-                                                                    focusedCardIndex.value = index
-                                                                    pickMultipleMedia.launch(
-                                                                        PickVisualMediaRequest(
-                                                                            ActivityResultContracts.PickVisualMedia.ImageAndVideo
-                                                                        )
-                                                                    )
-                                                                },
-                                                                painter = painterResource(R.drawable.ic_plus_image),
-                                                                contentDescription = "image plus"
-                                                            )
-                                                        }
-                                                    }
-                                                })
-                                        }
-
-                                        Spacer(modifier = Modifier.height(30.dp))
-
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 24.dp)
-                                        ) {
-                                            Text(
-                                                text = when(index){
-                                                    0 -> {"꽤나 즐거운 대화였네요"}
-                                                    1 -> {"오늘도 고생했어요"}
-                                                    2 -> {"좋은 하루 보내세요"}
-                                                    else -> {"푹 쉬세요"}
-                                                },
-                                                fontFamily = FontMoment.preStandardFont,
-                                                fontWeight = FontWeight.Medium,
-                                                fontSize = 11.sp
-                                            )
-                                            Spacer(modifier = Modifier.weight(1f))
-                                            Text(
-                                                text = "감정분석",
-                                                fontFamily = FontMoment.preStandardFont,
-                                                fontWeight = FontWeight.Medium,
-                                                fontSize = 11.sp
-                                            )
-                                        }
-
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Divider(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 11.dp),
-                                            color = Color("#706969".toColorInt())
-                                        )
-                                        Spacer(modifier = Modifier.height(4.dp))
-
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 24.dp)
-                                        ) {
-                                            emotionList.forEach { item ->
                                                 Row(
-                                                    modifier = Modifier.height(20.dp),
-                                                    verticalAlignment = Alignment.CenterVertically
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(horizontal = 22.dp),
+                                                    verticalAlignment = Alignment1.CenterVertically
                                                 ) {
                                                     Image(
-                                                        modifier = Modifier.size(12.dp),
-                                                        painter = painterResource(id = item.icon),
+                                                        painter = painterResource(id = R.drawable.ic_clock_grey),
                                                         contentDescription = ""
                                                     )
-
-                                                    Spacer(modifier = Modifier.width(6.dp))
+                                                    Spacer(modifier = Modifier.width(8.dp))
                                                     Text(
-                                                        text = item.text,
+                                                        text = cardItems[index].cardView.recordedAt.split("T")
+                                                            .first(),
+                                                        fontFamily = FontMoment.preStandardFont,
+                                                        fontWeight = FontWeight.Medium
+                                                    )
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Divider(
+                                                        modifier = Modifier
+                                                            .weight(1f)
+                                                            .height(1.dp)
+                                                    )
+                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    val tempStrList=cardItems[index].cardView.recordedAt.split("T").last().split(":")
+                                                    Log.d("weagwagaw","${tempStrList}")
+                                                    Text(
+                                                        text = "${tempStrList[0]}:${tempStrList[1]}" ,
+                                                        fontFamily = FontMoment.preStandardFont,
+                                                        fontWeight = FontWeight.Medium
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.height(30.dp))
+
+//                                LinearDeterminateIndicator()
+                                                Column(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(horizontal = 23.dp)
+                                                        .background(
+                                                            brush = Brush.verticalGradient(
+                                                                listOf(
+                                                                    Color("#FBFAF7".toColorInt()),
+                                                                    Color("#C3C8BC".toColorInt())
+                                                                )
+                                                            ),
+                                                            shape = RoundedCornerShape(4.dp)
+                                                        )
+                                                ) {
+                                                    FancyProgressBar(
+                                                        Modifier
+                                                            .height(12.dp)
+                                                            .fillMaxWidth(),
+                                                        onDragEnd = { finalProgress ->
+                                                            Log.e(
+                                                                "finalProgress: ",
+                                                                "${
+                                                                    String.format(
+                                                                        "%.0f",
+                                                                        (1 - finalProgress) * 100
+                                                                    )
+                                                                }%"
+                                                            )
+
+
+                                                        }, onDrag = { progress ->
+                                                            Log.d(
+                                                                "progress: ",
+                                                                "${
+                                                                    String.format(
+                                                                        "%.0f",
+                                                                        (1 - progress) * 100
+                                                                    )
+                                                                }%"
+                                                            )
+                                                        })
+                                                    Spacer(modifier = Modifier.height(10.dp))
+                                                    Column(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(horizontal = 8.dp),
+                                                        horizontalAlignment = Alignment.CenterHorizontally
+                                                    ) {
+                                                        Image(
+                                                            modifier = Modifier.clickable {
+                                                                val file = File(MomentPath.RECORDER_PATH+convertUrlLinkStringToRcorderNameString(cardItems[index].cardView.recordFileUrl))
+                                                                if(file.exists()){
+                                                                    if(!momentAudioPlayer.checkSameFile(file.name)){
+                                                                        momentAudioPlayer.playFile(file)
+                                                                    }else if(momentAudioPlayer.isIng()){
+                                                                        momentAudioPlayer.pause()
+                                                                    }else{
+                                                                        momentAudioPlayer.start()
+                                                                    }
+                                                                }else{
+                                                                    Toast.makeText(this@CardActivity,"녹음파일이 없습니다.",Toast.LENGTH_SHORT).show()
+                                                                }
+                                                            },
+                                                            painter = painterResource(id = R.drawable.ic_record_start),
+                                                            contentDescription = "seg"
+                                                        )
+                                                        Spacer(modifier = Modifier.height(10.dp))
+                                                        Text(
+                                                            text = "질문리스트가 있다면 여기에 먼저 띄워질거에요",
+                                                            fontFamily = FontMoment.preStandardFont,
+                                                            fontWeight = FontWeight.Medium,
+                                                            fontSize = 11.sp,
+                                                            color = Color("#99342E".toColorInt())
+                                                        )
+                                                        Spacer(modifier = Modifier.height(8.dp))
+                                                        Text(
+                                                            text = cardItems[index].cardView.stt ?: "열심히 분석중이에요!\n조금만 기다려주세요",
+                                                            fontFamily = FontMoment.preStandardFont,
+                                                            fontWeight = FontWeight.Medium,
+                                                            fontSize = 12.sp
+                                                        )
+                                                        Spacer(modifier = Modifier.height(8.dp))
+                                                        Image(
+                                                            painter = painterResource(id = R.drawable.ic_pencil),
+                                                            contentDescription = "edit"
+                                                        )
+                                                        Spacer(modifier = Modifier.height(18.dp))
+                                                    }
+
+                                                }
+
+                                            if(cardItems[index].cardView.stt.isNullOrEmpty()){
+                                                Spacer(modifier = Modifier.height(18.dp))
+
+                                            }else{
+                                                if(cardItems[index].cardView.imageUrls.isNullOrEmpty() && cardItems[index].imageNum.value==0) {
+
+                                                    Spacer(modifier = Modifier.height(8.dp))
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(end = 24.dp)
+                                                            .clickable {
+                                                                focusedCardIndex.value = index
+                                                                pickMultipleMedia.launch(
+                                                                    PickVisualMediaRequest(
+                                                                        ActivityResultContracts.PickVisualMedia.ImageAndVideo
+                                                                    )
+                                                                )
+                                                            },
+                                                        horizontalArrangement = Arrangement.End,
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
+                                                        Text(
+                                                            text = "사진추가",
+                                                            fontFamily = FontMoment.preStandardFont,
+                                                            fontWeight = FontWeight.Medium,
+                                                            fontSize = 12.sp
+                                                        )
+                                                        Image(
+                                                            painter = painterResource(R.drawable.ic_plus_image),
+                                                            contentDescription = "image plus"
+                                                        )
+                                                    }
+                                                } else {
+
+                                                    Spacer(modifier = Modifier.height(8.dp))
+                                                    Divider(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(horizontal = 23.dp),
+                                                        color = Color("#C3C1C1".toColorInt())
+                                                    )
+                                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                                    LazyRow(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                        ,
+                                                        contentPadding = PaddingValues(horizontal = 32.dp),
+                                                        horizontalArrangement = Arrangement.Start,
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        content = {
+                                                            items(cardItems[index].cardView.imageUrls.size) { imageUrlindex ->
+                                                                Box(
+                                                                    modifier = Modifier
+                                                                        .size(72.dp)
+                                                                ) {
+
+                                                                    GlideImage(
+                                                                        contentScale = ContentScale.Crop,
+                                                                        modifier = Modifier
+                                                                            .size(70.dp)
+                                                                            .clip(
+                                                                                RoundedCornerShape(
+                                                                                    6.dp
+                                                                                )
+                                                                            ),
+                                                                        model = cardItems[index].cardView.imageUrls[imageUrlindex],
+                                                                        contentDescription = "Image",
+                                                                    )
+
+
+                                                                }
+
+                                                                Spacer(modifier = Modifier.width(8.dp))
+                                                            }
+
+
+                                                            items(cardItems[index].imageNum.value){uploadImageIndex->
+                                                                AsyncImage(
+                                                                    contentScale = ContentScale.Crop,
+                                                                    modifier = Modifier
+                                                                        .size(70.dp)
+                                                                        .clip(RoundedCornerShape(6.dp)),
+                                                                    model = ImageRequest.Builder(this@CardActivity)
+                                                                        .data(cardItems[index].uploadImage[uploadImageIndex])
+                                                                        .build(),
+                                                                    contentDescription = "image"
+                                                                )
+                                                                Spacer(modifier = Modifier.width(8.dp))
+                                                            }
+
+                                                            if(cardItems[index].let { it.cardView.imageUrls.size + it.uploadImage.size } < 10){
+                                                                item {
+                                                                    Image(
+                                                                        modifier = Modifier.clickable {
+                                                                            focusedCardIndex.value = index
+                                                                            pickMultipleMedia.launch(
+                                                                                PickVisualMediaRequest(
+                                                                                    ActivityResultContracts.PickVisualMedia.ImageAndVideo
+                                                                                )
+                                                                            )
+                                                                        },
+                                                                        painter = painterResource(R.drawable.ic_plus_image),
+                                                                        contentDescription = "image plus"
+                                                                    )
+                                                                }
+                                                            }
+                                                        })
+                                                }
+
+                                                Spacer(modifier = Modifier.height(30.dp))
+
+                                                Row(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(horizontal = 24.dp)
+                                                ) {
+                                                    Text(
+                                                        text = when(index){
+                                                            0 -> {"꽤나 즐거운 대화였네요"}
+                                                            1 -> {"오늘도 고생했어요"}
+                                                            2 -> {"좋은 하루 보내세요"}
+                                                            else -> {"푹 쉬세요"}
+                                                        },
                                                         fontFamily = FontMoment.preStandardFont,
                                                         fontWeight = FontWeight.Medium,
                                                         fontSize = 11.sp
                                                     )
-                                                    Spacer(modifier = Modifier.width(26.dp))
-
-                                                    LinearProgressIndicator(
-                                                        modifier = Modifier.weight(1f),
-                                                        color = Color(item.color.toColorInt()),
-                                                        progress = {
-                                                            when(item.text){
-                                                                "평범해요" -> {
-                                                                    cardItems[index].cardView.neutral.let {
-                                                                        it.toFloat()*(0.01f)
-                                                                    }
-                                                                }
-                                                                "즐거워요" -> {
-                                                                    cardItems[index].cardView.happy.let {
-                                                                        it.toFloat()*(0.01f)
-                                                                    }
-                                                                }
-                                                                "화가나요" -> {
-                                                                    cardItems[index].cardView.angry.let {
-                                                                        it.toFloat()*(0.01f)
-                                                                    }
-                                                                }
-                                                                "슬퍼요 ." -> {
-                                                                    cardItems[index].cardView.sad.let {
-                                                                        it.toFloat()*(0.01f)
-                                                                    }
-                                                                }
-                                                                else -> {
-                                                                    cardItems[index].cardView.disgust.let {
-                                                                        it.toFloat()*(0.01f)
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    )
-                                                    Spacer(modifier = Modifier.width(36.dp))
-
+                                                    Spacer(modifier = Modifier.weight(1f))
                                                     Text(
-                                                        modifier = Modifier.weight(0.3f),
-                                                        text = "${(item.persent*100).toInt()}%",
+                                                        text = "감정분석",
                                                         fontFamily = FontMoment.preStandardFont,
                                                         fontWeight = FontWeight.Medium,
-                                                        fontSize = 12.sp
+                                                        fontSize = 11.sp
                                                     )
                                                 }
+
+                                                Spacer(modifier = Modifier.height(4.dp))
+                                                Divider(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(horizontal = 11.dp),
+                                                    color = Color("#706969".toColorInt())
+                                                )
+                                                Spacer(modifier = Modifier.height(4.dp))
+
+                                                Column(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(horizontal = 24.dp)
+                                                ) {
+                                                    emotionList.forEach { item ->
+                                                        Row(
+                                                            modifier = Modifier.height(20.dp),
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            Image(
+                                                                modifier = Modifier.size(12.dp),
+                                                                painter = painterResource(id = item.icon),
+                                                                contentDescription = ""
+                                                            )
+
+                                                            Spacer(modifier = Modifier.width(6.dp))
+                                                            Text(
+                                                                text = item.text,
+                                                                fontFamily = FontMoment.preStandardFont,
+                                                                fontWeight = FontWeight.Medium,
+                                                                fontSize = 11.sp
+                                                            )
+                                                            Spacer(modifier = Modifier.width(26.dp))
+
+
+                                                            LinearProgressIndicator(
+                                                                modifier = Modifier.weight(1f),
+                                                                color = Color(item.color.toColorInt()),
+                                                                progress = {
+                                                                    when(item.text){
+                                                                        "평범해요" -> {
+                                                                            cardItems[index].cardView.neutral.let {
+                                                                                it.toFloat()*(0.01f)
+                                                                            }
+                                                                        }
+                                                                        "즐거워요" -> {
+                                                                            cardItems[index].cardView.happy.let {
+                                                                                it.toFloat()*(0.01f)
+                                                                            }
+                                                                        }
+                                                                        "화가나요" -> {
+                                                                            cardItems[index].cardView.angry.let {
+                                                                                it.toFloat()*(0.01f)
+                                                                            }
+                                                                        }
+                                                                        "우울해요" -> {
+                                                                            cardItems[index].cardView.sad.let {
+                                                                                it.toFloat()*(0.01f)
+                                                                            }
+                                                                        }
+                                                                        "역겨워요" ->{
+                                                                            cardItems[index].cardView.disgust.let {
+                                                                                it.toFloat()*(0.01f)
+                                                                            }
+                                                                        }
+                                                                        else -> {
+                                                                            cardItems[index].cardView.disgust.let {
+                                                                                it.toFloat()*(0.01f)
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            )
+                                                            Spacer(modifier = Modifier.width(36.dp))
+
+                                                            Text(
+                                                                modifier = Modifier.weight(0.3f),
+                                                                text =
+                                                                when(item.text){
+                                                                    "평범해요" -> {
+                                                                        cardItems[index].cardView.neutral.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    "즐거워요" -> {
+                                                                        cardItems[index].cardView.happy.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    "화가나요" -> {
+                                                                        cardItems[index].cardView.angry.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    "우울해요" -> {
+                                                                        cardItems[index].cardView.sad.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    "역겨워요" ->{
+                                                                        cardItems[index].cardView.disgust.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    else -> {
+                                                                        cardItems[index].cardView.disgust.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                fontFamily = FontMoment.preStandardFont,
+                                                                fontWeight = FontWeight.Medium,
+                                                                fontSize = 12.sp
+                                                            )
+                                                        }
+                                                    }
+                                                }
                                             }
-                                        }
+
+
+
+
+
+
 
                                     }
                                 } else {
@@ -1009,8 +1103,9 @@ class CardActivity : ComponentActivity() {
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(horizontal = 24.dp),
-                                        horizontalArrangement = Arrangement.End
+                                            .padding(horizontal = 24.dp, vertical = 8.dp),
+                                        horizontalArrangement = Arrangement.End,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
                                             text = "꽤나 즐거운 대화였네요.",
@@ -1029,9 +1124,10 @@ class CardActivity : ComponentActivity() {
                                         )
                                         Image(
                                             modifier = Modifier.size(18.dp),
-                                            painter = painterResource(id = R.drawable.ic_weather_grey),
+                                            painter = painterResource(id = GetWeatherIconDrawableCode(weather = cardItems[index].cardView.weather)),
                                             contentDescription = ""
                                         )
+
                                     }
                                 }
                             }

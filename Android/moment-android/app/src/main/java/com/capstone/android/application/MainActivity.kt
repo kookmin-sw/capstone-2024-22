@@ -111,6 +111,7 @@ import com.capstone.android.application.app.composable.getDifferenceInDay
 import com.capstone.android.application.app.screen.BottomNavItem
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.utile.MomentPath
+import com.capstone.android.application.app.utile.common.GetWeatherIconDrawableCode
 import com.capstone.android.application.app.utile.common.GetWeatherType
 import com.capstone.android.application.app.utile.firebase.MyFirebaseMessagingService
 import com.capstone.android.application.app.utile.location.MomentLocation
@@ -198,7 +199,12 @@ import kotlin.math.roundToInt
 enum class TripState{
     EMPTY,EXISTS,ING
 }
+
+enum class TripType{
+    COMMON, ANALYZING, TRAVELING,BOTH
+}
 data class MainTrip(
+    var id :Int=0,
     var state:TripState = TripState.EMPTY,
     var tripName:String="",
     var period:Int=0
@@ -223,21 +229,6 @@ class MainActivity : ComponentActivity() {
     private var audioFile: File? = null
 
 
-    private fun MyFirebaseMessaging() {
-        val token: Task<String> = FirebaseMessaging.getInstance().token
-        token.addOnCompleteListener(OnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d("FCMToken",task.result)
-//                registerFCMToken(task.result)
-            }
-        })
-    }
-
-
-    private fun registerFCMToken(FCMToken:String){
-        val fcm = Intent(applicationContext, MyFirebaseMessagingService::class.java)
-        startService(fcm)
-    }
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -245,7 +236,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         var currentDate:String=""
         momentPermission.requestPermission()
-        MyFirebaseMessaging()
+
 
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -283,7 +274,7 @@ class MainActivity : ComponentActivity() {
              movenav = "Basic"
         }
 
-        val postTrip =
+        val tripContract =
             rememberLauncherForActivityResult(
                 ActivityResultContracts.StartActivityForResult()
             ) { result ->
@@ -452,7 +443,8 @@ class MainActivity : ComponentActivity() {
                             id = trip.id,
                             tripName = trip.tripName,
                             startDate = trip.startDate,
-                            endDate = trip.endDate
+                            endDate = trip.endDate,
+                            analyzingCount = trip.analyzingCount
                         )
                     }
                         .onSuccess {
@@ -483,6 +475,7 @@ class MainActivity : ComponentActivity() {
 
                             if (currentDate.compareTo(format.parse(it.startDate)) < 0) {
                                 mainTrip.value = MainTrip(
+                                    id = it.id,
                                     state = TripState.EXISTS,
                                     tripName = it.tripName,
                                     period = abs(
@@ -544,6 +537,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 tripViewModel.getTripAll()
+                Toast.makeText(this@MainActivity,"여행 파일이 삭제 되었어요",Toast.LENGTH_SHORT).show()
             }
 
             cardViewModel.getCardLikedSuccess.observe(this@MainActivity) { response ->
@@ -571,6 +565,7 @@ class MainActivity : ComponentActivity() {
                         sheetState.hide()
                         recordOpen.value = false
                     }
+                Toast.makeText(this@MainActivity,"녹음이 저장되었습니다",Toast.LENGTH_SHORT).show()
             }
 
             cardViewModel.getCardLikedSuccess.observe(this@MainActivity) {
@@ -781,7 +776,6 @@ class MainActivity : ComponentActivity() {
                                 .clickable {
                                     recordOpen.value = true
                                     isRecorderIng.value = recorder.isActivity()
-
                                 }
                         ) {
                             Image(
@@ -866,7 +860,7 @@ class MainActivity : ComponentActivity() {
                                             .clickable(enabled = if (title.value == "삭제" && !ReceiptCheckState.value) false else true) {
                                                 when (title.value) {
                                                     "추가" -> {
-                                                        postTrip.launch(
+                                                        tripContract.launch(
                                                             Intent(
                                                                 this@MainActivity,
                                                                 PostTripActivity::class.java
@@ -1018,6 +1012,9 @@ class MainActivity : ComponentActivity() {
 
         val pagerState = rememberPagerState()
 
+        val format: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+        val currentDate = format.parse(getCurrentTime())
+
 
         Column(
             modifier = Modifier
@@ -1056,7 +1053,10 @@ class MainActivity : ComponentActivity() {
                         }
                     }else{
                         Text(
-                            modifier = Modifier.clickable { navController.navigate(MainScreen.RecordDaily.screenRoute) },
+                            modifier = Modifier.clickable {
+                                tripFileViewModel.getTripFileUntitled()
+                                navController.navigate(MainScreen.RecordDaily.screenRoute)
+                            },
                             text = "일상기록",
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold
@@ -1112,24 +1112,51 @@ class MainActivity : ComponentActivity() {
             }else{
                 LazyColumn(
                     modifier = Modifier
-                        .padding(start = 16.dp, end = 4.dp)
                 ){
                     items(
                         count = tripList.size,
-                        itemContent = {index->
-                            ItemTrip(type = 0,id=tripList[index].id, tripName = tripList[index].tripName,startDate=tripList[index].startDate, endDate = tripList[index].endDate)
+                        itemContent = { index ->
+                            Log.d("awegewag","${tripList[index].tripName}")
+                            Log.d("awegewag","${currentDate.compareTo(format.parse(tripList[index].startDate))} , ${currentDate.compareTo(format.parse(tripList[index].endDate))}")
+                            if (currentDate.compareTo(format.parse(tripList[index].startDate)) >= 0 &&
+                                currentDate.compareTo(format.parse(tripList[index].endDate)) <= 0
+                            ) {
+                                if (tripList[index].analyzingCount == 0) {
+                                    ItemTrip(
+                                        type = TripType.TRAVELING,
+                                        id = tripList[index].id,
+                                        tripName = tripList[index].tripName,
+                                        startDate = tripList[index].startDate,
+                                        endDate = tripList[index].endDate
+                                    )
 
-//                        if(it==1){
-//                            // '현재 여행중이에요' 알람
-//                            ItemTrip(type = 1)
-//                        }else if(it==2){
-//                            // '카드 분석중이에요' 알람
-//                            ItemTrip(type = 2)
-//                        }else{
-//                            ItemTrip(type = 0)
-//
-//                        }
+                                } else {
+                                    ItemTrip(
+                                        type = TripType.BOTH,
+                                        id = tripList[index].id,
+                                        tripName = tripList[index].tripName,
+                                        startDate = tripList[index].startDate,
+                                        endDate = tripList[index].endDate
+                                    )
+                                }
+                            } else if (tripList[index].analyzingCount != 0) {
+                                ItemTrip(
+                                    type = TripType.ANALYZING,
+                                    id = tripList[index].id,
+                                    tripName = tripList[index].tripName,
+                                    startDate = tripList[index].startDate,
+                                    endDate = tripList[index].endDate
+                                )
+                            } else {
+                                ItemTrip(
+                                    type = TripType.COMMON,
+                                    id = tripList[index].id,
+                                    tripName = tripList[index].tripName,
+                                    startDate = tripList[index].startDate,
+                                    endDate = tripList[index].endDate
+                                )
 
+                            }
                         }
                     )
                 }
@@ -1249,11 +1276,23 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun ItemTrip(type:Int,id:Int,tripName:String,startDate:String,endDate:String){
+    fun ItemTrip(type:TripType,id:Int,tripName:String,startDate:String,endDate:String){
+        val isDeleteTrip = remember { mutableStateOf(false) }
+
         val density = LocalDensity.current
         val defaultActionSize = 80.dp
         val endActionSizePx = with(density) { (defaultActionSize * 2).toPx() }
         val startActionSizePx = with(density) { defaultActionSize.toPx() }
+        val tripPatchContract =
+            rememberLauncherForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == 2) {
+//                    val intent = result.data
+                    tripViewModel.getTripAll()
+                    //do something here
+                }
+            }
 
         val state = remember {
             AnchoredDraggableState(
@@ -1267,6 +1306,8 @@ class MainActivity : ComponentActivity() {
                 animationSpec = tween(),
             )
         }
+
+
 //        Box(
 //            contentAlignment = Alignment.TopCenter
 //        ){
@@ -1277,22 +1318,48 @@ class MainActivity : ComponentActivity() {
 //        }
 
         Column(
-            modifier = Modifier.clickable {
-                val intent = Intent(this@MainActivity,TripFileActivity::class.java)
-                intent.putExtra("tripId",id)
-                startActivity(intent)
-            } ,
+            modifier = Modifier
+                .clickable {
+                    val intent = Intent(this@MainActivity,TripFileActivity::class.java)
+                    intent.putExtra("tripId",id)
+                    startActivity(intent)
+                } ,
         ) {
+            if(isDeleteTrip.value){
+                CustomTitleCheckDialog(
+                    title = tripName,
+                    description = "해당 파일에 기록되어있는 녹음카드는\n'일상 기록'으로 이동됩니다.",
+                    checkleft = "네",
+                    checkright = "아니요",
+                    onClickCancel = { isDeleteTrip.value = false },
+                    onClickleft = {
+                        tripViewModel.deleteTrip(
+                            tripId = id
+                        )
+                        isDeleteTrip.value = false },
+                    onClickright = { isDeleteTrip.value = false }
+                )
+            }
+
+
+            Spacer(modifier = Modifier.height(4.dp))
             Box(
-                modifier = Modifier.clip(RectangleShape),
+                modifier = Modifier
+                    .clip(RectangleShape)
+                    .border(
+                        width = if (type !=TripType.COMMON) 1.dp else 0.dp, // 너비 5dp
+                        color = if (type == TripType.ANALYZING) Color.Black
+                        else if(type==TripType.BOTH || type==TripType.TRAVELING) Color("#99342E".toColorInt()) else Color.White, // 색상 파란색
+                        shape = RoundedCornerShape(4.dp) // 네모 모양
+                    )
+                    .padding(start = 16.dp)
+                    .padding(vertical = 16.dp)
+                ,
                 contentAlignment = Alignment.CenterEnd
             ) {
-
                 Row(
                     modifier = Modifier
-                        .padding(top = 24.dp)
                         .fillMaxSize()
-                        .background(color = Color.White)
                         .offset {
                             IntOffset(
                                 x = -state
@@ -1301,6 +1368,9 @@ class MainActivity : ComponentActivity() {
                                 y = 0,
                             )
                         }
+                        .background(
+                            color = Color.White
+                        )
                         .anchoredDraggable(
                             state = state,
                             Orientation.Horizontal,
@@ -1330,16 +1400,96 @@ class MainActivity : ComponentActivity() {
                         color = Color("#99342E".toColorInt()),
                         thickness = 2.dp
                     )
+
+
                     Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = tripName,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Text(
+                                text = tripName,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            when(type){
+                                TripType.BOTH -> {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "현재 여행중!",
+                                            color = Color("#99342E".toColorInt()),
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 11.sp
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_loading),
+                                            contentDescription = "loading"
+                                        )
+                                        Text(
+                                            text = "분석중..",
+                                            color = Color("#938F8F".toColorInt()),
+                                            fontSize = 11.sp,
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                                TripType.ANALYZING -> {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_loading),
+                                            contentDescription = "loading"
+                                        )
+                                        Text(
+                                            text = "분석중..",
+                                            color = Color("#938F8F".toColorInt()),
+                                            fontSize = 11.sp,
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                                TripType.TRAVELING -> {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "현재 여행중!",
+                                            color = Color("#99342E".toColorInt()),
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
+                                TripType.COMMON -> {
+                                }
+                                else -> {}
+                            }
+
+
+
+                        }
+
+
+                    Row {
+
+                    }
                     Spacer(modifier = Modifier.width(8.dp))
                     Divider(
                         modifier = Modifier
                             .height(50.dp)
+                            .padding()
                             .width(1.dp),
                         color = Color("#99342E".toColorInt()),
                         thickness = 2.dp
@@ -1348,15 +1498,14 @@ class MainActivity : ComponentActivity() {
 
                 Row(
                     modifier = Modifier
-                        .padding(end = 24.dp, top = 24.dp)
                         .fillMaxHeight()
                         .align(Alignment.CenterEnd)
+                        .padding(end = 24.dp)
                         .offset {
                             IntOffset(
                                 (-state
                                     .requireOffset() + endActionSizePx)
-                                    .roundToInt(), 0
-                            )
+                                    .roundToInt(), 0)
                         } ,
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
@@ -1368,7 +1517,7 @@ class MainActivity : ComponentActivity() {
                             intent.putExtra("startDate",startDate)
                             intent.putExtra("endDate",endDate)
                             intent.putExtra("tripName",tripName)
-                            startActivity(intent)
+                            tripPatchContract.launch(intent)
                         },
                         text = "수정",
                         fontFamily = FontMoment.obangFont,
@@ -1386,9 +1535,7 @@ class MainActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.width(26.dp))
                     Text(
                         modifier = Modifier.clickable {
-                            tripViewModel.deleteTrip(
-                                tripId = id
-                            )
+                            isDeleteTrip.value = true
                         },
                         text = "삭제",
                         fontFamily = FontMoment.obangFont,
@@ -1416,54 +1563,13 @@ class MainActivity : ComponentActivity() {
                             reverseDirection = true
                         )
                 ) {
-                    if(type==1){
-                        Box(
-                            contentAlignment = Alignment.TopCenter
-                        ){
-                            Spacer(modifier = Modifier.width(18.dp))
-
-                            Image(
-                                modifier = Modifier
-                                    .width(76.dp)
-                                    .height(32.dp),
-                                painter = painterResource(id = R.drawable.img_alarm_red), contentDescription = ""
-                            )
-                            Text(
-                                text = "현재 여행중이에요",
-                                fontSize = 8.sp,
-                                color = Color.White
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    if(type==2){
-                        Box(
-                            contentAlignment = Alignment.TopCenter
-                        ){
-                            Image(
-                                modifier = Modifier
-                                    .width(76.dp)
-                                    .height(32.dp),
-                                painter = painterResource(id = R.drawable.img_alarm_green), contentDescription = ""
-                            )
-                            Text(
-                                text = "카드 분석중이에요",
-                                fontSize = 8.sp,
-                                color = Color.White
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(40.dp))
-                    }
-
-
 
                 }
 
 
 
             }
-            Spacer(modifier = Modifier.height(24.dp))
+//            Spacer(modifier = Modifier.height(24.dp))
 
             Divider(
                 modifier = Modifier
@@ -1620,7 +1726,8 @@ class MainActivity : ComponentActivity() {
                                 Intent(
                                     this@MainActivity,
                                     ReciptActivity::class.java
-                                ).putExtra("MoveScreen", "ReceiptPost_Big")
+                                )
+                                    .putExtra("MoveScreen", "ReceiptPost_Big")
                                     .putExtra("BigReceipt", item)
                             )
                         } else {
@@ -1717,6 +1824,7 @@ class MainActivity : ComponentActivity() {
             momentPermission.requestPermission()
             closeSheet()
         }else{
+            Log.d("weagaewgewa","esf")
             momentLocation.getLocation().invoke().apply {
                 this.addOnSuccessListener {
 //                    x = "126.924776753718",
@@ -1730,7 +1838,7 @@ class MainActivity : ComponentActivity() {
                     openWeatherViewModel.getWeatherInCurrentLocation(
                         lat = lat.value,
                         lon = lon.value,
-                        appid = "750af8c3ad235147ce30452e8242d76f"
+                        appid = ApplicationClass.openWeartherAppId
                     )
                 }
             }
@@ -1750,6 +1858,10 @@ class MainActivity : ComponentActivity() {
 
 
         val isPasused = remember {
+            mutableStateOf(false)
+        }
+
+        val isRecording=remember{
             mutableStateOf(false)
         }
 
@@ -1850,8 +1962,10 @@ class MainActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(32.dp))
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.clickable {
-                            player.playFile(audioFile ?: return@clickable)
+                        if(isRecording.value){
+                            Column(Modifier.clickable {
+                                isRecording.value = false
+                                player.playFile(audioFile ?: return@clickable)
 //                            coroutineScope
 //                                .launch {
 //                                    sheetState.hide()
@@ -1861,16 +1975,21 @@ class MainActivity : ComponentActivity() {
 //                                        recordOpen.value = false
 //                                    }
 //                                }
-                        }) {
-                            YJ_Bold15("삭제", black)
+                            }) {
+                                YJ_Bold15("삭제", black)
+                            }
                         }
+
                          Spacer(modifier = Modifier.width(46.dp))
-                        Image(modifier = Modifier
+                        Image(
+                            modifier = Modifier
                             .size(50.dp)
                             .clickable {
-                                if(!momentPermission.checkPermission()){
+                                if (!momentPermission.checkPermission()) {
                                     momentPermission.requestPermission()
-                                }else{
+                                } else {
+                                    isRecording.value = true
+                                    Log.d("awegewagaew","${isRecording.value}")
                                     if (timerJob.isActive) {
                                         isPasused.value = !isPasused.value
 
@@ -1885,47 +2004,50 @@ class MainActivity : ComponentActivity() {
                                 }
 
 
-
                             },
-                            painter =  painterResource(R.drawable.ic_record_ing),
+                            painter =  if(!isRecording.value) painterResource(R.drawable.ic_record_ing) else painterResource(R.drawable.ic_ellipse),
                             contentDescription = "record")
                         Spacer(modifier = Modifier.width(46.dp))
 
-                        Column(
-                            Modifier.clickable {
-                                recorder.stop()
-                                timerJob.cancel()
+                        if(isRecording.value){
+                            Column(
+                                Modifier.clickable {
+                                    recorder.stop()
+                                    timerJob.cancel()
+                                    isRecording.value = false
 
-                                val requestFile = audioFile?.asRequestBody("audio/*".toMediaTypeOrNull())
+                                    val requestFile = audioFile?.asRequestBody("audio/*".toMediaTypeOrNull())
 
-                                val body = MultipartBody.Part.createFormData("recordFile",audioFile?.name,
-                                    requestFile!!
-                                )
-
-                                val cardUploadDto=Gson().toJson(
-                                    PostCardUploadReqeust(
-                                        location = addressName.value,
-                                        question = "",
-                                        recordedAt = currentDate,
-                                        temperature = temp.value,
-                                        weather = weather.value
+                                    val body = MultipartBody.Part.createFormData("recordFile",audioFile?.name,
+                                        requestFile!!
                                     )
-                                )
 
-                                val JSON: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
-                                val gson = Gson()
-                                val data = gson.toJson(cardUploadDto)
-                                val requestbody = RequestBody.create(JSON, cardUploadDto)
+                                    val cardUploadDto=Gson().toJson(
+                                        PostCardUploadReqeust(
+                                            location = addressName.value,
+                                            question = "",
+                                            recordedAt = currentDate,
+                                            temperature = temp.value,
+                                            weather = weather.value
+                                        )
+                                    )
 
-                                cardViewModel.postCardUpload(
-                                    cardUploadMultipart = requestbody,
-                                    recordFile = body
-                                )
+                                    val JSON: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
+                                    val gson = Gson()
+                                    val data = gson.toJson(cardUploadDto)
+                                    val requestbody = RequestBody.create(JSON, cardUploadDto)
+
+                                    cardViewModel.postCardUpload(
+                                        cardUploadMultipart = requestbody,
+                                        recordFile = body
+                                    )
 
 
-                            }) {
+                                }) {
                                 YJ_Bold15("저장", primary_500)
                             }
+                        }
+
 
                     }
 
@@ -1966,7 +2088,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = 16.dp),
-                    text = ApplicationClass.tripName,
+                    text = "즐겨찾은 녹음파일",
                     textAlign = TextAlign.End,
                     fontSize = 22.sp,
                     fontFamily = FontMoment.preStandardFont,
@@ -2075,7 +2197,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Image(
-                                            painter = painterResource(id = R.drawable.ic_weather_black),
+                                            painter = painterResource(id = GetWeatherIconDrawableCode(cardItems[index].cardView.weather)),
                                             contentDescription = ""
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
@@ -3115,8 +3237,26 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MainPreview() {
         ApplicationTheme {
+            val tripList = remember {
+                mutableListOf<Trip>()
+            }
+            var mainTrip = remember {
+                mutableStateOf(MainTrip())
+
+            }
+
+            tripList.add(
+                Trip(
+                    id =0 ,
+                    tripName = "waeg",
+                    startDate = "aesg",
+                    endDate = "weasg",
+                    analyzingCount = 0
+                )
+            )
+
 //            ReceiptCardChoice()
-//            Home()
+            Home(tripList,mainTrip)
 //            ItemTrip()
 //            RecordDaily()
 //            Setting()

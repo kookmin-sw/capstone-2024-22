@@ -5,7 +5,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.SharedPreferences
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.Wearable
 
 import dagger.hilt.android.HiltAndroidApp
 import okhttp3.Interceptor
@@ -30,6 +34,8 @@ class ApplicationClass: Application() {
         val KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/"
         val OPEN_WATHER_API_URL = "https://api.openweathermap.org/"
         var tripName:String = ""
+        var transactionId:String=""
+        val openWeartherAppId:String = "750af8c3ad235147ce30452e8242d76f"
     }
 
 
@@ -37,7 +43,7 @@ class ApplicationClass: Application() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
-
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         val notificationChannel= NotificationChannel(
             "moment_notification",
             "Moment",
@@ -45,6 +51,29 @@ class ApplicationClass: Application() {
         )
         val notificationManager=getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(notificationChannel)
+
+
+        Wearable.getCapabilityClient(this@ApplicationClass)
+            .getCapability("wear_app", CapabilityClient.FILTER_ALL)
+            .addOnSuccessListener {
+                Log.d("waegaewg","success, ${it.nodes.size}")
+                it.nodes.forEach {
+                    transactionId = it.id
+                    Log.d("waegaewg","${it.id} , ${it.displayName}")
+                }
+            }
+            .addOnFailureListener{
+                Log.d("waegaewg","afilure")
+            }.addOnCanceledListener {
+                Log.d("waegaewg","cancled")
+            }
+            .addOnCompleteListener {
+                Log.d("waegaewg","complete, ${it.result.nodes.size}")
+                it.result.nodes.forEach {
+                    Log.d("waegaewg","${it.id} , ${it.displayName}")
+                }
+            }
+
 
         tokenSharedPreferences =
             applicationContext.getSharedPreferences("TOKEN", MODE_PRIVATE)
