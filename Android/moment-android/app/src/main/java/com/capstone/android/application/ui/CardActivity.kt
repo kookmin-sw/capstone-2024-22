@@ -84,6 +84,7 @@ import com.capstone.android.application.app.composable.CustomTitleCheckDialog
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.composable.convertUrlLinkStringToRcorderNameString
 import com.capstone.android.application.app.utile.MomentPath
+import com.capstone.android.application.app.utile.common.GetWeatherIconDrawableCode
 import com.capstone.android.application.app.utile.loading.GlobalLoadingDialog
 import com.capstone.android.application.app.utile.loading.LoadingState
 import com.capstone.android.application.app.utile.recorder.MomentAudioPlayer
@@ -246,10 +247,10 @@ class CardActivity : ComponentActivity() {
 
             emotionList.add(
                 Emotion(
-                    icon = R.drawable.ic_emotion_sad,
+                    icon = R.drawable.ic_emotion_disgust,
                     text = "역겨워요",
                     persent = 0f,
-                    color = "#030712"
+                    color = "#89937C"
                 )
             )
 
@@ -548,7 +549,7 @@ class CardActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(end = 16.dp),
-                        text = ApplicationClass.tripName,
+                        text = "일상기록",
                         textAlign = TextAlign.End,
                         fontSize = 22.sp,
                         fontFamily = FontMoment.preStandardFont,
@@ -674,7 +675,9 @@ class CardActivity : ComponentActivity() {
 
                                 if (cardItems[index].isExpand.value && !isEdit.value) {
                                     Spacer(modifier = Modifier.height(40.dp))
-                                    Column {
+                                    Column(
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
                                         Row(
                                             modifier = Modifier.padding(horizontal = 22.dp)
                                         ) {
@@ -689,17 +692,20 @@ class CardActivity : ComponentActivity() {
                                                 fontWeight = FontWeight.Medium
                                             )
                                             Spacer(modifier = Modifier.weight(1f))
-                                            Image(
-                                                painter = painterResource(id = R.drawable.ic_weather_black),
-                                                contentDescription = ""
-                                            )
-                                            Spacer(modifier = Modifier.width(8.dp))
                                             Text(
                                                 text = cardItems[index].cardView.weather,
                                                 fontFamily = FontMoment.preStandardFont,
                                                 fontWeight = FontWeight.Medium
                                             )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Image(
+                                                modifier = Modifier.size(18.dp),
+                                                painter = painterResource(id = GetWeatherIconDrawableCode(cardItems[index].cardView.weather)),
+                                                contentDescription = ""
+                                            )
+
                                         }
+                                        Spacer(modifier = Modifier.height(8.dp))
                                         
 
                                                 Row(
@@ -726,9 +732,10 @@ class CardActivity : ComponentActivity() {
                                                             .height(1.dp)
                                                     )
                                                     Spacer(modifier = Modifier.width(8.dp))
+                                                    val tempStrList=cardItems[index].cardView.recordedAt.split("T").last().split(":")
+                                                    Log.d("weagwagaw","${tempStrList}")
                                                     Text(
-                                                        text = cardItems[index].cardView.recordedAt.split("T")
-                                                            .last(),
+                                                        text = "${tempStrList[0]}:${tempStrList[1]}" ,
                                                         fontFamily = FontMoment.preStandardFont,
                                                         fontWeight = FontWeight.Medium
                                                     )
@@ -999,6 +1006,7 @@ class CardActivity : ComponentActivity() {
                                                             )
                                                             Spacer(modifier = Modifier.width(26.dp))
 
+
                                                             LinearProgressIndicator(
                                                                 modifier = Modifier.weight(1f),
                                                                 color = Color(item.color.toColorInt()),
@@ -1019,8 +1027,13 @@ class CardActivity : ComponentActivity() {
                                                                                 it.toFloat()*(0.01f)
                                                                             }
                                                                         }
-                                                                        "슬퍼요 ." -> {
+                                                                        "우울해요" -> {
                                                                             cardItems[index].cardView.sad.let {
+                                                                                it.toFloat()*(0.01f)
+                                                                            }
+                                                                        }
+                                                                        "역겨워요" ->{
+                                                                            cardItems[index].cardView.disgust.let {
                                                                                 it.toFloat()*(0.01f)
                                                                             }
                                                                         }
@@ -1036,7 +1049,39 @@ class CardActivity : ComponentActivity() {
 
                                                             Text(
                                                                 modifier = Modifier.weight(0.3f),
-                                                                text = "${(item.persent*100).toInt()}%",
+                                                                text =
+                                                                when(item.text){
+                                                                    "평범해요" -> {
+                                                                        cardItems[index].cardView.neutral.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    "즐거워요" -> {
+                                                                        cardItems[index].cardView.happy.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    "화가나요" -> {
+                                                                        cardItems[index].cardView.angry.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    "우울해요" -> {
+                                                                        cardItems[index].cardView.sad.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    "역겨워요" ->{
+                                                                        cardItems[index].cardView.disgust.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    else -> {
+                                                                        cardItems[index].cardView.disgust.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                },
                                                                 fontFamily = FontMoment.preStandardFont,
                                                                 fontWeight = FontWeight.Medium,
                                                                 fontSize = 12.sp
@@ -1058,8 +1103,9 @@ class CardActivity : ComponentActivity() {
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(horizontal = 24.dp),
-                                        horizontalArrangement = Arrangement.End
+                                            .padding(horizontal = 24.dp, vertical = 8.dp),
+                                        horizontalArrangement = Arrangement.End,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
                                             text = "꽤나 즐거운 대화였네요.",
@@ -1078,9 +1124,10 @@ class CardActivity : ComponentActivity() {
                                         )
                                         Image(
                                             modifier = Modifier.size(18.dp),
-                                            painter = painterResource(id = R.drawable.ic_weather_grey),
+                                            painter = painterResource(id = GetWeatherIconDrawableCode(weather = cardItems[index].cardView.weather)),
                                             contentDescription = ""
                                         )
+
                                     }
                                 }
                             }
