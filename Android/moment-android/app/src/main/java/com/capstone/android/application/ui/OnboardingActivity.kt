@@ -930,7 +930,7 @@ class OnboardingActivity:ComponentActivity() {
                         keyboardType = KeyboardType.Text,
                         changecolor = black,
                         focusRequester = focusRequester,
-                        move = "manynextmove",
+                        move = "manyfirstmove",
                         focusManager = focusManager
                     )
                     Spacer(modifier = Modifier.height(10.dp))
