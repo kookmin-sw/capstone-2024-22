@@ -1019,7 +1019,10 @@ class OnboardingActivity:ComponentActivity() {
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 45.dp)
             ) {
-                BigButton("로그인하기", true) { navController.navigate(OnboardingScreen.Login.name) }
+                BigButton("시작하기", true) {
+                    startActivity(Intent(this@OnboardingActivity,MainActivity::class.java))
+                    finish()
+                }
             }
         }
     }
