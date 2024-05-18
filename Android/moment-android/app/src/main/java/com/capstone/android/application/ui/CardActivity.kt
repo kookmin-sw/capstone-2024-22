@@ -80,9 +80,11 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.capstone.android.application.R
 import com.capstone.android.application.app.ApplicationClass
+import com.capstone.android.application.app.composable.CustomTitleCheckDialog
 import com.capstone.android.application.app.composable.FancyProgressBar
 import com.capstone.android.application.app.composable.convertUrlLinkStringToRcorderNameString
 import com.capstone.android.application.app.utile.MomentPath
+import com.capstone.android.application.app.utile.common.GetWeatherIconDrawableCode
 import com.capstone.android.application.app.utile.loading.GlobalLoadingDialog
 import com.capstone.android.application.app.utile.loading.LoadingState
 import com.capstone.android.application.app.utile.recorder.MomentAudioPlayer
@@ -94,6 +96,7 @@ import com.capstone.android.application.presentation.DownloadLinkViewModel
 import com.capstone.android.application.ui.theme.FontMoment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -244,10 +247,10 @@ class CardActivity : ComponentActivity() {
 
             emotionList.add(
                 Emotion(
-                    icon = R.drawable.ic_emotion_sad,
+                    icon = R.drawable.ic_emotion_disgust,
                     text = "역겨워요",
                     persent = 0f,
-                    color = "#030712"
+                    color = "#89937C"
                 )
             )
 
@@ -274,6 +277,7 @@ class CardActivity : ComponentActivity() {
 
                 var isEdit = remember { mutableStateOf(false) }
 
+                val isDeleteCard = remember { mutableStateOf(false) }
                 cardViewModel.getCardAll(
                     tripFileId = tripFileId.value
                 )
@@ -345,6 +349,32 @@ class CardActivity : ComponentActivity() {
                         .fillMaxWidth(),
                     topBar = {
                         GlobalLoadingDialog()
+                        if(isDeleteCard.value){
+                            CustomTitleCheckDialog(
+                                title = "${deleteCardIdList.size}개의 녹음 카드를 정말 삭제할까요?",
+                                description = "삭제된 녹음 카드는 복구할 수 없어요",
+                                checkleft = "네",
+                                checkright = "아니요",
+                                onClickCancel = { isDeleteCard.value = false },
+                                onClickleft = {
+                                    runBlocking {
+                                        deleteCardIdList.forEach {
+                                            cardViewModel.deleteCard(
+                                                cardViewId = it
+                                            )
+                                        }
+                                        isDeleteCard.value = false
+                                        isEdit.value = !isEdit.value
+                                    }
+
+                                },
+                                onClickright = {
+                                    isDeleteCard.value = false
+                                    deleteCardIdList.clear()
+                                    LoadingState.hide()
+                                }
+                            )
+                        }
                         TopAppBar(
                             actions = {
 
@@ -382,16 +412,19 @@ class CardActivity : ComponentActivity() {
                                                     deleteCardIdList.add(it.cardView.id)
                                                 }
                                                 if(isEdit.value && deleteCardIdList.isNotEmpty()){
+
                                                     LoadingState.show()
-                                                    deleteCardIdList.forEach {
-                                                        cardViewModel.deleteCard(
-                                                            cardViewId = it
-                                                        )
-                                                    }
+                                                    isDeleteCard.value = true
+//                                                    deleteCardIdList.forEach {
+//                                                        cardViewModel.deleteCard(
+//                                                            cardViewId = it
+//                                                        )
+//                                                    }
                                                 }else{
                                                     cardItems.map { it.isDelete.value = false }
+                                                    isEdit.value = !isEdit.value
                                                 }
-                                                isEdit.value = !isEdit.value
+
 
                                             },
                                         text = if(isEdit.value) "삭제" else "편집",
@@ -642,7 +675,9 @@ class CardActivity : ComponentActivity() {
 
                                 if (cardItems[index].isExpand.value && !isEdit.value) {
                                     Spacer(modifier = Modifier.height(40.dp))
-                                    Column {
+                                    Column(
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
                                         Row(
                                             modifier = Modifier.padding(horizontal = 22.dp)
                                         ) {
@@ -657,17 +692,20 @@ class CardActivity : ComponentActivity() {
                                                 fontWeight = FontWeight.Medium
                                             )
                                             Spacer(modifier = Modifier.weight(1f))
-                                            Image(
-                                                painter = painterResource(id = R.drawable.ic_weather_black),
-                                                contentDescription = ""
-                                            )
-                                            Spacer(modifier = Modifier.width(8.dp))
                                             Text(
                                                 text = cardItems[index].cardView.weather,
                                                 fontFamily = FontMoment.preStandardFont,
                                                 fontWeight = FontWeight.Medium
                                             )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Image(
+                                                modifier = Modifier.size(18.dp),
+                                                painter = painterResource(id = GetWeatherIconDrawableCode(cardItems[index].cardView.weather)),
+                                                contentDescription = ""
+                                            )
+
                                         }
+                                        Spacer(modifier = Modifier.height(8.dp))
                                         
 
                                                 Row(
@@ -694,9 +732,10 @@ class CardActivity : ComponentActivity() {
                                                             .height(1.dp)
                                                     )
                                                     Spacer(modifier = Modifier.width(8.dp))
+                                                    val tempStrList=cardItems[index].cardView.recordedAt.split("T").last().split(":")
+                                                    Log.d("weagwagaw","${tempStrList}")
                                                     Text(
-                                                        text = cardItems[index].cardView.recordedAt.split("T")
-                                                            .last(),
+                                                        text = "${tempStrList[0]}:${tempStrList[1]}" ,
                                                         fontFamily = FontMoment.preStandardFont,
                                                         fontWeight = FontWeight.Medium
                                                     )
@@ -967,6 +1006,7 @@ class CardActivity : ComponentActivity() {
                                                             )
                                                             Spacer(modifier = Modifier.width(26.dp))
 
+
                                                             LinearProgressIndicator(
                                                                 modifier = Modifier.weight(1f),
                                                                 color = Color(item.color.toColorInt()),
@@ -987,8 +1027,13 @@ class CardActivity : ComponentActivity() {
                                                                                 it.toFloat()*(0.01f)
                                                                             }
                                                                         }
-                                                                        "슬퍼요 ." -> {
+                                                                        "우울해요" -> {
                                                                             cardItems[index].cardView.sad.let {
+                                                                                it.toFloat()*(0.01f)
+                                                                            }
+                                                                        }
+                                                                        "역겨워요" ->{
+                                                                            cardItems[index].cardView.disgust.let {
                                                                                 it.toFloat()*(0.01f)
                                                                             }
                                                                         }
@@ -1004,7 +1049,39 @@ class CardActivity : ComponentActivity() {
 
                                                             Text(
                                                                 modifier = Modifier.weight(0.3f),
-                                                                text = "${(item.persent*100).toInt()}%",
+                                                                text =
+                                                                when(item.text){
+                                                                    "평범해요" -> {
+                                                                        cardItems[index].cardView.neutral.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    "즐거워요" -> {
+                                                                        cardItems[index].cardView.happy.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    "화가나요" -> {
+                                                                        cardItems[index].cardView.angry.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    "우울해요" -> {
+                                                                        cardItems[index].cardView.sad.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    "역겨워요" ->{
+                                                                        cardItems[index].cardView.disgust.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                    else -> {
+                                                                        cardItems[index].cardView.disgust.let {
+                                                                            "${it.toInt()}%"
+                                                                        }
+                                                                    }
+                                                                },
                                                                 fontFamily = FontMoment.preStandardFont,
                                                                 fontWeight = FontWeight.Medium,
                                                                 fontSize = 12.sp
@@ -1026,8 +1103,9 @@ class CardActivity : ComponentActivity() {
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(horizontal = 24.dp),
-                                        horizontalArrangement = Arrangement.End
+                                            .padding(horizontal = 24.dp, vertical = 8.dp),
+                                        horizontalArrangement = Arrangement.End,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
                                             text = "꽤나 즐거운 대화였네요.",
@@ -1046,9 +1124,10 @@ class CardActivity : ComponentActivity() {
                                         )
                                         Image(
                                             modifier = Modifier.size(18.dp),
-                                            painter = painterResource(id = R.drawable.ic_weather_grey),
+                                            painter = painterResource(id = GetWeatherIconDrawableCode(weather = cardItems[index].cardView.weather)),
                                             contentDescription = ""
                                         )
+
                                     }
                                 }
                             }
