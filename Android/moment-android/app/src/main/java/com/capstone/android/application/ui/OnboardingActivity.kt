@@ -799,18 +799,17 @@ class OnboardingActivity:ComponentActivity() {
                     Row(modifier = Modifier
                         .width(86.dp)
                         .align(Alignment.End)
-                        .clickable { countViewModel.restartCountdown() }) {
+                        .clickable { countViewModel.restartCountdown()
+                            authViewModel.postAuthAuthCode(
+                                body = PostAuthAuthCodeRequest(
+                                    email = email.value,
+                                    isSignUp = "false"
+                                )
+                            )
+                        }){
                         Column {
                             Column(modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .clickable {
-                                    authViewModel.postAuthAuthCode(
-                                        body = PostAuthAuthCodeRequest(
-                                            email = email.value,
-                                            isSignUp = "true"
-                                        )
-                                    )
-                                }) {
+                                .padding(horizontal = 8.dp)) {
                                 P_Medium11(
                                     content = "인증번호 재전송",
                                     color = black
