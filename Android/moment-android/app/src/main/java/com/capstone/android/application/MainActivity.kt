@@ -144,6 +144,7 @@ import com.capstone.android.application.ui.theme.P_ExtraBold
 import com.capstone.android.application.ui.theme.P_Medium
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
+import com.capstone.android.application.ui.theme.P_Medium14_center
 import com.capstone.android.application.ui.theme.P_Medium18
 import com.capstone.android.application.ui.theme.P_Medium_Oneline
 import com.capstone.android.application.ui.theme.YJ_Bold
@@ -1517,6 +1518,7 @@ class MainActivity : ComponentActivity() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(tertiary_500)
                 .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.Center
             ) {
@@ -1542,8 +1544,20 @@ class MainActivity : ComponentActivity() {
         Column(
             Modifier
                 .fillMaxWidth()
+                .background(tertiary_500)
                 .padding(horizontal = 12.dp)) {
-            MyGrid(makeReceipt, receiptList, 2, EditCheckState, DeleteReceipt)
+
+            if(receiptList.size == 0){
+                Column(modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center) {
+                    P_Medium14_center(content = "아직 만들어진 티켓이 없어요\n" +
+                            "여행 티켓으로 여행을 멋지게 마무리 해봐요 !", color = neutral_300, Align = TextAlign.Center)
+                }
+            }else{
+                MyGrid(makeReceipt, receiptList, 2, EditCheckState, DeleteReceipt)
+            }
+
 
         }
     }
