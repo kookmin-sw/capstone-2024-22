@@ -110,6 +110,7 @@ import com.capstone.android.application.app.composable.getDifferenceInDay
 import com.capstone.android.application.app.screen.BottomNavItem
 import com.capstone.android.application.app.screen.MainScreen
 import com.capstone.android.application.app.utile.MomentPath
+import com.capstone.android.application.app.utile.common.GetWeatherIconDrawableCode
 import com.capstone.android.application.app.utile.common.GetWeatherType
 import com.capstone.android.application.app.utile.firebase.MyFirebaseMessagingService
 import com.capstone.android.application.app.utile.location.MomentLocation
@@ -558,6 +559,7 @@ class MainActivity : ComponentActivity() {
                         sheetState.hide()
                         recordOpen.value = false
                     }
+                Toast.makeText(this@MainActivity,"녹음이 저장되었습니다",Toast.LENGTH_SHORT).show()
             }
 
             cardViewModel.getCardLikedSuccess.observe(this@MainActivity) {
@@ -1826,6 +1828,10 @@ class MainActivity : ComponentActivity() {
             mutableStateOf(false)
         }
 
+        val isRecording=remember{
+            mutableStateOf(false)
+        }
+
 
         val timerJob: Job = CoroutineScope(Dispatchers.Main).launch(start = CoroutineStart.LAZY) {
             withContext(Dispatchers.IO) {
@@ -1923,8 +1929,10 @@ class MainActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(32.dp))
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.clickable {
-                            player.playFile(audioFile ?: return@clickable)
+                        if(isRecording.value){
+                            Column(Modifier.clickable {
+                                isRecording.value = false
+                                player.playFile(audioFile ?: return@clickable)
 //                            coroutineScope
 //                                .launch {
 //                                    sheetState.hide()
@@ -1934,16 +1942,21 @@ class MainActivity : ComponentActivity() {
 //                                        recordOpen.value = false
 //                                    }
 //                                }
-                        }) {
-                            YJ_Bold15("삭제", black)
+                            }) {
+                                YJ_Bold15("삭제", black)
+                            }
                         }
+
                          Spacer(modifier = Modifier.width(46.dp))
-                        Image(modifier = Modifier
+                        Image(
+                            modifier = Modifier
                             .size(50.dp)
                             .clickable {
                                 if (!momentPermission.checkPermission()) {
                                     momentPermission.requestPermission()
                                 } else {
+                                    isRecording.value = true
+                                    Log.d("awegewagaew","${isRecording.value}")
                                     if (timerJob.isActive) {
                                         isPasused.value = !isPasused.value
 
@@ -1959,45 +1972,49 @@ class MainActivity : ComponentActivity() {
 
 
                             },
-                            painter =  painterResource(R.drawable.ic_record_ing),
+                            painter =  if(!isRecording.value) painterResource(R.drawable.ic_record_ing) else painterResource(R.drawable.ic_ellipse),
                             contentDescription = "record")
                         Spacer(modifier = Modifier.width(46.dp))
 
-                        Column(
-                            Modifier.clickable {
-                                recorder.stop()
-                                timerJob.cancel()
+                        if(isRecording.value){
+                            Column(
+                                Modifier.clickable {
+                                    recorder.stop()
+                                    timerJob.cancel()
+                                    isRecording.value = false
 
-                                val requestFile = audioFile?.asRequestBody("audio/*".toMediaTypeOrNull())
+                                    val requestFile = audioFile?.asRequestBody("audio/*".toMediaTypeOrNull())
 
-                                val body = MultipartBody.Part.createFormData("recordFile",audioFile?.name,
-                                    requestFile!!
-                                )
-
-                                val cardUploadDto=Gson().toJson(
-                                    PostCardUploadReqeust(
-                                        location = addressName.value,
-                                        question = "",
-                                        recordedAt = currentDate,
-                                        temperature = temp.value,
-                                        weather = weather.value
+                                    val body = MultipartBody.Part.createFormData("recordFile",audioFile?.name,
+                                        requestFile!!
                                     )
-                                )
 
-                                val JSON: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
-                                val gson = Gson()
-                                val data = gson.toJson(cardUploadDto)
-                                val requestbody = RequestBody.create(JSON, cardUploadDto)
+                                    val cardUploadDto=Gson().toJson(
+                                        PostCardUploadReqeust(
+                                            location = addressName.value,
+                                            question = "",
+                                            recordedAt = currentDate,
+                                            temperature = temp.value,
+                                            weather = weather.value
+                                        )
+                                    )
 
-                                cardViewModel.postCardUpload(
-                                    cardUploadMultipart = requestbody,
-                                    recordFile = body
-                                )
+                                    val JSON: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
+                                    val gson = Gson()
+                                    val data = gson.toJson(cardUploadDto)
+                                    val requestbody = RequestBody.create(JSON, cardUploadDto)
+
+                                    cardViewModel.postCardUpload(
+                                        cardUploadMultipart = requestbody,
+                                        recordFile = body
+                                    )
 
 
-                            }) {
+                                }) {
                                 YJ_Bold15("저장", primary_500)
                             }
+                        }
+
 
                     }
 
@@ -2038,7 +2055,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(end = 16.dp),
-                    text = "즐겨찾기",
+                    text = "즐겨찾은 녹음파일",
                     textAlign = TextAlign.End,
                     fontSize = 22.sp,
                     fontFamily = FontMoment.preStandardFont,
@@ -2147,7 +2164,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Image(
-                                            painter = painterResource(id = R.drawable.ic_weather_black),
+                                            painter = painterResource(id = GetWeatherIconDrawableCode(cardItems[index].cardView.weather)),
                                             contentDescription = ""
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
