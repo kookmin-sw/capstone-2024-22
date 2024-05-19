@@ -12,7 +12,7 @@ struct AddUser: View {
     @State private var pathword: String = ""
     @State private var checkpathword: String = ""
     @EnvironmentObject private var pathModel: PathModel
-    @EnvironmentObject var authViewModel: AuthViewModel
+    @ObservedObject var authViewModel: AuthViewModel
     var body: some View {
         ZStack {
             Color.clear
@@ -49,7 +49,7 @@ struct AddUser: View {
                     Spacer()
                 }
                 
-                TextField("이메일을 입력해 주세요", text: $email)
+                TextField("이메일을 입력해 주세요", text: $authViewModel.email)
                     .padding()
                     .frame(height: 44)
                     .overlay(Rectangle().frame(height: 1), alignment: .bottom)
@@ -115,8 +115,4 @@ struct AddUser: View {
     private func hideKeyboard() {
           UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
       }
-}
-
-#Preview {
-    AddUser()
 }

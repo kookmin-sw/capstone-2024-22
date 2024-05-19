@@ -138,7 +138,7 @@ struct OnboardingView: View {
                         AuthNumView(authViewModel: authViewModel)
                             .environmentObject(homeViewModel)
                     case .AddUser:
-                        AddUser()
+                        AddUser(authViewModel : authViewModel)
                             .environmentObject(homeViewModel)
                         
                     case .AuthComplete:

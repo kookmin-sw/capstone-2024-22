@@ -9,6 +9,7 @@ import Foundation
 import Foundation
 import SwiftUI
 import Alamofire
+import KeychainAccess
 
 
 
@@ -28,11 +29,23 @@ class AuthViewModel: ObservableObject {
     @Published var errorMessage: String = ""
     @Published var isCodeSent: Bool = false
     
-   @Published var accessToken: String = ""
+    @Published var accessToken: String = ""
     
-  var authToken: String = ""
-    
+//  var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTQyNDgzMiwiZXhwIjoxNzU4NjI0ODMyfQ.iHg2ACmOB_hzoSlwsTfzGc_1gn6OHYmAxD0b2wgqNJg"
+
   
+    var authToken: String {
+        get {
+            // 키체인에서 토큰을 가져옵니다
+            if let token = KeychainHelper.shared.getAccessToken() {
+                return "Bearer \(token)"
+            } else {
+                // 토큰이 없는 경우 기본값 또는 빈 문자열을 반환합니다
+                return ""
+            }
+        }
+    }
+    
     
     func requestAuthCode(){
         let parameters: [String: Any] = [
@@ -101,7 +114,13 @@ class AuthViewModel: ObservableObject {
                     case .success(let authResponse):
                         // 응답 성공, 인증 코드 유효
                         self.isCodeValid = true
-                        print(authResponse.data.accessToken)
+                       
+//                        if let newAccessToken = authResponse.data.accessToken {
+//                                           self.saveAccessTokenToKeychain(token: newAccessToken)
+//                                       }
+                        let newAccessToken = authResponse.data.accessToken
+                                           KeychainHelper.shared.saveAccessToken(token: newAccessToken)
+                        print(newAccessToken)
                         completion(true)
                         print("인증 성공")
                     case .failure(let error):
@@ -114,33 +133,54 @@ class AuthViewModel: ObservableObject {
             }
     }
     
-  
+    
     func changePassword() {
-            let url = "http://211.205.171.117:8000/auth/password"
-            let parameters: [String: String] = [
-                "code": verificationCode,
-                "newPassword": pathword
-            ]
-            let headers: HTTPHeaders = [
-                "Authorization": authToken,
-                "Content-Type": "application/json;charset=UTF-8"
-            ]
+           let url = "http://211.205.171.117:8000/auth/password"
+           
+           print(verificationCode)
+           print(pathword)
+           
+           let parameters: [String: String] = [
+               "code": verificationCode,
+               "newPassword": pathword
+           ]
+           
+           print(authToken)
+           
+           let headers: HTTPHeaders = [
+               "Authorization": authToken,
+               "Content-Type": "application/json;charset=UTF-8"
+           ]
 
-            AF.request(url, method: .patch, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
-                .validate()
-                .responseJSON { response in
-                    switch response.result {
-                    case .success:
-                        print("비밀번호 변경 성공: \(response)")
-                       // completion(true)
-                    case .failure(let error):
-                        print("비밀번호 변경 실패: \(error)")
-                        //completion(false)
-                    }
-                }
-        }
-    
-    
+           AF.request(url, method: .patch, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+               .validate(statusCode: 200..<500)
+               .responseDecodable(of: ChangePassword.self) { response in
+                   if let statusCode = response.response?.statusCode {
+                       print("HTTP 상태 코드: \(statusCode)")
+                       
+                       if statusCode == 200 {
+                           print("비밀번호 변경 성공")
+                       } else {
+                           print("비밀번호 변경 실패: 상태 코드 \(statusCode)")
+                       }
+                   } else {
+                       print("비밀번호 변경 실패: 상태 코드를 가져올 수 없음")
+                   }
+
+                   switch response.result {
+                   case .success(let passwordResponse):
+                       print("비밀번호 변경 성공: \(passwordResponse)")
+                       // 여기서 passwordResponse를 사용하여 응답 데이터를 처리할 수 있습니다.
+                   case .failure(let error):
+                       if let data = response.data, let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) {
+                           print("비밀번호 변경 실패: \(json)")
+                       } else {
+                           print("비밀번호 변경 실패: \(error.localizedDescription)")
+                       }
+                   }
+               }
+       }
+   
 
     
     func loginUser() {
@@ -177,15 +217,14 @@ class AuthViewModel: ObservableObject {
 }
 
 //
-//{
-//  "status" : 200,
-//  "code" : "200",
-//  "msg" : "UPDATE SUCCESS",
-//  "detailMsg" : "",
-//  "data" : {
-//    "grantType" : "Bearer",
-//    "accessToken" : "accessToken",
-//    "refreshToken" : "refresh",
-//    "role" : "ROLE_AUTH_USER"
-//  }
-//}
+
+// MARK: - ChangePassword
+struct ChangePassword: Codable {
+    let status: Int
+    let code, msg, detailMsg: String
+    let data: DataClass
+}
+
+// MARK: - DataClass
+struct DataClass: Codable {
+}

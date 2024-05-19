@@ -25,8 +25,8 @@ struct HomeView: View {
     @ObservedObject var cardViewModel : CardViewModel
     @State private var showSlideOverCard = false
     @State private var selectedItemId: Int?
-    
-
+    @State private var item: Item = Item(id: 0, tripName: "", startdate: "", enddate: "")
+   
     
     var body: some View {
         // NavigationView {
@@ -51,21 +51,14 @@ struct HomeView: View {
                 TabView(selection: $selectedSlideIndex) {
                     
                     // "여행 종료"의 경우
-               
-                        
-                   
-                          
-                            
-                          
-                        
 
                                 // 큰 숫자
                     VStack{
                         
                       
-                            
+                       // Text("\(homeviewModel.items.)")
                                 
-                                Text("전라도의 선유도")
+                        Text("\(item.tripName)")
                                     .font(.pretendardExtrabold14)
                                     .tint(.black)
                                     .padding(.top,30)
@@ -142,9 +135,10 @@ struct HomeView: View {
                 .onAppear {
                     homeviewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
                        
-                            
-                        
                 }
+                .onChange(of: homeviewModel.items) {
+                    item = homeviewModel.items[item.id]
+                       }
             
             if showingCustomAlert ,let itemToDelete = itemToDelete{
                 

@@ -8,7 +8,7 @@
 import SwiftUI
 
 
-struct Item: Identifiable {
+struct Item: Identifiable,Equatable {
     let id: Int
     let tripName: String
     let startdate: String
