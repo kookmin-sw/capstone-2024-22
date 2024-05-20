@@ -1053,7 +1053,7 @@ class CardActivity : ComponentActivity() {
                                                                                 it.toFloat()*(0.01f)
                                                                             }
                                                                         }
-                                                                        "역겨워요" ->{
+                                                                        "불쾌해요" ->{
                                                                             cardItems[index].cardView.disgust.let {
                                                                                 it.toFloat()*(0.01f)
                                                                             }
@@ -1092,7 +1092,7 @@ class CardActivity : ComponentActivity() {
                                                                             "${it.toInt()}%"
                                                                         }
                                                                     }
-                                                                    "역겨워요" ->{
+                                                                    "불쾌해요" ->{
                                                                         cardItems[index].cardView.disgust.let {
                                                                             "${it.toInt()}%"
                                                                         }

@@ -3166,7 +3166,7 @@ class MainActivity : ComponentActivity() {
         emotionList.add(
             com.capstone.android.application.data.local.Emotion(
                 icon = R.drawable.ic_emotion_sad,
-                text = "우울해퍼",
+                text = "우울해요",
                 persent = (sad).toInt()
             )
         )
@@ -3190,28 +3190,28 @@ class MainActivity : ComponentActivity() {
                 1 -> R.drawable.ic_receipt1_emotion_common_2
                 2 -> R.drawable.ic_receipt1_emotion_common_3
                 3 -> R.drawable.ic_receipt1_emotion_common_4
-                else -> R.drawable.ic_receipt1_emotion_common_1
+                else -> R.drawable.ic_receipt1_emotion_common5
             }
             "화가나요" -> return when(index){
                 0 -> R.drawable.ic_receipt1_emotion_angry_1
                 1 -> R.drawable.ic_receipt1_emotion_angry_2
                 2 -> R.drawable.ic_receipt1_emotion_angry_3
                 3 -> R.drawable.ic_receipt1_emotion_angry_4
-                else -> R.drawable.ic_receipt1_emotion_angry_1
+                else -> R.drawable.ic_receipt1_emotion_angry5
             }
             "즐거워요" -> return when(index){
                 0 -> R.drawable.ic_receipt1_emotion_happy_1
                 1 -> R.drawable.ic_receipt1_emotion_happy_2
                 2 -> R.drawable.ic_receipt1_emotion_happy_3
                 3 -> R.drawable.ic_receipt1_emotion_happy_4
-                else -> R.drawable.ic_receipt1_emotion_happy_1
+                else -> R.drawable.ic_receipt1_emotion_happy5
             }
-            "우울해" -> return when(index){
+            "우울해요" -> return when(index){
                 0 -> R.drawable.ic_receipt1_emotion_sad_1
                 1 -> R.drawable.ic_receipt1_emotion_sad_2
                 2 -> R.drawable.ic_receipt1_emotion_sad_3
                 3 -> R.drawable.ic_receipt1_emotion_sad_4
-                else -> R.drawable.ic_receipt1_emotion_sad_1
+                else -> R.drawable.ic_receipt1_emotion_sad5
             }
             "불쾌해요" -> return when(index){
                 0 -> R.drawable.ic_receipt1_emotion_disgust1
@@ -3230,7 +3230,7 @@ class MainActivity : ComponentActivity() {
             "평범해요" -> R.drawable.ic_receipt2_emotion_common
             "화가나요" -> R.drawable.ic_receipt2_emotion_angry
             "즐거워요" -> R.drawable.ic_receipt2_emotion_happy
-            "우울해" -> R.drawable.ic_receipt2_emotion_sad
+            "우울해요" -> R.drawable.ic_receipt2_emotion_sad
             "불쾌해요" -> R.drawable.ic_receipt2_emotion_disgust
             else -> R.drawable.ic_receipt2_emotion_common
         }
