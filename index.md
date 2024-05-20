@@ -82,7 +82,7 @@ AI를 활용하여 자동 텍스트 변환, 감정 분석, 기록 아카이빙�
 |-------|-------|    
 |협업관리|<img src="https://img.shields.io/badge/notion-%23000000.svg?&style=for-the-badge&logo=notion&logoColor=white" />|
 |디자인|<img src="https://img.shields.io/badge/figma-%23F24E1E.svg?&style=for-the-badge&logo=figma&logoColor=white" />|
-|APi 문서|<img src="https://img.shields.io/badge/swagger-%2385EA2D.svg?&style=for-the-badge&logo=swagger&logoColor=black" />|
+|API 문서|<img src="https://img.shields.io/badge/swagger-%2385EA2D.svg?&style=for-the-badge&logo=swagger&logoColor=black" />|
 |형상관리|<img src="https://img.shields.io/badge/git-%23F05032.svg?&style=for-the-badge&logo=git&logoColor=white" />|    
 
 <br><br>
