@@ -30,7 +30,7 @@ AI를 활용하여 자동 텍스트 변환, 감정 분석, 기록 아카이빙�
 
 # 포스터 및 소개 영상
 ## 포스터
-<img width="600" height="800" src="./src/모먼트.png">
+<img width="600" height="800" src="./src/momentposter.png">
 
 <br>
 
