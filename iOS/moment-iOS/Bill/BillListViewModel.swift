@@ -8,9 +8,57 @@
 import Foundation
 import SwiftUI
 import UIKit
+import Alamofire
 
-class BillListViewModel : ObservableObject { // 옵서버블옵젝트를 따르는 클래스를 선언해줌 이유는 옵저버블 옵젝트를 가지고있는 다른 데이터모델들을 사용해야하기때문임
+class BillListViewModel: ObservableObject {
+    @Published var items: [Item] = []
+    @Published var totalReceiptCount = 0
+   
+    
+//    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTQyNDgzMiwiZXhwIjoxNzU4NjI0ODMyfQ.iHg2ACmOB_hzoSlwsTfzGc_1gn6OHYmAxD0b2wgqNJg"
+//// 
+    var authToken: String {
+        get {
+            // 키체인에서 토큰을 가져옵니다
+            if let token = KeychainHelper.shared.getAccessToken() {
+                return "Bearer \(token)"
+            } else {
+                // 토큰이 없는 경우 기본값 또는 빈 문자열을 반환합니다
+                return ""
+            }
+        }
+    }
+//    
+    func fetchReceiptCount() {
+            let url = "http://211.205.171.117:8000/core/receipt/count"
+            let headers: HTTPHeaders = [
+                .authorization(bearerToken: authToken),// 적절한 토큰으로 교체하세요.
+                .accept("application/json")
+            ]
 
+            AF.request(url, method: .get, headers: headers).responseDecodable(of: ReceiptCountResponse.self) { response in
+                switch response.result {
+                case .success(let countResponse):
+                    DispatchQueue.main.async {
+                        self.totalReceiptCount = countResponse.data.count
+                    }
+                case .failure(let error):
+                    print("Error fetching receipt count: \(error)")
+                }
+            }
+        }
 
+    // 기존에 항목을 로드하는 등의 다른 함수들...
 }
 
+
+struct ReceiptCountResponse: Codable {
+    struct Data: Codable {
+        let count: Int
+    }
+    let status: Int
+    let code: String
+    let msg: String
+    let detailMsg: String
+    let data: Data
+}

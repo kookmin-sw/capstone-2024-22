@@ -12,7 +12,7 @@ import SwiftUI
 
 class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있는녀석 가져와서 뷰모델에서 뷰에 넣기 전에 데이터들을 잘 처리해준다 이렇게 해주는게 MVVM 패턴인거거덩
     
-    
+    @Published var tripFiles: [TripFile] = []
     @Published var todos : [Todo]
     @Published var isEditTodoMode : Bool
     @Published var removeTodos : [Todo]
@@ -22,20 +22,33 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
     @Published var tripEndDate: Date?
     @Published var showingDeleteAlert: Bool = false
     @Published var indexToDelete: Int? = nil
+    private var dayIndexMapping: [String: Int] = [:]
+    //Published var item : Item
     
     @Published var items: [Item] = []
-    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxMDkzMDMyMCwiZXhwIjoxNzU0MTMwMzIwfQ.mVy33lNv-by6bWXshsT4xFOwZSWGkOW76GWimliqHP4"
+    
+    
+    
+//    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTQyNDgzMiwiZXhwIjoxNzU4NjI0ODMyfQ.iHg2ACmOB_hzoSlwsTfzGc_1gn6OHYmAxD0b2wgqNJg"
+//    
+    
+    var authToken: String {
+        get {
+            // 키체인에서 토큰을 가져옵니다
+            if let token = KeychainHelper.shared.getAccessToken() {
+                return "Bearer \(token)"
+            } else {
+                // 토큰이 없는 경우 기본값 또는 빈 문자열을 반환합니다
+                return ""
+            }
+        }
+    }
         
         init() {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy. MM. dd"
-//            
-//            items = [
-//                       Item(tripName: "선유도여행", startdate: "2024. 04. 11", enddate: "2024. 04. 13"),
-//                       Item(tripName: "일본여행", startdate: "2024. 05. 15", enddate: "2024. 05. 19"),
-//                       Item(tripName: "뭐하기 여행", startdate: "2024. 06. 05", enddate: "2024. 06. 13"),
-//                       Item(tripName: "좋은여행", startdate: "2024. 07. 05", enddate: "2024. 10. 13")
-//                   ]
+
+            
             self.todos = []
             self.isEditTodoMode = false
             self.removeTodos = []
@@ -43,7 +56,18 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
             self.tripName = ""
             
         }
+    func calculateDayIndexes() {
+           var uniqueDates = Set<String>()
+           for file in tripFiles {
+               uniqueDates.insert(file.yearDate)
+           }
+           let sortedDates = uniqueDates.sorted()
+           dayIndexMapping = Dictionary(uniqueKeysWithValues: sortedDates.enumerated().map { ($1, $0) })
+       }
     
+    func dayIndex(for date: String) -> Int {
+            return dayIndexMapping[date] ?? 0
+        }
     
     func getIndex(item: Item) -> Int {
         return items.firstIndex { item1 -> Bool in
@@ -86,7 +110,7 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
  
     func deleteItem(itemToDelete: Item, completion: @escaping (Bool, String) -> Void) {
         let itemId = itemToDelete.id
-        let url = "http://wasuphj.synology.me:8000/core/trip/\(itemId)"
+        let url = "http://211.205.171.117:8000/core/trip/\(itemId)"
         let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
 
         AF.request(url, method: .delete, headers: headers)
@@ -111,7 +135,46 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
             }
         }
     }
+    
+    
+   
+    func fetchTripFiles(for tripId: Int) {
+        let urlString = "http://211.205.171.117:8000/core/tripfile/\(tripId)"
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json;charset=UTF-8",
+            "Authorization": authToken  // 여기서 실제 유저 ID 또는 인증 토큰으로 변경해야 할 수 있습니다.
+        ]
+        print("Fetching trip files for Trip ID: \(tripId)")
+
+        AF.request(urlString, method: .get, headers: headers).responseJSON { response in
+            // HTTP 상태 코드 출력
+            if let statusCode = response.response?.statusCode {
+                print("HTTP Status Code: \(statusCode)")
+            }
+
+            
+            switch response.result {
+                   case .success(let value):
+                       do {
+                           let data = try JSONSerialization.data(withJSONObject: value, options: [])
+                           let decoder = JSONDecoder()
+                           let tripFileResponse = try decoder.decode(TripFileResponse.self, from: data)
+                           DispatchQueue.main.async {
+                               self.tripFiles = tripFileResponse.data.tripFiles
+                           }
+                       } catch {
+                           print("Decoding error: \(error)")
+                       }
+                   case .failure(let error):
+                       print("Failed to fetch with error: \(error)")
+                   }
+        }
+    }
+
+
 }
+
+
 
 
 extension HomeViewModel {
@@ -137,9 +200,13 @@ extension HomeViewModel {
         return ("어디로 떠나면 좋을까요?", nil)
     }
     
+    
+    
+    
+    
     func fetchTrips() {
            let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
-           AF.request("http://wasuphj.synology.me:8000/core/trip/all", method: .get, headers: headers)
+           AF.request("http://211.205.171.117:8000/core/trip/all", method: .get, headers: headers)
                .responseDecodable(of: TripsResponse.self) { response in
                    switch response.result {
                    case .success(let data):
@@ -151,5 +218,30 @@ extension HomeViewModel {
                    }
                }
        }
+    
+    
 }
+
+
+struct TripFileResponse: Codable {
+    var status: Int
+    var code: String
+    var msg: String
+    var detailMsg: String
+    var data: TripFileData
+}
+
+struct TripFileData: Codable {
+    var tripFiles: [TripFile]
+}
+
+struct TripFile: Codable {
+    var id: Int//얘로 카드뷰를 조회한다
+    var tripId: Int
+    var email: String
+    var yearDate : String
+    var totalCount: Int
+    
+}
+//
 

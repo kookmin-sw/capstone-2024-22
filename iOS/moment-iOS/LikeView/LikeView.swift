@@ -11,10 +11,15 @@ import SwiftUI
 
 
 import SwiftUI
+import AVFoundation
 
 struct LikeView: View {
-    var day: Date
-    var item: Item
+    //var day: Date
+//    var item: Item
+//    var tripFile : TripFile
+//    var tripFileId : Int
+    var player : AVPlayer?
+    
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @State private var isDeleteMode = false // 삭제 모드 상태
@@ -23,7 +28,7 @@ struct LikeView: View {
     @ObservedObject var cardViewModel : CardViewModel
     @State private var isEditing = false // 편집 모드 상태
     @State private var selectedCardIDs = Set<Int>() // 선택된 카드의 ID 저장
-    
+   
     
     var body: some View {
         ZStack{
@@ -32,8 +37,8 @@ struct LikeView: View {
                 ZStack {
                     
                     VStack {
-                        Spacer().frame(height: 70)
-                      
+                        Spacer().frame(height: 30)
+                        
                         
                         CustomTitleMainDivider()
                             .padding(.bottom, -10)
@@ -43,6 +48,7 @@ struct LikeView: View {
                             Spacer()
                             Text("즐겨찾은 녹음 파일")
                                 .font(.pretendardBold22)
+                                .padding(.horizontal,16)
                                 .foregroundColor(.black)
                         }
                         .padding(.horizontal, 20)
@@ -52,9 +58,10 @@ struct LikeView: View {
                         
                         ScrollView {
                             // ForEach를 사용하여 cardViewModel의 cardItems 배열을 반복 처리
-                            ForEach(cardViewModel.cardItems) { cardItem in
+                            ForEach(cardViewModel.cardItemsLike) { cardItemLike in
                                 // 각 cardItem에 대한 AccordionView 인스턴스를 생성
-                                AccordionLikeView(audioRecorderManager: audioRecorderManager, isEditing: $isEditing, selectedCardIDs: $selectedCardIDs, cardViewModel: cardViewModel, cardItem: cardItem)
+                               
+                                AccordionLikeView(audioRecorderManager: audioRecorderManager, isEditing: $isEditing, selectedCardIDs: $selectedCardIDs, cardViewModel: cardViewModel, cardItemLike: cardItemLike)
                                 
                             }
                         }
@@ -87,10 +94,13 @@ struct LikeView: View {
             
         }
         .navigationBarBackButtonHidden(true)
-        
+        .onAppear{
+            cardViewModel.fetchLikedCardViews()
+        }
         
         
     }
+      
 }
 
 
@@ -100,35 +110,21 @@ struct AccordionLikeView: View {
     @Binding var isEditing: Bool
     @Binding var selectedCardIDs: Set<Int>
     @ObservedObject var cardViewModel: CardViewModel
-    var cardItem: CardItem1
+    var cardItemLike: LikeCardViewData
+    
     
     var body: some View {
         HStack { // 체크박스와 카드 컨텐츠 사이의 간격을 없애기 위해 spacing을 0으로 설정
             // 편집 모드일 때만 체크박스 표시
-            if isEditing {
-                Button(action: {
-                    // 체크박스 선택/해제 로직
-                    if selectedCardIDs.contains(cardItem.id) {
-                        selectedCardIDs.remove(cardItem.id)
-                    } else {
-                        selectedCardIDs.insert(cardItem.id)
-                    }
-                }) {
-                    Image(systemName: selectedCardIDs.contains(cardItem.id) ? "checkmark.square.fill" : "square")
-                        .foregroundColor(.homeRed)
-                        .padding(.leading, 100) // 왼쪽 패딩 추가로 체크박스 위치 조정
-                }
-            }
+          
             
             VStack {
                 DisclosureGroup(isExpanded: $isExpanded) {
                     contentVStack
                 } label: {
-                    HeaderLikeView(isExpanded: $isExpanded, cardItem: cardItem)
+                    HeaderLikeView(isExpanded: $isExpanded, cardItemLike: cardItemLike, cardViewModel: cardViewModel)
                 }
                 .accentColor(.black)
-                
-                //                .padding(.horizontal, isEditing ? 15 : 5) // 편집 모드일 때의 패딩 조정
                 .padding()
                 
                 
@@ -157,10 +153,10 @@ struct AccordionLikeView: View {
         VStack {
             Spacer().frame(height: 40)
             locationAndTimeInfo
-            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, longText: "\(cardItem.exampleText)")
-            DynamicGradientImagePicker()
+            DynamicGradientRectangleLikeView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItemLike.stt)", cardItemsLike: cardItemLike)
+            DynamicGradientImagePicker(cardViewModel: cardViewModel, cardViewId: cardItemLike.id)
             Spacer().frame(height: 30)
-            EmotionView()
+            EmotionLikeView1(cardViewModel: cardViewModel, cardItemLike: cardItemLike)
         }
     }
     
@@ -169,22 +165,85 @@ struct AccordionLikeView: View {
     private var locationAndTimeInfo: some View {
         HStack {
             Image("Location")
-            Text("선유도 공영주차장")
+            ScrollingTextView(text: "\(cardItemLike.location)", maxWidth: 130)
                 .font(.pretendardMedium11)
             Spacer()
-            Text("해가 쨍쨍한날")
+            Text("\(cardItemLike.weather)")
                 .font(.pretendardMedium11)
             Image("Weather_Sunny")
         }
         HStack {
+            let (date, time) = cardViewModel.formatDateAndTime(dateString: cardItemLike.recordedAt)
             Image("CardTime")
-            Text(cardItem.date).font(.pretendardMedium11)
+            Text("\(date)").font(.pretendardMedium11)
+            //cardItem.recordedAt
             Spacer()
             CustomCarbarDivider()
-            Text(cardItem.time).font(.pretendardMedium11)
+            Text("\(time)").font(.pretendardMedium11)
+            //cardItem.recordedAt
         }
     }
 }
+
+struct EmotionLikeView1: View {
+    @ObservedObject var cardViewModel: CardViewModel
+    var cardItemLike: LikeCardViewData
+    
+    var body: some View {
+        VStack {
+            HStack{
+                Text("꽤나 즐거운 대화였어요")
+                    .font(.pretendardMedium11)
+                    .padding(.horizontal,20)
+                Spacer()
+                Text("감정분석")
+                    .font(.pretendardMedium11)
+                    .padding(.horizontal,10)
+                
+            }
+            CustomEmotionViewDivider()
+ 
+            ForEach(cardViewModel.emotions, id: \.name) { emotion in
+                        emotionRow(emotion: emotion)
+                    }
+        }
+        .padding(.horizontal, 1) // HStack에 패딩을 적용하여 내용이 화면 가장자리에 붙지 않도록 합니다.
+        .onAppear{
+            cardViewModel.updateEmotions(happy: cardItemLike.happy, sad: cardItemLike.sad, angry: cardItemLike.angry, neutral: cardItemLike.neutral, disgust: cardItemLike.disgust)
+        }
+    }
+ 
+    
+    
+    @ViewBuilder
+      private func emotionRow(emotion: EmotionDataCard) -> some View {
+          HStack {
+              Image(emotion.image)
+                  .resizable()
+                  .scaledToFit()
+                  .frame(width: 12, height: 12)
+
+              Text(emotion.name)
+                  .font(.pretendardMedium11)
+                  .frame(width: 50, alignment: .leading)
+              
+              Spacer().frame(width:35)
+              
+              ProgressView(value: emotion.score, total: 1.0)
+                  .progressViewStyle(LinearProgressViewStyle(tint: emotion.color))
+                  .frame(width: 136)
+
+              Spacer().frame(width:35)
+              
+              Text("\(Int(emotion.score * 100))%")
+                  .font(.pretendardMedium11)
+                  .frame(width: 27, alignment: .trailing)
+          }
+      }
+    
+   
+}
+ 
 
 
 
@@ -193,29 +252,33 @@ struct AccordionLikeView: View {
 struct HeaderLikeView: View {
     @Binding var isExpanded: Bool
     @State private var isHeartFilled = true // 하트가 채워졌는지 여부
-    var cardItem: CardItem1
+    var cardItemLike: LikeCardViewData
+    @ObservedObject var cardViewModel: CardViewModel
     var body: some View {
         VStack{
             HStack {
                 Button(action: {
                     // 하트 버튼을 눌렀을 때의 액션
                     isHeartFilled.toggle()
-                    //updateHeartStatus(isHeartFilled: isHeartFilled) 네트워크 통신로직
+                    cardViewModel.updateCardViewLikeStatus(cardViewId: cardItemLike.id)
                 }) {
                     Image(isHeartFilled ? "HeartFill" : "HeartEmpty")
                     
                     
                 }
-                Text("\(cardItem.time)") // 타이틀 예시
+                let (date,time) =
+                cardViewModel.formatDateAndTime(dateString: cardItemLike.recordedAt)
+                Text("\(time)") // 타이틀 예시
                     .foregroundColor(.black)
                     .font(.pretendardExtrabold14)
                 Spacer()
                 
-                Text("\(cardItem.id)")
+                Text("_00\(cardItemLike.id)")
                     .font(.pretendardExtrabold14)
                     .foregroundColor(.black)
             }
             .padding(.horizontal,10)
+            .padding(.bottom,10)
             .background(Color.homeBack) // 헤더 배경색
             .cornerRadius(10)
             CustomHomeVDividerCard()
@@ -243,13 +306,24 @@ struct HeaderLikeView: View {
 
 struct DynamicGradientRectangleLikeView: View {
     @ObservedObject var audioRecorderManager: AudioRecorderManager
+    @ObservedObject var cardViewModel: CardViewModel
     let longText: String
+
+    var playerItem: AVPlayerItem?
+    var cardItemsLike : LikeCardViewData
     
     var body: some View {
         //ScrollView {
         VStack {
-            AudioPlayerControls(audioRecorderManager: audioRecorderManager)
-                .padding()
+
+            let url = URL(string: cardItemsLike.recordFileUrl)!
+            // 여기에서 url이 어떤 url 이 들어가있는지 확인하고싶어
+            let audioPlayer = AudioPlayer(url: url)
+                   
+                   CustomAudioPlayerView(audioPlayer: audioPlayer)
+          
+
+      
             
             Text(longText)
                 .font(.pretendardMedium13)
@@ -259,9 +333,10 @@ struct DynamicGradientRectangleLikeView: View {
             LinearGradient(gradient: Gradient(colors: [.homeBack, .toastColor]), startPoint: .top, endPoint: .bottom)
         )
         .cornerRadius(3)
-        // .padding(.horizontal,3)
+      
         .frame(width: 340)
-        //}
+   
+        
     }
 }
 

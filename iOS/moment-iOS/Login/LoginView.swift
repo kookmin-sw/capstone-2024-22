@@ -16,6 +16,7 @@ struct LoginView: View {
     @State private var isLoading: Bool = false
 
     var body: some View {
+        
         VStack {
             StartHomeBtnView(authViewModel:authViewModel) {
 //                isLoading = true
@@ -142,11 +143,11 @@ struct LoginView: View {
                     .font(.pretendardSemiBold18)
                     .frame(minWidth: 0, maxWidth: .infinity)
                     .padding()
-                    .background(email.isEmpty || password.isEmpty ? Color.gray : Color.homeRed)
+                    .background(email.isEmpty || password.isEmpty ? Color.homeRed : Color.homeRed)
                     .foregroundColor(.white)
                     .cornerRadius(3)
             })
-           /* .disabled(email.isEmpty || password.isEmpty) */ // 이메일과 비밀번호 입력 여부에 따라 버튼 활성화
+           // .disabled(email.isEmpty || password.isEmpty)  // 이메일과 비밀번호 입력 여부에 따라 버튼 활성화
             .padding(.bottom, 20)
             
             Button(action: {

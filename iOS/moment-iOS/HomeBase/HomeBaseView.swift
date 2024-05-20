@@ -22,10 +22,12 @@ struct HomeBaseView: View {
     @EnvironmentObject private var pathModel: PathModel
     var edges = UIApplication.shared.windows.first?.safeAreaInsets
     @StateObject private var homeBaseViewModel = HomeBaseViewModel()
+   // @ObservedObject var sharedViewModel: SharedViewModel
     @Namespace var animation // 탭 전환 애니메이션을 위한 네임스페이스
     @State private var showPartialSheet = false // 커스텀 시트 표시 여부
     @ObservedObject  var audioRecorderManager: AudioRecorderManager
     @State var isPresentedFloating: Bool = false
+    @State var isPresentedFloatingDelete: Bool = false
     @State private var wasDeleted = false
     @State private var wasLoad = false
     @State private var showingCustomAlertInHome = false
@@ -33,6 +35,7 @@ struct HomeBaseView: View {
     @State private var showingCustomAlertInSetting = false
     @State private var showDialogGoodbyeAlert = false
     @StateObject private var homeViewModel = HomeViewModel()
+    
     
     
     var body: some View {
@@ -46,13 +49,18 @@ struct HomeBaseView: View {
                     switch homeBaseViewModel.selectedTab {
                     case .Home:
                         HomeView(showingCustomAlert: $showingCustomAlertInHome, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
+                          
                     case .Bill:
                         BillListView()
                             .environmentObject(homeViewModel)
+                            .environmentObject(homeBaseViewModel)
+                       
                     case .voiceRecorder:
                         VoiceRecorderView()
+                          //  .environmentObject(sharedViewModel)
                     case .Like:
-                        LikeView(day: Date(), item: Item(id: 1, tripName: "선유도", startdate: "0305", enddate: "0315"), audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
+                        LikeView( audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)
+                           // .environmentObject(sharedViewModel)
 
                     case .setting:
                         SettingView(showDialog : $showingCustomAlertInSetting, showDialogGoodbye: $showDialogGoodbyeAlert)
@@ -115,22 +123,22 @@ struct HomeBaseView: View {
         
         .onChange(of: homeBaseViewModel.isRecording) { newValue in
             withAnimation {
-                showPartialSheet = newValue
+                showPartialSheet = true
             }
         }
         .onChange(of: wasDeleted) { newValue in
             if newValue {
                 // 토스트 메시지를 표시하는 로직
                 withAnimation {
-                    isPresentedFloating = true
+                    isPresentedFloatingDelete = true
                 }
                 // 3초 후 토스트 메시지 숨김
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    isPresentedFloating = false
+                    isPresentedFloatingDelete = false
                     wasDeleted = false // 상태 초기화
                 }
             }
-        }.popup(isPresented: $isPresentedFloating) {
+        }.popup(isPresented: $isPresentedFloatingDelete) {
             FloatingToastDeleteView() // 사용자 정의 토스트 뷰
         } customize: {
             $0.type(.floater())
@@ -175,7 +183,7 @@ struct BottomSheetView1: View {
     @State var isPresentedFloating : Bool = false
     @Binding var wasDeleted: Bool
     @Binding var wasLoad : Bool
-    
+    @State private var listeningText = "열심히 듣고 있어요"
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     //test
@@ -204,7 +212,7 @@ struct BottomSheetView1: View {
                 .opacity(tooltipOpacity)  // 투명도 적용
                 .onAppear {
                     // 5초 후에 투명도를 0으로 변경하여 툴팁을 서서히 사라지게 함
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         withAnimation(.easeOut(duration: 2.0)) {
                             tooltipOpacity = 0
                         }
@@ -236,12 +244,14 @@ struct BottomSheetView1: View {
                         
                     }
                 
+                
                 // 추가 텍스트
-                Text("열심히 듣고 있어요")
+                Text(listeningText)
                     .font(.pretendardMedium18)
                     .frame(height: 44)
                     .overlay(Rectangle().frame(height: 1), alignment: .bottom)
                     .padding(.horizontal,20)
+                    .padding(.bottom,20)
                 
                 // 녹음 및 취소/저장 버튼
                 HStack {
@@ -270,9 +280,9 @@ struct BottomSheetView1: View {
                         : audioRecorderManager.startRecording()
                         timeElapsed = 0
                         
-                        
+                        listeningText = audioRecorderManager.isRecording ? "받아적을 준비 완료" : "받아적을 준비 완료"
                     }) {
-                        Image(systemName: audioRecorderManager.isRecording ? "record.circle" : "stop.fill")
+                        Image( audioRecorderManager.isRecording ? "RecordPress" : "RecordStop")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 50, height: 50)
@@ -288,7 +298,7 @@ struct BottomSheetView1: View {
                            
                             recordBtn = false  // 버튼 상태 업데이트
                             timerRunning = false  // 타이머 중지
-                            wasDeleted = true
+                            wasLoad = true
                             if let lastRecordedFile = audioRecorderManager.recordedFiles.last {
                                 print(lastRecordedFile.lastPathComponent) // 마지막으로 레코드된 녹음 파일의 이름 확인함
                             } else {
@@ -314,7 +324,7 @@ struct BottomSheetView1: View {
                 
                 
             }
-            .frame(maxWidth: .infinity, maxHeight: 284)
+            .frame(maxWidth: .infinity, maxHeight: 350)
             .background(Color.homeBack)
             
         }

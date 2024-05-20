@@ -6,10 +6,18 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct CardView: View {
-    var day: Date
+    //var day: Date
     var item: Item
+    var tripFile: TripFile
+    var tripFileId: Int
+    var player: AVPlayer?
+    var index: Int
+
+    
+    
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var audioRecorderManager: AudioRecorderManager
     @State private var isDeleteMode = false // 삭제 모드 상태
@@ -18,6 +26,8 @@ struct CardView: View {
     @ObservedObject var cardViewModel : CardViewModel
     @State private var isEditing = false // 편집 모드 상태
     @State private var selectedCardIDs = Set<Int>() // 선택된 카드의 ID 저장
+   // @State private var cardViews : cardViews?
+  
     
     
     var body: some View {
@@ -27,6 +37,7 @@ struct CardView: View {
                 ZStack {
                     
                     VStack {
+                        
                         HStack {
                             Button(action: {
                                 // "뒤로" 버튼의 액션: 현재 뷰를 종료
@@ -77,8 +88,9 @@ struct CardView: View {
                         
                         HStack {
                             Spacer()
-                            Text(item.tripName)
+                            Text(item.tripName + "여행" + " \(index + 1)일차")
                                 .font(.pretendardBold22)
+                                .padding(.horizontal,16)
                                 .foregroundColor(.black)
                         }
                         .padding(.horizontal, 20)
@@ -87,13 +99,16 @@ struct CardView: View {
                             .padding(.top, -7)
                         
                         ScrollView {
-                            // ForEach를 사용하여 cardViewModel의 cardItems 배열을 반복 처리
+                    
+                            
+            
                             ForEach(cardViewModel.cardItems) { cardItem in
                                 // 각 cardItem에 대한 AccordionView 인스턴스를 생성
                                 AccordionView(audioRecorderManager: audioRecorderManager, isEditing: $isEditing, selectedCardIDs: $selectedCardIDs, cardViewModel: cardViewModel, cardItem: cardItem)
                                 
                             }
                         }
+                       
                         //첫번째 주석 넣기
                         
                     }
@@ -123,85 +138,12 @@ struct CardView: View {
             
         }
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+                       // 특정 tripFileId를 사용하여 카드뷰 데이터 로드
+            cardViewModel.fetchAllCardViews(tripFileId: tripFile.id)
+                   }
         
         
-        
-    }
-}
-
-struct CustomConfirmationDialog: View {
-    @Binding var isActive: Bool
-    var title: String
-    var message: String
-    var yesAction: () -> Void
-    var noAction: () -> Void
-    @State private var offset: CGFloat = 1000
-    
-    var body: some View {
-        ZStack {
-            // 어두운 배경
-            Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
-            
-            VStack {
-                Text(title)
-                    .font(.pretendardExtrabold16)
-                
-                    .padding()
-                
-                Text(message)
-                    .font(.pretendardMedium14)
-                    .foregroundColor(Color.gray500)
-                    .padding(.bottom)
-                
-                HStack { // 버튼 사이 간격을 0으로 조정
-                    Button {
-                        yesAction()
-                        close()
-                    } label: {
-                        ZStack {
-                            
-                            Text("네")
-                                .font(.yjObangBold15)
-                                .foregroundColor(Color.black)
-                            
-                        }
-                        .frame(width: 116, height: 36) // 버튼의 크기 조절
-                    }
-                    
-                    Rectangle() // 빨간색 세로줄 추가
-                        .fill(Color.gray500)
-                        .frame(width: 2, height: 20)
-                    
-                    Button {
-                        noAction()
-                        close()
-                    } label: {
-                        ZStack {
-                            
-                            Text("아니요")
-                                .font(.yjObangBold15)
-                                .foregroundColor(Color.black)
-                            
-                        }
-                        .frame(width: 116, height: 36) // 버튼의 크기 조절
-                    }
-                }.padding(.bottom,10)
-                
-            }
-            .frame(width: 280, height: 158) // 다이얼로그의 크기 조절
-            
-            .background(.homeBack)
-            .clipShape(RoundedRectangle(cornerRadius: 0))
-        }
-        .onTapGesture {
-            // 배경 탭시 다이얼로그 닫기 (선택적)
-        }
-    }
-    func close() {
-        withAnimation(.spring()) {
-            offset = 1000
-            isActive = false
-        }
     }
 }
 
@@ -211,7 +153,7 @@ struct AccordionView: View {
     @Binding var isEditing: Bool
     @Binding var selectedCardIDs: Set<Int>
     @ObservedObject var cardViewModel: CardViewModel
-    var cardItem: CardItem1
+    var cardItem: cardViews
     
     var body: some View {
         HStack { // 체크박스와 카드 컨텐츠 사이의 간격을 없애기 위해 spacing을 0으로 설정
@@ -235,11 +177,9 @@ struct AccordionView: View {
                 DisclosureGroup(isExpanded: $isExpanded) {
                     contentVStack
                 } label: {
-                    HeaderView(isExpanded: $isExpanded, cardItem: cardItem)
+                    HeaderView(isExpanded: $isExpanded, cardItem: cardItem, cardViewModel: cardViewModel)
                 }
                 .accentColor(.black)
-                
-                //                .padding(.horizontal, isEditing ? 15 : 5) // 편집 모드일 때의 패딩 조정
                 .padding()
                 
                 
@@ -256,7 +196,10 @@ struct AccordionView: View {
         }
         
         .animation(.default, value: isEditing) // 편집 모드 변화에 따른 애니메이션
+        
+        
     }
+    
     
     
     
@@ -268,34 +211,86 @@ struct AccordionView: View {
         VStack {
             Spacer().frame(height: 40)
             locationAndTimeInfo
-            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, longText: "\(cardItem.exampleText)")
-            DynamicGradientImagePicker()
+            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItem.stt)", cardItem: cardItem)
+            DynamicGradientImagePicker(cardViewModel: cardViewModel, cardViewId: cardItem.id)
             Spacer().frame(height: 30)
-            EmotionView()
+            EmotionView(cardViewModel: cardViewModel, cardItem: cardItem)
         }
+        
     }
     
     // 위치 및 시간 정보를 보여주는 HStack을 별도의 ViewBuilder로 추출
     @ViewBuilder
     private var locationAndTimeInfo: some View {
+        
         HStack {
-            Image("Location")
-            Text("선유도 공영주차장")
-                .font(.pretendardMedium11)
+            Image("Location").padding(.bottom,3)
+            ScrollingTextView(text: "\(cardItem.location)", maxWidth: 130)
+                        
             Spacer()
-            Text("해가 쨍쨍한날")
+            Text("\(cardItem.weather)")
                 .font(.pretendardMedium11)
             Image("Weather_Sunny")
         }
         HStack {
+            let (date, time) = cardViewModel.formatDateAndTime(dateString: cardItem.recordedAt)
+            
             Image("CardTime")
-            Text(cardItem.date).font(.pretendardMedium11)
+            Text("\(date)").font(.pretendardMedium11)
+            //cardItem.recordedAt
+            //날짜부가 들어가야함
             Spacer()
             CustomCarbarDivider()
-            Text(cardItem.time).font(.pretendardMedium11)
+            Text("\(time)").font(.pretendardMedium11) // 시간부만 들어가야함
+            //cardItem.recordedAt
+
         }
+        
     }
 }
+import SwiftUI
+
+struct ScrollingTextView: View {
+    var text: String
+    var maxWidth: CGFloat
+    @State private var animateText = false
+    @State private var textWidth: CGFloat = 0
+    
+    var body: some View {
+        GeometryReader { geometry in
+            HStack(spacing: 0) {
+                ForEach(0..<2) { _ in  // 텍스트를 두 번 복제
+                    Text(text)
+                        .font(.pretendardMedium11)
+                        .lineLimit(1)
+                        .background(GeometryReader {
+                            Color.clear.preference(key: TextWidthPreferenceKey.self,
+                                                   value: $0.frame(in: .local).size.width)
+                        })
+                        .fixedSize(horizontal: true, vertical: false)
+                }
+            }
+            .offset(x: animateText ? -2 * textWidth : 0, y: 0)  // 시작 위치에서 두 배의 텍스트 너비만큼 이동
+            .onPreferenceChange(TextWidthPreferenceKey.self) { width in
+                self.textWidth = width / 2  // 하나의 텍스트 너비 계산
+                withAnimation(Animation.linear(duration: Double(textWidth) * 2 / 30).repeatForever(autoreverses: false)) {
+                    animateText = true
+                }
+            }
+        }
+        .frame(width: maxWidth, height: 20)  // 텍스트 뷰의 너비와 높이 제한
+        .clipped()  // 프레임 밖의 내용을 잘라냄
+    }
+}
+
+// Preference key to pass the text width
+struct TextWidthPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 
 
 
@@ -304,27 +299,31 @@ struct AccordionView: View {
 struct HeaderView: View {
     @Binding var isExpanded: Bool
     @State private var isHeartFilled = false // 하트가 채워졌는지 여부
-    var cardItem: CardItem1
+    var cardItem: cardViews
+    @ObservedObject var cardViewModel: CardViewModel
     var body: some View {
         VStack{
             HStack {
                 Button(action: {
                     // 하트 버튼을 눌렀을 때의 액션
                     isHeartFilled.toggle()
+                    cardViewModel.updateCardViewLikeStatus(cardViewId: cardItem.id)
                 }) {
                     Image(isHeartFilled ? "HeartFill" : "HeartEmpty")
                     
                 }
-                Text("\(cardItem.time)") // 타이틀 예시
+                let (date, time) = cardViewModel.formatDateAndTime(dateString: cardItem.recordedAt)
+                Text("\(time)") // 타이틀 예시
                     .foregroundColor(.black)
                     .font(.pretendardExtrabold14)
                 Spacer()
                 
-                Text("\(cardItem.id)")
+                Text("_00\(cardItem.id)")
                     .font(.pretendardExtrabold14)
                     .foregroundColor(.black)
             }
             .padding(.horizontal,10)
+            .padding(.bottom,10)
             .background(Color.homeBack) // 헤더 배경색
             .cornerRadius(10)
             CustomHomeVDividerCard()
@@ -336,7 +335,7 @@ struct HeaderView: View {
                         .padding(.horizontal,10)
                         .padding(.top,10)
                     Spacer()
-                    Text("해가 쨍쨍한날")
+                    Text("\(cardItem.weather)")
                         .font(.pretendardMedium11)
                         .foregroundColor(.gray500)
                         .padding(.top,10)
@@ -347,18 +346,32 @@ struct HeaderView: View {
                 }
             }
         }
+        
     }
 }
 
+
+
 struct DynamicGradientRectangleView: View {
     @ObservedObject var audioRecorderManager: AudioRecorderManager
+    @ObservedObject var cardViewModel: CardViewModel
     let longText: String
+
+    var playerItem: AVPlayerItem?
+    var cardItem : cardViews
     
     var body: some View {
         //ScrollView {
         VStack {
-            AudioPlayerControls(audioRecorderManager: audioRecorderManager)
-                .padding()
+
+            let url = URL(string: cardItem.recordFileUrl)!
+            // 여기에서 url이 어떤 url 이 들어가있는지 확인하고싶어
+            let audioPlayer = AudioPlayer(url: url)
+                   
+                   CustomAudioPlayerView(audioPlayer: audioPlayer)
+          
+
+      
             
             Text(longText)
                 .font(.pretendardMedium13)
@@ -368,82 +381,151 @@ struct DynamicGradientRectangleView: View {
             LinearGradient(gradient: Gradient(colors: [.homeBack, .toastColor]), startPoint: .top, endPoint: .bottom)
         )
         .cornerRadius(3)
-        // .padding(.horizontal,3)
+      
         .frame(width: 340)
-        //}
+   
+        
     }
+    
 }
+
+
+//
+//struct DynamicGradientImagePicker: View {
+//    @State private var showingImagePicker = false
+//    @State private var showingAddButton = false // 처음에는 추가 버튼이 보이지 않음
+//    @State private var selectedImages: [UIImage] = []
+//    @ObservedObject var cardViewModel: CardViewModel
+//    
+//
+//    var body: some View {
+//        VStack {
+//            HStack {
+//                Spacer() // HStack의 왼쪽에 Spacer를 추가하여 오른쪽으로 요소를 밀어냄
+//                Button(action: {
+//                    showingAddButton.toggle() // '이미지 추가하기' 버튼을 토글
+//                }) {
+//                    HStack {
+//                        Text("사진 추가")
+//                            .font(.pretendardMedium11)
+//                            .foregroundColor(.black)
+//                        Image("Imageadd")
+//                            .foregroundColor(.white)
+//                    }
+//                    .padding(.horizontal,10)
+//                }
+//            }
+//            
+//            if showingAddButton {
+//                // 이미지들과 추가 버튼을 보여주는 스크롤 뷰
+//                CustomDividerCardView()
+//                ScrollView(.horizontal, showsIndicators: false) {
+//                    HStack(spacing: 10) {
+//                        ForEach(selectedImages.indices, id: \.self) { index in
+//                            Image(uiImage: selectedImages[index])
+//                                .resizable()
+//                                .frame(width: 66, height: 77)
+//                                .cornerRadius(3)
+//                                .aspectRatio(contentMode: .fill)
+//                        }
+//                        addButton()
+//                    }
+//                }
+//                .background(Color.homeBack)
+//                .cornerRadius(3)
+//                .frame(width: 340) // 가로 크기 고정
+//            }
+//        }
+//        .sheet(isPresented: $showingImagePicker, onDismiss: loadImage) {
+//            ImagePicker(selectedImage: $selectedImage)
+//        }
+//    }
+//    
+//    private func addButton() -> some View {
+//        Button(action: {
+//            showingImagePicker = true
+//        }) {
+//            RoundedRectangle(cornerRadius: 3)
+//                .fill(Color.gray)
+//                .frame(width: 66, height: 77)
+//                .overlay(
+//                    Image(systemName: "plus")
+//                        .foregroundColor(.white)
+//                )
+//        }
+//    }
+//    
+//    @State private var selectedImage: UIImage?
+//    
+//    func loadImage() {
+//        guard let selectedImage = selectedImage else { return }
+//        selectedImages.append(selectedImage)
+//      
+//    }
+//}
 
 struct DynamicGradientImagePicker: View {
     @State private var showingImagePicker = false
-    @State private var showingAddButton = false // 처음에는 추가 버튼이 보이지 않음
-    @State private var selectedImages: [UIImage?] = []
-    
+    @State private var showingAddButton = false
+    @State private var selectedImages: [UIImage] = [] // 옵셔널이 아닌 UIImage 배열로 변경
+    @ObservedObject var cardViewModel: CardViewModel
+    var cardViewId: Int // 이 ID는 이 뷰로 전달되어야 합니다
+
     var body: some View {
         VStack {
-            
             HStack {
-                Spacer() // HStack의 왼쪽에 Spacer를 추가하여 오른쪽으로 요소를 밀어냄
+                Spacer()
                 if !showingAddButton {
-                    // '이미지 추가하기' 텍스트 버튼
-                    Group{
-                        Button(action: {
-                            showingAddButton = true // '이미지 추가하기' 버튼을 누르면 추가 버튼 생성
-                            selectedImages.append(nil) // 추가 버튼에 해당하는 nil 추가
-                        }) {
-                            HStack {
-                                Text("사진 추가")
-                                    .font(.pretendardMedium11)
-                                    .foregroundColor(.black)
-                                Image("Imageadd")
-                                    .foregroundColor(.white)
-                            }
-                            .padding(.horizontal,10)
-                            
-                            
+                    Button(action: {
+                        showingAddButton = true
+                    }) {
+                        HStack {
+                            Text("사진 추가")
+                                .font(.pretendardMedium11)
+                                .foregroundColor(.black)
+                            Image("Imageadd")
+                                .foregroundColor(.white)
                         }
-                        
+                        .padding(.horizontal,10)
                     }
                 }
             }
-            
+
             if showingAddButton {
-                // 이미지들과 추가 버튼을 보여주는 스크롤 뷰
                 CustomDividerCardView()
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
-                        ForEach(0..<selectedImages.count, id: \.self) { index in
-                            if let image = selectedImages[index] {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .frame(width: 66, height: 77)
-                                    .cornerRadius(3)
-                            } else {
-                                addButton(index: index)
-                            }
+                        ForEach(selectedImages.indices, id: \.self) { index in
+                            Image(uiImage: selectedImages[index])
+                                .resizable()
+                                .frame(width: 66, height: 77)
+                                .cornerRadius(3)
+                                .aspectRatio(contentMode: .fill)
                         }
+                        addButton() // 맨 끝에 추가 버튼
                     }
                 }
                 .background(Color.homeBack)
                 .cornerRadius(3)
-                .frame(width: 340) // 가로 크기 고정
+                .frame(width: 340)
             }
         }
         .sheet(isPresented: $showingImagePicker) {
             ImagePicker(selectedImage: Binding(
                 get: { UIImage() },
                 set: { image in
-                    if let image = image, let index = selectedImages.lastIndex(where: { $0 == nil }) {
-                        selectedImages[index] = image // 이미지 추가
-                        selectedImages.append(nil) // 새로운 추가 버튼 생성
+                    if let image = image {
+                        selectedImages.append(image)
+                        cardViewModel.uploadImages([image], to: cardViewId)
                     }
                 }
             ))
         }
     }
     
+    
     @ViewBuilder
-    private func addButton(index: Int) -> some View {
+    private func addButton() -> some View {
         Button(action: {
             showingImagePicker = true
         }) {
@@ -457,9 +539,15 @@ struct DynamicGradientImagePicker: View {
         }
     }
 }
-//CustomEmotionViewDivider()
+
+
+
+
 
 struct EmotionView: View {
+    @ObservedObject var cardViewModel: CardViewModel
+    var cardItem: cardViews
+    
     var body: some View {
         VStack {
             HStack{
@@ -473,86 +561,68 @@ struct EmotionView: View {
                 
             }
             CustomEmotionViewDivider()
-            
-            emotionRow(imageName: "netral", emotionText: "평범해요", progressValue: 0.6, percentage: "60%")
-            emotionRow(imageName: "fun", emotionText: "즐거워요", progressValue: 0.2, percentage: "20%")
-            emotionRow(imageName: "angry", emotionText: "화나요", progressValue: 0.15, percentage: "15%")
-            emotionRow(imageName: "sad", emotionText: "슬퍼요", progressValue: 0.05, percentage: "5%")
+ 
+            ForEach(cardViewModel.emotions, id: \.name) { emotion in
+                        emotionRow(emotion: emotion)
+                    }
         }
         .padding(.horizontal, 1) // HStack에 패딩을 적용하여 내용이 화면 가장자리에 붙지 않도록 합니다.
+        .onAppear{
+            cardViewModel.updateEmotions(happy: cardItem.happy, sad: cardItem.sad, angry: cardItem.angry, neutral: cardItem.neutral, disgust: cardItem.disgust)
+        }
     }
+ 
+    
     
     @ViewBuilder
-    private func emotionRow(imageName: String, emotionText: String, progressValue: Double, percentage: String) -> some View {
-        HStack {
-            
-            Image(imageName)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 12, height: 12) // 이미지의 크기를 설정합니다.
-            
-            Text(emotionText)
-                .font(.pretendardMedium11)
-                .frame(width: 50, alignment: .leading) // 텍스트의 너비와 정렬을 설정합니다.
-            
-            
-            Spacer().frame(width:35)
-            
-            ProgressView(value: progressValue, total: 1.0)
-            
-                .progressViewStyle(LinearProgressViewStyle(tint: getColorForEmotion(emotionText: emotionText))) // 감정에 따른 색상
-                .frame(width: 136) // 진행률 표시기의 너비를 설정합니다.
-            Spacer().frame(width:35)
-            Text(percentage)
-                .font(.pretendardMedium11)
-                .frame(width: 27, alignment: .trailing) // 퍼센트 텍스트의 너비와 정렬을 설정합니다.
-            
-            // Spacer() // 오른쪽에 Spacer를 추가하여 모든 요소를 왼쪽으로 정렬합니다.
-        }
-    }
-    private func getColorForEmotion(emotionText: String) -> Color {
-        switch emotionText {
-        case "평범해요":
-            return .homeRed
-        case "즐거워요":
-            return .black
-        case "화나요":
-            return .StrangeColor
-        case "슬퍼요":
-            return .unsafeColor
-        default:
-            return .gray
-        }
-    }
-}
+      private func emotionRow(emotion: EmotionDataCard) -> some View {
+          HStack {
+              Image(emotion.image)
+                  .resizable()
+                  .scaledToFit()
+                  .frame(width: 12, height: 12)
 
+              Text(emotion.name)
+                  .font(.pretendardMedium11)
+                  .frame(width: 50, alignment: .leading)
+              
+              Spacer().frame(width:35)
+              
+              ProgressView(value: emotion.score, total: 1.0)
+                  .progressViewStyle(LinearProgressViewStyle(tint: emotion.color))
+                  .frame(width: 136)
 
-struct AudioPlayerControls: View {
-    @ObservedObject var audioRecorderManager: AudioRecorderManager
+              Spacer().frame(width:35)
+              
+              Text("\(Int(emotion.score * 100))%")
+                  .font(.pretendardMedium11)
+                  .frame(width: 27, alignment: .trailing)
+          }
+      }
     
-    var body: some View {
-        // 녹음 파일 재생 관련 UI 구성
-        // 예시: 재생, 정지 버튼 등
-        VStack {
-            ProgressView(value: audioRecorderManager.playbackProgress)
-                .progressViewStyle(LinearProgressViewStyle())
-                .frame(height: 20)
-                .padding()
-            HStack{
-                if let lastRecording = audioRecorderManager.recordedFiles.last {
-                    Button("재생") {
-                        audioRecorderManager.startPlaying(recordingURL: lastRecording)
-                    }
-                }
-                Button("정지") {
-                    audioRecorderManager.stopPlaying()
-                }
-            }
-            Spacer()
-        }
-        
-    }
+   
 }
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 struct CustomDialogRecordCard: View {
@@ -638,3 +708,82 @@ struct CustomDialogRecordCard: View {
     }
 }
 
+
+struct CustomConfirmationDialog: View {
+    @Binding var isActive: Bool
+    var title: String
+    var message: String
+    var yesAction: () -> Void
+    var noAction: () -> Void
+    @State private var offset: CGFloat = 1000
+    
+    var body: some View {
+        ZStack {
+            // 어두운 배경
+            Color.black.opacity(0.4).edgesIgnoringSafeArea(.all)
+            
+            VStack {
+                Text(title)
+                    .font(.pretendardExtrabold16)
+                
+                    .padding()
+                
+                Text(message)
+                    .font(.pretendardMedium14)
+                    .foregroundColor(Color.gray500)
+                    .padding(.bottom)
+                
+                HStack { // 버튼 사이 간격을 0으로 조정
+                    Button {
+                        yesAction()
+                        close()
+                    } label: {
+                        ZStack {
+                            
+                            Text("네")
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
+                        }
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
+                    }
+                    
+                    Rectangle() // 빨간색 세로줄 추가
+                        .fill(Color.gray500)
+                        .frame(width: 2, height: 20)
+                    
+                    Button {
+                        noAction()
+                        close()
+                    } label: {
+                        ZStack {
+                            
+                            Text("아니요")
+                                .font(.yjObangBold15)
+                                .foregroundColor(Color.black)
+                            
+                        }
+                        .frame(width: 116, height: 36) // 버튼의 크기 조절
+                    }
+                }.padding(.bottom,10)
+                
+            }
+            .frame(width: 280, height: 158) // 다이얼로그의 크기 조절
+            
+            .background(.homeBack)
+            .clipShape(RoundedRectangle(cornerRadius: 0))
+        }
+        .onTapGesture {
+            // 배경 탭시 다이얼로그 닫기 (선택적)
+        }
+        
+    }
+    
+    func close() {
+        withAnimation(.spring()) {
+            offset = 1000
+            isActive = false
+        }
+    }
+    
+}

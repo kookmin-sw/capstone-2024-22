@@ -12,13 +12,14 @@
 		8E15C8822B6527E7001468C7 /* moment_iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E15C8812B6527E7001468C7 /* moment_iOSTests.swift */; };
 		8E15C88C2B6527E7001468C7 /* moment_iOSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E15C88B2B6527E7001468C7 /* moment_iOSUITests.swift */; };
 		8E15C88E2B6527E7001468C7 /* moment_iOSUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E15C88D2B6527E7001468C7 /* moment_iOSUITestsLaunchTests.swift */; };
+		8E1B246C2BF7D2A7008A0367 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 8E1B246B2BF7D2A7008A0367 /* KeychainAccess */; };
+		8E1B246E2BF7D63D008A0367 /* KeyChainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E1B246D2BF7D63D008A0367 /* KeyChainHelper.swift */; };
 		8E2D273B2BA57DE7006248EA /* FSCalendarWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2D273A2BA57DE7006248EA /* FSCalendarWrapper.swift */; };
 		8E3E7D4D2BC97A63004C6AD1 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 8E3E7D4C2BC97A63004C6AD1 /* Alamofire */; };
 		8E3E7D502BC97AF5004C6AD1 /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 8E3E7D4F2BC97AF5004C6AD1 /* PopupView */; };
 		8E3E7D5E2BCD7C4B004C6AD1 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E3E7D5D2BCD7C4B004C6AD1 /* Model.swift */; };
 		8E5CAE322B970BC800A483B4 /* Time.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE312B970BC800A483B4 /* Time.swift */; };
 		8E5CAE342B970C2C00A483B4 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE332B970C2C00A483B4 /* Color+Extensions.swift */; };
-		8E5CAE362B970C4500A483B4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E5CAE352B970C4500A483B4 /* Assets.xcassets */; };
 		8E5CAE382B970C5600A483B4 /* OnboardingContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE372B970C5600A483B4 /* OnboardingContent.swift */; };
 		8E5CAE3A2B970C9D00A483B4 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE392B970C9D00A483B4 /* OnboardingViewModel.swift */; };
 		8E5CAE3C2B970CB300A483B4 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E5CAE3B2B970CB300A483B4 /* OnboardingView.swift */; };
@@ -50,7 +51,10 @@
 		8E7FB8FE2BA1E66200F05045 /* CustomDevider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E7FB8FD2BA1E66200F05045 /* CustomDevider.swift */; };
 		8E86C0662BD0100C00291360 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C0652BD0100C00291360 /* View+Extensions.swift */; };
 		8E86C0682BD0103F00291360 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C0672BD0103F00291360 /* ActivityView.swift */; };
-		8E86C06A2BD0357F00291360 /* TextFieldDynamicWidth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C0692BD0357F00291360 /* TextFieldDynamicWidth.swift */; };
+		8E86C12D2BDA766A00291360 /* SnapshotManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C12C2BDA766A00291360 /* SnapshotManager.swift */; };
+		8E86C1AB2BE819A100291360 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C1AA2BE819A100291360 /* LocationManager.swift */; };
+		8E86C1AD2BE8FAC100291360 /* VideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C1AC2BE8FAC100291360 /* VideoPlayerView.swift */; };
+		8E86C1E92BEA358F00291360 /* SharedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E86C1E82BEA358F00291360 /* SharedViewModel.swift */; };
 		8E8C17452BA8575000BF1E1C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17442BA8575000BF1E1C /* LoginView.swift */; };
 		8E8C17482BA85AE200BF1E1C /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C17472BA85AE200BF1E1C /* AuthView.swift */; };
 		8E8C174F2BA97B4500BF1E1C /* AuthNumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C174E2BA97B4500BF1E1C /* AuthNumView.swift */; };
@@ -97,6 +101,14 @@
 		8ECCFBD72BB93BC100C39125 /* Font+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFBD52BB93BC100C39125 /* Font+Extensions.swift */; };
 		8ECCFBD92BB9463700C39125 /* CardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFBD82BB9463700C39125 /* CardViewModel.swift */; };
 		8ECCFBDA2BB9463700C39125 /* CardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFBD82BB9463700C39125 /* CardViewModel.swift */; };
+		8EDC94DD2BEA8AE400B646AB /* BillComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94DC2BEA8AE400B646AB /* BillComplete.swift */; };
+		8EDC94E02BED3FB900B646AB /* ReceiptcompleteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94DF2BED3FB900B646AB /* ReceiptcompleteView.swift */; };
+		8EDC94E22BEE881700B646AB /* ReceiptCompleteviewB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94E12BEE881700B646AB /* ReceiptCompleteviewB.swift */; };
+		8EDC94E42BEEAFA400B646AB /* CustomSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDC94E32BEEAFA400B646AB /* CustomSlider.swift */; };
+		8EDC94E62BF06DF100B646AB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8EDC94E52BF06DF100B646AB /* GoogleService-Info.plist */; };
+		8EDC94E72BF06DF100B646AB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8EDC94E52BF06DF100B646AB /* GoogleService-Info.plist */; };
+		8EDC94E82BF06DF100B646AB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8EDC94E52BF06DF100B646AB /* GoogleService-Info.plist */; };
+		8EDC94EB2BF06F8000B646AB /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 8EDC94EA2BF06F8000B646AB /* FirebaseMessaging */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -138,11 +150,11 @@
 		8E15C8872B6527E7001468C7 /* moment-iOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "moment-iOSUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E15C88B2B6527E7001468C7 /* moment_iOSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = moment_iOSUITests.swift; sourceTree = "<group>"; };
 		8E15C88D2B6527E7001468C7 /* moment_iOSUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = moment_iOSUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		8E1B246D2BF7D63D008A0367 /* KeyChainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyChainHelper.swift; sourceTree = "<group>"; };
 		8E2D273A2BA57DE7006248EA /* FSCalendarWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FSCalendarWrapper.swift; sourceTree = "<group>"; };
 		8E3E7D5D2BCD7C4B004C6AD1 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		8E5CAE312B970BC800A483B4 /* Time.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Time.swift; sourceTree = "<group>"; };
 		8E5CAE332B970C2C00A483B4 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
-		8E5CAE352B970C4500A483B4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = ../../NAVERRECORD/NaverRECORDAPP/NaverRECORDAPP/Assets.xcassets; sourceTree = "<group>"; };
 		8E5CAE372B970C5600A483B4 /* OnboardingContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContent.swift; sourceTree = "<group>"; };
 		8E5CAE392B970C9D00A483B4 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
 		8E5CAE3B2B970CB300A483B4 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -173,7 +185,10 @@
 		8E7FB8FD2BA1E66200F05045 /* CustomDevider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDevider.swift; sourceTree = "<group>"; };
 		8E86C0652BD0100C00291360 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
 		8E86C0672BD0103F00291360 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
-		8E86C0692BD0357F00291360 /* TextFieldDynamicWidth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldDynamicWidth.swift; sourceTree = "<group>"; };
+		8E86C12C2BDA766A00291360 /* SnapshotManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotManager.swift; sourceTree = "<group>"; };
+		8E86C1AA2BE819A100291360 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		8E86C1AC2BE8FAC100291360 /* VideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; };
+		8E86C1E82BEA358F00291360 /* SharedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedViewModel.swift; sourceTree = "<group>"; };
 		8E8C17442BA8575000BF1E1C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		8E8C17472BA85AE200BF1E1C /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		8E8C174E2BA97B4500BF1E1C /* AuthNumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthNumView.swift; sourceTree = "<group>"; };
@@ -209,6 +224,12 @@
 		8ECCFBD42BB93AEC00C39125 /* moment-iOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "moment-iOS-Info.plist"; sourceTree = "<group>"; };
 		8ECCFBD52BB93BC100C39125 /* Font+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Font+Extensions.swift"; sourceTree = "<group>"; };
 		8ECCFBD82BB9463700C39125 /* CardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardViewModel.swift; sourceTree = "<group>"; };
+		8EDC94DC2BEA8AE400B646AB /* BillComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillComplete.swift; sourceTree = "<group>"; };
+		8EDC94DF2BED3FB900B646AB /* ReceiptcompleteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptcompleteView.swift; sourceTree = "<group>"; };
+		8EDC94E12BEE881700B646AB /* ReceiptCompleteviewB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptCompleteviewB.swift; sourceTree = "<group>"; };
+		8EDC94E32BEEAFA400B646AB /* CustomSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSlider.swift; sourceTree = "<group>"; };
+		8EDC94E52BF06DF100B646AB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		8EDC94EC2BF0738400B646AB /* moment-iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "moment-iOS.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -216,9 +237,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8EDC94EB2BF06F8000B646AB /* FirebaseMessaging in Frameworks */,
 				8E3E7D502BC97AF5004C6AD1 /* PopupView in Frameworks */,
 				8E747AFC2B860E3C00D9302D /* FSCalendar in Frameworks */,
 				8E3E7D4D2BC97A63004C6AD1 /* Alamofire in Frameworks */,
+				8E1B246C2BF7D2A7008A0367 /* KeychainAccess in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,12 +265,14 @@
 		8E15C8642B6527E3001468C7 = {
 			isa = PBXGroup;
 			children = (
+				8EDC94EC2BF0738400B646AB /* moment-iOS.entitlements */,
 				8E3E7D5F2BCD7C50004C6AD1 /* Model */,
 				8ECCFBD42BB93AEC00C39125 /* moment-iOS-Info.plist */,
 				8ECCFBB52BB93A4800C39125 /* Font */,
 				8ECCFBB12BB804B900C39125 /* ImagePicker.swift */,
 				8E970E152BC3E05B003476C4 /* DailyView */,
 				8ECCFA992BAFE4A300C39125 /* VoiceRecorder_EX */,
+				8EDC94E52BF06DF100B646AB /* GoogleService-Info.plist */,
 				8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */,
 				8E15C8702B6527E3001468C7 /* moment_iOSApp.swift */,
 				8E5CAE712B970EE700A483B4 /* AppDelegate.swift */,
@@ -268,9 +293,10 @@
 				8ECCFBA82BB59F0C00C39125 /* CardView */,
 				8ECCFBAD2BB5C91D00C39125 /* LikeView */,
 				8ECCFBA92BB5A06500C39125 /* Bill */,
+				8EDC94DB2BEA8AD300B646AB /* BillComplete */,
+				8E86C1A92BE8198C00291360 /* Manager */,
 				8E5CAE312B970BC800A483B4 /* Time.swift */,
 				8E5CAE6F2B970ED700A483B4 /* NotificationService.swift */,
-				8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */,
 				8E5CAE632B970E5B00A483B4 /* Double+Extensions.swift */,
 				8E5CAE692B970E9900A483B4 /* Int-Extensions.swift */,
 				8E5CAE492B970D3B00A483B4 /* CustomNavigationBar.swift */,
@@ -278,10 +304,10 @@
 				8E5CAE4D2B970D5D00A483B4 /* Todo.swift */,
 				8E5CAE452B970D1000A483B4 /* Tab.swift */,
 				8E15C8722B6527E3001468C7 /* ContentView.swift */,
-				8E5CAE352B970C4500A483B4 /* Assets.xcassets */,
 				8E15C8802B6527E7001468C7 /* moment-iOSTests */,
 				8E15C88A2B6527E7001468C7 /* moment-iOSUITests */,
 				8E15C86E2B6527E3001468C7 /* Products */,
+				8E86C12B2BD2C7A400291360 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -359,6 +385,23 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		8E86C12B2BD2C7A400291360 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		8E86C1A92BE8198C00291360 /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */,
+				8E86C1AA2BE819A100291360 /* LocationManager.swift */,
+				8E1B246D2BF7D63D008A0367 /* KeyChainHelper.swift */,
+			);
+			path = Manager;
+			sourceTree = "<group>";
+		};
 		8E8C17462BA8575500BF1E1C /* Login */ = {
 			isa = PBXGroup;
 			children = (
@@ -396,7 +439,6 @@
 				8E5CAE472B970D2700A483B4 /* Date+Extensions.swift */,
 				8ECCFBD52BB93BC100C39125 /* Font+Extensions.swift */,
 				8E86C0652BD0100C00291360 /* View+Extensions.swift */,
-				8E86C0692BD0357F00291360 /* TextFieldDynamicWidth.swift */,
 			);
 			path = Style;
 			sourceTree = "<group>";
@@ -469,6 +511,8 @@
 			children = (
 				8ECCFBA62BB59F0100C39125 /* CardView.swift */,
 				8ECCFBD82BB9463700C39125 /* CardViewModel.swift */,
+				8E86C1AC2BE8FAC100291360 /* VideoPlayerView.swift */,
+				8EDC94E32BEEAFA400B646AB /* CustomSlider.swift */,
 			);
 			path = CardView;
 			sourceTree = "<group>";
@@ -479,6 +523,7 @@
 				8E5CAE592B970DF600A483B4 /* BillListViewModel.swift */,
 				8E5CAE5B2B970E0400A483B4 /* BillListView.swift */,
 				8E86C0672BD0103F00291360 /* ActivityView.swift */,
+				8E86C12C2BDA766A00291360 /* SnapshotManager.swift */,
 			);
 			path = Bill;
 			sourceTree = "<group>";
@@ -516,6 +561,25 @@
 			path = Font;
 			sourceTree = "<group>";
 		};
+		8EDC94DB2BEA8AD300B646AB /* BillComplete */ = {
+			isa = PBXGroup;
+			children = (
+				8EDC94DE2BED3FA000B646AB /* BillLastCompleteView */,
+				8EDC94DC2BEA8AE400B646AB /* BillComplete.swift */,
+				8E86C1E82BEA358F00291360 /* SharedViewModel.swift */,
+			);
+			path = BillComplete;
+			sourceTree = "<group>";
+		};
+		8EDC94DE2BED3FA000B646AB /* BillLastCompleteView */ = {
+			isa = PBXGroup;
+			children = (
+				8EDC94DF2BED3FB900B646AB /* ReceiptcompleteView.swift */,
+				8EDC94E12BEE881700B646AB /* ReceiptCompleteviewB.swift */,
+			);
+			path = BillLastCompleteView;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -537,6 +601,8 @@
 				8E747AFB2B860E3C00D9302D /* FSCalendar */,
 				8E3E7D4C2BC97A63004C6AD1 /* Alamofire */,
 				8E3E7D4F2BC97AF5004C6AD1 /* PopupView */,
+				8EDC94EA2BF06F8000B646AB /* FirebaseMessaging */,
+				8E1B246B2BF7D2A7008A0367 /* KeychainAccess */,
 			);
 			productName = "moment-iOS";
 			productReference = 8E15C86D2B6527E3001468C7 /* moment-iOS.app */;
@@ -614,6 +680,8 @@
 				8E747AFA2B860E3C00D9302D /* XCRemoteSwiftPackageReference "FSCalendar" */,
 				8E3E7D4B2BC97A63004C6AD1 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				8E3E7D4E2BC97AF5004C6AD1 /* XCRemoteSwiftPackageReference "PopupView" */,
+				8EDC94E92BF06F8000B646AB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				8E1B246A2BF7D2A7008A0367 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 			);
 			productRefGroup = 8E15C86E2B6527E3001468C7 /* Products */;
 			projectDirPath = "";
@@ -635,9 +703,9 @@
 				8E8C17CA2BABF1A800BF1E1C /* Assets.xcassets in Resources */,
 				8ECCFBCD2BB93A6D00C39125 /* Pretendard-Thin.otf in Resources */,
 				8ECCFBC32BB93A6D00C39125 /* Pretendard-Medium.otf in Resources */,
+				8EDC94E62BF06DF100B646AB /* GoogleService-Info.plist in Resources */,
 				8ECCFBC92BB93A6D00C39125 /* Pretendard-ExtraLight.otf in Resources */,
 				8ECCFBC12BB93A6D00C39125 /* Pretendard-Regular.otf in Resources */,
-				8E5CAE362B970C4500A483B4 /* Assets.xcassets in Resources */,
 				8ECCFBC72BB93A6D00C39125 /* Pretendard-Light.otf in Resources */,
 				8ECCFBD22BB93A7B00C39125 /* YJ_Obang_OTF.otf in Resources */,
 				8ECCFBCB2BB93A6D00C39125 /* Pretendard-SemiBold.otf in Resources */,
@@ -650,6 +718,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8EDC94E72BF06DF100B646AB /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -667,6 +736,7 @@
 				8ECCFBC82BB93A6D00C39125 /* Pretendard-Light.otf in Resources */,
 				8ECCFBD02BB93A6D00C39125 /* Pretendard-Bold.otf in Resources */,
 				8ECCFBC42BB93A6D00C39125 /* Pretendard-Medium.otf in Resources */,
+				8EDC94E82BF06DF100B646AB /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -686,8 +756,10 @@
 				8E5CAE442B970CFF00A483B4 /* HomeBaseViewModel.swift in Sources */,
 				8E5CAE642B970E5B00A483B4 /* Double+Extensions.swift in Sources */,
 				8E2D273B2BA57DE7006248EA /* FSCalendarWrapper.swift in Sources */,
+				8E86C1AD2BE8FAC100291360 /* VideoPlayerView.swift in Sources */,
 				8E5CAE402B970CD800A483B4 /* PathModel.swift in Sources */,
 				8E5CAE6E2B970EC600A483B4 /* LikeView.swift in Sources */,
+				8E86C12D2BDA766A00291360 /* SnapshotManager.swift in Sources */,
 				8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */,
 				8E5CAE502B970D6B00A483B4 /* HomeViewModel.swift in Sources */,
 				8E970F272BC96AC3003476C4 /* LoginViewModel.swift in Sources */,
@@ -714,18 +786,23 @@
 				8E5CAE382B970C5600A483B4 /* OnboardingContent.swift in Sources */,
 				8E5CAE4E2B970D5D00A483B4 /* Todo.swift in Sources */,
 				8E7FB8FE2BA1E66200F05045 /* CustomDevider.swift in Sources */,
+				8E1B246E2BF7D63D008A0367 /* KeyChainHelper.swift in Sources */,
+				8EDC94E42BEEAFA400B646AB /* CustomSlider.swift in Sources */,
 				8E970E172BC3E070003476C4 /* DailyView.swift in Sources */,
 				8E15C8732B6527E3001468C7 /* ContentView.swift in Sources */,
+				8EDC94E22BEE881700B646AB /* ReceiptCompleteviewB.swift in Sources */,
+				8EDC94DD2BEA8AE400B646AB /* BillComplete.swift in Sources */,
 				8E5CAE522B970DB600A483B4 /* HomeView.swift in Sources */,
 				8E8C17562BAAC8F000BF1E1C /* AuthComplete.swift in Sources */,
 				8E8C17482BA85AE200BF1E1C /* AuthView.swift in Sources */,
 				8E15C8712B6527E3001468C7 /* moment_iOSApp.swift in Sources */,
 				8ECCFA982BAFE3BD00C39125 /* AudioRecorderManager.swift in Sources */,
+				8E86C1E92BEA358F00291360 /* SharedViewModel.swift in Sources */,
 				8E5CAE6A2B970E9900A483B4 /* Int-Extensions.swift in Sources */,
 				8ECCFBD92BB9463700C39125 /* CardViewModel.swift in Sources */,
 				8E5CAE342B970C2C00A483B4 /* Color+Extensions.swift in Sources */,
+				8E86C1AB2BE819A100291360 /* LocationManager.swift in Sources */,
 				8E5CAE5A2B970DF600A483B4 /* BillListViewModel.swift in Sources */,
-				8E86C06A2BD0357F00291360 /* TextFieldDynamicWidth.swift in Sources */,
 				8ECCFBA72BB59F0100C39125 /* CardView.swift in Sources */,
 				8E86C0662BD0100C00291360 /* View+Extensions.swift in Sources */,
 				8E5CAE742B970EF400A483B4 /* SettingView.swift in Sources */,
@@ -733,6 +810,7 @@
 				8E5CAE6C2B970EAE00A483B4 /* LikeViewModel.swift in Sources */,
 				8E5CAE722B970EE700A483B4 /* AppDelegate.swift in Sources */,
 				8E970F292BC96EBF003476C4 /* AuthViewModel.swift in Sources */,
+				8EDC94E02BED3FB900B646AB /* ReceiptcompleteView.swift in Sources */,
 				8E970E1D2BC405C7003476C4 /* DailyCardView.swift in Sources */,
 				8E3E7D5E2BCD7C4B004C6AD1 /* Model.swift in Sources */,
 				8ECCFBB22BB804B900C39125 /* ImagePicker.swift in Sources */,
@@ -899,6 +977,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "moment-iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9GGZWXBXQ6;
@@ -906,6 +986,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "moment-iOS-Info.plist";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "앱이 실행되지않아도 위치사용을 허가 하시겠습니까?";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "위치 사용을 허가 하시겠습니까?";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "이 앱은 사용자의 음성을 녹음하기 위해 마이크에 접근합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -931,6 +1013,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = "moment-iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9GGZWXBXQ6;
@@ -938,6 +1022,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "moment-iOS-Info.plist";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "앱이 실행되지않아도 위치사용을 허가 하시겠습니까?";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "위치 사용을 허가 하시겠습니까?";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "이 앱은 사용자의 음성을 녹음하기 위해 마이크에 접근합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -1076,6 +1162,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		8E1B246A2BF7D2A7008A0367 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		8E3E7D4B2BC97A63004C6AD1 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
@@ -1100,9 +1194,22 @@
 				minimumVersion = 2.8.4;
 			};
 		};
+		8EDC94E92BF06F8000B646AB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.25.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8E1B246B2BF7D2A7008A0367 /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8E1B246A2BF7D2A7008A0367 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
 		8E3E7D4C2BC97A63004C6AD1 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8E3E7D4B2BC97A63004C6AD1 /* XCRemoteSwiftPackageReference "Alamofire" */;
@@ -1117,6 +1224,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8E747AFA2B860E3C00D9302D /* XCRemoteSwiftPackageReference "FSCalendar" */;
 			productName = FSCalendar;
+		};
+		8EDC94EA2BF06F8000B646AB /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8EDC94E92BF06F8000B646AB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

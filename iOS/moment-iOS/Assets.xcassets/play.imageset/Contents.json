@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Vector (7).png",
+      "filename" : "State=Play.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "State=Play (1).png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "State=Play (2).png",
       "idiom" : "universal",
       "scale" : "3x"
     }

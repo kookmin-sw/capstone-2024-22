@@ -61,3 +61,37 @@ struct DeleteResponse: Codable {
 
     struct EmptyData: Codable {}
 }
+
+
+
+// 서버 응답을 위한 구조체
+struct AuthResponse: Codable {
+    var status: Int
+    var code: String
+    var msg: String
+    var detailMsg: String
+    var data: AuthData
+}
+
+struct AuthData: Codable {
+    var grantType: String
+    var accessToken: String
+    var role: String
+    var userId: Int
+}
+
+
+struct AuthResponseverify: Decodable {
+    let status: Int
+    let code: String
+    let msg: String
+    let detailMsg: String
+    let data: AuthDataverify
+}
+
+struct AuthDataverify: Decodable {
+    let grantType: String
+    let accessToken: String
+    let refreshToken: String
+    let role: String
+}

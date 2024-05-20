@@ -30,7 +30,9 @@ struct SelectDayView: View {
     var body: some View {
         ZStack{
             Color(.homeBack).edgesIgnoringSafeArea(.all)
-            
+                .onTapGesture {
+                           hideKeyboard()
+                       }
             VStack(alignment:.center) {
                 Spacer()
                 HStack {
@@ -78,6 +80,9 @@ struct SelectDayView: View {
                             .foregroundColor(Color.black), alignment: .bottom
                     )
                     .padding(.top, 20)
+                    .onTapGesture {
+                               hideKeyboard()
+                           }
                 
                 HStack(spacing:20) {
                     CustomTabField(selectedTab: $selectedTab, date: calendarViewModel.startTime, dateFormatter: dateFormatter, title: "출발 날짜", tag: 0, isCalendarVisible: $isCalendarVisible)
@@ -104,12 +109,16 @@ struct SelectDayView: View {
                 }
             } .animation(.easeInOut, value: isCalendarVisible) // 선택적: 달력 표시/숨김에 애니메이션 적용
                 .navigationBarBackButtonHidden(true)
+               
                 .padding()
             
             
             
         }
     }
+     func hideKeyboard() {
+         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+     }
 }
 
 

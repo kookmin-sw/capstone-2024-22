@@ -23,7 +23,19 @@ class CalendarViewModel : ObservableObject {
     @Published var endTime: Date?
     @Published var selectedDays: [Date] = []
     // ui의 상태를 최신화해주는 published를 사용해준다.
-    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxMDkzMDMyMCwiZXhwIjoxNzU0MTMwMzIwfQ.mVy33lNv-by6bWXshsT4xFOwZSWGkOW76GWimliqHP4"
+//    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTQyNDgzMiwiZXhwIjoxNzU4NjI0ODMyfQ.iHg2ACmOB_hzoSlwsTfzGc_1gn6OHYmAxD0b2wgqNJg"
+    
+    var authToken: String {
+        get {
+            // 키체인에서 토큰을 가져옵니다
+            if let token = KeychainHelper.shared.getAccessToken() {
+                return "Bearer \(token)"
+            } else {
+                // 토큰이 없는 경우 기본값 또는 빈 문자열을 반환합니다
+                return ""
+            }
+        }
+    }
     
     init(
         tripName: String = "",
@@ -80,7 +92,7 @@ class CalendarViewModel : ObservableObject {
 
         let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
 
-        AF.request("http://wasuphj.synology.me:8000/core/trip/register", method: .post, parameters: tripData, encoder: JSONParameterEncoder.default, headers: headers)
+        AF.request("http://211.205.171.117:8000/core/trip/register", method: .post, parameters: tripData, encoder: JSONParameterEncoder.default, headers: headers)
             .responseDecodable(of: TripRegistrationResponse.self) { response in
                 switch response.result {
                 case .success(let responseData):

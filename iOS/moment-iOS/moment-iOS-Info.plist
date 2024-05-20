@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
 	<key>Information Property List</key>
 	<dict>
 		<key>Applcation supports iTunes file sharing</key>
@@ -27,5 +31,11 @@
 		<string>Pretendard-Thin.otf</string>
 		<string>YJ_Obang_OTF.otf</string>
 	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>isSecureTextEntry</key>
+	<false/>
 </dict>
 </plist>

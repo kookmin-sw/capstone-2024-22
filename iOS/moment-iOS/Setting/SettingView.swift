@@ -24,7 +24,10 @@ struct SettingView: View {
     var body: some View {
         ZStack {
             Color.homeBack.edgesIgnoringSafeArea(.all)
-            
+                .onTapGesture {
+                                  self.showDialog = false
+                    self.showDialogGoodbye = false
+                              }
             
             VStack(spacing: 20) { // 각 항목 사이의 간격 조절
                 Spacer().frame(height: 85)
@@ -113,6 +116,10 @@ struct SettingView: View {
                                 Spacer().frame(width: 12)
                                 Text("kookmin@gmail.com")
                                     .font(.pretendardMedium14)
+                                   
+                                                   .padding(5) // 패딩 추가
+                                                   .background(Color.customSky) // 배경색을 파란색으로 설정
+                                                   .cornerRadius(5) // 모서리를 둥글게 처리
                                     .tint(.black)
                                 Spacer()
                                 
@@ -181,22 +188,25 @@ struct SettingView: View {
             .padding(.horizontal, 1) // 좌우 패딩
             
             if showDialog {
+               
+                    LogoutDialog(
+                        isActive: $showDialog,
+                        title: "정말 로그아웃 하시나요?",
+                        message: "",
+                        yesAction: {
+                            
+                            showDialog = false
+                        },
+                        noAction: {
+                            showDialog = false // 다이얼로그 닫기
+                            
+                        }
+                    )
                 
-                LogoutDialog(
-                    isActive: $showDialog,
-                    title: "정말 로그아웃 하시나요?",
-                    message: "",
-                    yesAction: {
-                        
-                        showDialog = false
-                    },
-                    noAction: {
-                        showDialog = false // 다이얼로그 닫기
-                        
-                    }
-                )
                 .transition(.opacity) // 다이얼로그 등장과 사라짐에 투명도 변화 적용
+                
                 .zIndex(1) // 다이얼로그가 다른 요소들 위에 오도록 설정
+           
             }
             
             else if showDialogGoodbye {

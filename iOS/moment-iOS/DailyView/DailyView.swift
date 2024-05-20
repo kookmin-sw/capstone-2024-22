@@ -11,13 +11,21 @@ import SwiftUI
 import Foundation
 
 struct DailyView: View {
-    @ObservedObject var viewModel = DailyItemViewModel() // 뷰 모델 인스턴스화
+    @ObservedObject var DailyViewModel = DailyItemViewModel() // 뷰 모델 인스턴스화
     @Environment(\.presentationMode) var presentationMode
+    @State private var selectedTripFileId: Int? = 0 // 선택된 여행 파일 ID
+    @ObservedObject var cardViewModel = CardViewModel()
+    @ObservedObject var audioRecorderManager: AudioRecorderManager
+    
+    
+    
     var body: some View {
         ZStack {
             Color(.homeBack).edgesIgnoringSafeArea(.all)
             
             VStack {
+                
+                
                 
                 Button(action: {
                     // "뒤로" 버튼의 액션: 현재 뷰를 종료
@@ -51,30 +59,34 @@ struct DailyView: View {
                     .padding(.bottom,10)
                 
                 // 항목 리스트
-                ScrollView(.vertical, showsIndicators: false) {
+                ScrollView {
                     LazyVStack(spacing: 10) {
-                        ForEach(viewModel.dailyItems) { item in
-                                                   NavigationLink(destination: Text("\(item.name) 상세 페이지")) {
-                                                       DailyItemViewCell(item: item) // ItemViewCell을 DailyItem에 맞게 수정
-                                                   }
+                        ForEach(DailyViewModel.tripDailyFiles) { tripDailyItem in
+                            NavigationLink(destination: DailyCardView(tripFileId: tripDailyItem.id, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) {
+                                DailyItemViewCell(tripDailyItem: tripDailyItem)
+                            }
                             CustomHomeSubDivider()
                         }
                     }
-                    
                 }
             }
         }.navigationBarBackButtonHidden()
+            .onAppear{
+                DailyViewModel.fetchTripFiles()
+            }
+        
     }
 }
 
 // DailyItem에 맞게 ItemViewCell 수정
 struct DailyItemViewCell: View {
-    var item: DailyItem
+    var tripDailyItem : TripFileDaily
+    @ObservedObject var DailyViewModel = DailyItemViewModel() // 뷰
     
     var body: some View {
         HStack {
             
-            Text(item.date)
+            Text("\(tripDailyItem.yearDate)")//날짜
                 .font(.pretendardMedium11)
                 .foregroundColor(.black)
             Rectangle()
@@ -83,7 +95,7 @@ struct DailyItemViewCell: View {
                 .padding(.leading, 5)
                 .padding(.trailing, 0)
             
-            Text(item.name)
+            Text("\(tripDailyItem.totalCount)개의 파일이 있어요")
                 .font(.pretendardMedium11)
                 .foregroundColor(.gray600)
             
@@ -92,5 +104,9 @@ struct DailyItemViewCell: View {
         }
         .padding(.horizontal,20)
         .padding()
+        .onAppear{
+            DailyViewModel.fetchTripFiles()
+        }
     }
+    
 }
