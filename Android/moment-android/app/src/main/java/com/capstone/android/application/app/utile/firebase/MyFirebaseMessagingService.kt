@@ -48,30 +48,21 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
 
 
+        requestTranscription(content.toByteArray(),transcriptionNodeId = transactionId)
 
         momentNotificationService.showBasicNotification(
             title = title,
             content = content
         )
 
-        requestTranscription(content.toByteArray(),transcriptionNodeId = transactionId)
 
         //수신한 메시지를 처리
     }
 
-    override fun handleIntent(intent: Intent?) {
 
-        val new = intent?.apply {
-            val temp = extras?.apply {
-                remove(Constants.MessageNotificationKeys.ENABLE_NOTIFICATION)
-//                remove(keyWithOldPrefix(Constants.MessageNotificationKeys.ENABLE_NOTIFICATION))
-            }
-            replaceExtras(temp)
-        }
-        super.handleIntent(new)
-    }
 
     private fun requestTranscription(voiceData: ByteArray,transcriptionNodeId:String) {
+        Log.d("waegweaga","wegwe")
         transcriptionNodeId?.also { nodeId ->
             val sendTask: Task<*> = Wearable.getMessageClient(this).sendMessage(
                 nodeId,
