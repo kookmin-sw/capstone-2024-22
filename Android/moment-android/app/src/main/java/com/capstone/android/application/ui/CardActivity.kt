@@ -248,7 +248,7 @@ class CardActivity : ComponentActivity() {
             emotionList.add(
                 Emotion(
                     icon = R.drawable.ic_emotion_disgust,
-                    text = "역겨워요",
+                    text = "불쾌해요",
                     persent = 0f,
                     color = "#89937C"
                 )
@@ -721,7 +721,7 @@ class CardActivity : ComponentActivity() {
                                                     Spacer(modifier = Modifier.width(8.dp))
                                                     Text(
                                                         text = cardItems[index].cardView.recordedAt.split("T")
-                                                            .first(),
+                                                            .first().replace('-','.'),
                                                         fontFamily = FontMoment.preStandardFont,
                                                         fontWeight = FontWeight.Medium
                                                     )
@@ -785,6 +785,27 @@ class CardActivity : ComponentActivity() {
                                                             )
                                                         })
                                                     Spacer(modifier = Modifier.height(10.dp))
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(horizontal = 4.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = "00 : 00",
+                                                            color = Color("#938F8F".toColorInt()),
+                                                            fontWeight = FontWeight.Medium,
+                                                            fontFamily = FontMoment.preStandardFont,
+                                                            fontSize = 8.sp
+                                                        )
+                                                        Spacer(modifier = Modifier.weight(1f))
+                                                        Text(
+                                                            text = "00 : 00",
+                                                            color = Color("#938F8F".toColorInt()),
+                                                            fontWeight = FontWeight.Medium,
+                                                            fontFamily = FontMoment.preStandardFont,
+                                                            fontSize = 8.sp
+                                                        )
+                                                    }
                                                     Column(
                                                         modifier = Modifier
                                                             .fillMaxWidth()
