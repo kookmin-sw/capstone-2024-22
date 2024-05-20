@@ -34,18 +34,19 @@ struct TripFileDaily: Codable, Identifiable {
 
 class DailyItemViewModel: ObservableObject {
     @Published var tripDailyFiles: [TripFileDaily] = []
-//        let authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTQyNDgzMiwiZXhwIjoxNzU4NjI0ODMyfQ.iHg2ACmOB_hzoSlwsTfzGc_1gn6OHYmAxD0b2wgqNJg"
-    var authToken: String {
-        get {
-            // 키체인에서 토큰을 가져옵니다
-            if let token = KeychainHelper.shared.getAccessToken() {
-                return "Bearer \(token)"
-            } else {
-                // 토큰이 없는 경우 기본값 또는 빈 문자열을 반환합니다
-                return ""
-            }
-        }
-    }
+        let authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTQyNDgzMiwiZXhwIjoxNzU4NjI0ODMyfQ.iHg2ACmOB_hzoSlwsTfzGc_1gn6OHYmAxD0b2wgqNJg"
+    
+//    var authToken: String {
+//        get {
+//            // 키체인에서 토큰을 가져옵니다
+//            if let token = KeychainHelper.shared.getAccessToken() {
+//                return "Bearer \(token)"
+//            } else {
+//                // 토큰이 없는 경우 기본값 또는 빈 문자열을 반환합니다
+//                return ""
+//            }
+//        }
+//    }
 
         func fetchTripFiles() {
             let urlString = "http://211.205.171.117:8000/core/tripfile/untitled"

@@ -58,7 +58,8 @@ struct HomeView: View {
                       
                        // Text("\(homeviewModel.items.)")
                                 
-                        Text("\(item.tripName)")
+//                        Text("\(item.tripName)")
+                        Text("캡스톤여행")
                                     .font(.pretendardExtrabold14)
                                     .tint(.black)
                                     .padding(.top,30)
@@ -70,7 +71,7 @@ struct HomeView: View {
                                 .padding(.bottom,20)
                                 .font(.pretendardMedium16)
                             
-                            Text("6")
+                            Text("0")
                                 .foregroundColor(.homeRed)
                                 .font(.pretendardExtrabold45)
                                 
@@ -136,9 +137,9 @@ struct HomeView: View {
                     homeviewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
                        
                 }
-                .onChange(of: homeviewModel.items) {
-                    item = homeviewModel.items[item.id]
-                       }
+//                .onChange(of: homeviewModel.items) {
+//                    item = homeviewModel.items[item.id]
+//                       }
             
             if showingCustomAlert ,let itemToDelete = itemToDelete{
                 
