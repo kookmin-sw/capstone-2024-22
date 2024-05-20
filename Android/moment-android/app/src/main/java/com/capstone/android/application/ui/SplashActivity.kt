@@ -296,6 +296,6 @@ class SplashActivity:ComponentActivity() {
     @Preview
     @Composable
     fun SplashPreview(){
-        Splash()
+        Intro()
     }
 }
