@@ -50,7 +50,7 @@ class AuthViewModel: ObservableObject {
     func requestAuthCode(){
         let parameters: [String: Any] = [
             "email": email,
-            "isSignUp": "false"
+            "isSignUp": "true"
         ]
         
         
