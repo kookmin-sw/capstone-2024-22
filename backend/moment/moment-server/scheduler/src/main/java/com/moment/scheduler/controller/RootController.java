@@ -27,7 +27,7 @@ public class RootController {
 
     @PostMapping("/turn-on/ec2")
     public ResponseEntity<String> turnOn() {
-        awsService.turnOnOrOff("moment-ai", true);
+        awsService.turnOnOrOff("moment-ai-t4", true);
         return ResponseEntity.ok("EC2 is turned on");
     }
 

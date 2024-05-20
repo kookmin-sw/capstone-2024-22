@@ -89,4 +89,15 @@ public class TripController {
         tripService.update(userId, updateTrip);
         return ResponseEntity.ok(APIResponse.of(SuccessCode.UPDATE_SUCCESS));
     }
+
+    // 여행 조회
+    @GetMapping("/{tripId}")
+    public ResponseEntity<APIResponse<TripResponseDTO.GetTripSpec>> getTrip(
+            @RequestHeader Long userId,
+            @PathVariable Long tripId
+    ) {
+        userService.validateUserWithTrip(userId, tripId);
+        TripResponseDTO.GetTripSpec trip = tripService.getTrip(tripId);
+        return ResponseEntity.ok(APIResponse.of(SuccessCode.SELECT_SUCCESS, trip));
+    }
 }

@@ -14,4 +14,6 @@ public interface AlreadyBookedDateRepository extends JpaRepository<AlreadyBooked
     void deleteByUserAndYearDateBetween(User user, LocalDate startDate, LocalDate endDate);
 
     List<AlreadyBookedDate> findAllByUserOrderByYearDate(User user);
+
+    List<AlreadyBookedDate> findAllByUser(User user);
 }

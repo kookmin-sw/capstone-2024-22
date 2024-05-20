@@ -4,6 +4,7 @@ import com.moment.auth.domain.Role;
 import com.moment.auth.dto.request.AuthRequest;
 import com.moment.auth.dto.response.TokenResponseDTO;
 import com.moment.auth.service.AuthService;
+import com.moment.auth.service.UserService;
 import io.swagger.v3.core.util.Json;
 import jakarta.ws.rs.core.MediaType;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,9 @@ class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
+
+    @MockBean
+    private UserService userService;
 
     @InjectMocks
     private AuthController authController;
@@ -79,7 +83,6 @@ class AuthControllerTest {
                                 fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("액세스 토큰"),
                                 fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("리프레시 토큰"),
                                 fieldWithPath("data.role").type(JsonFieldType.STRING).description("사용자 권한")
-
                         )
                 ))
                 .andDo(print());
@@ -129,11 +132,17 @@ class AuthControllerTest {
 
     @Test
     void verifyCode() throws Exception {
+        TokenResponseDTO.GetToken responseDTO = TokenResponseDTO.GetToken.builder()
+                .accessToken("accessToken")
+                .refreshToken("refresh")
+                .grantType("Bearer")
+                .role(Role.ROLE_AUTH_USER)
+                .build();
         AuthRequest.VerifyCode verifyCode = AuthRequest.VerifyCode.builder()
                 .code("1234")
                 .build();
 
-        Mockito.doNothing().when(authService).verifyCode(any(AuthRequest.VerifyCode.class), any());
+        Mockito.when(authService.verifyCode(any(AuthRequest.VerifyCode.class), any())).thenReturn(responseDTO);
 
         mockMvc.perform(RestDocumentationRequestBuilders.patch("/auth/verify")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -154,7 +163,10 @@ class AuthControllerTest {
                                 fieldWithPath("code").type(JsonFieldType.STRING).description("응답 코드"),
                                 fieldWithPath("msg").type(JsonFieldType.STRING).description("응답 메시지"),
                                 fieldWithPath("detailMsg").type(JsonFieldType.STRING).description("상세 메시지"),
-                                fieldWithPath("data").type(JsonFieldType.OBJECT).description("데이터 없음")
+                                fieldWithPath("data.grantType").type(JsonFieldType.STRING).description("토큰 타입"),
+                                fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("액세스 토큰"),
+                                fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("리프레시 토큰"),
+                                fieldWithPath("data.role").type(JsonFieldType.STRING).description("사용자 권한")
                         )
                 ))
                 .andDo(print());
@@ -183,6 +195,31 @@ class AuthControllerTest {
                         requestFields(
                                 fieldWithPath("code").type(JsonFieldType.STRING).description("인증 코드"),
                                 fieldWithPath("newPassword").type(JsonFieldType.STRING).description("새로운 비밀번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("status").type(JsonFieldType.NUMBER).description("응답 상태 코드"),
+                                fieldWithPath("code").type(JsonFieldType.STRING).description("응답 코드"),
+                                fieldWithPath("msg").type(JsonFieldType.STRING).description("응답 메시지"),
+                                fieldWithPath("detailMsg").type(JsonFieldType.STRING).description("상세 메시지"),
+                                fieldWithPath("data").type(JsonFieldType.OBJECT).description("데이터 없음")
+                        )
+                ))
+                .andDo(print());
+    }
+
+    @Test
+    void deleteAccount() throws Exception {
+
+        Mockito.doNothing().when(userService).deleteAccount(any());
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/auth/delete")
+                .header("userId", 1L))
+                .andExpect(status().isOk())
+                .andDo(document("auth/deleteAccount",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestHeaders(
+                                headerWithName("userId").description("Bearer Token")
                         ),
                         responseFields(
                                 fieldWithPath("status").type(JsonFieldType.NUMBER).description("응답 상태 코드"),

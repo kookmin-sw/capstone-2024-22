@@ -16,10 +16,19 @@ public class FcmMessageDto {
     @AllArgsConstructor
     @Getter
     public static class Message {
-        private Notification notification;
+        private Data data;
         private String token;
+//        private Notification notification;
     }
 
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    public static class Data {
+        private String title;
+        private String body;
+        private String image;
+    }
     @Builder
     @AllArgsConstructor
     @Getter

@@ -60,6 +60,8 @@ public class CardViewResponseDTO {
         @Schema(description = "중립")
         private final Float neutral;
 
+        private final Float disgust;
+
         @Schema(description = "질문")
         private final String question;
 
@@ -69,8 +71,10 @@ public class CardViewResponseDTO {
         @Schema(description = "분석 상태")
         private final String recordFileStatus;
 
+        private List<String> imageUrls;
+
         // fromEntity
-        public static GetCardView fromEntity(CardView cardView) {
+        public static GetCardView fromEntity(CardView cardView, List<String> imageUrls) {
             return GetCardView.builder()
                     .Id(cardView.getId())
                     .tripFileId(cardView.getTripFile().getId())
@@ -87,9 +91,11 @@ public class CardViewResponseDTO {
                     .sad(cardView.getSad())
                     .angry(cardView.getAngry())
                     .neutral(cardView.getNeutral())
+                    .disgust(cardView.getDisgust())
                     .question(cardView.getQuestion())
                     .isLoved(cardView.getIsLoved())
                     .recordFileStatus(cardView.getRecordFileStatus())
+                    .imageUrls(imageUrls)
                     .build();
         }
     }

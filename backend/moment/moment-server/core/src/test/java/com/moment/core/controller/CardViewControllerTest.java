@@ -3,6 +3,7 @@ package com.moment.core.controller;
 import com.moment.core.dto.request.CardViewRequestDTO;
 import com.moment.core.dto.response.CardViewResponseDTO;
 import com.moment.core.service.CardViewService;
+import com.moment.core.service.ImageFileService;
 import com.moment.core.service.UserService;
 import io.swagger.v3.core.util.Json;
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,8 @@ class CardViewControllerTest {
     private CardViewService cardViewService;
     @MockBean
     private UserService userService;
+    @MockBean
+    private ImageFileService imageFileService;
 
     @InjectMocks
     private CardViewController cardViewController;
@@ -86,9 +89,11 @@ class CardViewControllerTest {
                 .happy(0.1f)
                 .angry(0.1f)
                 .neutral(0.1f)
+                .disgust(0.1f)
                 .isLoved(true)
                 .sad(0.1f)
                 .recordFileStatus("WAIT")
+                .imageUrls(List.of(""))
                 .question("질문")
                 .build();
 
@@ -140,9 +145,11 @@ class CardViewControllerTest {
                                         fieldWithPath("data.sad").type(JsonFieldType.NUMBER).description("슬픔"),
                                         fieldWithPath("data.angry").type(JsonFieldType.NUMBER).description("화남"),
                                         fieldWithPath("data.neutral").type(JsonFieldType.NUMBER).description("중립"),
+                                        fieldWithPath("data.disgust").type(JsonFieldType.NUMBER).description("혐오"),
                                         fieldWithPath("data.question").type(JsonFieldType.STRING).description("질문"),
                                         fieldWithPath("data.loved").type(JsonFieldType.BOOLEAN).description("즐겨찾기"),
-                                        fieldWithPath("data.recordFileStatus").type(JsonFieldType.STRING).description("분석 상태")
+                                        fieldWithPath("data.recordFileStatus").type(JsonFieldType.STRING).description("분석 상태"),
+                                        fieldWithPath("data.imageUrls").type(JsonFieldType.ARRAY).description("이미지 URL")
                                 )
                         )
                 )
@@ -166,10 +173,12 @@ class CardViewControllerTest {
                 .happy(0.1f)
                 .angry(0.1f)
                 .neutral(0.1f)
+                .disgust(0.1f)
                 .isLoved(true)
                 .sad(0.1f)
                 .recordFileStatus("WAIT")
                 .question("질문")
+                .imageUrls(List.of(""))
                 .build();
 
         CardViewResponseDTO.GetCardView mockResponseDto2 = CardViewResponseDTO.GetCardView.builder()
@@ -186,10 +195,12 @@ class CardViewControllerTest {
                 .happy(0.1f)
                 .angry(0.1f)
                 .neutral(0.1f)
+                .disgust(0.1f)
                 .isLoved(false)
                 .sad(0.1f)
                 .recordFileStatus("WAIT")
                 .question("질문")
+                .imageUrls(List.of(""))
                 .build();
 
         List<CardViewResponseDTO.GetCardView> cardViews = List.of(mockResponseDto1, mockResponseDto2);
@@ -235,9 +246,11 @@ class CardViewControllerTest {
                                         fieldWithPath("data.cardViews[].sad").type(JsonFieldType.NUMBER).description("슬픔"),
                                         fieldWithPath("data.cardViews[].angry").type(JsonFieldType.NUMBER).description("화남"),
                                         fieldWithPath("data.cardViews[].neutral").type(JsonFieldType.NUMBER).description("중립"),
+                                        fieldWithPath("data.cardViews[].disgust").type(JsonFieldType.NUMBER).description("혐오"),
                                         fieldWithPath("data.cardViews[].question").type(JsonFieldType.STRING).description("질문"),
                                         fieldWithPath("data.cardViews[].loved").type(JsonFieldType.BOOLEAN).description("즐겨찾기"),
-                                        fieldWithPath("data.cardViews[].recordFileStatus").type(JsonFieldType.STRING).description("분석 상태")
+                                        fieldWithPath("data.cardViews[].recordFileStatus").type(JsonFieldType.STRING).description("분석 상태"),
+                                        fieldWithPath("data.cardViews[].imageUrls").type(JsonFieldType.ARRAY).description("이미지 URL")
                                 )
                         )
                 )
@@ -376,10 +389,12 @@ class CardViewControllerTest {
                 .happy(0.1f)
                 .angry(0.1f)
                 .neutral(0.1f)
+                .disgust(0.1f)
                 .isLoved(true)
                 .sad(0.1f)
                 .recordFileStatus("WAIT")
                 .question("질문")
+                .imageUrls(List.of(""))
                 .build();
 
         CardViewResponseDTO.GetCardView mockResponseDto2 = CardViewResponseDTO.GetCardView.builder()
@@ -396,10 +411,12 @@ class CardViewControllerTest {
                 .happy(0.1f)
                 .angry(0.1f)
                 .neutral(0.1f)
+                .disgust(0.1f)
                 .isLoved(false)
                 .sad(0.1f)
                 .recordFileStatus("WAIT")
                 .question("질문")
+                .imageUrls(List.of(""))
                 .build();
 
         List<CardViewResponseDTO.GetCardView> cardViews = List.of(mockResponseDto1, mockResponseDto2);
@@ -441,12 +458,17 @@ class CardViewControllerTest {
                                         fieldWithPath("data.cardViews[].sad").type(JsonFieldType.NUMBER).description("슬픔"),
                                         fieldWithPath("data.cardViews[].angry").type(JsonFieldType.NUMBER).description("화남"),
                                         fieldWithPath("data.cardViews[].neutral").type(JsonFieldType.NUMBER).description("중립"),
+                                        fieldWithPath("data.cardViews[].disgust").type(JsonFieldType.NUMBER).description("혐오"),
                                         fieldWithPath("data.cardViews[].question").type(JsonFieldType.STRING).description("질문"),
                                         fieldWithPath("data.cardViews[].loved").type(JsonFieldType.BOOLEAN).description("즐겨찾기"),
-                                        fieldWithPath("data.cardViews[].recordFileStatus").type(JsonFieldType.STRING).description("분석 상태")
+                                        fieldWithPath("data.cardViews[].recordFileStatus").type(JsonFieldType.STRING).description("분석 상태"),
+                                        fieldWithPath("data.cardViews[].imageUrls").type(JsonFieldType.ARRAY).description("이미지 URL")
                                 )
                         )
                 )
                 .andDo(print());
     }
+
+//    @Test
+//    void deleteImages
 }

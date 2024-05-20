@@ -112,6 +112,7 @@ class TripControllerTest {
                         .endDate(LocalDate.now().plusDays(1))
                         .analyzingCount(0)
                         .tripName("test")
+                        .numOfCard(0)
                         .build(),
                 TripResponseDTO.GetTrip.builder()
                         .id(2L)
@@ -119,6 +120,7 @@ class TripControllerTest {
                         .startDate(LocalDate.now())
                         .endDate(LocalDate.now().plusDays(1))
                         .analyzingCount(1)
+                        .numOfCard(2)
                         .tripName("test")
                         .build(),
                 TripResponseDTO.GetTrip.builder()
@@ -127,6 +129,7 @@ class TripControllerTest {
                         .startDate(LocalDate.now())
                         .endDate(LocalDate.now().plusDays(1))
                         .analyzingCount(2)
+                        .numOfCard(2)
                         .tripName("test")
                         .build()
         );
@@ -158,6 +161,7 @@ class TripControllerTest {
                                         fieldWithPath("data.trips[].startDate").attributes(getDateFormat()).description("출발일"),
                                         fieldWithPath("data.trips[].endDate").attributes(getDateFormat()).description("도착일"),
                                         fieldWithPath("data.trips[].analyzingCount").type(JsonFieldType.NUMBER).description("분석 중 파일 개수"),
+                                        fieldWithPath("data.trips[].numOfCard").type(JsonFieldType.NUMBER).description("카드뷰 개수"),
                                         fieldWithPath("data.trips[].tripName").type(JsonFieldType.STRING).description("여행 이름")
                                 )
                         )
@@ -240,5 +244,62 @@ class TripControllerTest {
                 )
                 .andDo(print());
 
+    }
+
+    @Test
+    void getTrip() throws Exception {
+        TripResponseDTO.GetTripSpec trip = TripResponseDTO.GetTripSpec.builder()
+                .id(1L)
+                .email("test")
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusDays(1))
+                .analyzingCount(0)
+                .tripName("test")
+                .numOfCard(0)
+                .happy(0f)
+                .sad(0f)
+                .angry(0f)
+                .neutral(0f)
+                .disgust(0f)
+                .build();
+        Mockito.doNothing().when(userService).validateUserWithTrip(any(Long.class), any(Long.class));
+        Mockito.when(tripService.getTrip(any(Long.class))).thenReturn(trip);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/core/trip/{tripId}", 1L)
+                .header("userId", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(
+                        document("trip/get",
+                                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                                requestHeaders(
+                                        headerWithName("userId").description("Bearer Token")
+                                ),
+                                pathParameters(
+                                        parameterWithName("tripId").description("조회할 여행 ID")
+                                ),
+                                responseFields(
+                                        fieldWithPath("status").type(JsonFieldType.NUMBER).description("응답 상태 코드"),
+                                        fieldWithPath("code").type(JsonFieldType.STRING).description("응답 코드"),
+                                        fieldWithPath("msg").type(JsonFieldType.STRING).description("응답 메시지"),
+                                        fieldWithPath("detailMsg").type(JsonFieldType.STRING).description("상세 메시지"),
+                                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("여행 ID"),
+                                        fieldWithPath("data.email").type(JsonFieldType.STRING).description("유저 email"),
+                                        fieldWithPath("data.startDate").attributes(getDateFormat()).description("출발일"),
+                                        fieldWithPath("data.endDate").attributes(getDateFormat()).description("도착일"),
+                                        fieldWithPath("data.analyzingCount").type(JsonFieldType.NUMBER).description("분석 중 파일 개수"),
+                                        fieldWithPath("data.tripName").type(JsonFieldType.STRING).description("여행 이름"),
+                                        fieldWithPath("data.numOfCard").type(JsonFieldType.NUMBER).description("카드뷰 개수"),
+                                        fieldWithPath("data.happy").type(JsonFieldType.NUMBER).description("행복한 감정 비율"),
+                                        fieldWithPath("data.sad").type(JsonFieldType.NUMBER).description("슬픈 감정 비율"),
+                                        fieldWithPath("data.angry").type(JsonFieldType.NUMBER).description("화난 감정 비율"),
+                                        fieldWithPath("data.neutral").type(JsonFieldType.NUMBER).description("중립적인 감정 비율"),
+                                        fieldWithPath("data.disgust").type(JsonFieldType.NUMBER).description("역겨운 감정 비율")
+                                )
+                        )
+                )
+                .andDo(print());
     }
 }

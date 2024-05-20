@@ -28,12 +28,12 @@ public class TripFile extends BaseEntity {
     private Long id;
 
     // 여행 아이디
-    @ManyToOne
-    @JoinColumn(name = "trip_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "trip_id", nullable = true)
     private Trip trip;
 
     // 유저
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

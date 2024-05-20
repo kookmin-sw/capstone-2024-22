@@ -63,7 +63,8 @@ public class TripFileService {
         List<TripFileResponseDTO.GetTripFile> rtnList = new ArrayList<>();
         List<TripFile> tripFiles = tripFileRepository.findByTrip_IdOrderByYearDate(tripId);
         for (TripFile tripFile : tripFiles) {
-            rtnList.add(TripFileResponseDTO.GetTripFile.fromEntity(tripFile));
+            Integer totalCount = cardViewRepository.findByTripFile(tripFile).size();
+            rtnList.add(TripFileResponseDTO.GetTripFile.fromEntity(tripFile, totalCount));
         }
         return TripFileResponseDTO.GetAllTripFile.builder().tripFiles(rtnList).build();
     }
@@ -78,6 +79,7 @@ public class TripFileService {
                         tripFileRepository.delete(tripFile);
                     } else {
                         tripFile.setTrip(untitledTrip);
+                        untitledTrip.setAnalyzingCount(untitledTrip.getAnalyzingCount() + tripFile.getAnalyzingCount());
                         tripFileRepository.save(tripFile);
                     }
                 }

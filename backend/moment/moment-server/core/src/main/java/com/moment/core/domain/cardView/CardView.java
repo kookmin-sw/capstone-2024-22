@@ -22,7 +22,7 @@ public class CardView extends BaseEntity {
     private Long id;
 
     // tripfile_id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_file_id", nullable = false)
     private TripFile tripFile;
 
@@ -59,7 +59,7 @@ public class CardView extends BaseEntity {
     private String temperature;
 
     // STT
-    @Column(name = "stt")
+    @Column(name = "stt", columnDefinition = "TEXT")
     private String stt;
 
     // happy
@@ -77,6 +77,10 @@ public class CardView extends BaseEntity {
     // neutral
     @Column(name = "neutral")
     private Float neutral;
+
+    // disgust
+    @Column(name = "disgust")
+    private Float disgust;
 
     // 질문
     @Column(name = "question", nullable = false)

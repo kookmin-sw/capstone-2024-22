@@ -2,6 +2,7 @@ package com.moment.core.service;
 
 import com.moment.core.domain.cardView.CardView;
 import com.moment.core.domain.cardView.CardViewRepository;
+import com.moment.core.domain.trip.Trip;
 import com.moment.core.domain.tripFile.TripFile;
 import com.moment.core.domain.user.User;
 import com.moment.core.domain.user.UserRepository;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,18 +32,20 @@ public class CardViewService {
     private final TripService tripService;
     private final TripFileService tripFileService;
     private final ImageFileService imageFileService;
+    private final S3Service s3Service;
 
 
     @Value("${file.path}")
     private String filePath;
 
     @Autowired
-    public CardViewService(CardViewRepository cardViewRepository, UserRepository userRepository, TripService tripService, TripFileService tripFileService, ImageFileService imageFileService) {
+    public CardViewService(CardViewRepository cardViewRepository, UserRepository userRepository, TripService tripService, TripFileService tripFileService, ImageFileService imageFileService, S3Service s3Service) {
         this.cardViewRepository = cardViewRepository;
         this.userRepository = userRepository;
         this.tripService = tripService;
         this.tripFileService = tripFileService;
         this.imageFileService = imageFileService;
+        this.s3Service = s3Service;
     }
 
 
@@ -69,7 +73,7 @@ public class CardViewService {
         String fileName = createFileName(recordFile.getOriginalFilename());
 
         // 로컬 저장소에 파일 저장
-        recordFile.transferTo(new File(getFullPath(fileName)));
+        String url = s3Service.uploadToS3(recordFile, userId, fileName, true);
 
         CardView cardView = CardView.builder()
                 .recordedAt(uploadRecord.getRecordedAt())
@@ -77,13 +81,14 @@ public class CardViewService {
                 .angry(null)
                 .sad(null)
                 .neutral(null)
+                .disgust(null)
                 .stt(null)
                 .isLoved(false)
                 .question(uploadRecord.getQuestion())
                 .location(uploadRecord.getLocation())
                 .recordFileStatus("WAIT")
                 .recordFileLength(length)
-                .recordFileUrl("")
+                .recordFileUrl(url)
                 .recordFileName(fileName)
 //                .user(user)
                 .tripFile(tripFile)
@@ -93,14 +98,15 @@ public class CardViewService {
 
         // tripFile, trip의 analyzingCount 증가
         tripFileService.increaseAnalyzingCount(tripFile);
-        tripService.increaseAnalyzingCount(tripFile.getTrip());
-
-        return CardViewResponseDTO.GetCardView.fromEntity(cardViewRepository.save(cardView));
+        Trip trip = tripFile.getTrip();
+        tripService.increaseAnalyzingCount(trip);
+        List<String> imageUrls = new ArrayList<>();
+        return CardViewResponseDTO.GetCardView.fromEntity(cardViewRepository.save(cardView), imageUrls);
     }
 
     private String createFileName(String originalFilename) {
         String ext = extractExt(originalFilename);
-        String uuid = UUID.randomUUID().toString();
+        String uuid = LocalDateTime.now().toString();
         return uuid + "." + ext;
     }
 
@@ -119,7 +125,8 @@ public class CardViewService {
         List<CardViewResponseDTO.GetCardView> rtnList = new ArrayList<>();
         List<CardView> cardViews = cardViewRepository.findAllByTripFile_IdOrderByRecordedAt(tripFileId);
         for (CardView cardView : cardViews) {
-            rtnList.add(CardViewResponseDTO.GetCardView.fromEntity(cardView));
+            List<String> imageUrls = imageFileService.getImageUrls(cardView);
+            rtnList.add(CardViewResponseDTO.GetCardView.fromEntity(cardView, imageUrls));
         }
         return CardViewResponseDTO.GetAllCardView.builder().cardViews(rtnList).build();
     }
@@ -145,30 +152,36 @@ public class CardViewService {
     @Transactional
     public void deleteRecord(Long cardViewId) {
         CardView cardView = cardViewRepository.findById(cardViewId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카드뷰입니다."));
+        TripFile tripFile = cardView.getTripFile();
+        Trip trip = tripFile.getTrip();
+        User user = tripFile.getUser();
+        String userId = user.getId().toString();
+
         // cardView에 엮인 사진들 먼저 삭제
-        imageFileService.deleteAll(cardView);
-        boolean isAnalyzed = cardView.getRecordFileStatus().equals("WAIT");
+        imageFileService.deleteAll(cardView, userId);
+        s3Service.deleteFile(cardView.getRecordFileName(), userId);
+        boolean isWaiting = cardView.getRecordFileStatus().equals("WAIT");
+        boolean isFail = cardView.getRecordFileStatus().equals("FAIL");
+
         // 만약 tripfile의 Trip이 untitled일 경우
         //     만약 tripfile의 크기가 1이라면 tripFile과 cardView 전부 삭제, untitledTrip의 analyzingCount 감소
-        TripFile tripFile = cardView.getTripFile();
-        if (tripFile.getTrip().getIsNotTitled()) {
+        if (trip.getIsNotTitled()) {
             if (tripFileService.getCardViewCount(tripFile) == 1) {
-                cardViewRepository.delete(cardView);
-                tripFileService.delete(cardView.getTripFile());
-                if (isAnalyzed)
-                    tripService.decreaseAnalyzingCount(cardView.getTripFile().getTrip());
+                tripFileService.delete(tripFile);
+                if (isWaiting || isFail)
+                    tripService.decreaseAnalyzingCount(trip);
             }
         }
         // 만약 tripfile의 trip이 untitled가 아닐경우
         // cardView만 삭제, tripFile의 analyzingCount 감소
         // trip의 analyzingCount 감소
         else {
-            cardViewRepository.delete(cardView);
-            if (isAnalyzed){
-                tripFileService.decreaseAnalyzingCount(cardView.getTripFile());
-                tripService.decreaseAnalyzingCount(cardView.getTripFile().getTrip());
+            if (isWaiting || isFail){
+                tripFileService.decreaseAnalyzingCount(tripFile);
+                tripService.decreaseAnalyzingCount(trip);
             }
         }
+        cardViewRepository.delete(cardView);
     }
 
     public void likeCardView(Long cardViewId) {
@@ -181,7 +194,8 @@ public class CardViewService {
         List<CardViewResponseDTO.GetCardView> rtnList = new ArrayList<>();
         List<CardView> cardViews = cardViewRepository.findByTripFile_User_IdAndIsLovedOrderByRecordedAt(userId, true);
         for (CardView cardView : cardViews) {
-            rtnList.add(CardViewResponseDTO.GetCardView.fromEntity(cardView));
+            List<String> imageUrls = imageFileService.getImageUrls(cardView);
+            rtnList.add(CardViewResponseDTO.GetCardView.fromEntity(cardView, imageUrls));
         }
         return CardViewResponseDTO.GetAllCardView.builder().cardViews(rtnList).build();
     }

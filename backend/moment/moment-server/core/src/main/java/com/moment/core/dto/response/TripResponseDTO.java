@@ -32,8 +32,10 @@ public class TripResponseDTO {
         @Schema(description = "여행 이름")
         private final String tripName;
 
+        private final int numOfCard;
+
         // fromEntity
-        public static GetTrip fromEntity(Trip trip) {
+        public static GetTrip fromEntity(Trip trip, int numOfCard) {
             return GetTrip.builder()
                     .id(trip.getId())
                     .email(trip.getUser().getEmail())
@@ -41,6 +43,7 @@ public class TripResponseDTO {
                     .endDate(trip.getEndDate())
                     .analyzingCount(trip.getAnalyzingCount())
                     .tripName(trip.getTripName())
+                    .numOfCard(numOfCard)
                     .build();
         }
     }
@@ -50,5 +53,50 @@ public class TripResponseDTO {
     @Builder
     public static class GetAllTrip {
         private final List<GetTrip> trips;
+    }
+
+    @Getter
+    @Builder
+    public static class GetTripSpec {
+        private final Long id;
+
+        private final String email;
+
+        private final LocalDate startDate;
+
+        private final LocalDate endDate;
+
+        private final Integer analyzingCount;
+
+        private final String tripName;
+
+        private final int numOfCard;
+
+        private final Float happy;
+
+        private final Float sad;
+
+        private final Float angry;
+
+        private final Float neutral;
+
+        private final Float disgust;
+
+        public static GetTripSpec fromEntity(Trip trip, int numOfCard, Float happy, Float sad, Float angry, Float neutral, Float disgust) {
+            return GetTripSpec.builder()
+                    .id(trip.getId())
+                    .email(trip.getUser().getEmail())
+                    .startDate(trip.getStartDate())
+                    .endDate(trip.getEndDate())
+                    .analyzingCount(trip.getAnalyzingCount())
+                    .tripName(trip.getTripName())
+                    .numOfCard(numOfCard)
+                    .happy(happy)
+                    .sad(sad)
+                    .angry(angry)
+                    .neutral(neutral)
+                    .disgust(disgust)
+                    .build();
+        }
     }
 }
