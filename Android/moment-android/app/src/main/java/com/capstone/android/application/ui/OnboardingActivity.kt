@@ -238,13 +238,7 @@ class OnboardingActivity:ComponentActivity() {
         // 인증코드 요청
         authViewModel.postAuthAuthCodeSuccess.observe(this@OnboardingActivity){ response->
             tokenSharedPreferences.edit().putString("accessToken",response.data.accessToken).apply()
-            if(navController.currentDestination?.route == OnboardingScreen.SignupEmail.name){
-                navController.navigate(OnboardingScreen.SignupNumber.name)
-            }
 
-            if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
-                navController.navigate(OnboardingScreen.FindPasswordNumber.name)
-            }
 
             userId=response.data.userId
         }
@@ -627,6 +621,15 @@ class OnboardingActivity:ComponentActivity() {
                             isSignUp = "true"
                         )
                     )
+                    if(navController.currentDestination?.route == OnboardingScreen.SignupEmail.name){
+                        navController.navigate(OnboardingScreen.SignupNumber.name)
+                    }
+
+                    if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
+                        navController.navigate(OnboardingScreen.FindPasswordNumber.name)
+                    }
+
+                    Toast.makeText(this@OnboardingActivity,"인증번호를 보냈습니다.",Toast.LENGTH_SHORT).show()
 
                 }
             }else{
