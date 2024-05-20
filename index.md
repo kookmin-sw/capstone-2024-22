@@ -1,6 +1,6 @@
 # 목차
 1. [프로젝트 소개](#🛠-프로젝트-소개)
-2. [소개 영상](#소개-영상)
+2. [포스터 및 소개 영상](#포스터-및-소개-영상)
 3. [팀 소개](#👩🏻‍💻-팀-소개)
 4. [사용법](#사용법)
 5. [설계](#설계)
@@ -28,14 +28,20 @@ AI를 활용하여 자동 텍스트 변환, 감정 분석, 기록 아카이빙�
 
 <br><br>
 
-# 소개 영상
+# 포스터 및 소개 영상
+## 포스터
+<img width="600" height="800" src="./src/모먼트.png">
+
+<br>
+
+## 소개 영상
 [![Video Label](http://img.youtube.com/vi/9_Bpa-_iTuk/0.jpg)](https://youtu.be/9_Bpa-_iTuk)
 
 <br><br>
 
 # 설계
 ## **Android 설계**  
-![](./src/Momentandroide.png){: width="100" height="100"}
+<img width="600" height="400" alt="아키텍쳐 설계" src="./src/momentandroide.png">
 
 <br>
 
@@ -97,6 +103,9 @@ AI를 활용하여 자동 텍스트 변환, 감정 분석, 기록 아카이빙�
 - [중간발표](https://drive.google.com/file/d/1ELYTpvr5rwQeEEy5aQ8zkQpWVYD6Tc5h/view?usp=sharing)
 - [중간보고서](https://docs.google.com/document/d/15EEr-d8ANUgzv2IuLtTUmPRXQ-5MzV7M/edit?usp=drive_link&ouid=100333300987560322826&rtpof=true&sd=true)
 - [최종발표](https://drive.google.com/file/d/1NVUngwnnO_g0cqBpgnbIXetWi-n_3aw2/view?usp=sharing)
+- [수행결과보고서](https://drive.google.com/file/d/1Ige8NZsifMVasT25bFnQQ1b8EKNBFPVM/view?usp=sharing)
+- [인쇄용 포스터](https://drive.google.com/file/d/1NlpX4JE9lVlnAaejtYVlCgYRj_xY7Sfm/view?usp=drive_link)
+- [최종보고서]()
 
 <br><br>
 
