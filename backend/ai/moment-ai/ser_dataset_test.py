@@ -24,7 +24,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 #        print(os.path.join(dirname, filename))
 
 DATA_PATH = "./emotion2vec/datas"
-DATA_PATH = os.path.abspath(DATA_PATH)
+# DATA_PATH = os.path.abspath(DATA_PATH)
 
 TESS =  os.path.join(DATA_PATH, "TESS/TESS Toronto emotional speech set data/")
 RAV =  os.path.join(DATA_PATH, "RAVDESS/audio_speech_actors_01-24/")
@@ -294,14 +294,14 @@ AIHUB_df = AIHUB_df.replace({'labels':'happiness'}, 'happy')
 AIHUB_df = AIHUB_df.replace({'labels':'sadness'}, 'sad')
 print(AIHUB_df.labels.value_counts())
 
-# remove fear labels
+# remove labels
 remove_list = ['fear', 'surprise']
 removes = AIHUB_df[AIHUB_df['labels'].str.contains("|".join(remove_list))]
 for i in removes['path']:
     if os.path.exists(i):
         os.remove(i)
 
-AIHUB_df = AIHUB_df[~AIHUB_df.isin(remove_list)]
+AIHUB_df = AIHUB_df[AIHUB_df['labels'].isin(labels)]
 
 print(AIHUB_df.head(10))
 print(AIHUB_df.labels.value_counts())
@@ -321,7 +321,7 @@ TOTAL_df = pd.concat([TOTAL_df, AIHUB_df])
 
 print(TOTAL_df.labels.value_counts())
 
-TOTAL_df.to_csv(os.path.join(DATA_PATH, "DATASETS.csv"))
+TOTAL_df.to_csv(os.path.join(DATA_PATH, "SER_DATASETS.csv"))
 
 
 # ---------------------------------------------------------------------------------------------------------------------------

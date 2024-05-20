@@ -1,5 +1,28 @@
+# from funasr import AutoModel
+# from pydub import AudioSegment
+# import librosa
+# import soundfile
+# import numpy as np
+
+# audio_path = './source/test.mp4'
+# audio = AudioSegment.from_file(audio_path)
+# # sampling rates, channel 변경
+# if audio.frame_rate != 16000:
+#     print(f"sample rate changed : {audio.frame_rate} -> {16000}")
+#     audio = audio.set_frame_rate(16000)
+    
+# if audio.channels != 1:
+#     print(f"channel changed : {audio.channels} -> {1}")
+#     audio = audio.set_channels(1)
+# audioseg = np.array(audio.get_array_of_samples())
+# libro, sr = librosa.load(audio_path, sr=16000, mono=False)
+# print(audioseg.shape)
+# print(libro.shape)
+
 from funasr import AutoModel
 from pydub import AudioSegment
+import subprocess, torch
+import numpy as np
 
 
 # # MP4 파일 로드
@@ -8,6 +31,7 @@ from pydub import AudioSegment
 # # WAV 파일로 저장
 # audio.export("source/test.wav", format="wav")
 
+from emotion2vec.iemocap_downstream.model import BaseModel
 
 '''
 Using the finetuned emotion recognization model
@@ -26,10 +50,28 @@ rec_result contains {'feats', 'labels', 'scores'}
     7: surprised
     8: unknown
 '''
+
 model = AutoModel(model="iic/emotion2vec_base_finetuned", model_revision="v2.0.4")
-wav_file = f"/Users/taejinpark/Desktop/moment-ai/source/test3.wav"
-rec_result = model.generate(wav_file, output_dir="./outputs", granularity="utterance", extract_embedding=False)
+ser_classifer_dir = "./emotion2vec/emotion2vec_classifier.pth"
+source_file = f"./source/test.m4a"
+wav_file = f"./source/test20.wav"
+command = f"ffmpeg -i {source_file} -ab 160k -ac 1 -ar 16000 -vn {wav_file}"
+subprocess.call(command, shell=True)
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+model.model.proj = BaseModel()
+params = torch.load(ser_classifer_dir, map_location=device)
+print(params)
+model.model.proj.load_state_dict(params)
+model.kwargs['device'] = device
+model.model.to(device)
+print(model.model)
+rec_result = model.generate(wav_file, output_dir="./outputs", granularity="utterance", extract_embedding=False)[0]
 print(rec_result)
+
+print(rec_result['scores'])
+scores = np.array(rec_result['scores'], dtype=np.float64)
+print(rec_result['labels'][np.argmax(scores)])
 
 
 

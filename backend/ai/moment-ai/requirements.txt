@@ -1,5 +1,7 @@
 numba
+boto3
 numpy
+pandas
 torch
 tqdm
 more-itertools

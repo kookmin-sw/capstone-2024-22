@@ -1,12 +1,14 @@
 from flask import Flask, request, jsonify
-
+import os
 import test
 import py_eureka_client.eureka_client as eureka_client
 
+
 rest_port = 5000
-eureka_client.init(eureka_server="http://localhost:8761/eureka",
+instance_ip = "15.164.139.204"
+eureka_client.init(eureka_server="http://wasuphj.synology.me:8761/eureka",
                     app_name="ai-service",
-                    instance_host="localhost",
+                    instance_host=instance_ip,
                     instance_port=rest_port)
 
 app = Flask(__name__)
@@ -24,7 +26,17 @@ def ai_server_run():
     if file_name is None:
         return jsonify({"error": "'file_name' parameter is missing."}), 400
 
-    result = test.main(file_name)
+    # # for naive demo, for real demo delete output and change result
+    # output = dict()
+    # output["text"] = "안녕하세요"
+    # output["emotions"] = {"sad": 75.3, "happy": 4.7, "angry": 7.1, "neutral": 12.9}
+    # output["status"] = "200"
+    # output["error"] = None
+    # output["file_name"] = file_name
+    # output["file_path"] = file_path
+    # return jsonify(output)
+    
+    result = test.main(file_name=file_name, file_path=file_path)
     return jsonify(result)
 
 if __name__ == '__main__':
