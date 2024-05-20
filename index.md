@@ -64,20 +64,20 @@ AI를 활용하여 자동 텍스트 변환, 감정 분석, 기록 아카이빙�
 <br><br>
 
 # 👩🏻‍💻 팀 소개
-🖥 **Frontend**
+🖥 **Frontend** <br>
 |이름|역할|개발스택|
 |-------|-------|-----|    
 |양시관|iOS|<img src="https://img.shields.io/badge/ios-%23000000.svg?&style=for-the-badge&logo=ios&logoColor=white" /> <img src="https://img.shields.io/badge/uikit-%232396F3.svg?&style=for-the-badge&logo=uikit&logoColor=white" /> <img src="https://img.shields.io/badge/swift-%23FA7343.svg?&style=for-the-badge&logo=swift&logoColor=white" />|  
 |김민중|Android|<img src="https://img.shields.io/badge/android-%233DDC84.svg?&style=for-the-badge&logo=android&logoColor=black" /> <img src="https://img.shields.io/badge/kotlin-%230095D5.svg?&style=for-the-badge&logo=kotlin&logoColor=white" />|  
 |홍서현|Android|<img src="https://img.shields.io/badge/android-%233DDC84.svg?&style=for-the-badge&logo=android&logoColor=black" /> <img src="https://img.shields.io/badge/kotlin-%230095D5.svg?&style=for-the-badge&logo=kotlin&logoColor=white" />|    
 
-🖥 **Backend**
+🖥 **Backend** <br>
 |이름|역할|개발스택|
 |-------|-------|-----|    
 |김재용|Server|<img src="https://img.shields.io/badge/spring-%236DB33F.svg?&style=for-the-badge&logo=spring&logoColor=white" /> <img src="https://img.shields.io/badge/mysql-%234479A1.svg?&style=for-the-badge&logo=mysql&logoColor=white" /> <img src="https://img.shields.io/badge/docker-%232496ED.svg?&style=for-the-badge&logo=docker&logoColor=white" /> <img src="https://img.shields.io/badge/json%20web%20tokens-%23000000.svg?&style=for-the-badge&logo=json%20web%20tokens&logoColor=white" />|  
 |박태진|AI|<img src="https://img.shields.io/badge/tensorflow-%23FF6F00.svg?&style=for-the-badge&logo=tensorflow&logoColor=white" /> <img src="https://img.shields.io/badge/pytorch-%23EE4C2C.svg?&style=for-the-badge&logo=pytorch&logoColor=white" /> <img src="https://img.shields.io/badge/flask-%23000000.svg?&style=for-the-badge&logo=flask&logoColor=white" />|  
 
-🖥 **Communication**
+🖥 **Communication** <br>
 |역할|종류|
 |-------|-------|    
 |협업관리|<img src="https://img.shields.io/badge/notion-%23000000.svg?&style=for-the-badge&logo=notion&logoColor=white" />|
