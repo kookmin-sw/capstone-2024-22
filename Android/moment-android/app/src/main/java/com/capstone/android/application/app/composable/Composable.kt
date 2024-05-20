@@ -316,37 +316,38 @@ fun FancyProgressBar(
                     )
             )
 
-            Box(modifier = Modifier
-                .layoutId("indicator")
-                .offset { IntOffset(offsetX.value.roundToInt(), 0) }
-                .width(5.dp)
-                .background(shape = RoundedCornerShape(5.dp), color = indicatorColor)
-                .pointerInput(Unit) {
-                    detectDragGestures(onDragEnd = { onDragEnd(guidelinePercentage.value) }) { change, dragAmount ->
-                        change.consume()
-                        offsetX.value = (offsetX.value + dragAmount.x)
-                            .coerceIn(0f, progressBarWidthInDp.value.value)
-                        onDrag(guidelinePercentage.value)
-                    }
+            Box(
+                modifier = Modifier
+                    .layoutId("indicator")
+                    .offset { IntOffset(offsetX.value.roundToInt(), 0) }
+                    .width(5.dp)
+                    .background(shape = RoundedCornerShape(5.dp), color = indicatorColor)
+                    .pointerInput(Unit) {
+                        detectDragGestures(onDragEnd = { onDragEnd(guidelinePercentage.value) }) { change, dragAmount ->
+                            change.consume()
+                            offsetX.value = (offsetX.value + dragAmount.x)
+                                .coerceIn(0f, progressBarWidthInDp.value.value)
+                            onDrag(guidelinePercentage.value)
+                        }
 
-                }
+                    }
             )
             Log.d("ewagwe",guidelinePercentage.value.toString())
-            Text(
-                text = "${String.format("%.0f", guidelinePercentage.value * 100)}%",
-                modifier = Modifier
-                    .layoutId("leftPercentage")
-                    .offset(y = animation.value),
-                style = textStyle
-            )
-
-            Text(
-                text = "${String.format("%.0f", (1 - guidelinePercentage.value) * 100)}%",
-                modifier = Modifier
-                    .layoutId("rightPercentage")
-                    .offset(y = animation.value),
-                style = textStyle
-            )
+//            Text(
+//                text = "${String.format("%.0f", guidelinePercentage.value * 100)}%",
+//                modifier = Modifier
+//                    .layoutId("leftPercentage")
+//                    .offset(y = animation.value),
+//                style = textStyle
+//            )
+//
+//            Text(
+//                text = "${String.format("%.0f", (1 - guidelinePercentage.value) * 100)}%",
+//                modifier = Modifier
+//                    .layoutId("rightPercentage")
+//                    .offset(y = animation.value),
+//                style = textStyle
+//            )
 
         }
     }
@@ -399,6 +400,7 @@ fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String
                                 fontSize = 15.sp,
                                 color = if(tripName.value.isNotEmpty() && startDate.value!="츨발 날짜" && endDate.value!="도착 날짜") Color.Black else Color("#938F8F".toColorInt())
                             )
+
                             Spacer(modifier = Modifier.width(40.dp))
                         }
 
@@ -426,6 +428,22 @@ fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String
                         modifier = Modifier.fillMaxWidth(),
                         color = Color("#706969".toColorInt()),
                         thickness = 2.dp
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = "· 새로운 여행은 이미 만들어진 여행의 날짜를 포함 할 수 없어요.",
+                        color = Color("#938F8F".toColorInt()),
+                        fontFamily = FontMoment.preStandardFont,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 11.sp
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "· 마지막으로 출발 날짜와 도착 날짜가 정확한지 한번 더 확인해봐요",
+                        color = Color("#938F8F".toColorInt()),
+                        fontFamily = FontMoment.preStandardFont,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 11.sp
                     )
                     Spacer(modifier = Modifier.height(60.dp))
                     TextField(
