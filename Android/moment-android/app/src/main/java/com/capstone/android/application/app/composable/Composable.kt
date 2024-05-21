@@ -454,8 +454,7 @@ fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String
                         ),
                         modifier = Modifier.fillMaxWidth(),
                         value = tripName.value, onValueChange = {
-                            tripName.value = it
-                            Log.d("awegwagwea",it.toString())
+                            if (it.length <= 13) tripName.value = it
                                                                 },
                         colors = TextFieldDefaults.textFieldColors(
                             backgroundColor = Color.Transparent,
@@ -470,7 +469,8 @@ fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String
                                 color = Color("#E7E6E6".toColorInt()),
                                 fontSize = 16.sp
                             )
-                        }
+                        },
+                        maxLines = 2
                     )
                     Spacer(modifier = Modifier.height(32.dp))
                     Row {
