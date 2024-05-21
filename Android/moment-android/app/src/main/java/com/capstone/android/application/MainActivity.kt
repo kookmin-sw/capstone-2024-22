@@ -851,6 +851,22 @@ class MainActivity : ComponentActivity() {
                                             }
 
                                         "Favorite" -> " "
+                                        MainScreen.RecordDaily.screenRoute -> {
+                                            Column(Modifier.clickable {
+                                                navController.navigate(
+                                                    BottomNavItem.Home.screenRoute
+                                                ){
+                                                    popUpTo(BottomNavItem.Home.screenRoute) { inclusive = true }
+                                                }
+                                            }) {
+                                                Text(
+                                                    text = "뒤로",
+                                                    fontFamily = FontMoment.obangFont,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 15.sp
+                                                )
+                                            }
+                                        }
                                         "Setting" -> " "
                                         else -> null
                                     }
