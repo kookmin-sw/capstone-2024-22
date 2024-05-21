@@ -476,6 +476,7 @@ class ReciptActivity : ComponentActivity() {
     @Composable
     fun MakeTripChoice(tripList: MutableList<ReceiptTrip>, mainIntent: Intent)
     {
+        val emptyTrip = remember{ mutableStateOf(true) }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -505,7 +506,7 @@ class ReciptActivity : ComponentActivity() {
                 }
 
                 
-                if (tripList.size == 0){
+                if (emptyTrip.value){
                     Column(Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center) {
@@ -525,6 +526,9 @@ class ReciptActivity : ComponentActivity() {
                                 if(tripList[index].analyzingCount==0 &&
                                     isDatePassed(LocalDate.parse(tripList[index].endDate)) &&
                                     tripList[index].numOfCard != 0 ){
+
+                                    emptyTrip.value = false
+
                                     ItemTrip(
                                         Trip(id=tripList[index].id,
                                             tripName = tripList[index].tripName,
