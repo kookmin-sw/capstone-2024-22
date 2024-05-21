@@ -431,7 +431,7 @@ fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = "· 새로운 여행은 이미 만들어진 여행의 날짜를 포함 할 수 없어요.",
+                        text = "· 새로운 여행은 이미 만들어진 여행의 날짜를 포함 할 수 없어요",
                         color = Color("#938F8F".toColorInt()),
                         fontFamily = FontMoment.preStandardFont,
                         fontWeight = FontWeight.Medium,
