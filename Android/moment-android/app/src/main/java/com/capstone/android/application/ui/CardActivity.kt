@@ -653,7 +653,7 @@ class CardActivity : ComponentActivity() {
                                             )
                                             Spacer(modifier = Modifier.width(16.dp))
                                             Text(
-                                                text = cardItems[index].cardView.recordFileName.split('T').first(),
+                                                text = cardItems[index].cardView.recordedAt.split('T').last().split(':').slice(IntRange(0,1)).joinToString(separator = ":"),
                                                 fontFamily = FontMoment.preStandardFont,
                                                 fontWeight = FontWeight.ExtraBold,
                                                 fontSize = 14.sp
