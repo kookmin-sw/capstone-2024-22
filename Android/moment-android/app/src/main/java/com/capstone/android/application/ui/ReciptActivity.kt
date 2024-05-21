@@ -1133,7 +1133,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 470.dp, start = 28.dp, end = 10.dp),
+                    .padding(top = 488.dp, start = 28.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 P_Medium14(content = receiptcontent.tripName, color = black)
@@ -1753,7 +1753,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 470.dp, start = 28.dp, end = 10.dp),
+                    .padding(top = 488.dp, start = 28.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 receiptcontent.tripName?.let { P_Medium14(content = it, color = black)
