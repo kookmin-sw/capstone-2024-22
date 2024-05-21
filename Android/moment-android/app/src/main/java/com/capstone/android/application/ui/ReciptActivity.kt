@@ -878,7 +878,7 @@ class ReciptActivity : ComponentActivity() {
                         onValueChanged = { intro.value = it },
                         text = intro,
                         keyboardType = KeyboardType.Text,
-                        textcolor = neutral_500,
+                        textcolor = black,
                         fontweight = FontWeight.Medium,
                         fontsize = 14.sp,
                         type = "intro"
@@ -1118,7 +1118,7 @@ class ReciptActivity : ComponentActivity() {
                         onValueChanged = { intro.value = it },
                         text = it,
                         keyboardType = KeyboardType.Text,
-                        textcolor = neutral_500,
+                        textcolor = black,
                         fontweight = FontWeight.Medium,
                         fontsize = 14.sp,
                         type = "intro"
@@ -1549,7 +1549,7 @@ class ReciptActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    receiptcontent.intro?.let { P_Medium14(content = it, color = neutral_500)
+                    receiptcontent.intro?.let { P_Medium14(content = it, color = black)
                     }?: P_Medium14(content = "", color = white)
                 }
             }
@@ -1742,7 +1742,7 @@ class ReciptActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(top = 21.dp, start = 36.dp)
             ) {
-                receiptcontent.intro?.let { P_Medium14(content = it, color = neutral_500)
+                receiptcontent.intro?.let { P_Medium14(content = it, color = black)
                 }?: P_Medium14(content = "", color = white)
             }
 

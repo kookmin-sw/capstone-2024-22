@@ -2714,7 +2714,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    P_Medium(receiptAll.oneLineMemo,neutral_500, 5.sp)
+                    P_Medium(receiptAll.oneLineMemo,black, 5.sp)
 
                 }
             }
@@ -2925,7 +2925,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 Column( modifier = Modifier
                     .padding(start = 4.dp)) {
-                    P_Medium(content = receiptAll.oneLineMemo, color = neutral_500, 5.sp)
+                    P_Medium(content = receiptAll.oneLineMemo, color = black, 5.sp)
                 }
                 Spacer(modifier = Modifier.height(2.dp))
                 Divider(color = primary_500, thickness = 1.dp)
