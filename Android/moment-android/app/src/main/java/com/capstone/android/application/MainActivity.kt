@@ -1071,15 +1071,23 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }else{
-                        Text(
-                            modifier = Modifier.clickable {
-                                tripFileViewModel.getTripFileUntitled()
-                                navController.navigate(MainScreen.RecordDaily.screenRoute)
-                            },
-                            text = "일상기록",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable {
+                                    tripFileViewModel.getTripFileUntitled()
+                                    navController.navigate(MainScreen.RecordDaily.screenRoute)
+                                },
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = "일상기록",
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+
                     }
 
                 }
@@ -1367,9 +1375,9 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier
                     .clip(RectangleShape)
                     .border(
-                        width = if (type !=TripType.COMMON) 1.dp else 0.dp, // 너비 5dp
+                        width = if (type != TripType.COMMON) 1.dp else 0.dp, // 너비 5dp
                         color = if (type == TripType.ANALYZING) Color.Black
-                        else if(type==TripType.BOTH || type==TripType.TRAVELING) Color("#99342E".toColorInt()) else Color.White, // 색상 파란색
+                        else if (type == TripType.BOTH || type == TripType.TRAVELING) Color("#99342E".toColorInt()) else Color.White, // 색상 파란색
                         shape = RoundedCornerShape(4.dp) // 네모 모양
                     )
                     .padding(start = 16.dp)
@@ -1525,7 +1533,8 @@ class MainActivity : ComponentActivity() {
                             IntOffset(
                                 (-state
                                     .requireOffset() + endActionSizePx)
-                                    .roundToInt(), 0)
+                                    .roundToInt(), 0
+                            )
                         } ,
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
@@ -1767,12 +1776,15 @@ class MainActivity : ComponentActivity() {
                     }) {
 
                     if(checkState.value){
-                        Column(Modifier
-                            .height(244.dp)
-                            .fillMaxWidth()
-                            .background(color = neutral_500,
-                                shape = RoundedCornerShape(2.dp))
-                            .alpha(0.5f)) {
+                        Column(
+                            Modifier
+                                .height(244.dp)
+                                .fillMaxWidth()
+                                .background(
+                                    color = neutral_500,
+                                    shape = RoundedCornerShape(2.dp)
+                                )
+                                .alpha(0.5f)) {
                             if(item.receiptThemeType == "A") MiniTheme1(item)
                             else MiniTheme2(item)
                         }
@@ -2003,28 +2015,28 @@ class MainActivity : ComponentActivity() {
                          Spacer(modifier = Modifier.width(46.dp))
                         Image(
                             modifier = Modifier
-                            .size(50.dp)
-                            .clickable {
-                                if (!momentPermission.checkPermission()) {
-                                    momentPermission.requestPermission()
-                                } else {
-                                    isRecording.value = true
-                                    Log.d("awegewagaew","${isRecording.value}")
-                                    if (timerJob.isActive) {
-                                        isPasused.value = !isPasused.value
-
+                                .size(50.dp)
+                                .clickable {
+                                    if (!momentPermission.checkPermission()) {
+                                        momentPermission.requestPermission()
                                     } else {
-                                        File(cacheDir, "audio.mp3").also {
-                                            recorder.start(it)
-                                            audioFile = it
+                                        isRecording.value = true
+                                        Log.d("awegewagaew", "${isRecording.value}")
+                                        if (timerJob.isActive) {
+                                            isPasused.value = !isPasused.value
+
+                                        } else {
+                                            File(cacheDir, "audio.mp3").also {
+                                                recorder.start(it)
+                                                audioFile = it
+                                            }
+                                            timerJob.start()
+
                                         }
-                                        timerJob.start()
-
                                     }
-                                }
 
 
-                            },
+                                },
                             painter =  if(!isRecording.value) painterResource(R.drawable.ic_record_ing) else painterResource(R.drawable.ic_ellipse),
                             contentDescription = "record")
                         Spacer(modifier = Modifier.width(46.dp))
