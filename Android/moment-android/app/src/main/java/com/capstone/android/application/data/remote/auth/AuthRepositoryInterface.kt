@@ -8,6 +8,7 @@ import com.capstone.android.application.data.remote.auth.login.response.PostAuth
 import com.capstone.android.application.domain.response.ApiResponse
 import com.capstone.android.application.domain.response.MomentResponse
 import com.capstone.android.application.domain.response.auth.AuthResponse
+import retrofit2.http.DELETE
 
 interface AuthRepositoryInterface {
 
@@ -25,5 +26,7 @@ interface AuthRepositoryInterface {
     suspend fun patchAuthAuthCodeConfirm(
         body : PatchAuthAuthCodeConfirmRequest
     ) : ApiResponse<AuthResponse>
+
+    suspend fun deleteAuth():ApiResponse<MomentResponse>
 
 }

@@ -29,9 +29,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -85,7 +83,6 @@ import com.capstone.android.application.ui.theme.CountText
 import com.capstone.android.application.ui.theme.FontMoment
 import com.capstone.android.application.ui.theme.ImgBackButton
 import com.capstone.android.application.ui.theme.P_Bold30
-import com.capstone.android.application.ui.theme.P_ExtraBold16
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
 import com.capstone.android.application.ui.theme.P_Medium18
@@ -102,7 +99,6 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 enum class OnboardingScreen(){
     Login,
@@ -241,6 +237,7 @@ class OnboardingActivity:ComponentActivity() {
 
 
             userId=response.data.userId
+            MyFirebaseMessaging()
         }
 
         // 인증코드 요청 실패
@@ -847,7 +844,8 @@ class OnboardingActivity:ComponentActivity() {
                     Row(modifier = Modifier
                         .width(86.dp)
                         .align(Alignment.End)
-                        .clickable { countViewModel.restartCountdown()
+                        .clickable {
+                            countViewModel.restartCountdown()
                             authViewModel.postAuthAuthCode(
                                 body = PostAuthAuthCodeRequest(
                                     email = email.value,
@@ -1068,7 +1066,11 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(bottom = 45.dp)
             ) {
                 BigButton("시작하기", true) {
-                    startActivity(Intent(this@OnboardingActivity,MainActivity::class.java))
+                    val intent = Intent(this@OnboardingActivity,MainActivity::class.java)
+                    intent.flags =
+                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP //액티비티 스택제거
+
+                    startActivity(intent)
                     finish()
                 }
             }

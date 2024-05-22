@@ -54,6 +54,14 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
         MutableLiveData<ApiResponse.Error<Exception>>()
     }
 
+    val deleteAuthSuccess:MutableLiveData<MomentResponse> by lazy {
+        MutableLiveData<MomentResponse>()
+    }
+
+    val deleteAuthFailure : MutableLiveData<ApiResponse.Error<Exception>> by lazy {
+        MutableLiveData<ApiResponse.Error<Exception>>()
+    }
+
 
 
     fun postAuthLogin(
@@ -218,6 +226,49 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
 
             }
 
+        }
+    }
+
+    fun deleteAuth(){
+        viewModelScope.launch {
+            try {
+                val response = authRepository.deleteAuth()
+
+
+                if(response is ApiResponse.Success){
+                    deleteAuthSuccess.value = response.data
+                }else{
+                    postAuthLoginFailure.postValue(ApiResponse.Error(exception = java.lang.Exception()))
+
+//                    val error = (data.body() as MomentNetworkError)
+//                    authFailure.value=MomentNetworkError(
+//                        errors =
+//                    )
+                }
+
+
+            } catch (e: HttpException) {
+
+                // Handle specific HTTP error codes
+                when (e.code()) {
+                    400 -> {
+                        deleteAuthFailure.postValue(ApiResponse.Error(exception = e))
+                    }
+                    // Handle other error codes
+                }
+            } catch (e: IOException) {
+
+                deleteAuthFailure.postValue(ApiResponse.Error(exception = e))
+
+
+                // Handle network-related errors
+//                throw NetworkException("Network error occurred", e)
+            } catch (e: Exception) {
+
+                deleteAuthFailure.postValue(ApiResponse.Error(exception = e))
+
+                // Handle other generic exceptions
+            }
         }
     }
 }

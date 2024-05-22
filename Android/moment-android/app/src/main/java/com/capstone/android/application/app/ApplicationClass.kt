@@ -36,6 +36,7 @@ class ApplicationClass: Application() {
         var tripName:String = ""
         var transactionId:String=""
         val openWeartherAppId:String = "750af8c3ad235147ce30452e8242d76f"
+        val versionName:String = "1.2.0"
     }
 
 

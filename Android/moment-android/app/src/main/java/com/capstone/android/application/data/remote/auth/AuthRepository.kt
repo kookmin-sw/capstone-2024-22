@@ -43,4 +43,8 @@ class AuthRepository @Inject constructor(private val authRetrofitInterface: Auth
         )
 
     }
+
+    override suspend fun deleteAuth(): ApiResponse<MomentResponse> {
+        return authRetrofitInterface.deleteAuth()
+    }
 }

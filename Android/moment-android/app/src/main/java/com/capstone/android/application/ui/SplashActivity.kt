@@ -46,6 +46,7 @@ import androidx.navigation.compose.rememberNavController
 import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
 import com.capstone.android.application.app.ApplicationClass.Companion.tokenSharedPreferences
+import com.capstone.android.application.app.utile.permission.MomentPermission
 import com.capstone.android.application.ui.theme.BigButton
 import com.capstone.android.application.ui.theme.P_Bold
 import com.capstone.android.application.ui.theme.PretendardFamily
@@ -58,6 +59,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
 enum class SplashScreen(){
@@ -68,9 +70,13 @@ enum class SplashScreen(){
 @AndroidEntryPoint
 class SplashActivity:ComponentActivity() {
     lateinit var navController: NavHostController
+    @Inject lateinit var momentPermission: MomentPermission
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if(!tokenSharedPreferences.getString("accessToken","").isNullOrEmpty()){
+            if(!momentPermission.checkPermission()){
+                momentPermission.requestPermission()
+            }
             startActivity(Intent(this@SplashActivity,MainActivity::class.java))
             finish()
         }

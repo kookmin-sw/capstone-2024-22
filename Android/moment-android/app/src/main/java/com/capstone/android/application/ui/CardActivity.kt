@@ -86,7 +86,9 @@ import com.capstone.android.application.app.composable.convertUrlLinkStringToRco
 import com.capstone.android.application.app.utile.MomentPath
 import com.capstone.android.application.app.utile.common.GetWeatherIconDrawableCode
 import com.capstone.android.application.app.utile.loading.GlobalLoadingDialog
+import com.capstone.android.application.app.utile.loading.LinearDeterminateIndicator
 import com.capstone.android.application.app.utile.loading.LoadingState
+import com.capstone.android.application.app.utile.loading.loadProgress
 import com.capstone.android.application.app.utile.recorder.MomentAudioPlayer
 import com.capstone.android.application.app.utile.recorder.MomentAudioRecorder
 import com.capstone.android.application.domain.Card
@@ -95,7 +97,9 @@ import com.capstone.android.application.presentation.CardViewModel
 import com.capstone.android.application.presentation.DownloadLinkViewModel
 import com.capstone.android.application.ui.theme.FontMoment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -303,7 +307,8 @@ class CardActivity : ComponentActivity() {
                             Card(
                                 cardView = cardView,
                                 uploadImage = ArrayList<File>(),
-                                imageNum = mutableStateOf(0)
+                                imageNum = mutableStateOf(0),
+                                recordingFile = File(MomentPath.RECORDER_PATH+convertUrlLinkStringToRcorderNameString(cardView.recordFileUrl))
                             ).apply {
                                 this.isFavorite.value = cardView.loved
                             }
@@ -471,6 +476,9 @@ class CardActivity : ComponentActivity() {
         @OptIn(ExperimentalGlideComposeApi::class)
         @Composable
         fun Main(isEdit: MutableState<Boolean>, cardItems: MutableList<Card>, emotionList:MutableList<Emotion>) {
+            var currentProgress = remember { mutableStateOf(0f) }
+            var loading = remember { mutableStateOf(false) }
+            val scope = rememberCoroutineScope() // Create a coroutine scope
             var expanded = remember { mutableStateOf(true) }
 
             val imageList = mutableStateListOf<File>()
@@ -549,7 +557,7 @@ class CardActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(end = 16.dp),
-                        text = ApplicationClass.tripName,
+                        text = if(tripFileListIndex!=-2) ApplicationClass.tripName+" ${tripFileListIndex+1}일차" else "일상기록",
                         textAlign = TextAlign.End,
                         fontSize = 22.sp,
                         fontFamily = FontMoment.preStandardFont,
@@ -565,295 +573,308 @@ class CardActivity : ComponentActivity() {
 
 
 
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(horizontal = if (isEdit.value) 0.dp else 20.dp)
-                ) {
-                    items(cardItems.size) { index ->
-                        Spacer(modifier = Modifier.height(20.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (isEdit.value) {
-                                Spacer(modifier = Modifier.width(40.dp))
-                                Image(
-                                    modifier = Modifier
-                                        .clickable {
+                if(cardItems.isNullOrEmpty()){
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = "오늘은 기록이 없어요\n기록으로만 묶어두긴 아까운 날도 있죠",
+                            color = Color("#C3C1C1".toColorInt()),
+                            fontSize = 14.sp,
+                            fontFamily = FontMoment.preStandardFont,
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
 
-                                            cardItems[index].isDelete.value =
-                                                !cardItems[index].isDelete.value
-                                            if (!cardItems[index].isDelete.value) {
-                                                cardItems.forEach {
-                                                    it.isDelete.value = false
-                                                }
-                                            }
-                                        },
-                                    painter = painterResource(id = if (cardItems[index].isDelete.value) R.drawable.ic_box_check else R.drawable.ic_box_uncheck),
-                                    contentDescription = ""
-                                )
-                                Spacer(modifier = Modifier.width(20.dp))
-                            }
-                            Column(
-                                verticalArrangement = Arrangement.Top,
-                                horizontalAlignment = Alignment1.CenterHorizontally,
-                                modifier = Modifier
-                                    .border(
-                                        border = BorderStroke(
-                                            width = 1.dp,
-                                            color = Color("#C3C8BC".toColorInt())
-                                        ), shape = RoundedCornerShape(4.dp)
-                                    )
-                                    .animateContentSize()
-                                    .fillMaxWidth()
-                                    .clickable(
-                                        interactionSource = remember { MutableInteractionSource() },
-                                        indication = null
-                                    ) {
-                                        cardItems[index].isExpand.value =
-                                            !cardItems[index].isExpand.value
-                                        momentAudioPlayer.stop()
-                                    }
-
+                }else{
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(horizontal = if (isEdit.value) 0.dp else 20.dp)
+                    ) {
+                        items(cardItems.size) { index ->
+                            Spacer(modifier = Modifier.height(20.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Spacer(modifier = Modifier.height(22.dp))
-                                Column() {
-                                    Row(
-                                        modifier = Modifier.padding(
-                                            horizontal = 24.dp,
-                                            vertical = 12.dp
+                                if (isEdit.value) {
+                                    Spacer(modifier = Modifier.width(40.dp))
+                                    Image(
+                                        modifier = Modifier
+                                            .clickable {
+
+                                                cardItems[index].isDelete.value =
+                                                    !cardItems[index].isDelete.value
+                                                if (!cardItems[index].isDelete.value) {
+                                                    cardItems.forEach {
+                                                        it.isDelete.value = false
+                                                    }
+                                                }
+                                            },
+                                        painter = painterResource(id = if (cardItems[index].isDelete.value) R.drawable.ic_box_check else R.drawable.ic_box_uncheck),
+                                        contentDescription = ""
+                                    )
+                                    Spacer(modifier = Modifier.width(20.dp))
+                                }
+                                Column(
+                                    verticalArrangement = Arrangement.Top,
+                                    horizontalAlignment = Alignment1.CenterHorizontally,
+                                    modifier = Modifier
+                                        .border(
+                                            border = BorderStroke(
+                                                width = 1.dp,
+                                                color = Color("#C3C8BC".toColorInt())
+                                            ), shape = RoundedCornerShape(4.dp)
                                         )
-                                    ) {
-                                        Image(
-                                            modifier = Modifier
-                                                .clickable {
-                                                    cardItems[index].isFavorite.value =
-                                                        !cardItems[index].isFavorite.value
-                                                    cardViewModel.putCardLike(
-                                                        cardViewId = cardItems[index].cardView.id
-                                                    )
-                                                },
-                                            painter = painterResource(id = if (cardItems[index].isFavorite.value) R.drawable.ic_heart_red else R.drawable.ic_heart_white),
-                                            contentDescription = ""
-                                        )
-                                        Spacer(modifier = Modifier.width(16.dp))
-                                        Text(
-                                            text = cardItems[index].cardView.recordFileName.split('T').first(),
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            fontSize = 14.sp
-                                        )
-                                        Spacer(modifier = Modifier.weight(1f))
-                                        Row {
+                                        .animateContentSize()
+                                        .fillMaxWidth()
+                                        .clickable(
+                                            interactionSource = remember { MutableInteractionSource() },
+                                            indication = null
+                                        ) {
+                                            cardItems[index].isExpand.value =
+                                                !cardItems[index].isExpand.value
+                                            momentAudioPlayer.stop()
+                                            cardItems[index].recordingFile?.let {
+                                                momentAudioPlayer.playFile(
+                                                    it
+                                                )
+                                            }
+                                        }
+
+                                ) {
+                                    Spacer(modifier = Modifier.height(22.dp))
+                                    Column() {
+                                        Row(
+                                            modifier = Modifier.padding(
+                                                horizontal = 24.dp,
+                                                vertical = 12.dp
+                                            )
+                                        ) {
+                                            Image(
+                                                modifier = Modifier
+                                                    .clickable {
+                                                        cardItems[index].isFavorite.value =
+                                                            !cardItems[index].isFavorite.value
+                                                        cardViewModel.putCardLike(
+                                                            cardViewId = cardItems[index].cardView.id
+                                                        )
+                                                    },
+                                                painter = painterResource(id = if (cardItems[index].isFavorite.value) R.drawable.ic_heart_red else R.drawable.ic_heart_white),
+                                                contentDescription = ""
+                                            )
+                                            Spacer(modifier = Modifier.width(16.dp))
                                             Text(
-                                                text = "_00${index + 1}",
+                                                text = cardItems[index].cardView.recordedAt.split('T').last().split(':').slice(IntRange(0,1)).joinToString(separator = ":"),
                                                 fontFamily = FontMoment.preStandardFont,
                                                 fontWeight = FontWeight.ExtraBold,
                                                 fontSize = 14.sp
                                             )
-                                            Spacer(modifier = Modifier.width(16.dp))
-                                            Image(
-                                                modifier = Modifier
-                                                    .size(18.dp)
-                                                    .padding(top = 6.dp),
-                                                painter = painterResource(id = R.drawable.ic_down),
-                                                contentDescription = ""
-                                            )
+                                            Spacer(modifier = Modifier.weight(1f))
+                                            Row {
+                                                Text(
+                                                    text = "_00${index + 1}",
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontWeight = FontWeight.ExtraBold,
+                                                    fontSize = 14.sp
+                                                )
+                                                Spacer(modifier = Modifier.width(16.dp))
+                                                Image(
+                                                    modifier = Modifier
+                                                        .size(18.dp)
+                                                        .padding(top = 6.dp),
+                                                    painter = painterResource(id = R.drawable.ic_down),
+                                                    contentDescription = ""
+                                                )
+                                            }
                                         }
+
+                                        Spacer(modifier = Modifier.height(6.dp))
+
+                                        Divider(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 12.dp)
+                                                .height(2.dp)
+                                                .background(color = Color("#706969".toColorInt()))
+                                        )
                                     }
 
-                                    Spacer(modifier = Modifier.height(6.dp))
 
-                                    Divider(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 12.dp)
-                                            .height(2.dp)
-                                            .background(color = Color("#706969".toColorInt()))
-                                    )
-                                }
-
-
-                                if (cardItems[index].isExpand.value && !isEdit.value) {
-                                    Spacer(modifier = Modifier.height(40.dp))
-                                    Column(
-                                        verticalArrangement = Arrangement.Center
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.padding(horizontal = 22.dp)
+                                    if (cardItems[index].isExpand.value && !isEdit.value) {
+                                        Spacer(modifier = Modifier.height(40.dp))
+                                        Column(
+                                            verticalArrangement = Arrangement.Center
                                         ) {
-                                            Image(
-                                                painter = painterResource(id = R.drawable.ic_location_grey),
-                                                contentDescription = ""
-                                            )
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Text(
-                                                text = cardItems[index].cardView.location,
-                                                fontFamily = FontMoment.preStandardFont,
-                                                fontWeight = FontWeight.Medium
-                                            )
-                                            Spacer(modifier = Modifier.weight(1f))
-                                            Text(
-                                                text = cardItems[index].cardView.weather,
-                                                fontFamily = FontMoment.preStandardFont,
-                                                fontWeight = FontWeight.Medium
-                                            )
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Image(
-                                                modifier = Modifier.size(18.dp),
-                                                painter = painterResource(id = GetWeatherIconDrawableCode(cardItems[index].cardView.weather)),
-                                                contentDescription = ""
-                                            )
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 22.dp)
+                                            ) {
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.ic_location_grey),
+                                                    contentDescription = ""
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(
+                                                    text = cardItems[index].cardView.location,
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontWeight = FontWeight.Medium
+                                                )
+                                                Spacer(modifier = Modifier.weight(1f))
+                                                Text(
+                                                    text = cardItems[index].cardView.weather,
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontWeight = FontWeight.Medium
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Image(
+                                                    modifier = Modifier.size(18.dp),
+                                                    painter = painterResource(id = GetWeatherIconDrawableCode(cardItems[index].cardView.weather)),
+                                                    contentDescription = ""
+                                                )
 
-                                        }
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        
+                                            }
+                                            Spacer(modifier = Modifier.height(8.dp))
 
+
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 22.dp),
+                                                verticalAlignment = Alignment1.CenterVertically
+                                            ) {
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.ic_clock_grey),
+                                                    contentDescription = ""
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(
+                                                    text = cardItems[index].cardView.recordedAt.split("T")
+                                                        .first().replace('-','.'),
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontWeight = FontWeight.Medium
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Divider(
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .height(1.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                val tempStrList=cardItems[index].cardView.recordedAt.split("T").last().split(":")
+                                                Log.d("weagwagaw","${tempStrList}")
+                                                Text(
+                                                    text = "${tempStrList[0]}:${tempStrList[1]}" ,
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontWeight = FontWeight.Medium
+                                                )
+                                            }
+                                            Spacer(modifier = Modifier.height(30.dp))
+
+//                                LinearDeterminateIndicator()
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 23.dp)
+                                                    .background(
+                                                        brush = Brush.verticalGradient(
+                                                            listOf(
+                                                                Color("#FBFAF7".toColorInt()),
+                                                                Color("#C3C8BC".toColorInt())
+                                                            )
+                                                        ),
+                                                        shape = RoundedCornerShape(4.dp)
+                                                    )
+                                            ) {
+                                                LinearDeterminateIndicator(
+                                                    currentProgress = currentProgress,
+                                                    loading = loading,
+                                                    scope = scope,
+                                                    onClick = {
+
+                                                    },
+                                                    maxTime = momentAudioPlayer.getSecondDuration().toInt()
+                                                )
+                                                Spacer(modifier = Modifier.height(10.dp))
                                                 Row(
                                                     modifier = Modifier
                                                         .fillMaxWidth()
-                                                        .padding(horizontal = 22.dp),
-                                                    verticalAlignment = Alignment1.CenterVertically
+                                                        .padding(horizontal = 8.dp)
                                                 ) {
-                                                    Image(
-                                                        painter = painterResource(id = R.drawable.ic_clock_grey),
-                                                        contentDescription = ""
-                                                    )
-                                                    Spacer(modifier = Modifier.width(8.dp))
                                                     Text(
-                                                        text = cardItems[index].cardView.recordedAt.split("T")
-                                                            .first().replace('-','.'),
+                                                        text = "00 : 00",
+                                                        color = Color("#938F8F".toColorInt()),
+                                                        fontWeight = FontWeight.Medium,
                                                         fontFamily = FontMoment.preStandardFont,
-                                                        fontWeight = FontWeight.Medium
+                                                        fontSize = 8.sp
                                                     )
-                                                    Spacer(modifier = Modifier.width(8.dp))
-                                                    Divider(
-                                                        modifier = Modifier
-                                                            .weight(1f)
-                                                            .height(1.dp)
-                                                    )
-                                                    Spacer(modifier = Modifier.width(8.dp))
-                                                    val tempStrList=cardItems[index].cardView.recordedAt.split("T").last().split(":")
-                                                    Log.d("weagwagaw","${tempStrList}")
+                                                    Spacer(modifier = Modifier.weight(1f))
                                                     Text(
-                                                        text = "${tempStrList[0]}:${tempStrList[1]}" ,
+                                                        text = "${momentAudioPlayer.getTimeDuration()}",
+                                                        color = Color("#938F8F".toColorInt()),
+                                                        fontWeight = FontWeight.Medium,
                                                         fontFamily = FontMoment.preStandardFont,
-                                                        fontWeight = FontWeight.Medium
+                                                        fontSize = 8.sp
                                                     )
                                                 }
-                                                Spacer(modifier = Modifier.height(30.dp))
-
-//                                LinearDeterminateIndicator()
                                                 Column(
                                                     modifier = Modifier
                                                         .fillMaxWidth()
-                                                        .padding(horizontal = 23.dp)
-                                                        .background(
-                                                            brush = Brush.verticalGradient(
-                                                                listOf(
-                                                                    Color("#FBFAF7".toColorInt()),
-                                                                    Color("#C3C8BC".toColorInt())
-                                                                )
-                                                            ),
-                                                            shape = RoundedCornerShape(4.dp)
-                                                        )
+                                                        .padding(horizontal = 8.dp),
+                                                    horizontalAlignment = Alignment.CenterHorizontally
                                                 ) {
-                                                    FancyProgressBar(
-                                                        Modifier
-                                                            .height(12.dp)
-                                                            .fillMaxWidth(),
-                                                        onDragEnd = { finalProgress ->
-                                                            Log.e(
-                                                                "finalProgress: ",
-                                                                "${
-                                                                    String.format(
-                                                                        "%.0f",
-                                                                        (1 - finalProgress) * 100
-                                                                    )
-                                                                }%"
-                                                            )
+                                                    Image(
+                                                        modifier = Modifier.clickable {
+//                                                            val file = File(MomentPath.RECORDER_PATH+convertUrlLinkStringToRcorderNameString(cardItems[index].cardView.recordFileUrl))
+//                                                            Log.d("awegweag","${file.name}, ${file.path}")
+                                                            try {
+                                                                if(!momentAudioPlayer.isActivity()){
+                                                                    momentAudioPlayer.playFile(cardItems[index].recordingFile!!)
+                                                                    momentAudioPlayer.start()
+                                                                    loading.value = !loading.value
 
-
-                                                        }, onDrag = { progress ->
-                                                            Log.d(
-                                                                "progress: ",
-                                                                "${
-                                                                    String.format(
-                                                                        "%.0f",
-                                                                        (1 - progress) * 100
-                                                                    )
-                                                                }%"
-                                                            )
-                                                        })
-                                                    Spacer(modifier = Modifier.height(10.dp))
-                                                    Row(
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .padding(horizontal = 4.dp)
-                                                    ) {
-                                                        Text(
-                                                            text = "00 : 00",
-                                                            color = Color("#938F8F".toColorInt()),
-                                                            fontWeight = FontWeight.Medium,
-                                                            fontFamily = FontMoment.preStandardFont,
-                                                            fontSize = 8.sp
-                                                        )
-                                                        Spacer(modifier = Modifier.weight(1f))
-                                                        Text(
-                                                            text = "00 : 00",
-                                                            color = Color("#938F8F".toColorInt()),
-                                                            fontWeight = FontWeight.Medium,
-                                                            fontFamily = FontMoment.preStandardFont,
-                                                            fontSize = 8.sp
-                                                        )
-                                                    }
-                                                    Column(
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .padding(horizontal = 8.dp),
-                                                        horizontalAlignment = Alignment.CenterHorizontally
-                                                    ) {
-                                                        Image(
-                                                            modifier = Modifier.clickable {
-                                                                val file = File(MomentPath.RECORDER_PATH+convertUrlLinkStringToRcorderNameString(cardItems[index].cardView.recordFileUrl))
-                                                                if(file.exists()){
-                                                                    if(!momentAudioPlayer.checkSameFile(file.name)){
-                                                                        momentAudioPlayer.playFile(file)
-                                                                    }else if(momentAudioPlayer.isIng()){
-                                                                        momentAudioPlayer.pause()
-                                                                    }else{
-                                                                        momentAudioPlayer.start()
-                                                                    }
+                                                                }else if(momentAudioPlayer.isIng()){
+//                                                                    momentAudioPlayer.pause()
+                                                                    momentAudioPlayer.stop()
+                                                                    loading.value = false
+//                                                                    momentAudioPlayer.playFile(cardItems[index].recordingFile!!)
                                                                 }else{
-                                                                    Toast.makeText(this@CardActivity,"녹음파일이 없습니다.",Toast.LENGTH_SHORT).show()
-                                                                }
-                                                            },
-                                                            painter = painterResource(id = R.drawable.ic_record_start),
-                                                            contentDescription = "seg"
-                                                        )
-                                                        Spacer(modifier = Modifier.height(10.dp))
-                                                        Text(
-                                                            text = "질문리스트가 있다면 여기에 먼저 띄워질거에요",
-                                                            fontFamily = FontMoment.preStandardFont,
-                                                            fontWeight = FontWeight.Medium,
-                                                            fontSize = 11.sp,
-                                                            color = Color("#99342E".toColorInt())
-                                                        )
-                                                        Spacer(modifier = Modifier.height(8.dp))
-                                                        Text(
-                                                            text = cardItems[index].cardView.stt ?: "열심히 분석중이에요!\n조금만 기다려주세요",
-                                                            fontFamily = FontMoment.preStandardFont,
-                                                            fontWeight = FontWeight.Medium,
-                                                            fontSize = 12.sp
-                                                        )
-                                                        Spacer(modifier = Modifier.height(8.dp))
-                                                        Image(
-                                                            painter = painterResource(id = R.drawable.ic_pencil),
-                                                            contentDescription = "edit"
-                                                        )
-                                                        Spacer(modifier = Modifier.height(18.dp))
-                                                    }
+                                                                    momentAudioPlayer.start()
+                                                                    loading.value = !loading.value
 
+                                                                }
+                                                            }catch (e:Exception){
+                                                                Toast.makeText(this@CardActivity,"녹음파일이 없습니다.",Toast.LENGTH_SHORT).show()
+                                                            }
+
+                                                        },
+                                                        painter = painterResource(id = R.drawable.ic_record_start),
+                                                        contentDescription = "seg"
+                                                    )
+                                                    Spacer(modifier = Modifier.height(10.dp))
+                                                    Text(
+                                                        text = "질문리스트가 있다면 여기에 먼저 띄워질거에요",
+                                                        fontFamily = FontMoment.preStandardFont,
+                                                        fontWeight = FontWeight.Medium,
+                                                        fontSize = 11.sp,
+                                                        color = Color("#99342E".toColorInt())
+                                                    )
+                                                    Spacer(modifier = Modifier.height(8.dp))
+                                                    Text(
+                                                        text = cardItems[index].cardView.stt ?: "열심히 분석중이에요!\n조금만 기다려주세요",
+                                                        fontFamily = FontMoment.preStandardFont,
+                                                        fontWeight = FontWeight.Medium,
+                                                        fontSize = 12.sp
+                                                    )
+                                                    Spacer(modifier = Modifier.height(8.dp))
+                                                    Image(
+                                                        painter = painterResource(id = R.drawable.ic_pencil),
+                                                        contentDescription = "edit"
+                                                    )
+                                                    Spacer(modifier = Modifier.height(18.dp))
                                                 }
+
+                                            }
 
                                             if(cardItems[index].cardView.stt.isNullOrEmpty()){
                                                 Spacer(modifier = Modifier.height(18.dp))
@@ -1110,6 +1131,7 @@ class CardActivity : ComponentActivity() {
                                                         }
                                                     }
                                                 }
+                                                Spacer(modifier = Modifier.height(4.dp))
                                             }
 
 
@@ -1118,44 +1140,47 @@ class CardActivity : ComponentActivity() {
 
 
 
-                                    }
-                                } else {
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 24.dp, vertical = 8.dp),
-                                        horizontalArrangement = Arrangement.End,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = "꽤나 즐거운 대화였네요.",
-                                            fontSize = 12.sp,
-                                            color = Color("#938F8F".toColorInt()),
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                        Spacer(modifier = Modifier.width(64.dp))
-                                        Text(
-                                            text = cardItems[index].cardView.weather,
-                                            fontSize = 12.sp,
-                                            color = Color("#938F8F".toColorInt()),
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                        Image(
-                                            modifier = Modifier.size(18.dp),
-                                            painter = painterResource(id = GetWeatherIconDrawableCode(weather = cardItems[index].cardView.weather)),
-                                            contentDescription = ""
-                                        )
+                                        }
+                                    } else {
+                                        momentAudioPlayer.stop()
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 24.dp, vertical = 8.dp),
+                                            horizontalArrangement = Arrangement.End,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = "꽤나 즐거운 대화였네요.",
+                                                fontSize = 12.sp,
+                                                color = Color("#938F8F".toColorInt()),
+                                                fontFamily = FontMoment.preStandardFont,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Spacer(modifier = Modifier.width(64.dp))
+                                            Text(
+                                                text = cardItems[index].cardView.weather,
+                                                fontSize = 12.sp,
+                                                color = Color("#938F8F".toColorInt()),
+                                                fontFamily = FontMoment.preStandardFont,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Image(
+                                                modifier = Modifier.size(18.dp),
+                                                painter = painterResource(id = GetWeatherIconDrawableCode(weather = cardItems[index].cardView.weather)),
+                                                contentDescription = ""
+                                            )
 
+                                        }
                                     }
                                 }
                             }
-                        }
 
+                        }
                     }
                 }
+
 
 
             }
@@ -1323,25 +1348,7 @@ class CardActivity : ComponentActivity() {
             }
         }
 
-        @Composable
-        fun LinearDeterminateIndicator() {
-            var currentProgress = remember { mutableStateOf(0.5f) }
-            var loading = remember { mutableStateOf(false) }
-            val scope = rememberCoroutineScope() // Create a coroutine scope
-            LinearProgressIndicator(
-                progress = { currentProgress.value },
-                modifier = Modifier.fillMaxWidth(),
-                strokeCap = ProgressIndicatorDefaults.CircularDeterminateStrokeCap,
-            )
-        }
 
-        /** Iterate the progress value */
-        suspend fun loadProgress(updateProgress: (Float) -> Unit) {
-            for (i in 1..100) {
-                updateProgress(i.toFloat() / 100)
-                delay(100)
-            }
-        }
 
 
         @Preview
