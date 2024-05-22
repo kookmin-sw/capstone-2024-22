@@ -11,6 +11,7 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -31,6 +32,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -98,6 +100,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.capstone.android.application.app.ApplicationClass
 import com.capstone.android.application.app.ApplicationClass.Companion.tokenSharedPreferences
 import com.capstone.android.application.app.composable.CustomTitleCheckDialog
@@ -114,6 +118,8 @@ import com.capstone.android.application.app.utile.MomentPath
 import com.capstone.android.application.app.utile.common.GetWeatherIconDrawableCode
 import com.capstone.android.application.app.utile.common.GetWeatherType
 import com.capstone.android.application.app.utile.firebase.MyFirebaseMessagingService
+import com.capstone.android.application.app.utile.loading.LinearDeterminateIndicator
+import com.capstone.android.application.app.utile.loading.loadProgress
 import com.capstone.android.application.app.utile.location.MomentLocation
 import com.capstone.android.application.app.utile.permission.MomentPermission
 import com.capstone.android.application.app.utile.recorder.MomentAudioPlayer
@@ -126,6 +132,7 @@ import com.capstone.android.application.domain.Emotion
 import com.capstone.android.application.domain.ReceiptAll
 import com.capstone.android.application.domain.Trip
 import com.capstone.android.application.domain.TripFile
+import com.capstone.android.application.presentation.AuthViewModel
 import com.capstone.android.application.presentation.CardViewModel
 import com.capstone.android.application.presentation.KakaoViewModel
 import com.capstone.android.application.presentation.OpenWeatherViewModel
@@ -171,6 +178,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
+import com.google.firebase.messaging.BuildConfig
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -221,6 +229,7 @@ class MainActivity : ComponentActivity() {
     private val tripFileViewModel : TripFileViewModel by viewModels()
     private val kakaoViewModel : KakaoViewModel by viewModels()
     private val openWeatherViewModel : OpenWeatherViewModel by viewModels()
+    private val authViewModel:AuthViewModel by viewModels()
     @Inject lateinit var momentLocation : MomentLocation
     @Inject lateinit var momentPermission: MomentPermission
     @Inject lateinit var recorder: MomentAudioRecorder
@@ -550,7 +559,8 @@ class MainActivity : ComponentActivity() {
                         Card(
                             cardView = cardView,
                             uploadImage = ArrayList<File>(),
-                            imageNum = mutableStateOf(0)
+                            imageNum = mutableStateOf(0),
+                            recordingFile = File(MomentPath.RECORDER_PATH+convertUrlLinkStringToRcorderNameString(cardView.recordFileUrl))
                         )
                     }.onSuccess {
                         favoriteCardList.clear()
@@ -571,9 +581,13 @@ class MainActivity : ComponentActivity() {
                 Toast.makeText(this@MainActivity,"녹음이 저장되었습니다",Toast.LENGTH_SHORT).show()
             }
 
-            cardViewModel.getCardLikedSuccess.observe(this@MainActivity) {
-
+            authViewModel.deleteAuthSuccess.observe(this@MainActivity){ response ->
+                tokenSharedPreferences.edit().putString("accessToken","").apply()
+                startActivity(Intent(this@MainActivity,SplashActivity::class.java))
+                finish()
             }
+
+
 
             tripFileViewModel.getTripFileUntitledSuccess.observe(this@MainActivity) { response ->
                 response.data.tripFiles.mapNotNull { tripFile ->
@@ -962,7 +976,7 @@ class MainActivity : ComponentActivity() {
                         currentSelectedBottomRoute.value = "Favorite"
                         cardViewModel.getCardLiked()
                         Favorite(cardItems = favoriteCardList, emotionList = emotionList)
-                        title.value = "작게보기"
+                        title.value = ""
                     }
                     composable(BottomNavItem.Setting.screenRoute) {
                         currentSelectedBottomRoute.value = "Setting"
@@ -1237,7 +1251,7 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.clickable {
                                 val intent = Intent(this@MainActivity,CardActivity::class.java)
                                 intent.putExtra("tripFileId",tripFileUntitledList[index].id)
-                                intent.putExtra("tripFileListIndex",tripFileUntitledList[index].id)
+                                intent.putExtra("tripFileListIndex",-2)
 
                                 startActivity(intent)
                             } ,
@@ -2088,10 +2102,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalGlideComposeApi::class)
     @SuppressLint("UnrememberedMutableState")
     @Composable
     fun Favorite(cardItems: MutableList<Card>, emotionList:MutableList<Emotion>){
+
         var expanded = remember { mutableStateOf(true) }
+
+        var currentProgress = remember { mutableStateOf(0f) }
+        var loading = remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope() // Create a coroutine scope
 
         val imageList = mutableStateListOf<File>()
 
@@ -2104,414 +2124,557 @@ class MainActivity : ComponentActivity() {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            ) {
-                Divider(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color("#706969".toColorInt()),
-                    thickness = 2.dp
-                )
-                Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
+            if(cardItems.isNullOrEmpty()){
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+                    Text(
+                        text = "오늘은 기록이 없어요\n기록으로만 묶어두긴 아까운 날도 있죠",
+                        color = Color("#C3C1C1".toColorInt()),
+                        fontSize = 14.sp,
+                        fontFamily = FontMoment.preStandardFont,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+            }else{
+                LazyColumn(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(end = 16.dp),
-                    text = "즐겨찾은 녹음파일",
-                    textAlign = TextAlign.End,
-                    fontSize = 22.sp,
-                    fontFamily = FontMoment.preStandardFont,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Divider(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color("#706969".toColorInt()),
-                    thickness = 2.dp
-                )
-            }
-
-
-
-            LazyColumn(
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-            ) {
-                items(cardItems.size) { index ->
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.Top,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .border(
-                                    border = BorderStroke(
-                                        width = 1.dp,
-                                        color = Color("#C3C8BC".toColorInt())
-                                    ), shape = RoundedCornerShape(4.dp)
-                                )
-                                .animateContentSize()
-                                .fillMaxWidth()
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                ) {
-                                    cardItems[index].isExpand.value =
-                                        !cardItems[index].isExpand.value
-                                }
-
+                        .padding(horizontal =20.dp)
+                ) {
+                    items(cardItems.size) { index ->
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Spacer(modifier = Modifier.height(22.dp))
-                            Column() {
-                                Row(
-                                    modifier = Modifier.padding(
-                                        horizontal = 24.dp,
-                                        vertical = 12.dp
+                            Column(
+                                verticalArrangement = Arrangement.Top,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .border(
+                                        border = BorderStroke(
+                                            width = 1.dp,
+                                            color = Color("#C3C8BC".toColorInt())
+                                        ), shape = RoundedCornerShape(4.dp)
                                     )
-                                ) {
-                                    Text(
-                                        text = cardItems[index].cardView.recordFileName.split('T').first(),
-                                        fontFamily = FontMoment.preStandardFont,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        fontSize = 14.sp
-                                    )
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Row {
+                                    .animateContentSize()
+                                    .fillMaxWidth()
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null
+                                    ) {
+                                        cardItems[index].isExpand.value =
+                                            !cardItems[index].isExpand.value
+                                        momentAudioPlayer.stop()
+                                        cardItems[index].recordingFile?.let {
+                                            momentAudioPlayer.playFile(
+                                                it
+                                            )
+                                        }
+                                    }
+
+                            ) {
+                                Spacer(modifier = Modifier.height(22.dp))
+                                Column() {
+                                    Row(
+                                        modifier = Modifier.padding(
+                                            horizontal = 24.dp,
+                                            vertical = 12.dp
+                                        )
+                                    ) {
+                                        Image(
+                                            modifier = Modifier
+                                                .clickable {
+                                                    cardItems[index].isFavorite.value =
+                                                        !cardItems[index].isFavorite.value
+                                                    cardViewModel.putCardLike(
+                                                        cardViewId = cardItems[index].cardView.id
+                                                    )
+                                                },
+                                            painter = painterResource(id = if (cardItems[index].isFavorite.value) R.drawable.ic_heart_red else R.drawable.ic_heart_white),
+                                            contentDescription = ""
+                                        )
+                                        Spacer(modifier = Modifier.width(16.dp))
                                         Text(
-                                            text = "_00${index + 1}",
+                                            text = cardItems[index].cardView.recordedAt.split('T').last().split(':').slice(IntRange(0,1)).joinToString(separator = ":"),
                                             fontFamily = FontMoment.preStandardFont,
                                             fontWeight = FontWeight.ExtraBold,
                                             fontSize = 14.sp
                                         )
-                                        Spacer(modifier = Modifier.width(16.dp))
-                                        Image(
-                                            modifier = Modifier
-                                                .size(18.dp)
-                                                .padding(top = 6.dp),
-                                            painter = painterResource(id = R.drawable.ic_down),
-                                            contentDescription = ""
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(6.dp))
-
-                                Divider(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 12.dp)
-                                        .height(2.dp)
-                                        .background(color = Color("#706969".toColorInt()))
-                                )
-                            }
-
-
-                            if (cardItems[index].isExpand.value) {
-                                Spacer(modifier = Modifier.height(40.dp))
-                                Column {
-                                    Row(
-                                        modifier = Modifier.padding(horizontal = 22.dp)
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.ic_location_grey),
-                                            contentDescription = ""
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = cardItems[index].cardView.location,
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium
-                                        )
                                         Spacer(modifier = Modifier.weight(1f))
-                                        Image(
-                                            painter = painterResource(id = GetWeatherIconDrawableCode(cardItems[index].cardView.weather)),
-                                            contentDescription = ""
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = cardItems[index].cardView.weather,
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 22.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.ic_clock_grey),
-                                            contentDescription = ""
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = cardItems[index].cardView.recordedAt.split("T")
-                                                .first(),
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Divider(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .height(1.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = cardItems[index].cardView.recordedAt.split("T")
-                                                .last(),
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.height(30.dp))
-
-//                                LinearDeterminateIndicator()
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 23.dp)
-                                            .background(
-                                                brush = Brush.verticalGradient(
-                                                    listOf(
-                                                        Color("#FBFAF7".toColorInt()),
-                                                        Color("#C3C8BC".toColorInt())
-                                                    )
-                                                ),
-                                                shape = RoundedCornerShape(4.dp)
-                                            )
-                                    ) {
-                                        FancyProgressBar(
-                                            Modifier
-                                                .height(12.dp)
-                                                .fillMaxWidth(),
-                                            onDragEnd = { finalProgress ->
-                                                Log.d("aewgawegweag", finalProgress.toString())
-                                                Log.e(
-                                                    "finalProgress: ",
-                                                    "${
-                                                        String.format(
-                                                            "%.0f",
-                                                            (1 - finalProgress) * 100
-                                                        )
-                                                    }%"
-                                                )
-
-
-                                            }, onDrag = { progress ->
-                                                Log.d("awegawegaew", progress.toString())
-                                                Log.d(
-                                                    "progress: ",
-                                                    "${
-                                                        String.format(
-                                                            "%.0f",
-                                                            (1 - progress) * 100
-                                                        )
-                                                    }%"
-                                                )
-                                            })
-                                        Spacer(modifier = Modifier.height(10.dp))
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 8.dp),
-                                            horizontalAlignment = Alignment.CenterHorizontally
-                                        ) {
-                                            Image(
-                                                modifier = Modifier.clickable {
-                                                    val file = File(MomentPath.RECORDER_PATH+ convertUrlLinkStringToRcorderNameString(cardItems[index].cardView.recordFileUrl))
-                                                    if(file.exists()){
-                                                        momentAudioPlayer.playFile(file)
-                                                    }else{
-                                                        Toast.makeText(this@MainActivity,"녹음파일이 없습니다.",
-                                                            Toast.LENGTH_SHORT).show()
-                                                    }
-                                                },
-                                                painter = painterResource(id = R.drawable.ic_record_start),
-                                                contentDescription = "seg"
-                                            )
-                                            Spacer(modifier = Modifier.height(10.dp))
+                                        Row {
                                             Text(
-                                                text = "질문리스트가 있다면 여기에 먼저 띄워질거에요",
+                                                text = "_00${index + 1}",
                                                 fontFamily = FontMoment.preStandardFont,
-                                                fontWeight = FontWeight.Medium,
-                                                fontSize = 11.sp,
-                                                color = Color("#99342E".toColorInt())
+                                                fontWeight = FontWeight.ExtraBold,
+                                                fontSize = 14.sp
                                             )
-                                            Spacer(modifier = Modifier.height(8.dp))
-                                            Text(
-                                                text = cardItems[index].cardView.stt ?: "",
-                                                fontFamily = FontMoment.preStandardFont,
-                                                fontWeight = FontWeight.Medium,
-                                                fontSize = 12.sp
-                                            )
-                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Spacer(modifier = Modifier.width(16.dp))
                                             Image(
-                                                painter = painterResource(id = R.drawable.ic_pencil),
-                                                contentDescription = "edit"
+                                                modifier = Modifier
+                                                    .size(18.dp)
+                                                    .padding(top = 6.dp),
+                                                painter = painterResource(id = R.drawable.ic_down),
+                                                contentDescription = ""
                                             )
-                                            Spacer(modifier = Modifier.height(18.dp))
                                         }
-
-                                    }
-                                    if (imageList.isNullOrEmpty()) {
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                    } else {
-
-
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Divider(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 23.dp),
-                                            color = Color("#C3C1C1".toColorInt())
-                                        )
-                                        Spacer(modifier = Modifier.height(8.dp))
-
-                                        LazyRow(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 30.dp),
-                                            horizontalArrangement = Arrangement.Start,
-                                            content = {
-                                                items(imageList.size) { index ->
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .size(72.dp)
-                                                            .padding(end = 8.dp)
-                                                    ) {
-                                                        AsyncImage(
-                                                            contentScale = ContentScale.Crop,
-                                                            modifier = Modifier
-                                                                .height(70.dp)
-                                                                .width(66.dp)
-                                                                .clip(RoundedCornerShape(6.dp)),
-                                                            model = ImageRequest.Builder(this@MainActivity)
-                                                                .data(imageList[index])
-                                                                .build(),
-                                                            contentDescription = "image"
-                                                        )
-
-                                                    }
-                                                }
-                                            })
                                     }
 
-                                    Spacer(modifier = Modifier.height(30.dp))
+                                    Spacer(modifier = Modifier.height(6.dp))
 
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 24.dp)
-                                    ) {
-                                        Text(
-                                            text = "꽤나 즐거운 대화였네요",
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium,
-                                            fontSize = 11.sp
-                                        )
-                                        Spacer(modifier = Modifier.weight(1f))
-                                        Text(
-                                            text = "꽤나 즐거운 대화였네요",
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium,
-                                            fontSize = 11.sp
-                                        )
-                                    }
-
-                                    Spacer(modifier = Modifier.height(4.dp))
                                     Divider(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(horizontal = 11.dp),
-                                        color = Color("#706969".toColorInt())
+                                            .padding(horizontal = 12.dp)
+                                            .height(2.dp)
+                                            .background(color = Color("#706969".toColorInt()))
                                     )
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                }
 
+
+                                if (cardItems[index].isExpand.value) {
+                                    Spacer(modifier = Modifier.height(40.dp))
                                     Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 24.dp)
+                                        verticalArrangement = Arrangement.Center
                                     ) {
-                                        emotionList.forEach { item ->
+                                        Row(
+                                            modifier = Modifier.padding(horizontal = 22.dp)
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.ic_location_grey),
+                                                contentDescription = ""
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = cardItems[index].cardView.location,
+                                                fontFamily = FontMoment.preStandardFont,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Spacer(modifier = Modifier.weight(1f))
+                                            Text(
+                                                text = cardItems[index].cardView.weather,
+                                                fontFamily = FontMoment.preStandardFont,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Image(
+                                                modifier = Modifier.size(18.dp),
+                                                painter = painterResource(id = GetWeatherIconDrawableCode(cardItems[index].cardView.weather)),
+                                                contentDescription = ""
+                                            )
+
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+
+
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 22.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.ic_clock_grey),
+                                                contentDescription = ""
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = cardItems[index].cardView.recordedAt.split("T")
+                                                    .first().replace('-','.'),
+                                                fontFamily = FontMoment.preStandardFont,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Divider(
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .height(1.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            val tempStrList=cardItems[index].cardView.recordedAt.split("T").last().split(":")
+                                            Log.d("weagwagaw","${tempStrList}")
+                                            Text(
+                                                text = "${tempStrList[0]}:${tempStrList[1]}" ,
+                                                fontFamily = FontMoment.preStandardFont,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(30.dp))
+
+//                                LinearDeterminateIndicator()
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 23.dp)
+                                                .background(
+                                                    brush = Brush.verticalGradient(
+                                                        listOf(
+                                                            Color("#FBFAF7".toColorInt()),
+                                                            Color("#C3C8BC".toColorInt())
+                                                        )
+                                                    ),
+                                                    shape = RoundedCornerShape(4.dp)
+                                                )
+                                        ) {
+                                            LinearDeterminateIndicator(
+                                                currentProgress = currentProgress,
+                                                loading = loading,
+                                                scope = scope,
+                                                onClick = {
+
+                                                },
+                                                maxTime = momentAudioPlayer.getSecondDuration().toInt()
+                                            )
+                                            Spacer(modifier = Modifier.height(10.dp))
                                             Row(
-                                                modifier = Modifier.height(20.dp),
-                                                verticalAlignment = Alignment.CenterVertically
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 8.dp)
+                                            ) {
+                                                Text(
+                                                    text = "00 : 00",
+                                                    color = Color("#938F8F".toColorInt()),
+                                                    fontWeight = FontWeight.Medium,
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontSize = 8.sp
+                                                )
+                                                Spacer(modifier = Modifier.weight(1f))
+                                                Text(
+                                                    text = "${momentAudioPlayer.getTimeDuration()}",
+                                                    color = Color("#938F8F".toColorInt()),
+                                                    fontWeight = FontWeight.Medium,
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontSize = 8.sp
+                                                )
+                                            }
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 8.dp),
+                                                horizontalAlignment = Alignment.CenterHorizontally
                                             ) {
                                                 Image(
-                                                    modifier = Modifier.size(12.dp),
-                                                    painter = painterResource(id = item.icon),
-                                                    contentDescription = ""
-                                                )
+                                                    modifier = Modifier.clickable {
+//                                                            val file = File(MomentPath.RECORDER_PATH+convertUrlLinkStringToRcorderNameString(cardItems[index].cardView.recordFileUrl))
+//                                                            Log.d("awegweag","${file.name}, ${file.path}")
+                                                        try {
+                                                            if(!momentAudioPlayer.isActivity()){
+                                                                momentAudioPlayer.playFile(cardItems[index].recordingFile!!)
+                                                                momentAudioPlayer.start()
+                                                                loading.value = !loading.value
 
-                                                Spacer(modifier = Modifier.width(6.dp))
+                                                            }else if(momentAudioPlayer.isIng()){
+//                                                                    momentAudioPlayer.pause()
+                                                                momentAudioPlayer.stop()
+                                                                loading.value = false
+//                                                                    momentAudioPlayer.playFile(cardItems[index].recordingFile!!)
+                                                            }else{
+                                                                momentAudioPlayer.start()
+                                                                loading.value = !loading.value
+
+                                                            }
+                                                        }catch (e:Exception){
+                                                            Toast.makeText(this@MainActivity,"녹음파일이 없습니다.",Toast.LENGTH_SHORT).show()
+                                                        }
+
+                                                    },
+                                                    painter = painterResource(id = R.drawable.ic_record_start),
+                                                    contentDescription = "seg"
+                                                )
+                                                Spacer(modifier = Modifier.height(10.dp))
                                                 Text(
-                                                    text = item.text,
+                                                    text = "질문리스트가 있다면 여기에 먼저 띄워질거에요",
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontWeight = FontWeight.Medium,
+                                                    fontSize = 11.sp,
+                                                    color = Color("#99342E".toColorInt())
+                                                )
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                                Text(
+                                                    text = cardItems[index].cardView.stt ?: "열심히 분석중이에요!\n조금만 기다려주세요",
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontWeight = FontWeight.Medium,
+                                                    fontSize = 12.sp
+                                                )
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.ic_pencil),
+                                                    contentDescription = "edit"
+                                                )
+                                                Spacer(modifier = Modifier.height(18.dp))
+                                            }
+
+                                        }
+
+                                        if(cardItems[index].cardView.stt.isNullOrEmpty()){
+                                            Spacer(modifier = Modifier.height(18.dp))
+
+                                        }else{
+                                            if(cardItems[index].cardView.imageUrls.isNullOrEmpty() && cardItems[index].imageNum.value==0) {
+                                                Spacer(modifier = Modifier.height(8.dp))
+
+                                            } else {
+
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                                Divider(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(horizontal = 23.dp),
+                                                    color = Color("#C3C1C1".toColorInt())
+                                                )
+                                                Spacer(modifier = Modifier.height(8.dp))
+
+                                                LazyRow(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                    ,
+                                                    contentPadding = PaddingValues(horizontal = 32.dp),
+                                                    horizontalArrangement = Arrangement.Start,
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    content = {
+                                                        items(cardItems[index].cardView.imageUrls.size) { imageUrlindex ->
+                                                            Box(
+                                                                modifier = Modifier
+                                                                    .size(72.dp)
+                                                            ) {
+
+                                                                GlideImage(
+                                                                    contentScale = ContentScale.Crop,
+                                                                    modifier = Modifier
+                                                                        .size(70.dp)
+                                                                        .clip(
+                                                                            RoundedCornerShape(
+                                                                                6.dp
+                                                                            )
+                                                                        ),
+                                                                    model = cardItems[index].cardView.imageUrls[imageUrlindex],
+                                                                    contentDescription = "Image",
+                                                                )
+
+
+                                                            }
+
+                                                            Spacer(modifier = Modifier.width(8.dp))
+                                                        }
+
+
+                                                        items(cardItems[index].imageNum.value){uploadImageIndex->
+                                                            AsyncImage(
+                                                                contentScale = ContentScale.Crop,
+                                                                modifier = Modifier
+                                                                    .size(70.dp)
+                                                                    .clip(RoundedCornerShape(6.dp)),
+                                                                model = ImageRequest.Builder(this@MainActivity)
+                                                                    .data(cardItems[index].uploadImage[uploadImageIndex])
+                                                                    .build(),
+                                                                contentDescription = "image"
+                                                            )
+                                                            Spacer(modifier = Modifier.width(8.dp))
+                                                        }
+
+                                                        if(cardItems[index].let { it.cardView.imageUrls.size + it.uploadImage.size } < 10){
+
+                                                        }
+                                                    })
+                                            }
+
+                                            Spacer(modifier = Modifier.height(30.dp))
+
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 24.dp)
+                                            ) {
+                                                Text(
+                                                    text = when(index){
+                                                        0 -> {"꽤나 즐거운 대화였네요"}
+                                                        1 -> {"오늘도 고생했어요"}
+                                                        2 -> {"좋은 하루 보내세요"}
+                                                        else -> {"푹 쉬세요"}
+                                                    },
                                                     fontFamily = FontMoment.preStandardFont,
                                                     fontWeight = FontWeight.Medium,
                                                     fontSize = 11.sp
                                                 )
-                                                Spacer(modifier = Modifier.width(26.dp))
-
-                                                LinearProgressIndicator(
-                                                    color = Color(item.color.toColorInt()),
-                                                    progress = { item.persent }
-                                                )
-                                                Spacer(modifier = Modifier.width(36.dp))
+                                                Spacer(modifier = Modifier.weight(1f))
                                                 Text(
-                                                    text = item.text,
+                                                    text = "감정분석",
                                                     fontFamily = FontMoment.preStandardFont,
                                                     fontWeight = FontWeight.Medium,
                                                     fontSize = 11.sp
                                                 )
                                             }
-                                        }
-                                    }
 
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                }
-                            } else {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 24.dp),
-                                    horizontalArrangement = Arrangement.End
-                                ) {
-                                    Text(
-                                        text = "꽤나 즐거운 대화였네요.",
-                                        fontSize = 12.sp,
-                                        color = Color("#938F8F".toColorInt()),
-                                        fontFamily = FontMoment.preStandardFont,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Spacer(modifier = Modifier.width(64.dp))
-                                    Text(
-                                        text = cardItems[index].cardView.weather,
-                                        fontSize = 12.sp,
-                                        color = Color("#938F8F".toColorInt()),
-                                        fontFamily = FontMoment.preStandardFont,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Image(
-                                        modifier = Modifier.size(18.dp),
-                                        painter = painterResource(id = R.drawable.ic_weather_grey),
-                                        contentDescription = ""
-                                    )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Divider(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 11.dp),
+                                                color = Color("#706969".toColorInt())
+                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 24.dp)
+                                            ) {
+                                                emotionList.forEach { item ->
+                                                    Row(
+                                                        modifier = Modifier.height(20.dp),
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
+                                                        Image(
+                                                            modifier = Modifier.size(12.dp),
+                                                            painter = painterResource(id = item.icon),
+                                                            contentDescription = ""
+                                                        )
+
+                                                        Spacer(modifier = Modifier.width(6.dp))
+                                                        Text(
+                                                            text = item.text,
+                                                            fontFamily = FontMoment.preStandardFont,
+                                                            fontWeight = FontWeight.Medium,
+                                                            fontSize = 11.sp
+                                                        )
+                                                        Spacer(modifier = Modifier.width(26.dp))
+
+
+                                                        LinearProgressIndicator(
+                                                            modifier = Modifier.weight(1f),
+                                                            color = Color(item.color.toColorInt()),
+                                                            progress = {
+                                                                when(item.text){
+                                                                    "평범해요" -> {
+                                                                        cardItems[index].cardView.neutral.let {
+                                                                            it.toFloat()*(0.01f)
+                                                                        }
+                                                                    }
+                                                                    "즐거워요" -> {
+                                                                        cardItems[index].cardView.happy.let {
+                                                                            it.toFloat()*(0.01f)
+                                                                        }
+                                                                    }
+                                                                    "화가나요" -> {
+                                                                        cardItems[index].cardView.angry.let {
+                                                                            it.toFloat()*(0.01f)
+                                                                        }
+                                                                    }
+                                                                    "우울해요" -> {
+                                                                        cardItems[index].cardView.sad.let {
+                                                                            it.toFloat()*(0.01f)
+                                                                        }
+                                                                    }
+                                                                    "역겨워요" ->{
+                                                                        cardItems[index].cardView.disgust.let {
+                                                                            it.toFloat()*(0.01f)
+                                                                        }
+                                                                    }
+                                                                    else -> {
+                                                                        cardItems[index].cardView.disgust.let {
+                                                                            it.toFloat()*(0.01f)
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        )
+                                                        Spacer(modifier = Modifier.width(36.dp))
+
+                                                        Text(
+                                                            modifier = Modifier.weight(0.3f),
+                                                            text =
+                                                            when(item.text){
+                                                                "평범해요" -> {
+                                                                    cardItems[index].cardView.neutral.let {
+                                                                        "${it.toInt()}%"
+                                                                    }
+                                                                }
+                                                                "즐거워요" -> {
+                                                                    cardItems[index].cardView.happy.let {
+                                                                        "${it.toInt()}%"
+                                                                    }
+                                                                }
+                                                                "화가나요" -> {
+                                                                    cardItems[index].cardView.angry.let {
+                                                                        "${it.toInt()}%"
+                                                                    }
+                                                                }
+                                                                "우울해요" -> {
+                                                                    cardItems[index].cardView.sad.let {
+                                                                        "${it.toInt()}%"
+                                                                    }
+                                                                }
+                                                                "역겨워요" ->{
+                                                                    cardItems[index].cardView.disgust.let {
+                                                                        "${it.toInt()}%"
+                                                                    }
+                                                                }
+                                                                else -> {
+                                                                    cardItems[index].cardView.disgust.let {
+                                                                        "${it.toInt()}%"
+                                                                    }
+                                                                }
+                                                            },
+                                                            fontFamily = FontMoment.preStandardFont,
+                                                            fontWeight = FontWeight.Medium,
+                                                            fontSize = 12.sp
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                        }
+
+
+
+
+
+
+
+                                    }
+                                } else {
+                                    momentAudioPlayer.stop()
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 24.dp, vertical = 8.dp),
+                                        horizontalArrangement = Arrangement.End,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "꽤나 즐거운 대화였네요.",
+                                            fontSize = 12.sp,
+                                            color = Color("#938F8F".toColorInt()),
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Spacer(modifier = Modifier.width(64.dp))
+                                        Text(
+                                            text = cardItems[index].cardView.weather,
+                                            fontSize = 12.sp,
+                                            color = Color("#938F8F".toColorInt()),
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Image(
+                                            modifier = Modifier.size(18.dp),
+                                            painter = painterResource(id = GetWeatherIconDrawableCode(weather = cardItems[index].cardView.weather)),
+                                            contentDescription = ""
+                                        )
+
+                                    }
                                 }
                             }
                         }
-                    }
 
+                    }
                 }
             }
+
 
 
         }
@@ -2597,7 +2760,7 @@ class MainActivity : ComponentActivity() {
                 }
                 if (InquirybtnState.value){
                     Spacer(modifier = Modifier.height(8.dp))
-                    P_Medium14(content = "kookminmoment@gmail.com", color = black)
+                    P_Medium14(content = "nex1223@naver.com", color = black)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
                 else{
@@ -2619,7 +2782,7 @@ class MainActivity : ComponentActivity() {
                 }
                 if (versionbtnState.value){
                     Spacer(modifier = Modifier.height(8.dp))
-                    P_Medium14(content = "v1.1", color = black)
+                    P_Medium14(content = "v ${ApplicationClass.versionName}", color = black)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
                 else{
@@ -2638,6 +2801,7 @@ class MainActivity : ComponentActivity() {
                     }
                     Spacer(modifier = Modifier.height(28.dp))
                     Column(Modifier.clickable {
+                        authViewModel.deleteAuth()
                         tokenSharedPreferences.edit().putString("accessToken","").apply()
                         startActivity(Intent(this@MainActivity,SplashActivity::class.java))
                         finish()
