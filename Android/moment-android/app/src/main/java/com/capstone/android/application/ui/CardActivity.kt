@@ -86,7 +86,9 @@ import com.capstone.android.application.app.composable.convertUrlLinkStringToRco
 import com.capstone.android.application.app.utile.MomentPath
 import com.capstone.android.application.app.utile.common.GetWeatherIconDrawableCode
 import com.capstone.android.application.app.utile.loading.GlobalLoadingDialog
+import com.capstone.android.application.app.utile.loading.LinearDeterminateIndicator
 import com.capstone.android.application.app.utile.loading.LoadingState
+import com.capstone.android.application.app.utile.loading.loadProgress
 import com.capstone.android.application.app.utile.recorder.MomentAudioPlayer
 import com.capstone.android.application.app.utile.recorder.MomentAudioRecorder
 import com.capstone.android.application.domain.Card
@@ -95,7 +97,9 @@ import com.capstone.android.application.presentation.CardViewModel
 import com.capstone.android.application.presentation.DownloadLinkViewModel
 import com.capstone.android.application.ui.theme.FontMoment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -303,7 +307,8 @@ class CardActivity : ComponentActivity() {
                             Card(
                                 cardView = cardView,
                                 uploadImage = ArrayList<File>(),
-                                imageNum = mutableStateOf(0)
+                                imageNum = mutableStateOf(0),
+                                recordingFile = File(MomentPath.RECORDER_PATH+convertUrlLinkStringToRcorderNameString(cardView.recordFileUrl))
                             ).apply {
                                 this.isFavorite.value = cardView.loved
                             }
@@ -471,6 +476,9 @@ class CardActivity : ComponentActivity() {
         @OptIn(ExperimentalGlideComposeApi::class)
         @Composable
         fun Main(isEdit: MutableState<Boolean>, cardItems: MutableList<Card>, emotionList:MutableList<Emotion>) {
+            var currentProgress = remember { mutableStateOf(0f) }
+            var loading = remember { mutableStateOf(false) }
+            val scope = rememberCoroutineScope() // Create a coroutine scope
             var expanded = remember { mutableStateOf(true) }
 
             val imageList = mutableStateListOf<File>()
@@ -549,7 +557,7 @@ class CardActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(end = 16.dp),
-                        text = ApplicationClass.tripName+" ${tripFileListIndex+1}일차",
+                        text = if(tripFileListIndex!=-2) ApplicationClass.tripName+" ${tripFileListIndex+1}일차" else "일상기록",
                         textAlign = TextAlign.End,
                         fontSize = 22.sp,
                         fontFamily = FontMoment.preStandardFont,
@@ -628,6 +636,11 @@ class CardActivity : ComponentActivity() {
                                             cardItems[index].isExpand.value =
                                                 !cardItems[index].isExpand.value
                                             momentAudioPlayer.stop()
+                                            cardItems[index].recordingFile?.let {
+                                                momentAudioPlayer.playFile(
+                                                    it
+                                                )
+                                            }
                                         }
 
                                 ) {
@@ -773,38 +786,20 @@ class CardActivity : ComponentActivity() {
                                                         shape = RoundedCornerShape(4.dp)
                                                     )
                                             ) {
-                                                FancyProgressBar(
-                                                    Modifier
-                                                        .height(12.dp)
-                                                        .fillMaxWidth(),
-                                                    onDragEnd = { finalProgress ->
-                                                        Log.e(
-                                                            "finalProgress: ",
-                                                            "${
-                                                                String.format(
-                                                                    "%.0f",
-                                                                    (1 - finalProgress) * 100
-                                                                )
-                                                            }%"
-                                                        )
+                                                LinearDeterminateIndicator(
+                                                    currentProgress = currentProgress,
+                                                    loading = loading,
+                                                    scope = scope,
+                                                    onClick = {
 
-
-                                                    }, onDrag = { progress ->
-                                                        Log.d(
-                                                            "progress: ",
-                                                            "${
-                                                                String.format(
-                                                                    "%.0f",
-                                                                    (1 - progress) * 100
-                                                                )
-                                                            }%"
-                                                        )
-                                                    })
+                                                    },
+                                                    maxTime = momentAudioPlayer.getSecondDuration().toInt()
+                                                )
                                                 Spacer(modifier = Modifier.height(10.dp))
                                                 Row(
                                                     modifier = Modifier
                                                         .fillMaxWidth()
-                                                        .padding(horizontal = 4.dp)
+                                                        .padding(horizontal = 8.dp)
                                                 ) {
                                                     Text(
                                                         text = "00 : 00",
@@ -815,7 +810,7 @@ class CardActivity : ComponentActivity() {
                                                     )
                                                     Spacer(modifier = Modifier.weight(1f))
                                                     Text(
-                                                        text = "00 : 00",
+                                                        text = "${momentAudioPlayer.getTimeDuration()}",
                                                         color = Color("#938F8F".toColorInt()),
                                                         fontWeight = FontWeight.Medium,
                                                         fontFamily = FontMoment.preStandardFont,
@@ -830,18 +825,28 @@ class CardActivity : ComponentActivity() {
                                                 ) {
                                                     Image(
                                                         modifier = Modifier.clickable {
-                                                            val file = File(MomentPath.RECORDER_PATH+convertUrlLinkStringToRcorderNameString(cardItems[index].cardView.recordFileUrl))
-                                                            if(file.exists()){
-                                                                if(!momentAudioPlayer.checkSameFile(file.name)){
-                                                                    momentAudioPlayer.playFile(file)
+//                                                            val file = File(MomentPath.RECORDER_PATH+convertUrlLinkStringToRcorderNameString(cardItems[index].cardView.recordFileUrl))
+//                                                            Log.d("awegweag","${file.name}, ${file.path}")
+                                                            try {
+                                                                if(!momentAudioPlayer.isActivity()){
+                                                                    momentAudioPlayer.playFile(cardItems[index].recordingFile!!)
+                                                                    momentAudioPlayer.start()
+                                                                    loading.value = !loading.value
+
                                                                 }else if(momentAudioPlayer.isIng()){
-                                                                    momentAudioPlayer.pause()
+//                                                                    momentAudioPlayer.pause()
+                                                                    momentAudioPlayer.stop()
+                                                                    loading.value = false
+//                                                                    momentAudioPlayer.playFile(cardItems[index].recordingFile!!)
                                                                 }else{
                                                                     momentAudioPlayer.start()
+                                                                    loading.value = !loading.value
+
                                                                 }
-                                                            }else{
+                                                            }catch (e:Exception){
                                                                 Toast.makeText(this@CardActivity,"녹음파일이 없습니다.",Toast.LENGTH_SHORT).show()
                                                             }
+
                                                         },
                                                         painter = painterResource(id = R.drawable.ic_record_start),
                                                         contentDescription = "seg"
@@ -1126,6 +1131,7 @@ class CardActivity : ComponentActivity() {
                                                         }
                                                     }
                                                 }
+                                                Spacer(modifier = Modifier.height(4.dp))
                                             }
 
 
@@ -1136,6 +1142,7 @@ class CardActivity : ComponentActivity() {
 
                                         }
                                     } else {
+                                        momentAudioPlayer.stop()
                                         Spacer(modifier = Modifier.height(4.dp))
                                         Row(
                                             modifier = Modifier
@@ -1341,25 +1348,7 @@ class CardActivity : ComponentActivity() {
             }
         }
 
-        @Composable
-        fun LinearDeterminateIndicator() {
-            var currentProgress = remember { mutableStateOf(0.5f) }
-            var loading = remember { mutableStateOf(false) }
-            val scope = rememberCoroutineScope() // Create a coroutine scope
-            LinearProgressIndicator(
-                progress = { currentProgress.value },
-                modifier = Modifier.fillMaxWidth(),
-                strokeCap = ProgressIndicatorDefaults.CircularDeterminateStrokeCap,
-            )
-        }
 
-        /** Iterate the progress value */
-        suspend fun loadProgress(updateProgress: (Float) -> Unit) {
-            for (i in 1..100) {
-                updateProgress(i.toFloat() / 100)
-                delay(100)
-            }
-        }
 
 
         @Preview
