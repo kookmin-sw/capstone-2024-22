@@ -153,6 +153,7 @@ struct CustomPageIndicator: View {
     @Binding var currentPage: Int
     
     var body: some View {
+        
         HStack {
             ForEach(0..<numberOfPages, id: \.self) { index in
                 Rectangle()

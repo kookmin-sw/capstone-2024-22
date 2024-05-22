@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Alamofire
 
 struct SettingView: View {
     @EnvironmentObject private var homeBaseViewModel: HomeBaseViewModel
@@ -19,58 +20,50 @@ struct SettingView: View {
     @State private var isShowEmail : Bool = false
     @Binding var showDialog : Bool
     @Binding var showDialogGoodbye : Bool
-    //@State private var selectedButtonTitle: String? = nil
-    
+    @State private var firebaseToken: String = "c9cnFm9_nECdu25ruUK0Cp:APA91bHD_BbbL7FAlu91S1u4BZRK0JXcueZIH8343CXCmuAX6mjkYShohze7GuuwyLlwqdjuIHh_0e-MFSGnqd1Mv83dWMDySamauZ0uPoHb3bVz1FAdmPherPcVDqND8AKUDOCHxMY-"
+
     var body: some View {
         ZStack {
             Color.homeBack.edgesIgnoringSafeArea(.all)
                 .onTapGesture {
-                                  self.showDialog = false
+                    self.showDialog = false
                     self.showDialogGoodbye = false
-                              }
+                }
             
             VStack(spacing: 20) { // 각 항목 사이의 간격 조절
                 Spacer().frame(height: 85)
                 CustomTitleMainDivider()
                 Spacer().frame(height: 20)
-                // Spacer().frame(height: 30)
-                // "알림설정" 버튼
                 
-                VStack{
+                VStack {
                     SettingButton(title: "알림설정", isSelected: selectedButtonTitle == "알림설정") {
                         withAnimation {
                             selectedButtonTitle = selectedButtonTitle == "알림설정" ? nil : "알림설정"
                         }
                     }
                     
-                    
-                    HStack{
-                        
+                    HStack {
                         if selectedButtonTitle == "알림설정" {
                             CustomToggleAlert(isOn: $isNotificationsEnabledAlert)
                         }
                         Spacer()
                     }
-                }
-                
-                
-                // "데이터 허용" 버튼
-                VStack{
+                    
                     SettingButton(title: "데이터 허용", isSelected: selectedButtonTitle == "데이터 허용") {
                         withAnimation {
                             selectedButtonTitle = selectedButtonTitle == "데이터 허용" ? nil : "데이터 허용"
                         }
                     }
                     
-                    HStack{
-                        
+                    HStack {
                         if selectedButtonTitle == "데이터 허용" {
                             CustomToggleData(isOnData: $isNotificationsEnabledData)
                         }
                         Spacer()
                     }
-                    .padding(.bottom,2)
-                    HStack{
+                    .padding(.bottom, 2)
+                    
+                    HStack {
                         Spacer().frame(width: 27)
                         if selectedButtonTitle == "데이터 허용" {
                             Text("셀룰러 데이터를 허용하면, 데이터 환경에서도 녹음카드 분석이 가능해요\n허용하지 않으면, WI-FI가 연결된 환경에서만 분석해요")
@@ -78,156 +71,147 @@ struct SettingView: View {
                                 .foregroundColor(.natural500)
                             Spacer().frame(width: 25)
                         }
-                        
                     }
-                }
-                VStack{
                     
                     SettingButton(title: "버전안내", isSelected: selectedButtonTitle == "버전안내") {
                         selectedButtonTitle = selectedButtonTitle == "버전안내" ? nil : "버전안내"
                         isNotificationsEnabledVersion.toggle()
                     }
                     if selectedButtonTitle == "버전안내" {
-                        HStack{
+                        HStack {
                             Spacer().frame(width: 35)
-                            if selectedButtonTitle == "버전안내"{
-                                Text("V 1.1")
-                                    .font(.pretendardMedium14)
-                                Spacer().frame(width: 30)
-                                Text("가장 최신버전이에요")
-                                    .font(.pretendardMedium11)
-                            }
+                            Text("V 1.1")
+                                .font(.pretendardMedium14)
+                            Spacer().frame(width: 30)
+                            Text("가장 최신버전이에요")
+                                .font(.pretendardMedium11)
                             Spacer()
-                                .padding(.horizontal,30)
+                                .padding(.horizontal, 30)
                         }
                     }
-                }
-                VStack{
+                    
                     SettingButton(title: "문의하기", isSelected: selectedButtonTitle == "문의하기") {
                         selectedButtonTitle = selectedButtonTitle == "문의하기" ? nil : "문의하기"
                         isShowEmail.toggle()
                     }
-                    //    HStack{
-                    
-                    if selectedButtonTitle == "문의하기"  {
+                    if selectedButtonTitle == "문의하기" {
                         VStack(alignment: .leading, spacing: 8) {
-                            
-                            HStack{
+                            HStack {
                                 Spacer().frame(width: 12)
                                 Text("kookmin@gmail.com")
                                     .font(.pretendardMedium14)
-                                   
-                                                   .padding(5) // 패딩 추가
-                                                   .background(Color.customSky) // 배경색을 파란색으로 설정
-                                                   .cornerRadius(5) // 모서리를 둥글게 처리
+                                    .padding(5)
+                                    .background(Color.customSky)
+                                    .cornerRadius(5)
                                     .tint(.black)
                                 Spacer()
-                                
                             }
-                            HStack{
+                            HStack {
                                 Spacer().frame(width: 12)
                                 Text("앗! 사용하시면서 불편한 점이 있으시다구요?\n이메일로 보내주시면 친절히 답변해드릴게요")
                                     .font(.pretendardMedium11)
-                                    .foregroundColor(.gray) // 설명 텍스트의 색상 조정
-                                    .multilineTextAlignment(.leading) // 텍스트를 왼쪽 정렬
+                                    .foregroundColor(.gray)
+                                    .multilineTextAlignment(.leading)
                                 Spacer()
                             }
                         }
-                        .padding(.leading) // 왼쪽 패딩 추가로 내용을 좌측에 정렬
+                        .padding(.leading)
                     }
                     
-                    // }
+                    Spacer()
                     
-                }
-                
-                Spacer()
-                VStack(spacing: 20) {
-                    Button(action: {
-                        // 로그아웃 로직을 여기에 작성하세요
-                        self.showDialog = true
-                        print("로그아웃 처리")
-                    }) {
-                        HStack {
-                            Text("로그아웃")
-                                .font(.pretendardMedium14)
-                                .foregroundColor(.black) // 텍스트 색상을 지정할 수 있습니다.
-                                .padding(.leading, 16) // 왼쪽 패딩을 추가하여 여백을 조정하세요.
-                            Spacer() // 나머지 공간을 채워서 텍스트를 왼쪽으로 밀어냅니다.
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading) // HStack을 최대 너비로 설정하고 왼쪽 정렬
-                    }
-                    
-                    Button(action: {
-                        // 탈퇴하기 로직을 여기에 작성하세요
-                        print("탈퇴 처리")
-                        self.showDialogGoodbye = true
-                        for fontFamily in UIFont.familyNames {
-                            for fontName in UIFont.fontNames(forFamilyName: fontFamily) {
-                                print(fontName)
+                    VStack(spacing: 20) {
+                        Button(action: {
+                            self.showDialog = true
+                            print("로그아웃 처리")
+                        }) {
+                            HStack {
+                                Text("로그아웃")
+                                    .font(.pretendardMedium14)
+                                    .foregroundColor(.black)
+                                    .padding(.leading, 16)
+                                Spacer()
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                    }) {
-                        HStack {
-                            Text("탈퇴하기")
-                                .font(.pretendardMedium14)
-                                .foregroundColor(.black) // 텍스트 색상을 지정할 수 있습니다.
-                                .padding(.leading, 16) // 왼쪽 패딩을 추가하여 여백을 조정하세요.
-                            Spacer() // 나머지 공간을 채워서 텍스트를 왼쪽으로 밀어냅니다.
+                        
+                        Button(action: {
+                            print("탈퇴 처리")
+                            self.showDialogGoodbye = true
+                        }) {
+                            HStack {
+                                Text("탈퇴하기")
+                                    .font(.pretendardMedium14)
+                                    .foregroundColor(.black)
+                                    .padding(.leading, 16)
+                                Spacer()
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading) // HStack을 최대 너비로 설정하고 왼쪽 정렬
+                        Spacer().frame(height: 40)
                     }
-                    Spacer().frame(height: 40)
+                    .padding()
+                    
+//                    Button(action: {
+//                        updateUserSettings()
+//                    }) {
+//                        Text("Update Settings")
+//                            .font(.pretendardMedium14)
+//                            .padding()
+//                            .background(Color.blue)
+//                            .foregroundColor(.white)
+//                            .cornerRadius(8)
+//                    }
                 }
-                .padding() // VStack에 대한 패딩 추가로 전체적인 여백
+                .padding(.horizontal, 1)
                 
-                
-                
-                
-                
-            }
-            .padding(.horizontal, 1) // 좌우 패딩
-            
-            if showDialog {
-               
+                if showDialog {
                     LogoutDialog(
                         isActive: $showDialog,
                         title: "정말 로그아웃 하시나요?",
                         message: "",
                         yesAction: {
-                            
                             showDialog = false
                         },
                         noAction: {
-                            showDialog = false // 다이얼로그 닫기
-                            
+                            showDialog = false
                         }
                     )
-                
-                .transition(.opacity) // 다이얼로그 등장과 사라짐에 투명도 변화 적용
-                
-                .zIndex(1) // 다이얼로그가 다른 요소들 위에 오도록 설정
-           
-            }
-            
-            else if showDialogGoodbye {
-                GoodbyeDialog(
-                    isActive: $showDialogGoodbye,
-                    title: "정말 탈퇴 하시나요..?",
-                    message: "새로운 계정으로 만나는건 가능하지만\n지금까지의 우리 추억은 모두 사라져요",
-                    yesAction: {
-                        
-                        showDialogGoodbye = false
-                    },
-                    noAction: {
-                        showDialogGoodbye = false // 다이얼로그 닫기
-                        
-                    }
-                )
-                .transition(.opacity) // 다이얼로그 등장과 사라짐에 투명도 변화 적용
-                .zIndex(1) // 다이얼로그가 다른 요소들 위에 오도록 설정
+                    .transition(.opacity)
+                    .zIndex(1)
+                } else if showDialogGoodbye {
+                    GoodbyeDialog(
+                        isActive: $showDialogGoodbye,
+                        title: "정말 탈퇴 하시나요..?",
+                        message: "새로운 계정으로 만나는건 가능하지만\n지금까지의 우리 추억은 모두 사라져요",
+                        yesAction: {
+                            showDialogGoodbye = false
+                        },
+                        noAction: {
+                            showDialogGoodbye = false
+                        }
+                    )
+                    .transition(.opacity)
+                    .zIndex(1)
+                }
             }
         }
-        
+    }
+    
+    func updateUserSettings() {
+        let settings = UserSettings(notification: isNotificationsEnabledAlert, dataUsage: isNotificationsEnabledData, firebaseToken: firebaseToken)
+        UserService.shared.updateUserSettings(userId: 1, settings: settings) { result in
+            switch result {
+            case .success(let success):
+                if success {
+                    print("Settings updated successfully")
+                } else {
+                    print("Failed to update settings")
+                }
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        }
     }
 }
 

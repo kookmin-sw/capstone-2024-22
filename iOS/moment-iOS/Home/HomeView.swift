@@ -59,7 +59,7 @@ struct HomeView: View {
                             .font(.pretendardExtrabold14)
                             .foregroundColor(.black)
                             .padding(.top, 30)
-                            .offset(x:-75,y:15)
+                            .offset(x:-80,y:15)// - 일수록 왼쪽으로 이동함
                         
                         HStack(alignment: .firstTextBaseline) {
                             Text("출발까지")
@@ -100,7 +100,9 @@ struct HomeView: View {
                 }
                 .frame(height: 100)
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+              
                 CustomPageIndicator(numberOfPages: 2, currentPage: $selectedSlideIndex)
+                    .offset(y:15)
                 CustomHomeVDivider().padding()
                 CustomHomeMainDividerthick()
                     .padding()
