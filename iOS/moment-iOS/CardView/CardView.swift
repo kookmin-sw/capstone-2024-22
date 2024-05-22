@@ -27,7 +27,7 @@ struct CardView: View {
     @State private var isEditing = false // 편집 모드 상태
     @State private var selectedCardIDs = Set<Int>() // 선택된 카드의 ID 저장
    // @State private var cardViews : cardViews?
-  
+   // var cardItem: cardViews
     
     
     var body: some View {
@@ -125,10 +125,11 @@ struct CardView: View {
                     message: "삭제된 녹음 카드는 복구할 수 없어요",
                     yesAction: {
                         // 삭제 로직
-                        cardViewModel.cardItems.removeAll { selectedCardIDs.contains($0.id) }
-                        selectedCardIDs.removeAll()
-                        isEditing = false
-                        showConfirmationDialog = false
+//                        cardViewModel.cardItems.removeAll { selectedCardIDs.contains($0.id) }
+//                        selectedCardIDs.removeAll()
+                        deleteSelectedCardViews()
+//                        isEditing = false
+//                        showConfirmationDialog = false
                     },
                     noAction: {
                         showConfirmationDialog = false
@@ -145,6 +146,38 @@ struct CardView: View {
         
         
     }
+    private func deleteSelectedCardViews() {
+          let group = DispatchGroup()
+          var failedDeletes = [Int]()
+
+          for cardViewId in selectedCardIDs {
+              group.enter()
+              cardViewModel.deleteCardView(cardViewId: cardViewId) { result in
+                  switch result {
+                  case .success(let success):
+                      if !success {
+                          failedDeletes.append(cardViewId)
+                      }
+                  case .failure:
+                      failedDeletes.append(cardViewId)
+                  }
+                  group.leave()
+              }
+          }
+
+          group.notify(queue: .main) {
+              if failedDeletes.isEmpty {
+                  // 성공적으로 삭제된 경우
+                  cardViewModel.cardItems.removeAll { selectedCardIDs.contains($0.id) }
+                  selectedCardIDs.removeAll()
+                  isEditing = false
+                  showConfirmationDialog = false
+              } else {
+                  // 일부 삭제 실패한 경우, 사용자에게 알림 또는 다른 처리를 할 수 있습니다.
+                  print("다음 카드뷰를 삭제하지 못했습니다: \(failedDeletes)")
+              }
+          }
+      }
 }
 
 struct AccordionView: View {

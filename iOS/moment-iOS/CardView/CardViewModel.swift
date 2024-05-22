@@ -69,13 +69,7 @@ class CardViewModel: ObservableObject {
     @Published var emotions: [EmotionDataCard] = []
     @Published var cardItemsLike: [LikeCardViewData] = []
     
-//    init() {
-//        updateEmotions(happy: 24.09, sad: 15.9, angry: 14.95, neutral: 21.14, disgust: 23.91)
-//    }
-    
-    
-//    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTQyNDgzMiwiZXhwIjoxNzU4NjI0ODMyfQ.iHg2ACmOB_hzoSlwsTfzGc_1gn6OHYmAxD0b2wgqNJg"
-    
+
     var authToken: String {
         get {
             // 키체인에서 토큰을 가져옵니다
@@ -237,7 +231,7 @@ class CardViewModel: ObservableObject {
     }
     
     func uploadImages(_ images: [UIImage], to cardViewId: Int) {
-        let url = "http://wasuphj.synology.me:8000/core/cardView/image/\(cardViewId)"
+        let url = "http://211.205.171.117:8000/core/cardView/image/\(cardViewId)"
         let headers: HTTPHeaders = [
             "Authorization": authToken,
             "Content-Type": "multipart/form-data"
@@ -259,7 +253,31 @@ class CardViewModel: ObservableObject {
             }
         }
     }
+    
+    func deleteCardView(cardViewId: Int, completion: @escaping (Result<Bool, Error>) -> Void) {
+           let url = "http://211.205.171.117:8000/core/cardView/\(cardViewId)"
+           let headers: HTTPHeaders = [
+               "Content-Type": "application/json;charset=UTF-8",
+               "Authorization": authToken,
+           
+           ]
 
+           AF.request(url, method: .delete, headers: headers)
+               .validate()
+               .responseDecodable(of: DeleteResponse.self) { response in
+                   switch response.result {
+                   case .success(let value):
+                       if value.status == 200 {
+                           completion(.success(true))
+                       } else {
+                           let error = NSError(domain: "", code: value.status, userInfo: [NSLocalizedDescriptionKey: value.msg])
+                           completion(.failure(error))
+                       }
+                   case .failure(let error):
+                       completion(.failure(error))
+                   }
+               }
+       }
     
 }
 
