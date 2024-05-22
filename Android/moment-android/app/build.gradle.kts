@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+
 
 plugins {
     kotlin("plugin.serialization") version "1.5.0"
@@ -6,6 +6,9 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("dagger.hilt.android.plugin")
+    id("com.google.gms.google-services")
+
+
 }
 
 android {
@@ -16,8 +19,8 @@ android {
         applicationId = "com.capstone.android.application"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -25,13 +28,37 @@ android {
         }
     }
 
+
+
+    signingConfigs {
+        create("release") {
+            keyAlias = "moment-release-key2"
+            keyPassword = "rlaalswnd1"
+            storeFile = file("/Users/kimminjung/AndroidStudioProjects/moment-key-manage/release/moment-releasekeystore2")
+            storePassword = "rlaalswnd1"
+        }
+    }
+
     buildTypes {
+
+//        배포 준비 할 때 디버그 모드와 릴리즈 모드 나누기
+//        debug {
+//            applicationIdSuffix = ".debug"
+//            isDebuggable = true
+//
+//        }
+
         release {
+
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -72,6 +99,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.compose.material3:material3-android:1.2.1")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
+    implementation("com.google.android.gms:play-services-wearable:18.1.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -118,4 +147,14 @@ dependencies {
 
     // AsyncImage
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // Timber
+    implementation("com.jakewharton.timber:timber:5.0.1")
+
+    // Glide-Compose
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+
+    // firebase
+    implementation("com.google.firebase:firebase-messaging:21.1.0")
+
 }

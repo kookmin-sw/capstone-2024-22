@@ -1,9 +1,6 @@
 package com.capstone.android.application.presentation
 
 
-import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
@@ -32,7 +29,6 @@ class CountViewModel : ViewModel(){
                     val elapsedTime =  System.currentTimeMillis() - startTime
                     val remainingTime = max(0, time - elapsedTime)
                     _timeLeft.value = remainingTime
-                    Log.d("remainingTime", "startCountdown: $remainingTime")
                     delay(1000) // 1초마다 업데이트
                 }
             }
@@ -64,4 +60,8 @@ class CountViewModel : ViewModel(){
         countdownJob?.cancel() // ViewModel이 제거될 때 카운트다운을 중지
     }
 }
+
+
+
+
 

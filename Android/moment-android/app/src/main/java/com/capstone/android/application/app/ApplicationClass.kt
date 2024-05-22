@@ -1,7 +1,15 @@
 package com.capstone.android.application.app
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.SharedPreferences
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.Wearable
 
 import dagger.hilt.android.HiltAndroidApp
 import okhttp3.Interceptor
@@ -10,6 +18,7 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 
@@ -21,20 +30,68 @@ class ApplicationClass: Application() {
         lateinit var retrofit: Retrofit
         lateinit var retrofitKakao: Retrofit
 
-        val API_URL="http://wasuphj.synology.me:8000/"
+        val API_URL="http://211.205.171.117:8000/"
         val KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/"
+        val OPEN_WATHER_API_URL = "https://api.openweathermap.org/"
+        var tripName:String = ""
+        var transactionId:String=""
+        val openWeartherAppId:String = "750af8c3ad235147ce30452e8242d76f"
+        val versionName:String = "1.2.0"
     }
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        val notificationChannel= NotificationChannel(
+            "moment_notification",
+            "Moment",
+            NotificationManager.IMPORTANCE_HIGH
+        )
+        val notificationManager=getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(notificationChannel)
+
+
+        Wearable.getCapabilityClient(this@ApplicationClass)
+            .getCapability("wear_app", CapabilityClient.FILTER_ALL)
+            .addOnSuccessListener {
+                Log.d("waegaewg","success, ${it.nodes.size}")
+                it.nodes.forEach {
+                    transactionId = it.id
+                    Log.d("waegaewg","${it.id} , ${it.displayName}")
+                }
+            }
+            .addOnFailureListener{
+                Log.d("waegaewg","afilure")
+            }.addOnCanceledListener {
+                Log.d("waegaewg","cancled")
+            }
+            .addOnCompleteListener {
+                Log.d("waegaewg","complete, ${it.result.nodes.size}")
+                it.result.nodes.forEach {
+                    Log.d("waegaewg","${it.id} , ${it.displayName}")
+                }
+            }
+
+
         tokenSharedPreferences =
             applicationContext.getSharedPreferences("TOKEN", MODE_PRIVATE)
 
         initRetrofitInstance()
+//        디버그 모드일 때 적용
+//        if (BuildConfig.DEBUG) {
+//            Timber.plant(Timber.DebugTree())
+//        }
 
 
+        if(true){
+            Timber.plant(Timber.DebugTree())
+            Timber.i("ApplicationClass Success")
+        }else{
+//            Timber.plant(ReleaseTree())
+        }
     }
 
 
@@ -43,7 +100,7 @@ class ApplicationClass: Application() {
             proceed(
                 request()
                     .newBuilder()
-                    .addHeader("Authorization", "KakaoAK d1f4a1d0fde030076b6e307bd925ac90")
+                    .addHeader("Authorization", "KakaoAK 53abda48bb969b1264e59f56d17e1bb0")
                     .build()
             )
         }
@@ -54,7 +111,7 @@ class ApplicationClass: Application() {
             proceed(
                 request()
                     .newBuilder()
-                    .addHeader("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxMDkzMDMyMCwiZXhwIjoxNzU0MTMwMzIwfQ.mVy33lNv-by6bWXshsT4xFOwZSWGkOW76GWimliqHP4")
+                    .addHeader("Authorization", "Bearer ${tokenSharedPreferences.getString("accessToken","")}")
                     .build()
             )
         }

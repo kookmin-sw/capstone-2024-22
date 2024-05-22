@@ -60,6 +60,32 @@ fun P_SemiBold18(content: String, color: Color){
             fontSize = 18.sp)
     )
 }
+
+@Composable
+fun P_Medium(content: String, color: Color, size: TextUnit){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = size)
+    )
+}
+@Composable
+fun P_Medium_Oneline(content: String, color: Color, size: TextUnit){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = size),
+        overflow = TextOverflow.Clip,
+        maxLines = 1
+    )
+}
+
 @Composable
 fun P_Medium8(content: String, color: Color){
     Text(
@@ -97,6 +123,21 @@ fun P_Medium14(content: String, color: Color){
     )
 }
 
+//옮길 때 전체 수정하기
+@Composable
+fun P_Medium14_center(content: String, color: Color, Align: TextAlign){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+            textAlign = Align)
+    )
+}
+
+
 @Composable
 fun P_Medium18(content: String, color: Color){
     Text(
@@ -132,8 +173,29 @@ fun P_ExtraBold14(content: String, color: Color){
             fontSize = 14.sp)
     )
 }
-
-
+@Composable
+fun P_ExtraBold(content: String, color: Color, size: TextUnit){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = size)
+    )
+}
+@Composable
+fun P_Bold(content: String, color: Color, size: TextUnit, textAlign: TextAlign){
+    Text(
+        text = content,
+        textAlign = textAlign,
+        style = TextStyle(
+            color = color,
+            fontFamily = PretendardFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = size)
+    )
+}
 @Composable
 fun P_Bold30(content: String, color: Color, textAlign: TextAlign){
     Text(
@@ -169,6 +231,18 @@ fun P_Black50(content: String, color: Color){
             fontSize = 50.sp)
     )
 }
+@Composable
+fun YJ_Bold(content: String, color: Color, size: TextUnit){
+    Text(
+        text = content,
+        style = TextStyle(
+            color = color,
+            fontFamily = FontMoment.obangFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = size)
+    )
+}
+
 
 @Composable
 fun YJ_Bold15(content: String, color: Color){
@@ -252,21 +326,7 @@ fun ReciptTextField(
                 innerTextField = it,
                 singleLine = true,
                 enabled = true,
-                placeholder = { if (text.value.isNotEmpty())
-                    Row(verticalAlignment = Alignment.CenterVertically){
-                        if(type == "small") {Image(painter = painterResource(R.drawable.ic_location_red), contentDescription = "장소", Modifier.size(19.dp))
-                            Spacer(modifier = Modifier.width(4.dp))}
-                        if(type == "small1") {Image( painter = painterResource(R.drawable.ic_location_grey), contentDescription = "장소", Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))}
-                        ReciptHintText(content = "", fontweight, fontsize, type)
-                    }
-                    else Row(verticalAlignment = Alignment.CenterVertically){
-                        if(type == "small") {Image(painter = painterResource(R.drawable.ic_location_red), contentDescription = "장소", Modifier.size(19.dp))
-                            Spacer(modifier = Modifier.width(4.dp))}
-                        if(type == "small1") {Image(painter = painterResource(R.drawable.ic_location_grey), contentDescription = "장소", Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))}
-                        ReciptHintText(hint, fontweight, fontsize, type)
-                } },
+                placeholder = {  ReciptHintText(hint, fontweight, fontsize, type) },
                 interactionSource = remember { MutableInteractionSource() },
                 contentPadding = TextFieldDefaults.textFieldWithoutLabelPadding(
                     start = 0.dp, top = 0.dp, end = 0.dp, bottom = 0.dp

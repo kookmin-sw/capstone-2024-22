@@ -3,7 +3,12 @@ package com.capstone.android.application.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -15,6 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,13 +29,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -42,19 +46,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -62,49 +66,121 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
+import com.capstone.android.application.app.ApplicationClass.Companion.tokenSharedPreferences
 import com.capstone.android.application.app.composable.MomentTextField
+import com.capstone.android.application.app.utile.firebase.MyFirebaseMessagingService
+import com.capstone.android.application.data.remote.auth.auth_code.request.PostAuthAuthCodeRequest
+import com.capstone.android.application.data.remote.auth.auth_code_confirm.request.PatchAuthAuthCodeConfirmRequest
+import com.capstone.android.application.data.remote.auth.change_password.request.PatchAuthChangePasswordRequest
+import com.capstone.android.application.data.remote.auth.login.request.PostAuthLoginRequest
+import com.capstone.android.application.data.remote.setting.model.PatchFcmTokenRequest
+import com.capstone.android.application.presentation.AuthViewModel
 import com.capstone.android.application.presentation.CountViewModel
+import com.capstone.android.application.presentation.SettingViewModel
 import com.capstone.android.application.ui.theme.BigButton
 import com.capstone.android.application.ui.theme.CheckButton
 import com.capstone.android.application.ui.theme.CountText
+import com.capstone.android.application.ui.theme.FontMoment
 import com.capstone.android.application.ui.theme.ImgBackButton
 import com.capstone.android.application.ui.theme.P_Bold30
-import com.capstone.android.application.ui.theme.P_ExtraBold16
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
 import com.capstone.android.application.ui.theme.P_Medium18
-import com.capstone.android.application.ui.theme.P_SemiBold18
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
 import com.capstone.android.application.ui.theme.negative_600
+import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
 import com.capstone.android.application.ui.theme.primary_500
 import com.capstone.android.application.ui.theme.tertiary_500
 import com.capstone.android.application.ui.theme.white
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 enum class OnboardingScreen(){
     Login,
-    LoginComplete,
+    LoginCompleteSplash,
     Signup,
-    Signup_email,
-    Signup_number,
+    SignupEmail,
+    SignupNumber,
     FindPassword,
-    FindPassword_number,
-    FindPassword_Signup,
+    FindPasswordNumber,
+    FindPasswordSignup,
     SignupComplete,
     AgreeDetail
 }
+
+@AndroidEntryPoint
 class OnboardingActivity:ComponentActivity() {
     lateinit var navController: NavHostController
-    @OptIn(ExperimentalMaterial3Api::class)
+    private val authViewModel : AuthViewModel by viewModels()
+    private val settingViewModel : SettingViewModel by viewModels()
+    private var userId:Int=0
+
+    private fun MyFirebaseMessaging() {
+        val token: Task<String> = FirebaseMessaging.getInstance().token
+        token.addOnCompleteListener(OnCompleteListener { task ->
+            if (task.isSuccessful) {
+                settingViewModel.patchFcmToken(
+                    body = PatchFcmTokenRequest(
+                        notification = true,
+                        dataUsage = true,
+                        firebaseToken=  task.result
+                    )
+                )
+                Log.d("FCMToken",task.result)
+//                registerFCMToken(task.result)
+            }
+        })
+    }
+
+
+    private fun registerFCMToken(FCMToken:String){
+        val fcm = Intent(applicationContext, MyFirebaseMessagingService::class.java)
+        startService(fcm)
+    }
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initApi()
+
 
         setContent{
+
+            val authCodeInFindPassword = remember {
+                mutableStateOf("")
+            }
+
+            val authCodeInSignup = remember {
+                mutableStateOf("")
+            }
+
+
+            val isLoginActivity = remember{
+                mutableStateOf(false)
+            }
+
+
+            val isEmaliWrite = remember{
+                mutableStateOf(false)
+            }
+
+            val isAuthCodeWrite = remember{
+                mutableStateOf(false)
+            }
+
+            val isFindPasswordWrite = remember {
+                mutableListOf(false)
+            }
+
+            val email = remember{mutableStateOf("")}
+            val FindPW_id = remember{ mutableStateOf("") }
+
             navController = rememberNavController()
 
             Scaffold(
@@ -118,18 +194,101 @@ class OnboardingActivity:ComponentActivity() {
                     navController = navController, startDestination = OnboardingScreen.Login.name
                 ){
                     composable(route=OnboardingScreen.Login.name){ Login() }
-                    composable(route=OnboardingScreen.LoginComplete.name){ LoginComplete()}
-                    composable(route=OnboardingScreen.Signup_email.name){ Signup_email() }
-                    composable(route=OnboardingScreen.Signup_number.name){ Signup_number() }
-                    composable(route=OnboardingScreen.Signup.name){ Signup() }
-                    composable(route=OnboardingScreen.FindPassword.name){ FindPassword() }
-                    composable(route=OnboardingScreen.FindPassword_number.name){ FindPassword_number() }
-                    composable(route=OnboardingScreen.FindPassword_Signup.name){ FindPassword_Signup() }
+                    composable(route=OnboardingScreen.LoginCompleteSplash.name){ LoginCompleteSplash()}
+                    composable(route=OnboardingScreen.SignupEmail.name){ SignupEmail(email) }
+                    composable(route=OnboardingScreen.SignupNumber.name){
+                        SignupNumber(authCode=authCodeInSignup, email = email)
+                    }
+                    composable(route=OnboardingScreen.Signup.name){ Signup(authCodeInSignup,email) }
+                    composable(route=OnboardingScreen.FindPassword.name){ FindPassword(FindPW_id) }
+                    composable(route=OnboardingScreen.FindPasswordNumber.name){
+                        FindPasswordNumber(authCodeInFindPassword, FindPW_id)
+                    }
+                    composable(route=OnboardingScreen.FindPasswordSignup.name){
+                        FindPasswordSignup(code = authCodeInFindPassword.value)
+                    }
                     composable(route=OnboardingScreen.SignupComplete.name){ SignupComplete() }
-                    composable(route=OnboardingScreen.AgreeDetail.name){ AgreeDetail() }
+                    composable(route=OnboardingScreen.AgreeDetail.name){ AgreeDetail("https://sites.google.com/view/tour-82/%ED%99%88") }
                 }
             }
         }
+
+    }
+
+    private fun initApi(){
+        // 로그인 성공
+        authViewModel.postAuthLoginSuccess.observe(this@OnboardingActivity){ response->
+            MyFirebaseMessaging()
+            tokenSharedPreferences.edit().putString("accessToken",response.data.accessToken).apply()
+            navController.navigate(OnboardingScreen.LoginCompleteSplash.name)
+
+//             startActivity(Intent(this@OnboardingActivity,MainActivity::class.java))
+//             finish()
+        }
+
+        // 로그인 실패
+        authViewModel.postAuthLoginFailure.observe(this@OnboardingActivity){ response->
+            Toast.makeText(this@OnboardingActivity,"로그인에 실패",Toast.LENGTH_SHORT).show()
+        }
+
+        // 인증코드 요청
+        authViewModel.postAuthAuthCodeSuccess.observe(this@OnboardingActivity){ response->
+            tokenSharedPreferences.edit().putString("accessToken",response.data.accessToken).apply()
+
+
+            userId=response.data.userId
+            MyFirebaseMessaging()
+        }
+
+        // 인증코드 요청 실패
+        authViewModel.postAuthAuthCodeFailure.observe(this@OnboardingActivity){ response->
+            Toast.makeText(this@OnboardingActivity,"인증코드요청에 실패했습니다.",Toast.LENGTH_SHORT).show()
+
+        }
+
+        // 인증코드 확인
+        authViewModel.patchAuthAuthCodeConfirmSuccess.observe(this@OnboardingActivity){ response ->
+            tokenSharedPreferences.edit().putString("accessToken",response.data.accessToken).apply()
+            MyFirebaseMessaging()
+            if(navController.currentDestination?.route == OnboardingScreen.SignupNumber.name){
+                navController.navigate(OnboardingScreen.Signup.name)
+            }
+
+            if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
+                navController.navigate(OnboardingScreen.Login.name)
+            }
+        }
+
+        // 인증코드 확인 실패
+        authViewModel.patchAuthAuthCodeConfirmFailure.observe(this@OnboardingActivity){ response->
+            Toast.makeText(this@OnboardingActivity,"인증번호가 틀렸습니다.",Toast.LENGTH_SHORT).show()
+
+        }
+
+        // 비밀번호 변경
+        authViewModel.patchAuthChangePasswordSuccess.observe(this@OnboardingActivity){ response->
+            Log.d("patchAuthChangePasswordSuccess", "initApi: ${navController.currentDestination?.route}")
+            if(navController.currentDestination?.route == OnboardingScreen.FindPasswordSignup.name){
+                navController.navigate(OnboardingScreen.Login.name)
+            }
+            if(navController.currentDestination?.route == OnboardingScreen.Signup.name){
+                navController.navigate(OnboardingScreen.SignupComplete.name)
+            }
+        }
+
+        // 비밀번호 변경 실패
+        authViewModel.patchAuthChangePasswordFailure.observe(this@OnboardingActivity){ response->
+            Toast.makeText(this@OnboardingActivity,"서버오류.",Toast.LENGTH_SHORT).show()
+        }
+
+        settingViewModel.patchFcmTokenSuccess.observe(this@OnboardingActivity){
+            Log.d("awegaewg","hello")
+
+        }
+
+
+
+
     }
 
     @SuppressLint("UnrememberedMutableState")
@@ -162,13 +321,14 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(top = 54.dp)
                     .wrapContentSize()
             ) {
-                ImgBackButton(onClick = {startActivity(Intent(this@OnboardingActivity, SplashActivity::class.java))}, "로그인")
+                ImgBackButton(onClick = {startActivity(Intent(this@OnboardingActivity, SplashActivity::class.java).putExtra("MoveScreen","intro"))}, "로그인")
             }
 
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = 277.dp)){
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center){
 
                 Column( modifier = Modifier
                     .padding(horizontal = 8.dp)){
@@ -241,30 +401,63 @@ class OnboardingActivity:ComponentActivity() {
                         Spacer(modifier = Modifier.height(4.dp))
                         Divider(color = black)
                     }
-                    Row(modifier = Modifier
-                        .padding(end = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically){
-                        P_Medium11(content = "자동로그인",color = black)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        CheckButton(autologin)
-                    }
                 }
             }
 
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 45.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Text(
+                    modifier = Modifier.clickable {
+                        tokenSharedPreferences.edit().putString("accessToken","Bearer " +
+                                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." +
+                                "eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjEsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTA4NzY0NCwiZXhwIjoxNzU4Mjg3NjQ0fQ" +
+                                ".6n5w1g87Pyoy11yyzsrxtwpdFHiGMzdjn56EgzFc9gc"
+                        ).apply()
+                        if(!tokenSharedPreferences.getString("accessToken","").isNullOrEmpty()){
+                            startActivity(Intent(this@OnboardingActivity,MainActivity::class.java))
+                            finish()
+                        }
+                    },
+                    text = "무료체험하기",
+                    textDecoration = TextDecoration.Underline,
+                    fontFamily = FontMoment.preStandardFont,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(12.dp))
                 if (id.value.isNotEmpty() && password.value.isNotEmpty()){
-                    BigButton("로그인하기", true, onClick = {navController.navigate(OnboardingScreen.LoginComplete.name)})
+
+                    BigButton("로그인하기", true,
+                        onClick = {
+                            authViewModel.postAuthLogin(
+                                body = PostAuthLoginRequest(
+                                    email = id.value,
+                                    password = password.value
+                                )
+                            )
+//                            navController.navigate(OnboardingScreen.LoginComplete.name)
+                        }
+                    )
+
                 }else{
                     BigButton("로그인하기", false, onClick = {startActivity(Intent(this@OnboardingActivity, MainActivity::class.java))})
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                BigButton("가입하기", true) { navController.navigate(OnboardingScreen.Signup_email.name) }
+                BigButton("가입하기", true) { navController.navigate(OnboardingScreen.SignupEmail.name) }
             }
         }
+    }
+
+    @Composable
+    fun LoginCompleteSplash(){
+        LoginComplete()
+        Handler(Looper.getMainLooper()).postDelayed({
+            startActivity(Intent(this@OnboardingActivity,MainActivity::class.java))
+            finish()
+        }, 1000)
     }
 
     @Composable
@@ -285,25 +478,19 @@ class OnboardingActivity:ComponentActivity() {
                     painter =  painterResource(R.drawable.img_logo),
                     contentDescription = "LOGO")
             }
-
-            Column(Modifier.clickable {
-                startActivity(Intent(this@OnboardingActivity, MainActivity::class.java)) }) {
-                P_Medium18(content = "다음으로~", color = black)
-            }
             Column(modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 112.dp),
                 horizontalAlignment = Alignment.CenterHorizontally) {
                 P_Medium14(content = "반가워요!", color = black)
-                P_Medium14(content = "사용자이메일@naver.com", color = black)
+                //P_Medium14(content = "사용자이메일@naver.com", color = black)
             }
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun Signup_email(){
-        val email = remember{mutableStateOf("")}
+    fun SignupEmail(email : MutableState<String>){
         //keyboard
         val focusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
@@ -313,7 +500,7 @@ class OnboardingActivity:ComponentActivity() {
 
         //bottomsheet
         val sheetState = rememberModalBottomSheetState()
-        var recordOpen = remember { mutableStateOf(false)}
+        val recordOpen = remember { mutableStateOf(false)}
 
         val agree1 = remember { mutableStateOf(false) }
         val agree2 = remember { mutableStateOf(false) }
@@ -351,7 +538,8 @@ class OnboardingActivity:ComponentActivity() {
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(top = 344.dp)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
             ) {
                 Column(
                     modifier = Modifier
@@ -420,11 +608,30 @@ class OnboardingActivity:ComponentActivity() {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp),
+                    .padding(bottom = 45.dp),
             ) {if (email.value.isNotEmpty() && agree.value){
-                BigButton("다음", true) { navController.navigate(OnboardingScreen.Signup_number.name) }
+                BigButton(
+                    "다음", true
+                ) {
+                    authViewModel.postAuthAuthCode(
+                        body = PostAuthAuthCodeRequest(
+                            email = email.value,
+                            isSignUp = "true"
+                        )
+                    )
+                    if(navController.currentDestination?.route == OnboardingScreen.SignupEmail.name){
+                        navController.navigate(OnboardingScreen.SignupNumber.name)
+                    }
+
+                    if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
+                        navController.navigate(OnboardingScreen.FindPasswordNumber.name)
+                    }
+
+                    Toast.makeText(this@OnboardingActivity,"인증번호를 보냈습니다.",Toast.LENGTH_SHORT).show()
+
+                }
             }else{
-                BigButton("다음", false) { navController.navigate(OnboardingScreen.Signup_number.name) }            }
+                BigButton("다음", false) { navController.navigate(OnboardingScreen.SignupNumber.name) }            }
             }
         }
     }
@@ -444,78 +651,77 @@ class OnboardingActivity:ComponentActivity() {
             containerColor = tertiary_500,
             dragHandle = null
         ){
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(tertiary_500)
-                    .height(216.dp)
-                    .padding(start = 44.dp, end = 35.dp, top = 46.dp, bottom = 34.dp)
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.Absolute.SpaceBetween
-                ) {
-                    Row(modifier = Modifier
-                        .width(259.dp)
-                        .align(Alignment.CenterVertically)) {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .background(tertiary_500)
+                .padding(10.dp)
+                .height(250.dp)){
+
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 10.dp),
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.Center) {
+                    CheckButton(agree1)
+                    Spacer(modifier =Modifier.height(16.dp))
+                    CheckButton(agree2)
+                    Spacer(modifier =Modifier.height(16.dp))
+                    CheckButton(agree3)
+                }
+
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(end = 50.dp),
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.Center) {
+                    Column (
+                        Modifier.clickable { navController.navigate(OnboardingScreen.AgreeDetail.name) }){
+                        P_Medium11(content = "보기", color = neutral_600)
+                    }
+                    Spacer(modifier =Modifier.height(16.dp))
+                    Column (
+                        Modifier.clickable { navController.navigate(OnboardingScreen.AgreeDetail.name) }){
+                        P_Medium11(content = "보기", color = neutral_600)
+                    }
+                    Spacer(modifier =Modifier.height(16.dp))
+                    Column (
+                        Modifier.clickable { navController.navigate(OnboardingScreen.AgreeDetail.name) }){
+                        P_Medium11(content = "보기", color = neutral_600)
+                    }
+                }
+
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 10.dp),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center) {
+                    Row(modifier = Modifier.wrapContentWidth()) {
                         P_Medium11(content = "(필수) ", color = primary_500)
                         P_Medium11(content = "이용약관 동의", color = black)
                     }
-                    Column (
-                        Modifier
-                            .align(Alignment.CenterVertically)
-                            .clickable { navController.navigate(OnboardingScreen.AgreeDetail.name) }){
-                        P_Medium11(content = "보기", color = neutral_600)
-                    }
-                    Spacer(modifier =Modifier.width(20.dp))
-                    CheckButton(agree1)
-                }
-                Spacer(modifier =Modifier.height(16.dp))
-                Row(
-                    horizontalArrangement = Arrangement.Absolute.SpaceBetween
-                ) {
-                    Row(modifier = Modifier
-                        .width(259.dp)
-                        .align(Alignment.CenterVertically)) {
+                    Spacer(modifier =Modifier.height(16.dp))
+                    Row(modifier = Modifier.wrapContentWidth()) {
                         P_Medium11(content = "(필수) ", color = primary_500)
                         P_Medium11(content = "개인정보 수집 이용 및 조회 동의", color = black)
                     }
-                    Column (
-                        Modifier
-                            .align(Alignment.CenterVertically)
-                            .clickable { navController.navigate(OnboardingScreen.AgreeDetail.name) }){
-                        P_Medium11(content = "보기", color = neutral_600)
-                    }
-                    Spacer(modifier =Modifier.width(20.dp))
-                    CheckButton(agree2)
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    horizontalArrangement = Arrangement.Absolute.SpaceBetween
-                ) {
-                    Row(modifier = Modifier
-                        .width(259.dp)
-                        .align(Alignment.CenterVertically)) {
+                    Spacer(modifier =Modifier.height(16.dp))
+                    Row(modifier = Modifier.wrapContentWidth()) {
                         P_Medium11(content = "(선택) ", color = black)
                         P_Medium11(content = "E-mail 마케팅 정보 수신 동의", color = black)
                     }
-                    Column (
-                        Modifier
-                            .align(Alignment.CenterVertically)
-                            .clickable { navController.navigate(OnboardingScreen.AgreeDetail.name) }){
-                        P_Medium11(content = "보기", color = neutral_600)
-                    }
-                    Spacer(modifier =Modifier.width(20.dp))
-                    CheckButton(agree3)
                 }
-                Spacer(modifier =Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .align(Alignment.End)
-                ) {
+
+
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 14.dp)
+                        .padding(bottom = 45.dp),
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.Bottom) {
                     Column(
                         Modifier
-                            .padding(horizontal = 14.dp, vertical = 10.dp)
+                            .wrapContentSize()
                             .clickable {
                                 coroutineScope
                                     .launch {
@@ -536,13 +742,15 @@ class OnboardingActivity:ComponentActivity() {
 
 
     @Composable
-    fun Signup_number(countViewModel: CountViewModel = viewModel()){
+    fun SignupNumber(countViewModel: CountViewModel = viewModel(), authCode:MutableState<String>,
+                     email : MutableState<String>){
 
         val timeLeft by countViewModel.timeLeft.collectAsState()
         val number = remember{mutableStateOf("")}
-        var signnumState = remember {mutableStateOf(true)}
+        val signnumState = remember {mutableStateOf(true)}
         val focusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
+        authCode.value = number.value
 
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
@@ -565,112 +773,114 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Signup_email.name)
+                    navController.navigate(OnboardingScreen.SignupEmail.name)
                 }, "회원가입")
             }
 
-            //Toast.makeText(this@OnboardingActivity, R.drawable.img_alarm_grey , Toast.LENGTH_LONG).show()
-            //Toast.makeText(this@OnboardingActivity, "dfd", Toast.LENGTH_LONG).show()
-
-            Column(modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 298.dp)) {
-                Box(
-                    contentAlignment = Alignment.Center
-                ){
-                    Spacer(modifier = Modifier.width(18.dp))
-                    Image(
-                        modifier = Modifier
-                            .width(205.dp)
-                            .height(42.dp),
-                        painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
-                    )
-                    P_Medium11(content = "입력하신 이메일로 인증번호가 전송되었어요\n" +
-                            "메일함을 확인해 주세요", color = white)
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 344.dp)
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11("인증번호", if(signnumState.value) black else negative_600)
-                    CountText(timeLeft)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "인증번호를 입력해주세요",
-                    onValueChanged = { number.value = it },
-                    onClicked = {},
-                    text = number,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "onemove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color =  if(signnumState.value) black else negative_600)
-
-                if(signnumState.value){}else{
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Column(modifier = Modifier.padding(horizontal = 8.dp)
-                    ){
-                        P_Medium11(content = "인증번호를 다시한번 확인해 주세요", color = negative_600)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11(content = "받으신 인증 번호 6자리는 차후 복구코드와 동일하게 사용됩니다\n" +
-                            "인터넷 상태에 따라 소요시간이 발생할 수 있습니다", color = neutral_600 )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(modifier = Modifier
-                    .width(86.dp)
-                    .align(Alignment.End)
-                    .clickable { countViewModel.restartCountdown() }) {
-                    Column {
-                        Column(modifier = Modifier
-                            .padding(horizontal = 8.dp)) {
-                            P_Medium11(
-                                content = "인증번호 재전송",
-                                color = black
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Divider(color = black)
-                    }
-                }
-                Row(modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .align(Alignment.End)
-
-                ) {
-
+            Column(modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center) {
+                Column(modifier = Modifier
+                    .padding(horizontal = 24.dp)) {
                     Box(
                         contentAlignment = Alignment.Center
                     ){
                         Spacer(modifier = Modifier.width(18.dp))
                         Image(
                             modifier = Modifier
-                                .width(155.dp)
-                                .height(26.dp),
-                            painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
+                                .width(205.dp)
+                                .height(42.dp),
+                            painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
                         )
+                        P_Medium11(content = "입력하신 이메일로 인증번호가 전송되었어요\n" +
+                                "메일함을 확인해 주세요", color = white)
+                    }
+                }
 
-                        P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("인증번호", if(signnumState.value) black else negative_600)
+                        CountText(timeLeft)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "인증번호를 입력해주세요",
+                        onValueChanged = { number.value = it },
+                        onClicked = {},
+                        text = number,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "onemove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color =  if(signnumState.value) black else negative_600)
+
+                    if(signnumState.value){}else{
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Column(modifier = Modifier.padding(horizontal = 8.dp)
+                        ){
+                            P_Medium11(content = "인증번호를 다시한번 확인해 주세요", color = negative_600)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11(content = "받으신 인증 번호 6자리는 차후 복구코드와 동일하게 사용됩니다\n" +
+                                "인터넷 상태에 따라 소요시간이 발생할 수 있습니다", color = neutral_600 )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(modifier = Modifier
+                        .width(86.dp)
+                        .align(Alignment.End)
+                        .clickable {
+                            countViewModel.restartCountdown()
+                            authViewModel.postAuthAuthCode(
+                                body = PostAuthAuthCodeRequest(
+                                    email = email.value,
+                                    isSignUp = "false"
+                                )
+                            )
+                        }){
+                        Column {
+                            Column(modifier = Modifier
+                                .padding(horizontal = 8.dp)) {
+                                P_Medium11(
+                                    content = "인증번호 재전송",
+                                    color = black
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Divider(color = black)
+                        }
+                    }
+                    Row(modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .align(Alignment.End)){
+                        Box(
+                            contentAlignment = Alignment.Center
+                        ){
+                            Spacer(modifier = Modifier.width(18.dp))
+                            Image(
+                                modifier = Modifier
+                                    .width(155.dp)
+                                    .height(26.dp),
+                                painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
+                            )
+                            P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
+                        }
                     }
                 }
             }
@@ -680,10 +890,18 @@ class OnboardingActivity:ComponentActivity() {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 45.dp)
             ) {
                 if ( number.value.isNotEmpty()){
-                    BigButton("다음", true) { navController.navigate(OnboardingScreen.Signup.name) }
+                    BigButton("다음", true) {
+                        authViewModel.patchAuthAuthCodeConfirm(
+                            body = PatchAuthAuthCodeConfirmRequest(
+                                userId = userId.toString(),
+                                code = number.value
+                            )
+                        )
+
+                    }
                 }else{
                     BigButton("다음", false) { navController.navigate(OnboardingScreen.Signup.name) }
                 }
@@ -693,21 +911,21 @@ class OnboardingActivity:ComponentActivity() {
     }
 
     @Composable
-    fun Signup(){
-        val id = remember{
-            mutableStateOf("")
-        }
+    fun Signup(emailAuthCode:MutableState<String>, email : MutableState<String>){
         val password = remember{
             mutableStateOf("")
         }
         val passwordcheck = remember{
             mutableStateOf("")
         }
-        var pwequel = remember{ mutableStateOf(true) }
+        val wificheck = remember{
+            mutableStateOf(false)
+        }
+        val pwequel = remember{ mutableStateOf(true) }
         val focusManager = LocalFocusManager.current
         val focusRequester = remember { FocusRequester() }
 
-        LaunchedEffect(id) {
+        LaunchedEffect(password) {
             focusRequester.requestFocus()
         }
 
@@ -723,90 +941,100 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Signup_number.name)
+                    navController.navigate(OnboardingScreen.SignupNumber.name)
                 }, "회원가입")
             }
 
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 210.dp)
-            ) {
+            Column(modifier=Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center) {
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
+                        .padding(horizontal = 16.dp)
                 ) {
-                    P_Medium11("아이디", black)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "abcd1234@naver.com 자동입력하기",
-                    onValueChanged = { id.value = it },
-                    onClicked = {},
-                    text = id,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "manyfirstmove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color = black)
-                Spacer(modifier = Modifier.height(16.dp))
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11("비밀번호", black)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "비밀번호를 입력해주세요",
-                    onValueChanged = { password.value = it },
-                    onClicked = {},
-                    text = password,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "manynextmove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color = black)
-                Spacer(modifier = Modifier.height(16.dp))
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("아이디", black)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    P_Medium18(content = email.value, color = black)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color = black)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("비밀번호", black)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "비밀번호를 입력해주세요",
+                        onValueChanged = { password.value = it },
+                        onClicked = {},
+                        text = password,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "manyfirstmove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color = black)
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11("비밀번호 확인", if(pwequel.value)black else primary_500)
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("비밀번호 확인", if(pwequel.value)black else primary_500)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "비밀번호를 다시 한 번 입력해주세요",
+                        onValueChanged = { passwordcheck.value = it },
+                        onClicked = {},
+                        text = passwordcheck,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "manyendmove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color = if(pwequel.value)black else primary_500)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(modifier = Modifier
+                        .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End){
+                        Column(horizontalAlignment = Alignment.End) {
+                            P_Medium11(content = "와이파이가 없는 환경에서도 녹음 파일 저장하기",color = black)
+                            P_Medium11(content = "나중에 설정에서 바꿀 수 있어요",color = neutral_500)
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        CheckButton(wificheck)
+                    }
                 }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "비밀번호를 다시 한 번 입력해주세요",
-                    onValueChanged = { passwordcheck.value = it },
-                    onClicked = {},
-                    text = passwordcheck,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "manyendmove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color = if(pwequel.value)black else primary_500)
             }
+
 
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 45.dp)
             ) {
-                if (id.value.isNotEmpty() && password.value.isNotEmpty() && passwordcheck.value.isNotEmpty()){
+                if ( password.value.isNotEmpty() && passwordcheck.value.isNotEmpty()){
                     BigButton("가입하기", true) {
                         if (password.value == passwordcheck.value) {
+                            authViewModel.patchAuthChangePassword(
+                                body = PatchAuthChangePasswordRequest(
+                                    code = emailAuthCode.value,
+                                    newPassword = password.value
+                                )
+                            )
                             pwequel.value = true
-                            navController.navigate(OnboardingScreen.Login.name)
                         } else {
                             pwequel.value = false
                         }
@@ -836,17 +1064,26 @@ class OnboardingActivity:ComponentActivity() {
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 45.dp)
             ) {
-                BigButton("로그인하기", true) { navController.navigate(OnboardingScreen.Login.name) }
+                BigButton("시작하기", true) {
+
+                    val intent = Intent(this@OnboardingActivity,MainActivity::class.java)
+                    intent.flags =
+                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP //액티비티 스택제거
+
+                    startActivity(intent)
+                    finish()
+                }
             }
         }
     }
 
-    @Composable
-    fun FindPassword(){
 
-        val id = remember{ mutableStateOf("") }
+    // 비밀번호 찾기
+    @Composable
+    fun FindPassword(id: MutableState<String>){
+
         val idState = remember{ mutableStateOf(true) }
 
         val focusRequester = remember { FocusRequester() }
@@ -870,64 +1107,72 @@ class OnboardingActivity:ComponentActivity() {
                 }, "비밀번호 찾기")
             }
 
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 344.dp)) {
+            Column(modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center) {
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11("아이디", if (idState.value) black else negative_600)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "가입한 이메일을 입력해주세요",
-                    onValueChanged = { id.value = it },
-                    onClicked = {},
-                    text = id,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "onemove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color =  if (idState.value) black else negative_600)
-
-                if(idState.value){ }else{
-                    Spacer(modifier = Modifier.height(4.dp))
+                        .padding(horizontal = 16.dp)) {
                     Column(
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    ){
-                        P_Medium11("앗 ! 올바른 이메일 형식이 아니에요", negative_600)
-                    }}
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("아이디", if (idState.value) black else negative_600)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "가입한 이메일을 입력해주세요",
+                        onValueChanged = { id.value = it },
+                        onClicked = {},
+                        text = id,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "onemove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color =  if (idState.value) black else negative_600)
 
-                Spacer(modifier = Modifier.height(8.dp))
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11(content = "해당 이메일로 비밀번호 초기화 코드가 발송됩니다", color = neutral_600 )
+                    if(idState.value){ }else{
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Column(
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ){
+                            P_Medium11("앗 ! 올바른 이메일 형식이 아니에요", negative_600)
+                        }}
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11(content = "해당 이메일로 비밀번호 초기화 코드가 발송됩니다", color = neutral_600 )
+                    }
                 }
             }
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp),
+                    .padding(bottom = 45.dp),
             ) {if (id.value.isNotEmpty()){
-                BigButton("다음", true) { navController.navigate(OnboardingScreen.FindPassword_number.name) }
+                BigButton("다음", true) {
+                    authViewModel.postAuthAuthCode(
+                        body = PostAuthAuthCodeRequest(
+                            email = id.value,
+                            isSignUp = "false"
+                        )
+                    )
+                }
             }else{
-                BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPassword_number.name) }            }
+                BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPasswordNumber.name) }            }
             }
         }
     }
 
+    // 비밀번호 찾기에서 인증코드 확인
     @Composable
-    fun FindPassword_number(){
-        val number = remember{
-            mutableStateOf("")
-        }
+    fun FindPasswordNumber(authCode:MutableState<String>, id: MutableState<String>){
+
         val findpwnumState = remember{
             mutableStateOf(true)
         }
@@ -948,124 +1193,134 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Signup_email.name)
+                    navController.navigate(OnboardingScreen.SignupEmail.name)
                 }, "비밀번호 찾기")
             }
 
-            //Toast.makeText(this@OnboardingActivity, R.drawable.img_alarm_grey , Toast.LENGTH_LONG).show()
-            //Toast.makeText(this@OnboardingActivity, "dfd", Toast.LENGTH_LONG).show()
-
-            Column(modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(top = 298.dp)) {
-                Box(
-                    contentAlignment = Alignment.Center
-                ){
-                    Spacer(modifier = Modifier.width(18.dp))
-                    Image(
-                        modifier = Modifier
-                            .width(205.dp)
-                            .height(42.dp),
-                        painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
-                    )
-                    P_Medium11(content = "입력하신 이메일로 복구코드가 전송되었어요\n" +
-                            "메일함을 확인해 주세요", color = white
-                    )
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 344.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11("복구코드", if(findpwnumState.value)black else negative_600)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "복구코드 6자리를 입력해주세요",
-                    onValueChanged = { number.value = it },
-                    onClicked = {},
-                    text = number,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "onemove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color = if(findpwnumState.value)black else negative_600)
-
-                if(findpwnumState.value){ }else{
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Column(
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    ){
-                        P_Medium11("복구코드를 다시한번 확인해 주세요", negative_600)
-                    }}
-
-                Spacer(modifier = Modifier.height(8.dp))
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11(content = "인터넷 상태에 따라 소요시간이 발생할 수 있습니다.", color = neutral_600 )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(modifier = Modifier
-                    .width(86.dp)
-                    .align(Alignment.End)
-                    .clickable { /*인증번호 재전송 기능*/ }) {
-                    Column {
-                        Column(modifier = Modifier
-                            .padding(horizontal = 8.dp)) {
-                            P_Medium11(
-                                content = "복구코드 재전송",
-                                color = black
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Divider(color = black)
-                    }
-                }
-                Row(modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .align(Alignment.End)
-
-                ) {
-
+            Column(modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center) {
+                Column(modifier = Modifier
+                    .padding(horizontal = 24.dp)) {
                     Box(
                         contentAlignment = Alignment.Center
                     ){
                         Spacer(modifier = Modifier.width(18.dp))
                         Image(
                             modifier = Modifier
-                                .width(155.dp)
-                                .height(26.dp),
-                            painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
+                                .width(205.dp)
+                                .height(42.dp),
+                            painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
                         )
+                        P_Medium11(content = "입력하신 이메일로 복구코드가 전송되었어요\n" +
+                                "메일함을 확인해 주세요", color = white
+                        )
+                    }
+                }
 
-                        P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("복구코드", if(findpwnumState.value)black else negative_600)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "복구코드 6자리를 입력해주세요",
+                        onValueChanged = { authCode.value = it },
+                        onClicked = {},
+                        text = authCode,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "onemove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color = if(findpwnumState.value)black else negative_600)
+
+                    if(findpwnumState.value){ }else{
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Column(
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ){
+                            P_Medium11("복구코드를 다시한번 확인해 주세요", negative_600)
+                        }}
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11(content = "인터넷 상태에 따라 소요시간이 발생할 수 있습니다.", color = neutral_600 )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(modifier = Modifier
+                        .width(86.dp)
+                        .align(Alignment.End)
+                        .clickable {
+                            authViewModel.postAuthAuthCode(
+                                body = PostAuthAuthCodeRequest(
+                                    email = id.value,
+                                    isSignUp = "false"
+                                )
+                            )
+                        }) {
+                        Column {
+                            Column(modifier = Modifier
+                                .padding(horizontal = 8.dp)) {
+                                P_Medium11(
+                                    content = "복구코드 재전송",
+                                    color = black
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Divider(color = black)
+                        }
+                    }
+                    Row(modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .align(Alignment.End)
+
+                ) {
+
+                        Box(
+                            contentAlignment = Alignment.Center
+                        ){
+                            Spacer(modifier = Modifier.width(18.dp))
+                            Image(
+                                modifier = Modifier
+                                    .width(155.dp)
+                                    .height(26.dp),
+                                painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
+                            )
+
+                            P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
+                        }
                     }
                 }
             }
-
-
-
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 45.dp)
             ) {
-                if ( number.value.isNotEmpty()){
-                    BigButton("다음", true) { navController.navigate(OnboardingScreen.FindPassword_Signup.name) }
+                if ( authCode.value.isNotEmpty()){
+                    BigButton("다음", true) {
+                        authViewModel.patchAuthAuthCodeConfirm(
+                            body = PatchAuthAuthCodeConfirmRequest(
+                                userId = userId.toString(),
+                                code = authCode.value
+                            )
+                        )
+                        navController.navigate(OnboardingScreen.FindPasswordSignup.name)
+                    }
                 }else{
-                    BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPassword_Signup.name) }
+                    BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPasswordSignup.name) }
                 }
 
             }
@@ -1073,7 +1328,7 @@ class OnboardingActivity:ComponentActivity() {
     }
 
     @Composable
-    fun  FindPassword_Signup() {
+    fun  FindPasswordSignup(code:String) {
 
         val password = remember {
             mutableStateOf("")
@@ -1103,79 +1358,88 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Signup_number.name)
+                    navController.navigate(OnboardingScreen.SignupNumber.name)
                 }, "비밀번호 찾기")
             }
 
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 277.dp)
-            ) {
+            Column(modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center) {
                 Column(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
+                        .padding(horizontal = 16.dp)
                 ) {
-                    P_Medium11("비밀번호", black)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "비밀번호를 입력해주세요",
-                    onValueChanged = { password.value = it },
-                    onClicked = {},
-                    text = password,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "manyfirstmove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color = black)
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                ) {
-                    P_Medium11("비밀번호 확인", if (pwequel.value) black else negative_600)
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                MomentTextField(
-                    hint = "비밀번호를 다시 한 번 입력해주세요",
-                    onValueChanged = { passwordcheck.value = it },
-                    onClicked = {},
-                    text = passwordcheck,
-                    keyboardType = KeyboardType.Text,
-                    changecolor = black,
-                    focusRequester = focusRequester,
-                    move = "manyendmove",
-                    focusManager = focusManager
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Divider(color = if (pwequel.value) black else negative_600)
-
-                if (pwequel.value) {
-                } else {
-                    Spacer(modifier = Modifier.height(4.dp))
                     Column(
-                        modifier = Modifier.padding(horizontal = 8.dp)
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
                     ) {
-                        P_Medium11(content = "비밀번호가 동일하지 않습니다.", color = negative_600)
+                        P_Medium11("비밀번호", black)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "비밀번호를 입력해주세요",
+                        onValueChanged = { password.value = it },
+                        onClicked = {},
+                        text = password,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "manyfirstmove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color = black)
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        P_Medium11("비밀번호 확인", if (pwequel.value) black else negative_600)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    MomentTextField(
+                        hint = "비밀번호를 다시 한 번 입력해주세요",
+                        onValueChanged = { passwordcheck.value = it },
+                        onClicked = {},
+                        text = passwordcheck,
+                        keyboardType = KeyboardType.Text,
+                        changecolor = black,
+                        focusRequester = focusRequester,
+                        move = "manyendmove",
+                        focusManager = focusManager
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Divider(color = if (pwequel.value) black else negative_600)
+
+                    if (pwequel.value) {
+                    } else {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Column(
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            P_Medium11(content = "비밀번호가 동일하지 않습니다.", color = negative_600)
+                        }
                     }
                 }
             }
 
+
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 72.dp)
+                    .padding(bottom = 45.dp)
             ) {
                 if (password.value.isNotEmpty() && passwordcheck.value.isNotEmpty()) {
                     BigButton("로그인하기", true) {
                         if (password.value == passwordcheck.value) {
+                            authViewModel.patchAuthChangePassword(
+                                body = PatchAuthChangePasswordRequest(
+                                    code = code,
+                                    newPassword = password.value
+                                )
+                            )
                             pwequel.value = true
-                            navController.navigate(OnboardingScreen.Login.name)
+
                         } else {
                             pwequel.value = false
                         }
@@ -1190,34 +1454,19 @@ class OnboardingActivity:ComponentActivity() {
     }
 
     @Composable
-    fun AgreeDetail(){
-        //데이터 결정되면 디자인 작은 수정 있을 수 있음
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .background(color = tertiary_500)
-            .padding(horizontal = 27.dp)){
+    fun AgreeDetail(url: String) {
+        val context = LocalContext.current
 
-            P_ExtraBold16(content = "약관동의", color = black)
-
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 100.dp, bottom = 92.dp)
-                .verticalScroll(rememberScrollState())) {
-                P_Medium11(content = "(필수)약관동의\n\n\n\n\n\n\n약관동의\n\n\n\n\n\n\n약관동의\n\n\n\n\n\n\n\n\n약관동의\n\n\n\n\n약관동의\n\n\n\n\n약관동의\n\n\n\n\n약관동의\n\n\n\n\n약관동의\n\n\n\n\n약관동의약\n\n\n\n\n관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의약관동의", color = black)
-            }
-
-
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 50.dp),
-            ) { Column(modifier = Modifier
-                .padding(horizontal = 14.dp, vertical = 10.dp)
-                .clickable { navController.navigate(OnboardingScreen.Signup_email.name) }) {
-                YJ_Bold15("확인",black)
-            }  }
-        }
+        AndroidView(factory = {
+            WebView(context).apply {
+                webViewClient = WebViewClient()
+                loadUrl(url)
+            }}, update = { webView ->
+            webView.loadUrl(url)
+        })
     }
+
+
 
     /*@Composable
     fun BackButton(onClick : () -> Unit, content : String){
@@ -1238,6 +1487,6 @@ class OnboardingActivity:ComponentActivity() {
     @Preview
     @Composable
     fun OnboardingPreView(){
-        Signup_email()
+        Login()
     }
 }

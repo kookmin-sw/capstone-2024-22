@@ -2,10 +2,19 @@ package com.capstone.android.application
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -21,7 +30,9 @@ import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -34,15 +45,15 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ModalBottomSheet
@@ -57,24 +68,30 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -83,43 +100,169 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.capstone.android.application.app.ApplicationClass
+import com.capstone.android.application.app.ApplicationClass.Companion.tokenSharedPreferences
+import com.capstone.android.application.app.composable.CustomTitleCheckDialog
 import com.capstone.android.application.app.composable.FancyProgressBar
-import com.capstone.android.application.app.screen.MainScreen
+import com.capstone.android.application.app.composable.TripEmpty
+import com.capstone.android.application.app.composable.TripExist
+import com.capstone.android.application.app.composable.TripIng
+import com.capstone.android.application.app.composable.convertUrlLinkStringToRcorderNameString
+import com.capstone.android.application.app.composable.getCurrentTime
+import com.capstone.android.application.app.composable.getDifferenceInDay
 import com.capstone.android.application.app.screen.BottomNavItem
+import com.capstone.android.application.app.screen.MainScreen
+import com.capstone.android.application.app.utile.MomentPath
+import com.capstone.android.application.app.utile.common.GetWeatherIconDrawableCode
+import com.capstone.android.application.app.utile.common.GetWeatherType
+import com.capstone.android.application.app.utile.firebase.MyFirebaseMessagingService
+import com.capstone.android.application.app.utile.loading.LinearDeterminateIndicator
+import com.capstone.android.application.app.utile.loading.loadProgress
+import com.capstone.android.application.app.utile.location.MomentLocation
+import com.capstone.android.application.app.utile.permission.MomentPermission
+import com.capstone.android.application.app.utile.recorder.MomentAudioPlayer
+import com.capstone.android.application.app.utile.recorder.MomentAudioRecorder
+import com.capstone.android.application.data.remote.card.model.card_post.request.PostCardUploadReqeust
+import com.capstone.android.application.data.remote.receipt.model.receipt_delete.ReceiptId
+import com.capstone.android.application.data.remote.receipt.model.receipt_delete.deleteReceiptDeleteRequest
+import com.capstone.android.application.domain.Card
+import com.capstone.android.application.domain.Emotion
+import com.capstone.android.application.domain.ReceiptAll
+import com.capstone.android.application.domain.Trip
+import com.capstone.android.application.domain.TripFile
+import com.capstone.android.application.presentation.AuthViewModel
+import com.capstone.android.application.presentation.CardViewModel
+import com.capstone.android.application.presentation.KakaoViewModel
+import com.capstone.android.application.presentation.OpenWeatherViewModel
+import com.capstone.android.application.presentation.ReceiptViewModel
+import com.capstone.android.application.presentation.TripFileViewModel
+import com.capstone.android.application.presentation.TripViewModel
 import com.capstone.android.application.ui.CardActivity
-import com.capstone.android.application.ui.OnboardingScreen
+import com.capstone.android.application.ui.PatchTripActivity
 import com.capstone.android.application.ui.PostTripActivity
 import com.capstone.android.application.ui.ReciptActivity
-import com.capstone.android.application.ui.ReciptScreen
+import com.capstone.android.application.ui.SplashActivity
 import com.capstone.android.application.ui.TripFileActivity
 import com.capstone.android.application.ui.theme.ApplicationTheme
 import com.capstone.android.application.ui.theme.BigButton
 import com.capstone.android.application.ui.theme.FontMoment
+import com.capstone.android.application.ui.theme.P_ExtraBold
+import com.capstone.android.application.ui.theme.P_Medium
 import com.capstone.android.application.ui.theme.P_Medium11
 import com.capstone.android.application.ui.theme.P_Medium14
+import com.capstone.android.application.ui.theme.P_Medium14_center
 import com.capstone.android.application.ui.theme.P_Medium18
+import com.capstone.android.application.ui.theme.P_Medium_Oneline
+import com.capstone.android.application.ui.theme.YJ_Bold
 import com.capstone.android.application.ui.theme.YJ_Bold15
 import com.capstone.android.application.ui.theme.black
+import com.capstone.android.application.ui.theme.neutral_100
+import com.capstone.android.application.ui.theme.neutral_200
+import com.capstone.android.application.ui.theme.neutral_300
+import com.capstone.android.application.ui.theme.neutral_400
 import com.capstone.android.application.ui.theme.neutral_500
 import com.capstone.android.application.ui.theme.neutral_600
+import com.capstone.android.application.ui.theme.positive_800
+import com.capstone.android.application.ui.theme.primary_200
 import com.capstone.android.application.ui.theme.primary_500
+import com.capstone.android.application.ui.theme.secondary_400
 import com.capstone.android.application.ui.theme.secondary_50
 import com.capstone.android.application.ui.theme.tertiary_500
+import com.capstone.android.application.ui.theme.tertiary_600
+import com.capstone.android.application.ui.theme.warning_600
 import com.capstone.android.application.ui.theme.white
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.messaging.BuildConfig
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import timber.log.Timber
 import java.io.File
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.util.Date
+import java.util.Locale
+import javax.inject.Inject
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterial3Api::class)
-class MainActivity : ComponentActivity() {
-    lateinit var navController: NavHostController
+enum class TripState{
+    EMPTY,EXISTS,ING
+}
 
+enum class TripType{
+    COMMON, ANALYZING, TRAVELING,BOTH
+}
+data class MainTrip(
+    var id :Int=0,
+    var state:TripState = TripState.EMPTY,
+    var tripName:String="",
+    var period:Int=0
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
+
+    lateinit var navController: NavHostController
+    private val tripViewModel : TripViewModel by viewModels()
+    private val cardViewModel : CardViewModel by viewModels()
+    private val receiptViewModel : ReceiptViewModel by viewModels()
+    private val tripFileViewModel : TripFileViewModel by viewModels()
+    private val kakaoViewModel : KakaoViewModel by viewModels()
+    private val openWeatherViewModel : OpenWeatherViewModel by viewModels()
+    private val authViewModel:AuthViewModel by viewModels()
+    @Inject lateinit var momentLocation : MomentLocation
+    @Inject lateinit var momentPermission: MomentPermission
+    @Inject lateinit var recorder: MomentAudioRecorder
+    @Inject lateinit var player: MomentAudioPlayer
+    @Inject lateinit var momentAudioPlayer:MomentAudioPlayer
+    private var audioFile: File? = null
+
+
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var currentDate:String=""
+        momentPermission.requestPermission()
+
+
+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("YYYY-MM-DD hh:mm:ss A Z"))
+//            currentDate = current
+//        } else {
+//            val date = Date(System.currentTimeMillis())
+//            val dateFormat = SimpleDateFormat(
+//                "yyyy-MM-dd HH:mm",
+//                Locale.KOREA
+//            )
+//
+//            currentDate=dateFormat.format(date)
+//        }
+
         setContent {
+
             ApplicationTheme {
                 // A surface container using the 'background' color from the theme
                 MainRoot()
@@ -127,265 +270,748 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    fun MainRoot(){
-
-        navController = rememberNavController()
-        val bottomItems = listOf<BottomNavItem>(
-            BottomNavItem.Home,
-            BottomNavItem.Receipt,
-            BottomNavItem.Record,
-            BottomNavItem.Favorite,
-            BottomNavItem.Setting,
-        )
-
-        val scope = rememberCoroutineScope()
-        val title = remember{
-            mutableStateOf("추가")
+    fun MainRoot() {
+        var movenav = "Basic"
+         try {
+             movenav = intent.getStringExtra("MoveScreen").toString()
+             if (movenav == "ReceiptPost") {
+                 receiptViewModel.getReceiptAll(0,10000)
+                 Log.d("ReceiptPost", "MainRoot: ")
+             }
+        } catch (e: Exception) {
+             movenav = "Basic"
         }
 
-        val currentSelectedBottomRoute = remember{
-            mutableStateOf("홈")
+        val tripContract =
+            rememberLauncherForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == 1) {
+//                    val intent = result.data
+                    tripViewModel.getTripAll()
+                    //do something here
+                }
+
+                if (result.resultCode == 2) {
+//                    val intent = result.data
+                    tripViewModel.getTripAll()
+                    //do something here
+                }
+            }
+
+        val makeReceipt =
+            rememberLauncherForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == 1) {
+                    receiptViewModel.getReceiptAll(0,10000)
+                }
+            }
+
+        val tripList = remember {
+            mutableStateListOf<Trip>()
         }
-        //bottomsheet
-        val sheetState = rememberModalBottomSheetState(/*
+        val tripFileUntitledList = remember {
+            mutableStateListOf<TripFile>()
+        }
+
+        val lat = remember {
+            mutableStateOf("")
+        }
+
+        val lon = remember {
+            mutableStateOf("")
+        }
+
+        val temp = remember {
+            mutableStateOf("")
+        }
+
+        val weather = remember {
+            mutableStateOf("")
+        }
+        val addressName = remember {
+            mutableStateOf("")
+        }
+
+        val favoriteCardList = remember {
+            mutableStateListOf<Card>()
+        }
+
+        val DeleteReceipt = remember { mutableListOf<ReceiptId>() }
+        val test: Int = 4
+        val colorName: Result<String> = runCatching {
+            when (test) {
+                1 -> "파란색"
+                2 -> "빨간색"
+                3 -> "노란색"
+                else -> throw Error("처음 들어보는 색")
+            }
+        }.onSuccess { it: String ->
+            Log.d("awegweagewag", it)
+        }.onFailure { it: Throwable ->}
+            //실패시만 실행 (try - catch문의 catch와 유사)
+
+
+            var mainTrip = remember {
+                mutableStateOf(MainTrip())
+
+            }
+
+
+            val bottomItems = listOf<BottomNavItem>(
+                BottomNavItem.Home,
+                BottomNavItem.Receipt,
+                BottomNavItem.Record,
+                BottomNavItem.Favorite,
+                BottomNavItem.Setting,
+            )
+
+            val scope = rememberCoroutineScope()
+            val title = remember {
+                mutableStateOf("추가")
+            }
+
+            val currentSelectedBottomRoute = remember {
+                mutableStateOf("홈")
+            }
+            //Record Bottomsheet
+            val sheetState = rememberModalBottomSheetState(/*
             initialValue = ModalBottomSheetValue.Hidden,
             confirmStateChange = {false}*/
+            )
+
+            val recordOpen = remember { mutableStateOf(false) }
+            val isRecorderIng = remember { mutableStateOf(false) }
+            var EditCheckState = remember { mutableStateOf(false) }
+            var ReceiptCheckState = remember { mutableStateOf(true) }
+
+
+        val coroutineScope = rememberCoroutineScope()
+            val emotionList = remember {
+                mutableStateListOf<Emotion>()
+            }
+
+            emotionList.add(
+                Emotion(
+                    icon = R.drawable.ic_emotion_common,
+                    text = "평범해요",
+                    persent = 0f,
+                    color = "#99342E"
+                )
+            )
+            emotionList.add(
+                Emotion(
+                    icon = R.drawable.ic_emotion_happy,
+                    text = "즐거워요",
+                    persent = 0f,
+                    color = "#030712"
+                )
+            )
+            emotionList.add(
+                Emotion(
+                    icon = R.drawable.ic_emotion_angry,
+                    text = "화가나요",
+                    persent = 0f,
+                    color = "#DAD0B4"
+                )
+            )
+            emotionList.add(
+                Emotion(
+                    icon = R.drawable.ic_emotion_sad,
+                    text = "우울해요 ",
+                    persent = 0f,
+                    color = "#1F9854"
+                )
+            )
+        emotionList.add(
+            Emotion(
+                icon = R.drawable.ic_receipt2_emotion_disgust,
+                text = "불쾌해요 ",
+                persent = 0f,
+                color = "#1F9854"
+            )
         )
-        var recordOpen = remember { mutableStateOf(false)}
 
-        if(recordOpen.value) {
-            RecordNavigatesheet(recordOpen,
-                sheetState = sheetState,
-                closeSheet = { recordOpen.value = false })
-        }
+            // 영수증 삭제 dialog
+            val showDeleteDialog = remember { mutableStateOf(false) }
+            val deleteyes = remember { mutableStateOf(false) }
 
-        Scaffold(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = WindowInsets.navigationBars.getBottom(LocalDensity.current).dp / 2)
-                .shadow(elevation = 6.dp)
-            ,
-            bottomBar = {
-                Box(
-                    contentAlignment = Alignment.Center
-                ){
-                    BottomNavigation(
-                        modifier = Modifier
-                            .height(70.dp)
-                            .fillMaxWidth()
-                            .align(Alignment.BottomCenter)
-                        ,
-                        backgroundColor = Color.White,
-                        elevation = 20.dp
-                    ) {
+            tripViewModel.getTripAll()
+            cardViewModel.getCardLiked()
+            tripFileViewModel.getTripFileUntitled()
+            receiptViewModel.getReceiptAll(0,10000)
 
-                        val navBackStackEntry by navController.currentBackStackEntryAsState()
-                        val currentDestination = navBackStackEntry?.destination
-                        bottomItems.forEach { screen ->
-                            BottomNavigationItem(
-                                selectedContentColor = Color.Black,
-                                unselectedContentColor = Color("#938F8F".toColorInt()),
-                                label = {
-                                    Column(
-                                        modifier = Modifier
-                                            .height(35.dp)
-                                    ) {
-                                        Text(
-                                            text = screen.label,
-                                            fontSize = 12.sp
+
+            tripViewModel.getTripAllSuccess.observe(this@MainActivity) { response ->
+                tripList.clear()
+                response.data.trips.mapNotNull { trip ->
+                    runCatching {
+                        Trip(
+                            id = trip.id,
+                            tripName = trip.tripName,
+                            startDate = trip.startDate,
+                            endDate = trip.endDate,
+                            analyzingCount = trip.analyzingCount
+                        )
+                    }
+                        .onSuccess {
+                        }.onFailure {
+                        }
+                        .getOrNull()
+                }.forEach {
+                    tripList.add(it)
+                }
+
+
+
+
+
+                if (tripList.isNotEmpty()) {
+                    Log.d("awegagwea", "waegewa")
+                    tripList.sortedBy { it.startDate }
+                    ApplicationClass.tripName = tripList.first().tripName
+                    tripList.forEach{
+                        Log.d("awegaewgewag",it.tripName)
+                    }
+                    val format: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+                    val currentDate = format.parse(getCurrentTime())
+                    val compareDate = format.parse(tripList.first().startDate)
+
+                    val different =
+                        getDifferenceInDay(startDate = currentDate, endDate = compareDate)
+
+                    run breaker@{
+                        tripList.forEach {
+
+                            if (currentDate.compareTo(format.parse(it.startDate)) < 0) {
+                                mainTrip.value = MainTrip(
+                                    id = it.id,
+                                    state = TripState.EXISTS,
+                                    tripName = it.tripName,
+                                    period = abs(
+                                        getDifferenceInDay(
+                                            startDate = currentDate,
+                                            endDate = format.parse(it.startDate)
                                         )
-                                    }
-                                },
-                                icon = {
-                                    Column(
-                                        modifier = Modifier.height(35.dp),
-                                        verticalArrangement = Arrangement.Top,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Box(
-                                            contentAlignment = Alignment.Center,
+                                    )
+                                )
+                                ApplicationClass.tripName = it.tripName
+                                return@breaker
+                            } else if (currentDate.compareTo(format.parse(it.endDate)) < 0) {
+                                mainTrip.value = MainTrip(
+                                    state = TripState.ING,
+                                    tripName = it.tripName,
+                                    period = abs(
+                                        getDifferenceInDay(
+                                            startDate = currentDate,
+                                            endDate = format.parse(it.startDate)
+                                        )
+                                    ) + 1
+                                )
+                                ApplicationClass.tripName = it.tripName
+                                return@breaker
+                            } else {
+                                mainTrip.value = MainTrip(
+                                    state = TripState.EMPTY,
+                                    tripName = it.tripName,
+                                    period = abs(
+                                        getDifferenceInDay(
+                                            startDate = currentDate,
+                                            endDate = format.parse(it.startDate)
+                                        )
+                                    ) + 1
+                                )
+                            }
+                        }
+                    }
+
+                } else {
+                    mainTrip.value = MainTrip(
+                        state = TripState.EMPTY
+                    )
+                    Log.d("awegwgwae", "wawegewa")
+                    tripList.clear()
+                }
+
+
+            }
+
+            tripViewModel.getTripAllFailure.observe(this@MainActivity) { response ->
+
+            }
+
+            tripViewModel.deleteTripSuccess.observe(this@MainActivity) { response ->
+                runCatching {
+                    when (response.status) {
+
+                    }
+                }
+                tripViewModel.getTripAll()
+                Toast.makeText(this@MainActivity,"여행 파일이 삭제 되었어요",Toast.LENGTH_SHORT).show()
+            }
+
+            cardViewModel.getCardLikedSuccess.observe(this@MainActivity) { response ->
+                favoriteCardList.clear()
+                response.data.cardViews.mapNotNull { cardView ->
+                    kotlin.runCatching {
+                        Card(
+                            cardView = cardView,
+                            uploadImage = ArrayList<File>(),
+                            imageNum = mutableStateOf(0),
+                            recordingFile = File(MomentPath.RECORDER_PATH+convertUrlLinkStringToRcorderNameString(cardView.recordFileUrl))
+                        )
+                    }.onSuccess {
+                        favoriteCardList.clear()
+                    }.onFailure {
+
+                    }.getOrNull()
+                }.forEach { card ->
+                    favoriteCardList.add(card)
+                }
+            }
+
+            cardViewModel.postCardUploadSuccess.observe(this@MainActivity) { response ->
+                coroutineScope
+                    .launch {
+                        sheetState.hide()
+                        recordOpen.value = false
+                    }
+                Toast.makeText(this@MainActivity,"녹음이 저장되었습니다",Toast.LENGTH_SHORT).show()
+            }
+
+            authViewModel.deleteAuthSuccess.observe(this@MainActivity){ response ->
+                tokenSharedPreferences.edit().putString("accessToken","").apply()
+                startActivity(Intent(this@MainActivity,SplashActivity::class.java))
+                finish()
+            }
+
+
+
+            tripFileViewModel.getTripFileUntitledSuccess.observe(this@MainActivity) { response ->
+                response.data.tripFiles.mapNotNull { tripFile ->
+                    kotlin.runCatching {
+                        TripFile(
+                            id = tripFile.id,
+                            tripId = tripFile.tripId,
+                            yearDate = tripFile.yearDate,
+                            analyzingCount = mutableStateOf(tripFile.totalCount)
+                        )
+                    }.onSuccess {
+                        tripFileUntitledList.clear()
+                    }.onFailure { }.getOrNull()
+                }.forEach { it ->
+                    tripFileUntitledList.add(it)
+                }
+            }
+
+            kakaoViewModel.getLocalSuccess.observe(this@MainActivity) { response ->
+                try {
+                    addressName.value = response.documents.first().address_name
+
+
+                } catch (e: Exception) {
+                    Timber.e(e)
+                }
+            }
+
+
+            // 영수증 삭제 성공
+            receiptViewModel.deleteReceiptDeleteSuccess.observe(this@MainActivity) { response ->
+                EditCheckState.value = false
+                DeleteReceipt.clear()
+                receiptViewModel.getReceiptAll(0, 10000)
+            }
+            // 영수증 삭제 실패
+            receiptViewModel.deleteReceiptDeleteFailure.observe(this@MainActivity) { response ->
+            }
+
+            val receiptList = remember { mutableStateListOf<ReceiptAll>() }
+            // 영수증 전체 받기 성공
+            receiptViewModel.getReceiptAllSuccess.observe(this@MainActivity) { response ->
+                    receiptList.clear()
+                    response.data.receiptList.mapNotNull { receiptAll ->
+                        runCatching {
+                            ReceiptAll(
+                                receiptAll.id,
+                                receiptAll.tripId,
+                                receiptAll.tripName,
+                                receiptAll.angry,
+                                receiptAll.disgust,
+                                receiptAll.happy,
+                                receiptAll.sad,
+                                receiptAll.neutral,
+                                receiptAll.stDate,
+                                receiptAll.edDate,
+                                receiptAll.numOfCard,
+                                receiptAll.mainDeparture,
+                                receiptAll.subDeparture,
+                                receiptAll.mainDestination,
+                                receiptAll.subDestination,
+                                receiptAll.oneLineMemo,
+                                receiptAll.receiptThemeType,
+                                receiptAll.createdAt
+                            )
+                        }
+                            .onSuccess { }
+                            .onFailure {  }.getOrNull()
+                    }.forEach {
+                        receiptList.add(it)
+                        /*if (response.data.receiptList.size == receiptList.size) {
+
+                        } else {
+                        }*/
+                    }
+            }
+            // 영수증 전체 받기 실패
+            receiptViewModel.getReceiptAllFailure.observe(this@MainActivity) { response ->
+                Log.d("receiptViewModel_getReceiptAllFailure", response.toString())
+            }
+
+//        val recordOpen = remember { mutableStateOf(false)}
+//        val EditCheckState = remember { mutableStateOf(false) }
+//        val ReceiptCheckState = remember { mutableStateOf(true) }
+//        val viewModel: CustomTitleCheckViewModel = viewModel()
+//        val CustomTitleCheckDialogState = viewModel.CustomTitleCheckDialogState.value
+
+            openWeatherViewModel.getWeatherInCurrentLocationlSuccess.observe(this@MainActivity) { response ->
+                try {
+                    temp.value = response.main.temp.toFloat().minus(273.15).toInt().toString()
+                    weather.value = GetWeatherType(response.weather.first().main)
+
+                } catch (e: Exception) {
+                    Timber.e(e)
+                }
+            }
+
+            openWeatherViewModel.getWeatherInCurrentLocationFailure.observe(this@MainActivity) { error ->
+
+
+            }
+            navController = rememberNavController()
+
+            Scaffold(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = WindowInsets.navigationBars.getBottom(LocalDensity.current).dp / 2)
+                    .shadow(elevation = 6.dp),
+                bottomBar = {
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+                        BottomNavigation(
+                            modifier = Modifier
+                                .height(70.dp)
+                                .fillMaxWidth()
+                                .align(Alignment.BottomCenter),
+                            backgroundColor = Color.White,
+                            elevation = 20.dp
+                        ) {
+
+                            val navBackStackEntry by navController.currentBackStackEntryAsState()
+                            val currentDestination = navBackStackEntry?.destination
+                            bottomItems.forEach { screen ->
+                                BottomNavigationItem(
+                                    selectedContentColor = Color.Black,
+                                    unselectedContentColor = Color("#938F8F".toColorInt()),
+                                    label = {
+                                        Column(
                                             modifier = Modifier
-                                                .height(6.dp)
-                                        ){
-                                            Divider(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                thickness = (0.8).dp, color = Color.Black
+                                                .height(35.dp)
+                                        ) {
+                                            Text(
+                                                text = screen.label,
+                                                fontSize = 12.sp
                                             )
-                                            if(screen?.screenRoute==currentSelectedBottomRoute.value){
+                                        }
+                                    },
+                                    icon = {
+                                        Column(
+                                            modifier = Modifier.height(35.dp),
+                                            verticalArrangement = Arrangement.Top,
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Box(
+                                                contentAlignment = Alignment.Center,
+                                                modifier = Modifier
+                                                    .height(6.dp)
+                                            ) {
                                                 Divider(
-                                                    modifier = Modifier
-                                                        .width(36.dp)
-                                                        .padding(top = (1.5).dp),
-                                                    thickness = 4.dp, color = Color("#99342E".toColorInt())
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    thickness = (0.8).dp, color = Color.Black
+                                                )
+                                                if (screen?.screenRoute == currentSelectedBottomRoute.value) {
+                                                    Divider(
+                                                        modifier = Modifier
+                                                            .width(36.dp)
+                                                            .padding(top = (1.5).dp),
+                                                        thickness = 4.dp,
+                                                        color = Color("#99342E".toColorInt())
+                                                    )
+                                                }
+                                            }
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            if (screen.selectedDrawableId != 0) {
+                                                Image(
+                                                    modifier = Modifier.size(20.dp),
+                                                    painter =
+                                                    if (screen?.screenRoute == currentSelectedBottomRoute.value) painterResource(
+                                                        id = screen.selectedDrawableId
+                                                    ) else painterResource(id = screen.unselectedDrawableId),
+                                                    contentDescription = "search"
                                                 )
                                             }
                                         }
-                                        Spacer(modifier = Modifier.height(6.dp))
-                                        if(screen.selectedDrawableId!=0) {
-                                            Image(
-                                                modifier = Modifier.size(20.dp),
-                                                painter =
-                                                if (screen?.screenRoute == currentSelectedBottomRoute.value) painterResource(
-                                                    id = screen.selectedDrawableId
-                                                ) else painterResource(id = screen.unselectedDrawableId),
-                                                contentDescription = "search"
-                                            )
-                                        }
-                                    }
-                                },
-                                selected = false,
-                                onClick = {
-                                    if(screen!=BottomNavItem.Record){
-                                        navController.navigate(screen.screenRoute) {
-                                            // Pop up to the start destination of the graph to
-                                            // avoid building up a large stack of destinations
-                                            // on the back stack as users select items
-                                            popUpTo(navController.graph.findStartDestination().id) {
-                                                saveState = true
+                                    },
+                                    selected = false,
+                                    onClick = {
+                                        if (screen != BottomNavItem.Record) {
+                                            navController.navigate(screen.screenRoute) {
+                                                // Pop up to the start destination of the graph to
+                                                // avoid building up a large stack of destinations
+                                                // on the back stack as users select items
+                                                popUpTo(navController.graph.findStartDestination().id) {
+                                                    saveState = true
+                                                }
+
+                                                // Avoid multiple copies of the same destination when
+                                                // reselecting the same item
+                                                launchSingleTop = true
+
+                                                // Restore state when reselecting a previously selected item
+                                                restoreState = true
                                             }
-
-                                            // Avoid multiple copies of the same destination when
-                                            // reselecting the same item
-                                            launchSingleTop = true
-
-                                            // Restore state when reselecting a previously selected item
-                                            restoreState = true
                                         }
                                     }
+                                )
+                            }
+                        }
+                        Column(
+                            modifier = Modifier
+                                .height(90.dp)
+                                .clickable {
+                                    recordOpen.value = true
+                                    isRecorderIng.value = recorder.isActivity()
                                 }
+                        ) {
+                            Image(
+                                modifier = Modifier.size(50.dp),
+                                painter = if (isRecorderIng.value) painterResource(id = R.drawable.ic_record_ing) else painterResource(
+                                    id = R.drawable.ic_record_before
+                                ),
+                                contentDescription = ""
                             )
                         }
                     }
-                    Column(
-                        modifier = Modifier
-                            .height(90.dp)
-                            .clickable {
-                                recordOpen.value = true
-                            }
-                    ) {
-                        Image(
-                            modifier = Modifier.size(50.dp),
-                            painter = painterResource(id = R.drawable.ic_record), contentDescription = ""
-                        )
-                    }
-                }
-            },
-            topBar = {
-                TopAppBar(
-                    actions = {
+                },
+                topBar = {
+                    TopAppBar(
+                        actions = {
 
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    title = {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(end = 20.dp)
-                            ,
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            val navBackStackEntry by navController.currentBackStackEntryAsState()
-                            val currentDestination = navBackStackEntry?.destination
-                            navBackStackEntry.let {
-                                if(it==null){
-                                    Log.d("waegfwa","null")
-                                }else{
-                                    Log.d("waegfwa",it.destination.route.toString())
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        title = {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(end = 20.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                                val currentDestination = navBackStackEntry?.destination
+                                navBackStackEntry.let {
+                                    if (it == null) {
+                                        Log.d("waegfwa", "null")
+                                    } else {
+                                        Log.d("waegfwa", it.destination.route.toString())
 
+                                    }
                                 }
-                            }
 
 
-                            navController.currentDestination.let {
-                                if(it==null || it.route=="Home"){
+                                navController.currentDestination.let {
+                                    when (it?.route) {
+                                        null -> " "
+                                        "Home" -> " "
+                                        "Receipt" -> " "
+                                        "ReceiptPost" ->
+                                            if (!EditCheckState.value) {
+                                                Column(Modifier.clickable {
+                                                    navController.navigate(
+                                                        BottomNavItem.Receipt.screenRoute
+                                                    ){
+                                                        popUpTo(BottomNavItem.Receipt.screenRoute) { inclusive = true }
+                                                    }
+                                                }) {
+                                                    Text(
+                                                        text = "뒤로",
+                                                        fontFamily = FontMoment.obangFont,
+                                                        fontWeight = FontWeight.Bold,
+                                                        fontSize = 15.sp
+                                                    )
+                                                }
+                                            } else {
+                                                Column(
+                                                    Modifier
+                                                        .wrapContentSize()
+                                                        .clickable {
+                                                            EditCheckState.value = false
+                                                            DeleteReceipt.clear()
+                                                        }) {
+                                                    YJ_Bold15(content = "완료", color = black)
+                                                }
+                                            }
 
-                                }else{
-                                    Log.d("wegewag",it.route.toString())
+                                        "Favorite" -> " "
+                                        MainScreen.RecordDaily.screenRoute -> {
+                                            Column(Modifier.clickable {
+                                                navController.navigate(
+                                                    BottomNavItem.Home.screenRoute
+                                                ){
+                                                    popUpTo(BottomNavItem.Home.screenRoute) { inclusive = true }
+                                                }
+                                            }) {
+                                                Text(
+                                                    text = "뒤로",
+                                                    fontFamily = FontMoment.obangFont,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 15.sp
+                                                )
+                                            }
+                                        }
+                                        "Setting" -> " "
+                                        else -> null
+                                    }
+                                }
 
+                                Spacer(Modifier.weight(1f))
+                                Column() {
                                     Text(
-                                        text = "뒤로",
+                                        modifier = Modifier
+                                            .clickable(enabled = if (title.value == "삭제" && !ReceiptCheckState.value) false else true) {
+                                                when (title.value) {
+                                                    "추가" -> {
+                                                        tripContract.launch(
+                                                            Intent(
+                                                                this@MainActivity,
+                                                                PostTripActivity::class.java
+                                                            )
+                                                        )
+                                                    }
+
+                                                    "영수증 모아보기" -> {
+                                                        EditCheckState.value = false
+                                                        DeleteReceipt.clear()
+                                                        navController.navigate(MainScreen.ReceiptPost.screenRoute)
+                                                        val size = 10000
+                                                        receiptViewModel.getReceiptAll(0, size)
+                                                    }
+
+                                                    "작게보기" -> {}
+                                                    "편집" -> {
+                                                        EditCheckState.value = true
+                                                    }
+
+                                                    "삭제" -> {
+                                                        if (DeleteReceipt.size != 0){
+                                                            showDeleteDialog.value = true
+                                                        }else{
+
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                        text = title.value,
                                         fontFamily = FontMoment.obangFont,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 15.sp
+                                        fontSize = 15.sp,
+                                        color = if (title.value == "삭제") {
+                                            if (ReceiptCheckState.value) primary_500 else neutral_500
+                                        } else black
                                     )
                                 }
                             }
 
-                            Spacer(Modifier.weight(1f))
-                            Text(
-                                modifier = Modifier
-                                    .clickable {
-                                        when(title.value){
-                                            "추가" -> {startActivity(Intent(this@MainActivity,PostTripActivity::class.java))}
-                                            "영수증 모아보기" -> {}
-                                            "작게보기" -> {}
-                                        }
-                                    },
-                                text = title.value,
-                                fontFamily = FontMoment.obangFont,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp
-                            )
                         }
 
+                    )
+                }
+            ) { innerPadding ->
+                if (showDeleteDialog.value){
+                    //dialog 띄우기
+                    deleteDialog(showDeleteDialog = showDeleteDialog,  DeleteReceipt = DeleteReceipt )
+                }
+                NavHost(
+                    navController,
+                    startDestination =
+                    when (movenav) {
+                        "Receipt" -> BottomNavItem.Receipt.screenRoute
+                        "ReceiptPost" -> MainScreen.ReceiptPost.screenRoute
+                        else -> BottomNavItem.Home.screenRoute
+                    },
+                    Modifier.padding(innerPadding)
+                ) {
+                    composable(BottomNavItem.Home.screenRoute) {
+                        currentSelectedBottomRoute.value = "Home"
+                        Log.d("waegwagewa", tripList.toString())
+                        Home(tripList, mainTrip)
+                        title.value = "추가"
+                    }
+                    composable(BottomNavItem.Receipt.screenRoute) {
+                        title.value = "추가"
+                        currentSelectedBottomRoute.value = "Receipt"
+
+                        Receipt(makeReceipt)
+                        title.value = "영수증 모아보기"
+                    }
+                    composable(BottomNavItem.Record.screenRoute) {
+                        currentSelectedBottomRoute.value = "Record"
+
+                        Record()
+
+                    }
+                    composable(BottomNavItem.Favorite.screenRoute) {
+                        currentSelectedBottomRoute.value = "Favorite"
+                        cardViewModel.getCardLiked()
+                        Favorite(cardItems = favoriteCardList, emotionList = emotionList)
+                        title.value = ""
+                    }
+                    composable(BottomNavItem.Setting.screenRoute) {
+                        currentSelectedBottomRoute.value = "Setting"
+                        Setting()
+                        title.value = ""
+                    }
+                    composable(MainScreen.ReceiptPost.screenRoute) {
+                        currentSelectedBottomRoute.value = MainScreen.ReceiptPost.rootRoute
+                        ReceiptPost(makeReceipt, receiptList, EditCheckState, DeleteReceipt)
+                        if (EditCheckState.value) title.value = "삭제" else title.value = "편집"
                     }
 
-                )
-            }
-        ) { innerPadding ->
-            NavHost(
-                navController,
-                startDestination = BottomNavItem.Home.screenRoute,
-                Modifier.padding(innerPadding)
-            ) {
-                composable(BottomNavItem.Home.screenRoute) {
-                    currentSelectedBottomRoute.value = "Home"
+                    composable(MainScreen.HomeTrip.screenRoute) {
+                        currentSelectedBottomRoute.value = MainScreen.HomeTrip.rootRoute
+                        HomeTrip()
+                    }
+                    composable(MainScreen.RecordDaily.screenRoute) {
+                        currentSelectedBottomRoute.value = MainScreen.RecordDaily.rootRoute
 
-                    Home()
-                    title.value = "추가"
+                        RecordDaily(tripFileUntitledList = tripFileUntitledList)
+                    }
                 }
-                composable(BottomNavItem.Receipt.screenRoute) {
-                    currentSelectedBottomRoute.value = "Receipt"
-
-                    Receipt()
-                    title.value = "영수증 모아보기"
-                }
-                composable(BottomNavItem.Record.screenRoute) {
-                    currentSelectedBottomRoute.value = "Record"
-
-                    Record()
-
-                }
-                composable(BottomNavItem.Favorite.screenRoute) {
-                    currentSelectedBottomRoute.value = "Favorite"
-
-                    Favorite()
-                    title.value = "작게보기"
-                }
-                composable(BottomNavItem.Setting.screenRoute) {
-                    currentSelectedBottomRoute.value = "Setting"
-                    Setting()
-                    title.value = ""
-                }
-                composable(MainScreen.ReceiptPost.screenRoute){
-                    currentSelectedBottomRoute.value = MainScreen.ReceiptPost.rootRoute
-                    ReceiptPost()
-                }
-
-                composable(MainScreen.HomeTrip.screenRoute){
-                    currentSelectedBottomRoute.value = MainScreen.HomeTrip.rootRoute
-                    HomeTrip()
-                }
-                composable(MainScreen.RecordDaily.screenRoute){
-                    currentSelectedBottomRoute.value = MainScreen.RecordDaily.rootRoute
-
-                    RecordDaily()
+                if (recordOpen.value) {
+                    RecordNavigatesheet(
+                        sheetState = sheetState,
+                        closeSheet = { recordOpen.value = false },
+                        lat = lat,
+                        lon = lon,
+                        temp = temp,
+                        addressName = addressName,
+                        weather = weather
+                    )
                 }
             }
-        }
+
     }
 
     enum class DragAnchors {
@@ -395,8 +1021,9 @@ class MainActivity : ComponentActivity() {
     }
     @OptIn(ExperimentalPagerApi::class, ExperimentalFoundationApi::class)
     @Composable
-    fun Home(){
+    fun Home(tripList:MutableList<Trip>,mainTrip:MutableState<MainTrip>){
 
+        Log.d("waegawgaw",tripList.size.toString())
         val density = LocalDensity.current
         val defaultActionSize = 80.dp
         val endActionSizePx = with(density) { (defaultActionSize * 2).toPx() }
@@ -417,6 +1044,9 @@ class MainActivity : ComponentActivity() {
         }
 
         val pagerState = rememberPagerState()
+
+        val format: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
+        val currentDate = format.parse(getCurrentTime())
 
 
         Column(
@@ -443,43 +1073,35 @@ class MainActivity : ComponentActivity() {
                     count = 2
                 ){index ->
                     if(index == 0){
-                        Column {
-                            Text(
-                                text = "전라도의 선유도",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                            Row {
-                                Text(
-                                    text = "출발까지",
-                                    color = Color("#706969".toColorInt()),
-                                    fontSize = 16.sp
-                                )
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Text(
-                                    text = "6",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 45.sp,
-                                    color = Color("#99342E".toColorInt())
-                                )
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Text(
-                                    modifier = Modifier.align(Alignment.Bottom),
-                                    text = "일 남았아요",
-                                    color = Color("#706969".toColorInt()),
-                                    fontSize = 16.sp
-                                )
-
+                        when(mainTrip.value.state){
+                            TripState.EMPTY -> {
+                                TripEmpty(text = "어디로 떠나면 좋을까요?")
+                            }
+                            TripState.ING -> {
+                                TripIng(tripName = mainTrip.value.tripName, remainPeriod = mainTrip.value.period)
+                            }
+                            TripState.EXISTS -> {
+                                TripExist(tripName = mainTrip.value.tripName, remainPeriod = mainTrip.value.period)
                             }
                         }
                     }else{
-                        Text(
-                            modifier = Modifier.clickable { navController.navigate(MainScreen.RecordDaily.screenRoute) },
-                            text = "일상기록",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable {
+                                    tripFileViewModel.getTripFileUntitled()
+                                    navController.navigate(MainScreen.RecordDaily.screenRoute)
+                                },
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = "일상기록",
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+
                     }
 
                 }
@@ -515,32 +1137,80 @@ class MainActivity : ComponentActivity() {
                 color = Color.Black,
                 thickness = 2.dp
             )
-
-            LazyColumn(
-                modifier = Modifier
-                    .padding(start = 16.dp, end = 4.dp)
-            ){
-                items(
-                    count = 8,
-                    itemContent = {
-                        if(it==1){
-                            ItemTrip(type = 1)
-                        }else if(it==2){
-                            ItemTrip(type = 2)
-                        }else{
-                            ItemTrip(type = 0)
-
-                        }
-
-
-                    }
+            
+            if(tripList.size == 0){
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "아직 계획된 여행이 없나요?\n화면 상단에서 일정 추가가 가능해요",
+                    color = neutral_300,
+                    fontFamily = FontMoment.preStandardFont,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center
                 )
+                Spacer(modifier = Modifier.weight(1f))
+            }else{
+                LazyColumn(
+                    modifier = Modifier
+                ){
+                    items(
+                        count = tripList.size,
+                        itemContent = { index ->
+                            Log.d("awegewag","${tripList[index].tripName}")
+                            Log.d("awegewag","${currentDate.compareTo(format.parse(tripList[index].startDate))} , ${currentDate.compareTo(format.parse(tripList[index].endDate))}")
+                            if (currentDate.compareTo(format.parse(tripList[index].startDate)) >= 0 &&
+                                currentDate.compareTo(format.parse(tripList[index].endDate)) <= 0
+                            ) {
+                                if (tripList[index].analyzingCount == 0) {
+                                    ItemTrip(
+                                        type = TripType.TRAVELING,
+                                        id = tripList[index].id,
+                                        tripName = tripList[index].tripName,
+                                        startDate = tripList[index].startDate,
+                                        endDate = tripList[index].endDate
+                                    )
+
+                                } else {
+                                    ItemTrip(
+                                        type = TripType.BOTH,
+                                        id = tripList[index].id,
+                                        tripName = tripList[index].tripName,
+                                        startDate = tripList[index].startDate,
+                                        endDate = tripList[index].endDate
+                                    )
+                                }
+                            } else if (tripList[index].analyzingCount != 0) {
+                                ItemTrip(
+                                    type = TripType.ANALYZING,
+                                    id = tripList[index].id,
+                                    tripName = tripList[index].tripName,
+                                    startDate = tripList[index].startDate,
+                                    endDate = tripList[index].endDate
+                                )
+                            } else {
+                                ItemTrip(
+                                    type = TripType.COMMON,
+                                    id = tripList[index].id,
+                                    tripName = tripList[index].tripName,
+                                    startDate = tripList[index].startDate,
+                                    endDate = tripList[index].endDate
+                                )
+
+                            }
+                        }
+                    )
+                }
             }
+
+
         }
     }
 
+
+
     @Composable
-    fun RecordDaily(){
+    fun RecordDaily(tripFileUntitledList:MutableList<TripFile>){
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -575,11 +1245,15 @@ class MainActivity : ComponentActivity() {
                     .padding(start = 16.dp, end = 4.dp)
             ){
                 items(
-                    count = 8,
-                    itemContent = {
+                    count = tripFileUntitledList.size,
+                    itemContent = { index->
                         Column(
                             modifier = Modifier.clickable {
-                                startActivity(Intent(this@MainActivity,TripFileActivity::class.java))
+                                val intent = Intent(this@MainActivity,CardActivity::class.java)
+                                intent.putExtra("tripFileId",tripFileUntitledList[index].id)
+                                intent.putExtra("tripFileListIndex",-2)
+
+                                startActivity(intent)
                             } ,
                         ) {
                             Box(
@@ -596,7 +1270,7 @@ class MainActivity : ComponentActivity() {
                                 ){
 
                                     Text(
-                                        text = "2024.03.05",
+                                        text = tripFileUntitledList[index].yearDate,
                                         fontSize = 11.sp,
                                         color = Color.Black
                                     )
@@ -612,7 +1286,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "4개의 파일이 있어요",
+                                        text = "${tripFileUntitledList[index].analyzingCount.value}개의 파일이 있어요",
                                         fontSize = 11.sp,
                                         color = Color("#706969".toColorInt())
                                     )
@@ -643,11 +1317,23 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    fun ItemTrip(type:Int){
+    fun ItemTrip(type:TripType,id:Int,tripName:String,startDate:String,endDate:String){
+        val isDeleteTrip = remember { mutableStateOf(false) }
+
         val density = LocalDensity.current
         val defaultActionSize = 80.dp
         val endActionSizePx = with(density) { (defaultActionSize * 2).toPx() }
         val startActionSizePx = with(density) { defaultActionSize.toPx() }
+        val tripPatchContract =
+            rememberLauncherForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == 2) {
+//                    val intent = result.data
+                    tripViewModel.getTripAll()
+                    //do something here
+                }
+            }
 
         val state = remember {
             AnchoredDraggableState(
@@ -661,6 +1347,8 @@ class MainActivity : ComponentActivity() {
                 animationSpec = tween(),
             )
         }
+
+
 //        Box(
 //            contentAlignment = Alignment.TopCenter
 //        ){
@@ -671,20 +1359,49 @@ class MainActivity : ComponentActivity() {
 //        }
 
         Column(
-            modifier = Modifier.clickable {
-                startActivity(Intent(this@MainActivity,TripFileActivity::class.java))
-            } ,
+            modifier = Modifier
+                .clickable {
+                    val intent = Intent(this@MainActivity,TripFileActivity::class.java)
+                    intent.putExtra("tripId",id)
+                    ApplicationClass.tripName = tripName
+                    startActivity(intent)
+                } ,
         ) {
+            if(isDeleteTrip.value){
+                CustomTitleCheckDialog(
+                    title = tripName,
+                    description = "해당 파일에 기록되어있는 녹음카드는\n'일상 기록'으로 이동됩니다.",
+                    checkleft = "네",
+                    checkright = "아니요",
+                    onClickCancel = { isDeleteTrip.value = false },
+                    onClickleft = {
+                        tripViewModel.deleteTrip(
+                            tripId = id
+                        )
+                        isDeleteTrip.value = false },
+                    onClickright = { isDeleteTrip.value = false }
+                )
+            }
+
+
+            Spacer(modifier = Modifier.height(4.dp))
             Box(
-                modifier = Modifier.clip(RectangleShape),
+                modifier = Modifier
+                    .clip(RectangleShape)
+                    .border(
+                        width = if (type != TripType.COMMON) 1.dp else 0.dp, // 너비 5dp
+                        color = if (type == TripType.ANALYZING) Color.Black
+                        else if (type == TripType.BOTH || type == TripType.TRAVELING) Color("#99342E".toColorInt()) else Color.White, // 색상 파란색
+                        shape = RoundedCornerShape(4.dp) // 네모 모양
+                    )
+                    .padding(start = 16.dp)
+                    .padding(vertical = 16.dp)
+                ,
                 contentAlignment = Alignment.CenterEnd
             ) {
-
                 Row(
                     modifier = Modifier
-                        .padding(top = 24.dp)
                         .fillMaxSize()
-                        .background(color = Color.White)
                         .offset {
                             IntOffset(
                                 x = -state
@@ -693,6 +1410,9 @@ class MainActivity : ComponentActivity() {
                                 y = 0,
                             )
                         }
+                        .background(
+                            color = Color.White
+                        )
                         .anchoredDraggable(
                             state = state,
                             Orientation.Horizontal,
@@ -703,12 +1423,12 @@ class MainActivity : ComponentActivity() {
 
                     Column {
                         Text(
-                            text = "2024.03.05",
+                            text = startDate,
                             fontSize = 11.sp,
                             color = Color.Black
                         )
                         Text(
-                            text = "2024.03.05",
+                            text = endDate,
                             fontSize = 11.sp,
                             color = Color.Black
                         )
@@ -722,16 +1442,96 @@ class MainActivity : ComponentActivity() {
                         color = Color("#99342E".toColorInt()),
                         thickness = 2.dp
                     )
+
+
                     Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = "전라도의 선유도",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Text(
+                                text = tripName,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            when(type){
+                                TripType.BOTH -> {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "현재 여행중!",
+                                            color = Color("#99342E".toColorInt()),
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 11.sp
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_loading),
+                                            contentDescription = "loading"
+                                        )
+                                        Text(
+                                            text = "분석중..",
+                                            color = Color("#938F8F".toColorInt()),
+                                            fontSize = 11.sp,
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                                TripType.ANALYZING -> {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_loading),
+                                            contentDescription = "loading"
+                                        )
+                                        Text(
+                                            text = "분석중..",
+                                            color = Color("#938F8F".toColorInt()),
+                                            fontSize = 11.sp,
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                                TripType.TRAVELING -> {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "현재 여행중!",
+                                            color = Color("#99342E".toColorInt()),
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
+                                TripType.COMMON -> {
+                                }
+                                else -> {}
+                            }
+
+
+
+                        }
+
+
+                    Row {
+
+                    }
                     Spacer(modifier = Modifier.width(8.dp))
                     Divider(
                         modifier = Modifier
                             .height(50.dp)
+                            .padding()
                             .width(1.dp),
                         color = Color("#99342E".toColorInt()),
                         thickness = 2.dp
@@ -740,9 +1540,9 @@ class MainActivity : ComponentActivity() {
 
                 Row(
                     modifier = Modifier
-                        .padding(end = 24.dp, top = 24.dp)
                         .fillMaxHeight()
                         .align(Alignment.CenterEnd)
+                        .padding(end = 24.dp)
                         .offset {
                             IntOffset(
                                 (-state
@@ -754,6 +1554,14 @@ class MainActivity : ComponentActivity() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
+                        modifier = Modifier.clickable {
+                            val intent = Intent(this@MainActivity, PatchTripActivity::class.java)
+                            intent.putExtra("tripId",id)
+                            intent.putExtra("startDate",startDate)
+                            intent.putExtra("endDate",endDate)
+                            intent.putExtra("tripName",tripName)
+                            tripPatchContract.launch(intent)
+                        },
                         text = "수정",
                         fontFamily = FontMoment.obangFont,
                         fontWeight = FontWeight.Bold,
@@ -769,6 +1577,9 @@ class MainActivity : ComponentActivity() {
                     )
                     Spacer(modifier = Modifier.width(26.dp))
                     Text(
+                        modifier = Modifier.clickable {
+                            isDeleteTrip.value = true
+                        },
                         text = "삭제",
                         fontFamily = FontMoment.obangFont,
                         fontWeight = FontWeight.Bold,
@@ -795,54 +1606,13 @@ class MainActivity : ComponentActivity() {
                             reverseDirection = true
                         )
                 ) {
-                    if(type==1){
-                        Box(
-                            contentAlignment = Alignment.TopCenter
-                        ){
-                            Spacer(modifier = Modifier.width(18.dp))
-
-                            Image(
-                                modifier = Modifier
-                                    .width(76.dp)
-                                    .height(32.dp),
-                                painter = painterResource(id = R.drawable.img_alarm_red), contentDescription = ""
-                            )
-                            Text(
-                                text = "현재 여행중이에요",
-                                fontSize = 8.sp,
-                                color = Color.White
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    if(type==2){
-                        Box(
-                            contentAlignment = Alignment.TopCenter
-                        ){
-                            Image(
-                                modifier = Modifier
-                                    .width(76.dp)
-                                    .height(32.dp),
-                                painter = painterResource(id = R.drawable.img_alarm_green), contentDescription = ""
-                            )
-                            Text(
-                                text = "카드 분석중이에요",
-                                fontSize = 8.sp,
-                                color = Color.White
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(40.dp))
-                    }
-
-
 
                 }
 
 
 
             }
-            Spacer(modifier = Modifier.height(24.dp))
+//            Spacer(modifier = Modifier.height(24.dp))
 
             Divider(
                 modifier = Modifier
@@ -891,35 +1661,197 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Receipt(){
+    fun Receipt(makeReceipt :
+                ManagedActivityResultLauncher<Intent, ActivityResult>
+    ){
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp)
+                .background(tertiary_500)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.Center
             ) {
             Image(
                 modifier = Modifier.fillMaxWidth(),
-                painter = painterResource(id = R.drawable.test_image), contentDescription = "test"
+                painter = painterResource(id = R.drawable.img_receipt_preview), contentDescription = "영수증미리보기"
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            BigButton("만들기", true,  onClick = {startActivity(Intent(this@MainActivity, ReciptActivity::class.java))})
-
+            Spacer(modifier = Modifier.height(55.dp))
+            BigButton("만들기", true,
+                onClick = { makeReceipt.launch(
+                    Intent(
+                        this@MainActivity,
+                        ReciptActivity::class.java
+                    )
+                ) })
         }
     }
 
     @Composable
-    fun ReceiptPost(){
+    fun ReceiptPost(makeReceipt : ManagedActivityResultLauncher<Intent, ActivityResult>,
+                    receiptList: MutableList<ReceiptAll>,EditCheckState: MutableState<Boolean>, DeleteReceipt :MutableList<ReceiptId> ) {
         //영수증 게시
-        Text(
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable {
-                    navController.navigate(MainScreen.ReceiptPost.screenRoute)
-                },
-            text = "만들기",
-            textAlign = TextAlign.Center
-        )
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .background(tertiary_500)
+                .padding(horizontal = 12.dp)) {
+
+            if(receiptList.size == 0){
+                Column(modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center) {
+                    P_Medium14_center(content = "아직 만들어진 티켓이 없어요\n" +
+                            "여행 티켓으로 여행을 멋지게 마무리 해봐요 !", color = neutral_300, Align = TextAlign.Center)
+                }
+            }else{
+                MyGrid(makeReceipt, receiptList, 2, EditCheckState, DeleteReceipt)
+            }
+
+
+        }
     }
+    @Composable
+    fun MyGrid(
+        makeReceipt : ManagedActivityResultLauncher<Intent, ActivityResult>,
+        receiptList: MutableList<ReceiptAll>,
+        columnSize: Int,
+        EditCheckState: MutableState<Boolean>,
+        DeleteReceipt: MutableList<ReceiptId>
+    ){
+        val rowsCount = 1 + (receiptList.size -1)/columnSize // row 개수
+        BoxWithConstraints {
+            val maxWidth = this.maxWidth
+
+            LazyColumn {
+                items(rowsCount) { rowIndex ->
+                    val rangeStart = rowIndex*columnSize
+                    var rangeEnd = rangeStart + columnSize -1
+                    if (rangeEnd > receiptList.lastIndex) rangeEnd = receiptList.lastIndex // row로 표현될 list의 range를 계산, slice하여 row 생성
+                    RowOfGrid(makeReceipt, receiptList.slice(rangeStart..rangeEnd), maxWidth/columnSize,
+                        EditCheckState, DeleteReceipt)
+                }
+            }
+        }
+    }
+
+    @SuppressLint("UnrememberedMutableState")
+    @Composable
+    fun RowOfGrid(
+        makeReceipt : ManagedActivityResultLauncher<Intent, ActivityResult>,
+        rowList: List<ReceiptAll>,
+        columnWidth: Dp,
+        EditCheckState: MutableState<Boolean>,
+        DeleteReceipt: MutableList<ReceiptId>
+    ) {
+        var intent = Intent(this@MainActivity, ReciptActivity::class.java)
+        intent.putExtra("MoveScreen", "ReceiptPost_Big")
+
+        LazyRow {
+            items(rowList.size) { index ->
+
+                val item = rowList[index]
+                val checkState = rememberSaveable { mutableStateOf(false) }
+
+                if (!EditCheckState.value) {
+                    checkState.value = false
+                }
+
+                val receiptId =  ReceiptId(item.id)
+                Box( modifier = Modifier
+                    .width(columnWidth)
+                    .height(224.dp)
+                    .padding(horizontal = 25.dp, vertical = 8.dp)
+                    .background(Color.Gray)
+                    .clickable {
+                        if (!EditCheckState.value) {
+
+                            makeReceipt.launch(
+                                Intent(
+                                    this@MainActivity,
+                                    ReciptActivity::class.java
+                                )
+                                    .putExtra("MoveScreen", "ReceiptPost_Big")
+                                    .putExtra("BigReceipt", item)
+                            )
+                        } else {
+                            if (checkState.value) {
+                                checkState.value = false
+                                if (DeleteReceipt.contains(receiptId)) {
+                                    DeleteReceipt.remove(receiptId)
+                                }
+
+                            } else {
+                                checkState.value = true
+                                if (!DeleteReceipt.contains(receiptId)) {
+                                    DeleteReceipt.add(receiptId)
+                                }
+                            }
+                        }
+                    }) {
+
+                    if(checkState.value){
+                        Column(
+                            Modifier
+                                .height(244.dp)
+                                .fillMaxWidth()
+                                .background(
+                                    color = neutral_500,
+                                    shape = RoundedCornerShape(2.dp)
+                                )
+                                .alpha(0.5f)) {
+                            if(item.receiptThemeType == "A") MiniTheme1(item)
+                            else MiniTheme2(item)
+                        }
+                    }else{
+                        if(item.receiptThemeType == "A") MiniTheme1(item)
+                        else MiniTheme2(item)
+                    }
+
+
+
+
+                    if (EditCheckState.value){
+                        Column(
+                            Modifier
+                                .padding(10.dp)
+                                .align(Alignment.BottomEnd)) {
+                            Column(
+                                Modifier
+                                    .size(32.dp)
+                                    .background(
+                                        if (!checkState.value) neutral_500 else white,
+                                        shape = RoundedCornerShape(3.dp)
+                                    )
+                                    .border(
+                                        0.5.dp, black,
+                                        shape = RoundedCornerShape(3.dp)
+                                    )
+                            ) {
+
+                            }
+                        }
+                        if(checkState.value){
+                            Column(
+                                Modifier
+                                    .padding(10.dp)
+                                    .align(Alignment.BottomEnd)) {
+                                Column(Modifier.size(32.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center) {
+                                    Image(
+                                        painter = painterResource(R.drawable.ic_receipt_check_red),
+                                        contentDescription = "체크버튼",
+                                        Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     @Composable
     fun Record(){
@@ -929,10 +1861,104 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun  RecordNavigatesheet(recordOpen : MutableState<Boolean>, sheetState: SheetState, closeSheet: () -> Unit
+    fun  RecordNavigatesheet(sheetState: SheetState, closeSheet: () -> Unit,
+                             lat:MutableState<String>,lon:MutableState<String>,
+                             temp:MutableState<String>, addressName:MutableState<String>, weather:MutableState<String>
     ){
 
-        val coroutineScope = rememberCoroutineScope()
+        if(!momentPermission.checkPermission()){
+            momentPermission.requestPermission()
+            closeSheet()
+        }else{
+            Log.d("weagaewgewa","esf")
+            momentLocation.getLocation().invoke().apply {
+                this.addOnSuccessListener {
+//                    x = "126.924776753718",
+//                    y = "37.5456269289384"
+                    lat.value = it.latitude.toString()
+                    lon.value = it.longitude.toString()
+                    kakaoViewModel.getLocal(
+                        x = lon.value,
+                        y = lat.value
+                    )
+                    openWeatherViewModel.getWeatherInCurrentLocation(
+                        lat = lat.value,
+                        lon = lon.value,
+                        appid = ApplicationClass.openWeartherAppId
+                    )
+                }
+            }
+        }
+
+
+        val minute = remember {
+            mutableStateOf(0)
+        }
+        val time = remember {
+            mutableStateOf("00")
+        }
+
+        val customTimerDuration = remember {
+            mutableStateOf(0)
+        }
+
+
+        val isPasused = remember {
+            mutableStateOf(false)
+        }
+
+        val isRecording=remember{
+            mutableStateOf(false)
+        }
+
+
+        val timerJob: Job = CoroutineScope(Dispatchers.Main).launch(start = CoroutineStart.LAZY) {
+            withContext(Dispatchers.IO) {
+
+                while (customTimerDuration.value >= 0) {
+
+                    if(!isPasused.value){
+                        delay(1000L)
+                        customTimerDuration.value+=1
+                        if(customTimerDuration.value==60){
+                            customTimerDuration.value = 0
+                            time.value = "0${customTimerDuration.value}"
+                            minute.value+=1
+                        }else if(customTimerDuration.value <10){
+                            time.value = "0${customTimerDuration.value}"
+                        }else{
+                            time.value = "${customTimerDuration.value}"
+                        }
+
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
+        var currentDate:String=""
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-ddTHH:mm:ss"))
+
+            currentDate = "${LocalDateTime.now()}"
+        } else {
+            val date = Date(System.currentTimeMillis())
+            val dateFormat = SimpleDateFormat(
+                "yyyy-MM-dd HH:mm",
+                Locale.KOREA
+            )
+            currentDate=dateFormat.format(date)
+        }
+
+
+
 
         ModalBottomSheet(
             onDismissRequest = closeSheet,
@@ -970,7 +1996,7 @@ class MainActivity : ComponentActivity() {
                         .padding(top = 63.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    P_Medium18(content = "0:03", color = black)
+                    P_Medium18(content = "${minute.value}:${time.value}", color = black)
                     Column(modifier = Modifier.width(45.dp)) {
                         Divider(color = black)
                     }
@@ -982,38 +2008,92 @@ class MainActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(32.dp))
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.clickable {
-                            coroutineScope
-                                .launch {
-                                    sheetState.hide()
-                                }
-                                .invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        recordOpen.value = false
-                                    }
-                                }
-                        }) {
-                            YJ_Bold15("삭제", black)
+                        if(isRecording.value){
+                            Column(Modifier.clickable {
+                                isRecording.value = false
+                                player.playFile(audioFile ?: return@clickable)
+//                            coroutineScope
+//                                .launch {
+//                                    sheetState.hide()
+//                                }
+//                                .invokeOnCompletion {
+//                                    if (!sheetState.isVisible) {
+//                                        recordOpen.value = false
+//                                    }
+//                                }
+                            }) {
+                                YJ_Bold15("삭제", black)
+                            }
                         }
+
                          Spacer(modifier = Modifier.width(46.dp))
-                        Image(modifier = Modifier.size(50.dp),
-                            painter =  painterResource(R.drawable.ic_record_ing),
+                        Image(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clickable {
+                                    if (!momentPermission.checkPermission()) {
+                                        momentPermission.requestPermission()
+                                    } else {
+                                        isRecording.value = true
+                                        Log.d("awegewagaew", "${isRecording.value}")
+                                        if (timerJob.isActive) {
+                                            isPasused.value = !isPasused.value
+
+                                        } else {
+                                            File(cacheDir, "audio.mp3").also {
+                                                recorder.start(it)
+                                                audioFile = it
+                                            }
+                                            timerJob.start()
+
+                                        }
+                                    }
+
+
+                                },
+                            painter =  if(!isRecording.value) painterResource(R.drawable.ic_record_ing) else painterResource(R.drawable.ic_ellipse),
                             contentDescription = "record")
                         Spacer(modifier = Modifier.width(46.dp))
 
-                        Column(Modifier.clickable {
-                            coroutineScope
-                                .launch {
-                                    sheetState.hide()
-                                }
-                                .invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        recordOpen.value = false
-                                    }
-                                }
-                        }) {
-                            YJ_Bold15("저장", primary_500)
+                        if(isRecording.value){
+                            Column(
+                                Modifier.clickable {
+                                    recorder.stop()
+                                    timerJob.cancel()
+                                    isRecording.value = false
+
+                                    val requestFile = audioFile?.asRequestBody("audio/*".toMediaTypeOrNull())
+
+                                    val body = MultipartBody.Part.createFormData("recordFile",audioFile?.name,
+                                        requestFile!!
+                                    )
+
+                                    val cardUploadDto=Gson().toJson(
+                                        PostCardUploadReqeust(
+                                            location = addressName.value,
+                                            question = "",
+                                            recordedAt = currentDate,
+                                            temperature = temp.value,
+                                            weather = weather.value
+                                        )
+                                    )
+
+                                    val JSON: MediaType? = "application/json; charset=utf-8".toMediaTypeOrNull()
+                                    val gson = Gson()
+                                    val data = gson.toJson(cardUploadDto)
+                                    val requestbody = RequestBody.create(JSON, cardUploadDto)
+
+                                    cardViewModel.postCardUpload(
+                                        cardUploadMultipart = requestbody,
+                                        recordFile = body
+                                    )
+
+
+                                }) {
+                                YJ_Bold15("저장", primary_500)
+                            }
                         }
+
 
                     }
 
@@ -1022,451 +2102,579 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalGlideComposeApi::class)
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun Favorite(){
+    fun Favorite(cardItems: MutableList<Card>, emotionList:MutableList<Emotion>){
+
         var expanded = remember { mutableStateOf(true) }
 
+        var currentProgress = remember { mutableStateOf(0f) }
+        var loading = remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope() // Create a coroutine scope
+
         val imageList = mutableStateListOf<File>()
-        val cardItems = mutableStateListOf<CardActivity.Card>()
-        val emotionList = mutableStateListOf<CardActivity.Emotion>()
 
-        cardItems.add(CardActivity.Card())
-        cardItems.add(CardActivity.Card())
-        cardItems.add(CardActivity.Card())
+//        cardItems.add(CardActivity.Card())
+//        cardItems.add(CardActivity.Card())
+//        cardItems.add(CardActivity.Card())
 
-        emotionList.add(
-            CardActivity.Emotion(
-                icon = R.drawable.ic_emotion_common,
-                text = "평범해요",
-                persent = "60%"
-            )
-        )
-        emotionList.add(
-            CardActivity.Emotion(
-                icon = R.drawable.ic_emotion_happy,
-                text = "즐거워요",
-                persent = "20%"
-            )
-        )
-        emotionList.add(
-            CardActivity.Emotion(
-                icon = R.drawable.ic_emotion_angry,
-                text = "화가나요",
-                persent = "15%"
-            )
-        )
-        emotionList.add(
-            CardActivity.Emotion(
-                icon = R.drawable.ic_emotion_sad,
-                text = "슬퍼요 ",
-                persent = "5%"
-            )
-        )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .clickable {
-                }
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            ) {
-                Divider(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color("#706969".toColorInt()),
-                    thickness = 2.dp
-                )
-                Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
+            if(cardItems.isNullOrEmpty()){
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+                    Text(
+                        text = "오늘은 기록이 없어요\n기록으로만 묶어두긴 아까운 날도 있죠",
+                        color = Color("#C3C1C1".toColorInt()),
+                        fontSize = 14.sp,
+                        fontFamily = FontMoment.preStandardFont,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+            }else{
+                LazyColumn(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(end = 16.dp),
-                    text = "전라도의 선유도",
-                    textAlign = TextAlign.End,
-                    fontSize = 22.sp,
-                    fontFamily = FontMoment.preStandardFont,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Divider(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color("#706969".toColorInt()),
-                    thickness = 2.dp
-                )
-            }
-
-
-
-            LazyColumn(
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-            ) {
-                items(cardItems.size) { index ->
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.Top,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .border(
-                                    border = BorderStroke(
-                                        width = 1.dp,
-                                        color = Color("#C3C8BC".toColorInt())
-                                    ), shape = RoundedCornerShape(4.dp)
-                                )
-                                .animateContentSize()
-                                .fillMaxWidth()
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                ) {
-                                    cardItems[index].isExpand.value =
-                                        !cardItems[index].isExpand.value
-                                }
-
+                        .padding(horizontal =20.dp)
+                ) {
+                    items(cardItems.size) { index ->
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Spacer(modifier = Modifier.height(22.dp))
-                            Column() {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 24.dp)
-                                ) {
-                                    Image(
-                                        modifier = Modifier
-                                            .size(26.dp)
-                                            .clickable {
-                                                cardItems[index].isFavorite.value =
-                                                    !cardItems[index].isFavorite.value
-                                            }
-                                        ,
-                                        painter = painterResource(id = if(cardItems[index].isFavorite.value) R.drawable.ic_heart_red else R.drawable.ic_heart_white),
-                                        contentDescription = ""
+                            Column(
+                                verticalArrangement = Arrangement.Top,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .border(
+                                        border = BorderStroke(
+                                            width = 1.dp,
+                                            color = Color("#C3C8BC".toColorInt())
+                                        ), shape = RoundedCornerShape(4.dp)
                                     )
-                                    Spacer(modifier = Modifier.width(16.dp))
-                                    Text(
-                                        text = "ss",
-                                        fontFamily = FontMoment.preStandardFont,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        fontSize = 14.sp
-                                    )
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Row {
+                                    .animateContentSize()
+                                    .fillMaxWidth()
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null
+                                    ) {
+                                        cardItems[index].isExpand.value =
+                                            !cardItems[index].isExpand.value
+                                        momentAudioPlayer.stop()
+                                        cardItems[index].recordingFile?.let {
+                                            momentAudioPlayer.playFile(
+                                                it
+                                            )
+                                        }
+                                    }
+
+                            ) {
+                                Spacer(modifier = Modifier.height(22.dp))
+                                Column() {
+                                    Row(
+                                        modifier = Modifier.padding(
+                                            horizontal = 24.dp,
+                                            vertical = 12.dp
+                                        )
+                                    ) {
+                                        Image(
+                                            modifier = Modifier
+                                                .clickable {
+                                                    cardItems[index].isFavorite.value =
+                                                        !cardItems[index].isFavorite.value
+                                                    cardViewModel.putCardLike(
+                                                        cardViewId = cardItems[index].cardView.id
+                                                    )
+                                                },
+                                            painter = painterResource(id = if (cardItems[index].isFavorite.value) R.drawable.ic_heart_red else R.drawable.ic_heart_white),
+                                            contentDescription = ""
+                                        )
+                                        Spacer(modifier = Modifier.width(16.dp))
                                         Text(
-                                            text = "_00${index + 1}",
+                                            text = cardItems[index].cardView.recordedAt.split('T').last().split(':').slice(IntRange(0,1)).joinToString(separator = ":"),
                                             fontFamily = FontMoment.preStandardFont,
                                             fontWeight = FontWeight.ExtraBold,
                                             fontSize = 14.sp
                                         )
-                                        Spacer(modifier = Modifier.width(16.dp))
-                                        Image(
-                                            modifier = Modifier
-                                                .size(18.dp)
-                                                .padding(top = 6.dp),
-                                            painter = painterResource(id = R.drawable.ic_down),
-                                            contentDescription = ""
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(6.dp))
-
-                                Divider(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 12.dp)
-                                        .height(2.dp)
-                                        .background(color = Color("#706969".toColorInt()))
-                                )
-                            }
-
-
-                            if (cardItems[index].isExpand.value) {
-                                Spacer(modifier = Modifier.height(40.dp))
-                                Column {
-                                    Row(
-                                        modifier = Modifier.padding(horizontal = 22.dp)
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.ic_location_grey),
-                                            contentDescription = ""
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = "wegwae",
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium
-                                        )
                                         Spacer(modifier = Modifier.weight(1f))
-                                        Image(
-                                            painter = painterResource(id = R.drawable.ic_weather_black),
-                                            contentDescription = ""
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = "wegwae",
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 22.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.ic_clock_grey),
-                                            contentDescription = ""
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = "wegwae",
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Divider(
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .height(1.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = "wegwae",
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.height(30.dp))
-
-//                                LinearDeterminateIndicator()
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 12.dp)
-                                            .background(
-                                                brush = Brush.verticalGradient(
-                                                    listOf(
-                                                        Color("#FBFAF7".toColorInt()),
-                                                        Color("#C3C8BC".toColorInt())
-                                                    )
-                                                ),
-                                                shape = RoundedCornerShape(4.dp)
-                                            )
-                                    ) {
-                                        FancyProgressBar(
-                                            Modifier
-                                                .height(12.dp)
-                                                .fillMaxWidth(),
-                                            onDragEnd = { finalProgress ->
-                                                Log.e(
-                                                    "finalProgress: ",
-                                                    "${
-                                                        String.format(
-                                                            "%.0f",
-                                                            (1 - finalProgress) * 100
-                                                        )
-                                                    }%"
-                                                )
-
-
-                                            }, onDrag = { progress ->
-                                                Log.d(
-                                                    "progress: ",
-                                                    "${
-                                                        String.format(
-                                                            "%.0f",
-                                                            (1 - progress) * 100
-                                                        )
-                                                    }%"
-                                                )
-                                            })
-                                        Spacer(modifier = Modifier.height(10.dp))
-                                        Column(
-                                            modifier = Modifier.padding(horizontal = 8.dp),
-                                            horizontalAlignment = Alignment.CenterHorizontally
-                                        ) {
-                                            Image(
-                                                painter = painterResource(id = R.drawable.ic_record_start),
-                                                contentDescription = "seg"
-                                            )
-                                            Spacer(modifier = Modifier.height(10.dp))
+                                        Row {
                                             Text(
-                                                text = "질문리스트가 있다면 여기에 먼저 띄워질거에요",
+                                                text = "_00${index + 1}",
                                                 fontFamily = FontMoment.preStandardFont,
-                                                fontWeight = FontWeight.Medium,
-                                                fontSize = 11.sp,
-                                                color = Color("#99342E".toColorInt())
+                                                fontWeight = FontWeight.ExtraBold,
+                                                fontSize = 14.sp
                                             )
-                                            Spacer(modifier = Modifier.height(8.dp))
-                                            Text(
-                                                text = "분석된 글이 쓰여지는 공간입니다. 칸의 가로 넓이는 고정되어있습니다. 칸의 사이즈별 마진은 동일합니다. 즉 모바일 사이즈 마진에 맞춰 칸이 늘어나거나 줄어들며 글자 쓰는 공간도 칸에 따라 유동적으로 변경됩니다. 칸 안의 글자 양 옆 마진은 8이며 칸의 모바일 사이즈 마진은 큰 카드가 왼 20px, 오 20px이며 / 글이 쓰여지는 공간의 마진은 카드마진 기준으로 왼 24px, 오23px입니다. 좌우가 다른이유는 아이폰 미니의 화면비율이 홀수라서 그렇습니다. 은근히 신경쓰이네요 또, 가로글자수 제한은 있지만 세로로는 제한이없습니다. 카드의 길이가 무한정 길어질 수도 있다는 말이지요. 세로에도 제한을 두는 것이 좋을까요?",
-                                                fontFamily = FontMoment.preStandardFont,
-                                                fontWeight = FontWeight.Medium,
-                                                fontSize = 12.sp
-                                            )
-                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Spacer(modifier = Modifier.width(16.dp))
                                             Image(
-                                                painter = painterResource(id = R.drawable.ic_pencil),
-                                                contentDescription = "edit"
+                                                modifier = Modifier
+                                                    .size(18.dp)
+                                                    .padding(top = 6.dp),
+                                                painter = painterResource(id = R.drawable.ic_down),
+                                                contentDescription = ""
                                             )
-                                            Spacer(modifier = Modifier.height(18.dp))
                                         }
-
-                                    }
-                                    if (imageList.isNotEmpty()) {
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Divider(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 23.dp),
-                                            color = Color("#C3C1C1".toColorInt())
-                                        )
-                                        Spacer(modifier = Modifier.height(8.dp))
-
-                                        LazyRow(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 30.dp),
-                                            horizontalArrangement = Arrangement.Start,
-                                            content = {
-                                                items(imageList.size) { index ->
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .size(72.dp)
-                                                            .padding(end = 8.dp)
-                                                    ) {
-                                                        AsyncImage(
-                                                            contentScale = ContentScale.Crop,
-                                                            modifier = Modifier
-                                                                .height(70.dp)
-                                                                .width(66.dp)
-                                                                .clip(RoundedCornerShape(6.dp)),
-                                                            model = ImageRequest.Builder(this@MainActivity)
-                                                                .data(imageList[index])
-                                                                .build(),
-                                                            contentDescription = "image"
-                                                        )
-
-                                                    }
-                                                }
-                                            })
                                     }
 
-                                    Spacer(modifier = Modifier.height(30.dp))
+                                    Spacer(modifier = Modifier.height(6.dp))
 
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 24.dp)
-                                    ) {
-                                        Text(
-                                            text = "꽤나 즐거운 대화였네요",
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium,
-                                            fontSize = 11.sp
-                                        )
-                                        Spacer(modifier = Modifier.weight(1f))
-                                        Text(
-                                            text = "꽤나 즐거운 대화였네요",
-                                            fontFamily = FontMoment.preStandardFont,
-                                            fontWeight = FontWeight.Medium,
-                                            fontSize = 11.sp
-                                        )
-                                    }
-
-                                    Spacer(modifier = Modifier.height(4.dp))
                                     Divider(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(horizontal = 11.dp),
-                                        color = Color("#706969".toColorInt())
+                                            .padding(horizontal = 12.dp)
+                                            .height(2.dp)
+                                            .background(color = Color("#706969".toColorInt()))
                                     )
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                }
 
+
+                                if (cardItems[index].isExpand.value) {
+                                    Spacer(modifier = Modifier.height(40.dp))
                                     Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 24.dp)
+                                        verticalArrangement = Arrangement.Center
                                     ) {
-                                        emotionList.forEach { item ->
+                                        Row(
+                                            modifier = Modifier.padding(horizontal = 22.dp)
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.ic_location_grey),
+                                                contentDescription = ""
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = cardItems[index].cardView.location,
+                                                fontFamily = FontMoment.preStandardFont,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Spacer(modifier = Modifier.weight(1f))
+                                            Text(
+                                                text = cardItems[index].cardView.weather,
+                                                fontFamily = FontMoment.preStandardFont,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Image(
+                                                modifier = Modifier.size(18.dp),
+                                                painter = painterResource(id = GetWeatherIconDrawableCode(cardItems[index].cardView.weather)),
+                                                contentDescription = ""
+                                            )
+
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+
+
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 22.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.ic_clock_grey),
+                                                contentDescription = ""
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = cardItems[index].cardView.recordedAt.split("T")
+                                                    .first().replace('-','.'),
+                                                fontFamily = FontMoment.preStandardFont,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Divider(
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .height(1.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            val tempStrList=cardItems[index].cardView.recordedAt.split("T").last().split(":")
+                                            Log.d("weagwagaw","${tempStrList}")
+                                            Text(
+                                                text = "${tempStrList[0]}:${tempStrList[1]}" ,
+                                                fontFamily = FontMoment.preStandardFont,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(30.dp))
+
+//                                LinearDeterminateIndicator()
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 23.dp)
+                                                .background(
+                                                    brush = Brush.verticalGradient(
+                                                        listOf(
+                                                            Color("#FBFAF7".toColorInt()),
+                                                            Color("#C3C8BC".toColorInt())
+                                                        )
+                                                    ),
+                                                    shape = RoundedCornerShape(4.dp)
+                                                )
+                                        ) {
+                                            LinearDeterminateIndicator(
+                                                currentProgress = currentProgress,
+                                                loading = loading,
+                                                scope = scope,
+                                                onClick = {
+
+                                                },
+                                                maxTime = momentAudioPlayer.getSecondDuration().toInt()
+                                            )
+                                            Spacer(modifier = Modifier.height(10.dp))
                                             Row(
-                                                modifier = Modifier.height(20.dp),
-                                                verticalAlignment = Alignment.CenterVertically
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 8.dp)
+                                            ) {
+                                                Text(
+                                                    text = "00 : 00",
+                                                    color = Color("#938F8F".toColorInt()),
+                                                    fontWeight = FontWeight.Medium,
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontSize = 8.sp
+                                                )
+                                                Spacer(modifier = Modifier.weight(1f))
+                                                Text(
+                                                    text = "${momentAudioPlayer.getTimeDuration()}",
+                                                    color = Color("#938F8F".toColorInt()),
+                                                    fontWeight = FontWeight.Medium,
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontSize = 8.sp
+                                                )
+                                            }
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 8.dp),
+                                                horizontalAlignment = Alignment.CenterHorizontally
                                             ) {
                                                 Image(
-                                                    modifier = Modifier.size(12.dp),
-                                                    painter = painterResource(id = item.icon),
-                                                    contentDescription = ""
-                                                )
+                                                    modifier = Modifier.clickable {
+//                                                            val file = File(MomentPath.RECORDER_PATH+convertUrlLinkStringToRcorderNameString(cardItems[index].cardView.recordFileUrl))
+//                                                            Log.d("awegweag","${file.name}, ${file.path}")
+                                                        try {
+                                                            if(!momentAudioPlayer.isActivity()){
+                                                                momentAudioPlayer.playFile(cardItems[index].recordingFile!!)
+                                                                momentAudioPlayer.start()
+                                                                loading.value = !loading.value
 
-                                                Spacer(modifier = Modifier.width(6.dp))
+                                                            }else if(momentAudioPlayer.isIng()){
+//                                                                    momentAudioPlayer.pause()
+                                                                momentAudioPlayer.stop()
+                                                                loading.value = false
+//                                                                    momentAudioPlayer.playFile(cardItems[index].recordingFile!!)
+                                                            }else{
+                                                                momentAudioPlayer.start()
+                                                                loading.value = !loading.value
+
+                                                            }
+                                                        }catch (e:Exception){
+                                                            Toast.makeText(this@MainActivity,"녹음파일이 없습니다.",Toast.LENGTH_SHORT).show()
+                                                        }
+
+                                                    },
+                                                    painter = painterResource(id = R.drawable.ic_record_start),
+                                                    contentDescription = "seg"
+                                                )
+                                                Spacer(modifier = Modifier.height(10.dp))
                                                 Text(
-                                                    text = item.text,
+                                                    text = "질문리스트가 있다면 여기에 먼저 띄워질거에요",
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontWeight = FontWeight.Medium,
+                                                    fontSize = 11.sp,
+                                                    color = Color("#99342E".toColorInt())
+                                                )
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                                Text(
+                                                    text = cardItems[index].cardView.stt ?: "열심히 분석중이에요!\n조금만 기다려주세요",
+                                                    fontFamily = FontMoment.preStandardFont,
+                                                    fontWeight = FontWeight.Medium,
+                                                    fontSize = 12.sp
+                                                )
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.ic_pencil),
+                                                    contentDescription = "edit"
+                                                )
+                                                Spacer(modifier = Modifier.height(18.dp))
+                                            }
+
+                                        }
+
+                                        if(cardItems[index].cardView.stt.isNullOrEmpty()){
+                                            Spacer(modifier = Modifier.height(18.dp))
+
+                                        }else{
+                                            if(cardItems[index].cardView.imageUrls.isNullOrEmpty() && cardItems[index].imageNum.value==0) {
+                                                Spacer(modifier = Modifier.height(8.dp))
+
+                                            } else {
+
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                                Divider(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(horizontal = 23.dp),
+                                                    color = Color("#C3C1C1".toColorInt())
+                                                )
+                                                Spacer(modifier = Modifier.height(8.dp))
+
+                                                LazyRow(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                    ,
+                                                    contentPadding = PaddingValues(horizontal = 32.dp),
+                                                    horizontalArrangement = Arrangement.Start,
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    content = {
+                                                        items(cardItems[index].cardView.imageUrls.size) { imageUrlindex ->
+                                                            Box(
+                                                                modifier = Modifier
+                                                                    .size(72.dp)
+                                                            ) {
+
+                                                                GlideImage(
+                                                                    contentScale = ContentScale.Crop,
+                                                                    modifier = Modifier
+                                                                        .size(70.dp)
+                                                                        .clip(
+                                                                            RoundedCornerShape(
+                                                                                6.dp
+                                                                            )
+                                                                        ),
+                                                                    model = cardItems[index].cardView.imageUrls[imageUrlindex],
+                                                                    contentDescription = "Image",
+                                                                )
+
+
+                                                            }
+
+                                                            Spacer(modifier = Modifier.width(8.dp))
+                                                        }
+
+
+                                                        items(cardItems[index].imageNum.value){uploadImageIndex->
+                                                            AsyncImage(
+                                                                contentScale = ContentScale.Crop,
+                                                                modifier = Modifier
+                                                                    .size(70.dp)
+                                                                    .clip(RoundedCornerShape(6.dp)),
+                                                                model = ImageRequest.Builder(this@MainActivity)
+                                                                    .data(cardItems[index].uploadImage[uploadImageIndex])
+                                                                    .build(),
+                                                                contentDescription = "image"
+                                                            )
+                                                            Spacer(modifier = Modifier.width(8.dp))
+                                                        }
+
+                                                        if(cardItems[index].let { it.cardView.imageUrls.size + it.uploadImage.size } < 10){
+
+                                                        }
+                                                    })
+                                            }
+
+                                            Spacer(modifier = Modifier.height(30.dp))
+
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 24.dp)
+                                            ) {
+                                                Text(
+                                                    text = when(index){
+                                                        0 -> {"꽤나 즐거운 대화였네요"}
+                                                        1 -> {"오늘도 고생했어요"}
+                                                        2 -> {"좋은 하루 보내세요"}
+                                                        else -> {"푹 쉬세요"}
+                                                    },
                                                     fontFamily = FontMoment.preStandardFont,
                                                     fontWeight = FontWeight.Medium,
                                                     fontSize = 11.sp
                                                 )
-                                                Spacer(modifier = Modifier.width(26.dp))
-
-                                                LinearProgressIndicator(
-                                                    progress = { 0.4f }
-                                                )
-                                                Spacer(modifier = Modifier.width(36.dp))
+                                                Spacer(modifier = Modifier.weight(1f))
                                                 Text(
-                                                    text = item.text,
+                                                    text = "감정분석",
                                                     fontFamily = FontMoment.preStandardFont,
                                                     fontWeight = FontWeight.Medium,
                                                     fontSize = 11.sp
                                                 )
                                             }
-                                        }
-                                    }
 
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                }
-                            } else {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 24.dp),
-                                    horizontalArrangement = Arrangement.End
-                                ) {
-                                    Text(
-                                        text = "꽤나 즐거운 대화였네요.",
-                                        fontSize = 12.sp,
-                                        color = Color("#938F8F".toColorInt()),
-                                        fontFamily = FontMoment.preStandardFont,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Spacer(modifier = Modifier.width(64.dp))
-                                    Text(
-                                        text = "해가 쨍쨍한 날",
-                                        fontSize = 12.sp,
-                                        color = Color("#938F8F".toColorInt()),
-                                        fontFamily = FontMoment.preStandardFont,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Image(
-                                        modifier = Modifier.size(18.dp),
-                                        painter = painterResource(id = R.drawable.ic_weather_grey),
-                                        contentDescription = ""
-                                    )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Divider(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 11.dp),
+                                                color = Color("#706969".toColorInt())
+                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 24.dp)
+                                            ) {
+                                                emotionList.forEach { item ->
+                                                    Row(
+                                                        modifier = Modifier.height(20.dp),
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
+                                                        Image(
+                                                            modifier = Modifier.size(12.dp),
+                                                            painter = painterResource(id = item.icon),
+                                                            contentDescription = ""
+                                                        )
+
+                                                        Spacer(modifier = Modifier.width(6.dp))
+                                                        Text(
+                                                            text = item.text,
+                                                            fontFamily = FontMoment.preStandardFont,
+                                                            fontWeight = FontWeight.Medium,
+                                                            fontSize = 11.sp
+                                                        )
+                                                        Spacer(modifier = Modifier.width(26.dp))
+
+
+                                                        LinearProgressIndicator(
+                                                            modifier = Modifier.weight(1f),
+                                                            color = Color(item.color.toColorInt()),
+                                                            progress = {
+                                                                when(item.text){
+                                                                    "평범해요" -> {
+                                                                        cardItems[index].cardView.neutral.let {
+                                                                            it.toFloat()*(0.01f)
+                                                                        }
+                                                                    }
+                                                                    "즐거워요" -> {
+                                                                        cardItems[index].cardView.happy.let {
+                                                                            it.toFloat()*(0.01f)
+                                                                        }
+                                                                    }
+                                                                    "화가나요" -> {
+                                                                        cardItems[index].cardView.angry.let {
+                                                                            it.toFloat()*(0.01f)
+                                                                        }
+                                                                    }
+                                                                    "우울해요" -> {
+                                                                        cardItems[index].cardView.sad.let {
+                                                                            it.toFloat()*(0.01f)
+                                                                        }
+                                                                    }
+                                                                    "역겨워요" ->{
+                                                                        cardItems[index].cardView.disgust.let {
+                                                                            it.toFloat()*(0.01f)
+                                                                        }
+                                                                    }
+                                                                    else -> {
+                                                                        cardItems[index].cardView.disgust.let {
+                                                                            it.toFloat()*(0.01f)
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        )
+                                                        Spacer(modifier = Modifier.width(36.dp))
+
+                                                        Text(
+                                                            modifier = Modifier.weight(0.3f),
+                                                            text =
+                                                            when(item.text){
+                                                                "평범해요" -> {
+                                                                    cardItems[index].cardView.neutral.let {
+                                                                        "${it.toInt()}%"
+                                                                    }
+                                                                }
+                                                                "즐거워요" -> {
+                                                                    cardItems[index].cardView.happy.let {
+                                                                        "${it.toInt()}%"
+                                                                    }
+                                                                }
+                                                                "화가나요" -> {
+                                                                    cardItems[index].cardView.angry.let {
+                                                                        "${it.toInt()}%"
+                                                                    }
+                                                                }
+                                                                "우울해요" -> {
+                                                                    cardItems[index].cardView.sad.let {
+                                                                        "${it.toInt()}%"
+                                                                    }
+                                                                }
+                                                                "역겨워요" ->{
+                                                                    cardItems[index].cardView.disgust.let {
+                                                                        "${it.toInt()}%"
+                                                                    }
+                                                                }
+                                                                else -> {
+                                                                    cardItems[index].cardView.disgust.let {
+                                                                        "${it.toInt()}%"
+                                                                    }
+                                                                }
+                                                            },
+                                                            fontFamily = FontMoment.preStandardFont,
+                                                            fontWeight = FontWeight.Medium,
+                                                            fontSize = 12.sp
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                        }
+
+
+
+
+
+
+
+                                    }
+                                } else {
+                                    momentAudioPlayer.stop()
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 24.dp, vertical = 8.dp),
+                                        horizontalArrangement = Arrangement.End,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "꽤나 즐거운 대화였네요.",
+                                            fontSize = 12.sp,
+                                            color = Color("#938F8F".toColorInt()),
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Spacer(modifier = Modifier.width(64.dp))
+                                        Text(
+                                            text = cardItems[index].cardView.weather,
+                                            fontSize = 12.sp,
+                                            color = Color("#938F8F".toColorInt()),
+                                            fontFamily = FontMoment.preStandardFont,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Image(
+                                            modifier = Modifier.size(18.dp),
+                                            painter = painterResource(id = GetWeatherIconDrawableCode(weather = cardItems[index].cardView.weather)),
+                                            contentDescription = ""
+                                        )
+
+                                    }
                                 }
                             }
                         }
-                    }
 
+                    }
                 }
             }
+
 
 
         }
@@ -1511,19 +2719,6 @@ class MainActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(40.dp))
                 }
 
-                Column(modifier = Modifier
-                    .width(134.dp)
-                    .clickable { }){
-                    Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-                        P_Medium18(
-                            content = "계정 이메일 변경",
-                            color = black
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Divider(color = black)
-                }
-                Spacer(modifier = Modifier.height(40.dp))
 
 
                 Column(modifier = Modifier
@@ -1565,7 +2760,7 @@ class MainActivity : ComponentActivity() {
                 }
                 if (InquirybtnState.value){
                     Spacer(modifier = Modifier.height(8.dp))
-                    P_Medium14(content = "kookminmoment@gmail.com", color = black)
+                    P_Medium14(content = "nex1223@naver.com", color = black)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
                 else{
@@ -1587,7 +2782,7 @@ class MainActivity : ComponentActivity() {
                 }
                 if (versionbtnState.value){
                     Spacer(modifier = Modifier.height(8.dp))
-                    P_Medium14(content = "v1.1", color = black)
+                    P_Medium14(content = "v ${ApplicationClass.versionName}", color = black)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
                 else{
@@ -1597,17 +2792,26 @@ class MainActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(top = 150.dp)) {
-                    Column(Modifier.clickable {  }) {
+                    Column(Modifier.clickable {
+                        tokenSharedPreferences.edit().putString("accessToken","").apply()
+                        startActivity(Intent(this@MainActivity,SplashActivity::class.java))
+                        finish()
+                    }) {
                         P_Medium14("로그아웃", black)
                     }
                     Spacer(modifier = Modifier.height(28.dp))
-                    Column(Modifier.clickable {  }) {
+                    Column(Modifier.clickable {
+                        authViewModel.deleteAuth()
+                        tokenSharedPreferences.edit().putString("accessToken","").apply()
+                        startActivity(Intent(this@MainActivity,SplashActivity::class.java))
+                        finish()
+                    }) {
                         P_Medium14("탈퇴하기", black)
                     }
                 }
         }
     }
-}
+    }
 
     @Composable
     fun Toggle() {
@@ -1653,20 +2857,609 @@ class MainActivity : ComponentActivity() {
             }
     }
 
+    @Composable
+    fun MiniTheme1(receiptAll:ReceiptAll){
+        val emotionList = emotionPercent(receiptAll.neutral,receiptAll.happy,receiptAll.angry,receiptAll.sad, receiptAll.disgust)
 
+        Box(
+            modifier = Modifier
+                .height(244.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 0.dp)
+                .background(
+                    color = white,
+                    shape = RoundedCornerShape(2.dp)
+                )
+                .border(
+                    BorderStroke((0.2).dp, black),
+                    shape = RoundedCornerShape(2.dp)
+                )
+        ) {
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Row(
+                    modifier = Modifier
+                        .height(17.7.dp)
+                        .fillMaxWidth()
+                        .background(
+                            color = primary_500,
+                            shape = RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp)
+                        )
+                        .padding(start = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    P_Medium(receiptAll.tripName, white , 5.sp)
+
+                    Image(
+                        modifier = Modifier
+                            .height(17.dp)
+                            .width(30.dp)
+                            .padding(end = 3.dp),
+                        painter = painterResource(R.drawable.img_logo_white),
+                        contentDescription = "로고 화이트"
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    P_Medium(receiptAll.oneLineMemo,black, 5.sp)
+
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 45.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                if(receiptAll.subDeparture !=""){
+                    Image(
+                        painter = painterResource(R.drawable.ic_location_red),
+                        contentDescription = "장소",
+                        Modifier.size(5.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    P_Medium(receiptAll.subDeparture,primary_500, 4.5.sp)
+                }else{}
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 55.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                P_ExtraBold(receiptAll.mainDeparture, primary_500, 18.sp)
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 87.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_airplain_red),
+                    contentDescription = "장소",
+                    Modifier.size(19.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 116.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                if(receiptAll.subDestination != ""){
+                    Image(
+                        painter = painterResource(R.drawable.ic_location_red),
+                        contentDescription = "장소",
+                        Modifier.size(5.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    P_Medium(receiptAll.subDestination,primary_500, 4.5.sp)
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 123.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                P_ExtraBold(receiptAll.mainDestination, primary_500, 18.sp)
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 150.dp)
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.img_cutline_red),
+                    contentDescription = "가위",
+                    modifier = Modifier
+                        .height(7.dp)
+                        .fillMaxWidth()
+                )
+            }
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 160.dp)
+                    .align(Alignment.BottomCenter),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Column(
+                    Modifier
+                        .wrapContentWidth()
+                        .height(50.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    P_Medium(content = "여행 카드", color = neutral_500, 4.sp)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    YJ_Bold(content = receiptAll.numOfCard.toString(), color = primary_500, 5.sp)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    P_Medium(content = "여행 날짜", color = neutral_500, 4.sp)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    P_Medium(content = receiptAll.stDate, color = primary_500, 4.sp)
+                    P_Medium(content = receiptAll.edDate, color = primary_500, 4.sp)
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                Column() {
+                    P_Medium(content = "여행 감정", color = neutral_500, 4.sp)
+                    Spacer(modifier = Modifier.height(3.8.dp))
+                    Column(
+                        modifier = Modifier
+                            .wrapContentWidth()
+                    ) {
+                        emotionList.forEachIndexed { index, item ->
+                            Row(
+                                modifier = Modifier
+                                    .height(6.dp)
+                                    .wrapContentWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(
+                                    modifier = Modifier.width(40.dp)
+                                )  {
+                                    LinearProgressIndicator(
+                                        progress = { item.persent.toFloat() / 100 },
+                                        modifier = Modifier.height(3.dp),
+                                        color = when (index) {
+                                            0 -> primary_500
+                                            1 -> neutral_600
+                                            2 -> neutral_400
+                                            3 -> neutral_200
+                                            4 -> neutral_100
+                                            else -> primary_500
+                                        },
+                                        strokeCap = StrokeCap.Round
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(4.2.dp))
+                                Image(
+                                    modifier = Modifier.size(5.dp),
+                                    painter = painterResource(
+                                        id = Theme1_Emotion(
+                                            item.text,
+                                            index
+                                        )
+                                    ),
+                                    contentDescription = ""
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                P_Medium(
+                                    content = item.persent.toString() + "%",
+                                    color = when (index) {
+                                        0 -> primary_500
+                                        1 -> neutral_600
+                                        2 -> neutral_400
+                                        3 -> neutral_200
+                                        4 -> neutral_100
+                                        else -> primary_500
+                                    }, 4.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun MiniTheme2(receiptAll:ReceiptAll){
+        val emotionList = emotionPercent(receiptAll.neutral,receiptAll.happy,receiptAll.angry,receiptAll.sad, receiptAll.disgust)
+
+        Box(
+            modifier = Modifier
+                .height(244.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 0.dp)
+                .background(
+                    color = white,
+                    shape = RoundedCornerShape(2.dp)
+                )
+                .border(
+                    BorderStroke((0.2).dp, neutral_500),
+                    shape = RoundedCornerShape(2.dp)
+                )
+        )
+        {
+            Column(
+                modifier = Modifier
+                    .width(3.74.dp)
+                    .padding(top = 15.dp)
+                    .fillMaxHeight()
+                    .background(
+                        color = primary_500,
+                        shape = RoundedCornerShape(bottomEnd = 2.dp)
+                    )
+                    .align(Alignment.BottomEnd)
+            ) {}
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 7.dp, start = 10.dp)
+            ) {
+                Column( modifier = Modifier
+                    .padding(start = 4.dp)) {
+                    P_Medium(content = receiptAll.oneLineMemo, color = black, 5.sp)
+                }
+                Spacer(modifier = Modifier.height(2.dp))
+                Divider(color = primary_500, thickness = 1.dp)
+                Spacer(modifier = Modifier.height(15.dp))
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_location_grey),
+                            contentDescription = "장소",
+                            Modifier.size(5.dp)
+                        )
+                        Spacer(modifier = Modifier.width(1.dp))
+                        P_Medium(content = receiptAll.subDeparture, color =neutral_600, 4.5.sp)
+                    }
+                    Spacer(modifier = Modifier.height(1.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        P_ExtraBold(content = receiptAll.mainDeparture, color = black, size = 18.sp)
+                    }
+                    Spacer(modifier = Modifier.height(1.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_train_grey),
+                            contentDescription = "기차",
+                            modifier = Modifier
+                                .height(34.dp)
+                                .width(15.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(1.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_location_grey),
+                            contentDescription = "장소",
+                            Modifier.size(5.dp)
+                        )
+                        Spacer(modifier = Modifier.width(1.dp))
+                        P_Medium(content = receiptAll.subDestination, color = neutral_600, 4.5.sp)
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        P_ExtraBold(content = receiptAll.mainDestination, color = black, size = 18.sp)
+                    }
+                    Spacer(modifier = Modifier.height(27.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        P_Medium(content = receiptAll.tripName, color = black, 5.sp)
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Row(
+                            Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Column(
+                                Modifier.width(40.dp)
+                            ) {
+                                P_Medium(content = "여행 감정", color = neutral_500, 4.sp)
+                                Spacer(modifier = Modifier.height(3.8.dp))
+                                Column(
+                                    modifier = Modifier.wrapContentWidth()
+                                ) {
+                                    emotionList.forEachIndexed { index, item ->
+                                        Row(
+                                            modifier = Modifier.height(5.5.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+
+                                            Image(
+                                                modifier = Modifier.size(5.dp),
+                                                painter = painterResource(
+                                                    id = Theme2_Emotion(
+                                                        kind = item.text
+                                                    )
+                                                ),
+                                                contentDescription = ""
+                                            )
+                                            Spacer(modifier = Modifier.width(3.dp))
+                                            Column(
+                                                modifier = Modifier.width(32.dp)
+                                            ) {
+                                                LinearProgressIndicator(
+                                                    progress = { item.persent.toFloat() / 100 },
+                                                    modifier = Modifier.height(1.5.dp),
+                                                    color = when (index) {
+                                                        0 -> primary_500
+                                                        1 -> warning_600
+                                                        2 -> tertiary_600
+                                                        3 -> positive_800
+                                                        4 -> secondary_400
+                                                        else -> primary_500
+                                                    },
+                                                    strokeCap = StrokeCap.Round
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            Column(
+                                Modifier.padding(start = 20.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                P_Medium(content = "카드 갯수", color = neutral_500, 4.sp)
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Column(
+                                    Modifier
+                                        .size(23.dp)
+                                        .background(
+                                            color = white,
+                                            shape = RoundedCornerShape(4.dp)
+                                        )
+                                        .border(
+                                            width = 0.3.dp,
+                                            color = black,
+                                            shape = RoundedCornerShape(4.dp)
+                                        ),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    YJ_Bold(content = receiptAll.numOfCard.toString(), color = primary_500, 8.sp)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Row(
+                Modifier
+                    .padding(bottom = 2.dp, end = 7.dp)
+                    .align(Alignment.BottomEnd)
+            ) {
+                P_Medium(content = receiptAll.stDate, color = neutral_500, 4.sp)
+                P_Medium(content = " / ", color = neutral_500, 4.sp)
+                P_Medium(content = receiptAll.edDate, color = neutral_500, 4.sp)
+            }
+
+            Row() {
+                Column(
+                    modifier = Modifier
+                        .width(10.dp)
+                        .fillMaxHeight()
+                        .background(
+                            color = primary_500,
+                            shape = RoundedCornerShape(topStart = 2.dp, bottomStart = 2.dp)
+                        ),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.img_logo_vertical),
+                        contentDescription = "로고",
+                        Modifier
+                            .width(30.dp)
+                            .fillMaxHeight()
+                    )
+                }
+            }
+            Column(Modifier.padding(top = 140.dp)) {
+                Image(
+                    painter = painterResource(R.drawable.img_cutline_circle),
+                    contentDescription = "로고",
+                    Modifier
+                        .height(4.5.dp)
+                        .fillMaxWidth()
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun deleteDialog(showDeleteDialog : MutableState<Boolean>, DeleteReceipt : MutableList<ReceiptId>){
+
+        CustomTitleCheckDialog(
+            title = "${DeleteReceipt.size} 개의 영수증을 정말 삭제 할까요?",
+            description = "삭제된 영수증은 복구할 수 없어요",
+            checkleft = "네",
+            checkright = "아니요",
+            onClickCancel = { showDeleteDialog.value = false },
+            onClickleft = {
+                receiptViewModel.deleteReceiptDelete(
+                    body = deleteReceiptDeleteRequest(receiptIds = DeleteReceipt))
+                showDeleteDialog.value = false },
+            onClickright = { showDeleteDialog.value = false }
+        )
+    }
+
+    fun emotionPercent(common : Double, happy : Double, angry : Double, sad : Double, disgust : Double): SnapshotStateList<com.capstone.android.application.data.local.Emotion> {
+        val emotionList = mutableStateListOf<com.capstone.android.application.data.local.Emotion>()
+        emotionList.add(
+            com.capstone.android.application.data.local.Emotion(
+                icon = R.drawable.ic_emotion_common,
+                text = "평범해요",
+                persent = (common).toInt()
+            )
+        )
+        emotionList.add(
+            com.capstone.android.application.data.local.Emotion(
+                icon = R.drawable.ic_emotion_happy,
+                text = "즐거워요",
+                persent = (happy).toInt()
+            )
+        )
+        emotionList.add(
+            com.capstone.android.application.data.local.Emotion(
+                icon = R.drawable.ic_emotion_angry,
+                text = "화가나요",
+                persent = (angry).toInt()
+            )
+        )
+        emotionList.add(
+            com.capstone.android.application.data.local.Emotion(
+                icon = R.drawable.ic_emotion_sad,
+                text = "우울해요",
+                persent = (sad).toInt()
+            )
+        )
+        emotionList.add(
+            com.capstone.android.application.data.local.Emotion(
+                icon = R.drawable.ic_receipt2_emotion_disgust,
+                text = "불쾌해요",
+                persent = (disgust).toInt()
+                )
+        )
+
+        emotionList.sortByDescending { it.persent }
+        return emotionList
+    }
+    @Composable
+    fun Theme1_Emotion(kind: String, index: Int): Int {
+
+        when(kind){
+            "평범해요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_common_1
+                1 -> R.drawable.ic_receipt1_emotion_common_2
+                2 -> R.drawable.ic_receipt1_emotion_common_3
+                3 -> R.drawable.ic_receipt1_emotion_common_4
+                else -> R.drawable.ic_receipt1_emotion_common5
+            }
+            "화가나요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_angry_1
+                1 -> R.drawable.ic_receipt1_emotion_angry_2
+                2 -> R.drawable.ic_receipt1_emotion_angry_3
+                3 -> R.drawable.ic_receipt1_emotion_angry_4
+                else -> R.drawable.ic_receipt1_emotion_angry5
+            }
+            "즐거워요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_happy_1
+                1 -> R.drawable.ic_receipt1_emotion_happy_2
+                2 -> R.drawable.ic_receipt1_emotion_happy_3
+                3 -> R.drawable.ic_receipt1_emotion_happy_4
+                else -> R.drawable.ic_receipt1_emotion_happy5
+            }
+            "우울해요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_sad_1
+                1 -> R.drawable.ic_receipt1_emotion_sad_2
+                2 -> R.drawable.ic_receipt1_emotion_sad_3
+                3 -> R.drawable.ic_receipt1_emotion_sad_4
+                else -> R.drawable.ic_receipt1_emotion_sad5
+            }
+            "불쾌해요" -> return when(index){
+                0 -> R.drawable.ic_receipt1_emotion_disgust1
+                1 -> R.drawable.ic_receipt1_emotion_disgust2
+                2 -> R.drawable.ic_receipt1_emotion_disgust3
+                3 -> R.drawable.ic_receipt1_emotion_disgust4
+                else -> R.drawable.ic_receipt1_emotion_disgust5
+            }
+            else -> return R.drawable.ic_emotion_angry
+        }
+    }
+    @Composable
+    fun Theme2_Emotion(kind: String): Int {
+
+        return when(kind){
+            "평범해요" -> R.drawable.ic_receipt2_emotion_common
+            "화가나요" -> R.drawable.ic_receipt2_emotion_angry
+            "즐거워요" -> R.drawable.ic_receipt2_emotion_happy
+            "우울해요" -> R.drawable.ic_receipt2_emotion_sad
+            "불쾌해요" -> R.drawable.ic_receipt2_emotion_disgust
+            else -> R.drawable.ic_receipt2_emotion_common
+        }
+    }
+
+    @SuppressLint("UnrememberedMutableState")
     @Preview(apiLevel = 33)
     @Composable
     fun MainPreview() {
         ApplicationTheme {
+            val tripList = remember {
+                mutableListOf<Trip>()
+            }
+            var mainTrip = remember {
+                mutableStateOf(MainTrip())
+
+            }
+
+            tripList.add(
+                Trip(
+                    id =0 ,
+                    tripName = "waeg",
+                    startDate = "aesg",
+                    endDate = "weasg",
+                    analyzingCount = 0
+                )
+            )
+
 //            ReceiptCardChoice()
-//            Home()
+            Home(tripList,mainTrip)
 //            ItemTrip()
 //            RecordDaily()
 //            Setting()
 //            ItemTrip()
+            //Receipt()
         }
     }
-
 
 
 @Composable
