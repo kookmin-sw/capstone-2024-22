@@ -7,9 +7,10 @@ import java.io.File
 
 data class Card(
     var isDelete: MutableState<Boolean> = mutableStateOf(false),
-    var isFavorite: MutableState<Boolean> = mutableStateOf(false),
+    var isFavorite: MutableState<Boolean> = mutableStateOf(true),
     var isExpand: MutableState<Boolean> = mutableStateOf(false),
     var cardView: CardView,
     val uploadImage:MutableList<File>,
-    val imageNum:MutableState<Int>
+    val imageNum:MutableState<Int>,
+    val recordingFile : File?
 )
