@@ -9,6 +9,7 @@ import com.capstone.android.application.domain.response.ApiResponse
 import com.capstone.android.application.domain.response.MomentResponse
 import com.capstone.android.application.domain.response.auth.AuthResponse
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 
@@ -32,6 +33,9 @@ interface AuthRetrofitInterface {
     suspend fun patchAuthAuthCodeConfirm(
         @Body body:PatchAuthAuthCodeConfirmRequest
     ):ApiResponse<AuthResponse>
+
+    @DELETE("/auth/delete")
+    suspend fun deleteAuth():ApiResponse<MomentResponse>
 
 
 }
