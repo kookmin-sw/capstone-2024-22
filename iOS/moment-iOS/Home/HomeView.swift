@@ -26,7 +26,7 @@ struct HomeView: View {
     @State private var showSlideOverCard = false
     @State private var selectedItemId: Int?
     @State private var item: Item = Item(id: 0, tripName: "", startdate: "", enddate: "")
-   
+    
     
     var body: some View {
         // NavigationView {
@@ -51,51 +51,37 @@ struct HomeView: View {
                 TabView(selection: $selectedSlideIndex) {
                     
                     // "여행 종료"의 경우
-
-                                // 큰 숫자
-                    VStack{
+                    
+                    // 큰 숫자
+                    VStack {
+                        let (status, name) = homeviewModel.tripStatusAndNameForToday()
+                        Text(name ?? "No Trips")
+                            .font(.pretendardExtrabold14)
+                            .tint(.black)
+                            .padding(.top, 30)
+                            .offset(x: -45, y: 15)
                         
-                      
-                       // Text("\(homeviewModel.items.)")
-                                
-//                        Text("\(item.tripName)")
-                        Text("캡스톤여행")
-                                    .font(.pretendardExtrabold14)
-                                    .tint(.black)
-                                    .padding(.top,30)
-                                    .offset(x: -45, y: 15) // x축은 변화 없이 y축으로 20만큼 이동
-                                       
-                        
-                        HStack{
-                            Text("출발까지")
-                                .padding(.bottom,20)
+                        HStack {
+                            Text(status)
+                                .padding(.bottom, 20)
                                 .font(.pretendardMedium16)
                             
-                            Text("0")
-                                .foregroundColor(.homeRed)
-                                .font(.pretendardExtrabold45)
-                                
-                            
-                            Text("일 남았어요")
-                                .padding(.top,10)
-                                .font(.pretendardMedium16)
+                            if status.contains("일 남음") {
+                                let daysRemaining = status.split(separator: "일")[0]
+                                Text(daysRemaining)
+                                    .foregroundColor(.homeRed)
+                                    .font(.pretendardExtrabold45)
+                            }
                         }
-                        
                     }
-                    .padding(.bottom,10)
-                            
-                            
-                            
-                           
-                            .font(.pretendardMedium14)
-                           
-                            .tag(0)
-                            
+                    .padding(.bottom, 10)
+                    .font(.pretendardMedium14)
+                    .tag(0)
                     
                     
                     
                     
-                       
+                    
                     
                     
                     NavigationLink(destination: DailyView(audioRecorderManager: audioRecorderManager)) {
@@ -135,11 +121,14 @@ struct HomeView: View {
             }  .background(Color.homeBack)
                 .onAppear {
                     homeviewModel.fetchTrips()  // 뷰가 나타날 때 데이터를 로드합니다.
-                       
+                    
                 }
-//                .onChange(of: homeviewModel.items) {
-//                    item = homeviewModel.items[item.id]
-//                       }
+                .onChange(of: homeviewModel.items) { newItems in
+                    if let index = homeviewModel.items.firstIndex(where: { $0.id == item.id }) {
+                        item = homeviewModel.items[index]
+                    }
+                }
+            
             
             if showingCustomAlert ,let itemToDelete = itemToDelete{
                 
@@ -265,7 +254,7 @@ struct ItemViewCell: View {
                 
                 onSelectItem(item.id)
                 print(item.id)
-             //   homeviewModel.fetchTripFiles(for: item.id)
+                //   homeviewModel.fetchTripFiles(for: item.id)
                 
                 
             }
@@ -498,34 +487,34 @@ struct DateRangeView1: View {
                         if let startDate = convertToDate(dateString: item.startdate),
                            let endDate = convertToDate(dateString: item.enddate) {
                             let days = generateDateRange(from: startDate, to: endDate)
-                     
-                       
+                            
+                            
                             
                             ForEach(Array(homeviewModel.tripFiles.enumerated()), id: \.element.id) { index, tripFile in
                                 NavigationLink(destination: CardView(item: item, tripFile: tripFile, tripFileId: tripFile.id, index: index, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel)) {
-                                                            
-                                                            
-                                                            DayView(dayIndex: index, item: item, tripFile: tripFile)
-                                                        }
+                                    
+                                    
+                                    DayView(dayIndex: index, item: item, tripFile: tripFile)
+                                }
                                 
                                 
-                                                    }.padding(.vertical, 4)
-                                
+                            }.padding(.vertical, 4)
+                            
                             
                             
                             
                         }
                         
                     }
-                              
+                    
                 }
             }
         }.background(Color.homeBack)
             .navigationBarBackButtonHidden(true)
-
+        
             .onAppear {
-                        homeviewModel.fetchTripFiles(for: item.id)  // 아이템 ID 사용하여 파일 데이터 로드
-                    }
+                homeviewModel.fetchTripFiles(for: item.id)  // 아이템 ID 사용하여 파일 데이터 로드
+            }
         
     }
     
@@ -565,7 +554,7 @@ let monthDayFormatter: DateFormatter = {
 struct DayView: View {
     //var day: Date
     var dayIndex: Int
-     var item: Item
+    var item: Item
     var tripFile: TripFile
     @ObservedObject var homeviewModel = HomeViewModel()
     

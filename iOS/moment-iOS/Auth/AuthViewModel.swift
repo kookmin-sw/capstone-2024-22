@@ -70,20 +70,14 @@ class AuthViewModel: ObservableObject {
                     
                     print("AccessToken: \(authResponse.data.accessToken)")
                  
-//                    self.verifyCode { success in
-//                                       if success {
-//                                           print("Verification successful.")
-//                                       } else {
-//                                           print("Verification failed.")
-//                                       }
-//                                   }
+
                     
                 case .failure(let error):
                     // 실패 시 처리
                     print("Error: \(error)")
                    
                 }
-            //}
+          
         }
     }
 

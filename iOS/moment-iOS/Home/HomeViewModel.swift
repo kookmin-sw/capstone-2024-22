@@ -10,91 +10,73 @@ import Alamofire
 import SwiftUI
 
 
-class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있는녀석 가져와서 뷰모델에서 뷰에 넣기 전에 데이터들을 잘 처리해준다 이렇게 해주는게 MVVM 패턴인거거덩
-    
+class HomeViewModel: ObservableObject {
     @Published var tripFiles: [TripFile] = []
-    @Published var todos : [Todo]
-    @Published var isEditTodoMode : Bool
-    @Published var removeTodos : [Todo]
-    @Published var isDisplayRemoveTodoAlert : Bool
+    @Published var todos: [Todo] = []
+    @Published var isEditTodoMode: Bool = false
+    @Published var removeTodos: [Todo] = []
+    @Published var isDisplayRemoveTodoAlert: Bool = false
     @Published var tripName: String = ""
     @Published var tripStartDate: Date?
     @Published var tripEndDate: Date?
     @Published var showingDeleteAlert: Bool = false
     @Published var indexToDelete: Int? = nil
     private var dayIndexMapping: [String: Int] = [:]
-    //Published var item : Item
-    
     @Published var items: [Item] = []
-    
-    
-    
-//    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTQyNDgzMiwiZXhwIjoxNzU4NjI0ODMyfQ.iHg2ACmOB_hzoSlwsTfzGc_1gn6OHYmAxD0b2wgqNJg"
-//    
     
     var authToken: String {
         get {
-            // 키체인에서 토큰을 가져옵니다
             if let token = KeychainHelper.shared.getAccessToken() {
                 return "Bearer \(token)"
             } else {
-                // 토큰이 없는 경우 기본값 또는 빈 문자열을 반환합니다
                 return ""
             }
         }
     }
         
-        init() {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy. MM. dd"
+    init() {
+        self.todos = []
+        self.isEditTodoMode = false
+        self.removeTodos = []
+        self.isDisplayRemoveTodoAlert = false
+        self.tripName = ""
+    }
 
-            
-            self.todos = []
-            self.isEditTodoMode = false
-            self.removeTodos = []
-            self.isDisplayRemoveTodoAlert = false
-            self.tripName = ""
-            
-        }
     func calculateDayIndexes() {
-           var uniqueDates = Set<String>()
-           for file in tripFiles {
-               uniqueDates.insert(file.yearDate)
-           }
-           let sortedDates = uniqueDates.sorted()
-           dayIndexMapping = Dictionary(uniqueKeysWithValues: sortedDates.enumerated().map { ($1, $0) })
-       }
+        var uniqueDates = Set<String>()
+        for file in tripFiles {
+            uniqueDates.insert(file.yearDate)
+        }
+        let sortedDates = uniqueDates.sorted()
+        dayIndexMapping = Dictionary(uniqueKeysWithValues: sortedDates.enumerated().map { ($1, $0) })
+    }
     
     func dayIndex(for date: String) -> Int {
-            return dayIndexMapping[date] ?? 0
-        }
+        return dayIndexMapping[date] ?? 0
+    }
     
     func getIndex(item: Item) -> Int {
-        return items.firstIndex { item1 -> Bool in
-            return item.id == item1.id
-        } ?? 0
+        return items.firstIndex { $0.id == item.id } ?? 0
     }
     
-    var removeTodosCount : Int {
-        return removeTodos.count // 여기 카운트는 그냥 제공하는녀석이네 이걸 왜의심했냐면 removeTodos 에 갔는데 데이터셋 Todo 를 가지고있어서 가봤더니 count 가 없네 그래서 count 를 의심했음
-        // 여튼 그렇게 해서 INt 형식으로 이번엔 값을 저장을 해주네 ㅇㅇ 아까 전에는 저장안하고 변하면 바로계산해서 쏴주기만했자나
+    var removeTodosCount: Int {
+        return removeTodos.count
     }
-    var navigationBarRightBtnMode : NavigationBtnType { // 네비게이션 버튼타입에 가서 내가쓰고싶은 열거형 ㅌ친구들을 잘써준 모습
-        isEditTodoMode ? .complete: .edit // 기본문법이니까 패스 ? 후 참이면 1 flase 면 두번째거
+    
+    var navigationBarRightBtnMode: NavigationBtnType {
+        isEditTodoMode ? .complete : .edit
     }
+    
     init(
-        todos: [Todo] = [], // 이소스코드는 Todo 클래스를 타입으로 가지는 녀석을 빈배열로 초기화하는 소스코드임
+        todos: [Todo] = [],
         isEditModeTodoMode: Bool = false,
-        removeTodos: [Todo] = [],// 이소스코드는 Todo 클래스를 타입으로 가지는 녀석을 빈배열로 초기화하는 소스코드임
+        removeTodos: [Todo] = [],
         isDisplayRemoveTodoAlert: Bool = false
-        
-    )
-    {
+    ) {
         self.todos = todos
         self.isEditTodoMode = isEditModeTodoMode
         self.removeTodos = removeTodos
         self.isDisplayRemoveTodoAlert = isDisplayRemoveTodoAlert
-        
     }
     
     func updateTripInfo(name: String, startDate: Date?, endDate: Date?) {
@@ -114,71 +96,59 @@ class HomeViewModel : ObservableObject {//뷰모델을 만들어서 Todo 에 있
         let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
 
         AF.request(url, method: .delete, headers: headers)
-          .responseDecodable(of: DeleteResponse.self) { response in
-            switch response.result {
-            case .success(let deleteResponse):
-                if deleteResponse.status == 200 {
-                    DispatchQueue.main.async {
-                        self.items.removeAll { $0.id == itemToDelete.id }
-                        completion(true, deleteResponse.msg)
+            .responseDecodable(of: DeleteResponse.self) { response in
+                switch response.result {
+                case .success(let deleteResponse):
+                    if deleteResponse.status == 200 {
+                        DispatchQueue.main.async {
+                            self.items.removeAll { $0.id == itemToDelete.id }
+                            completion(true, deleteResponse.msg)
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            completion(false, deleteResponse.msg)
+                        }
                     }
-                } else {
+                case .failure(let error):
+                    print("Response: \(String(describing: response.data))")
                     DispatchQueue.main.async {
-                        completion(false, deleteResponse.msg)
+                        completion(false, error.localizedDescription)
                     }
-                }
-            case .failure(let error):
-                print("Response: \(String(describing: response.data))") // 로그로 실제 응답 데이터 출력
-                DispatchQueue.main.async {
-                    completion(false, error.localizedDescription)
                 }
             }
-        }
     }
-    
-    
    
     func fetchTripFiles(for tripId: Int) {
         let urlString = "http://211.205.171.117:8000/core/tripfile/\(tripId)"
         let headers: HTTPHeaders = [
             "Content-Type": "application/json;charset=UTF-8",
-            "Authorization": authToken  // 여기서 실제 유저 ID 또는 인증 토큰으로 변경해야 할 수 있습니다.
+            "Authorization": authToken
         ]
         print("Fetching trip files for Trip ID: \(tripId)")
 
         AF.request(urlString, method: .get, headers: headers).responseJSON { response in
-            // HTTP 상태 코드 출력
             if let statusCode = response.response?.statusCode {
                 print("HTTP Status Code: \(statusCode)")
             }
-
             
             switch response.result {
-                   case .success(let value):
-                       do {
-                           let data = try JSONSerialization.data(withJSONObject: value, options: [])
-                           let decoder = JSONDecoder()
-                           let tripFileResponse = try decoder.decode(TripFileResponse.self, from: data)
-                           DispatchQueue.main.async {
-                               self.tripFiles = tripFileResponse.data.tripFiles
-                           }
-                       } catch {
-                           print("Decoding error: \(error)")
-                       }
-                   case .failure(let error):
-                       print("Failed to fetch with error: \(error)")
-                   }
+            case .success(let value):
+                do {
+                    let data = try JSONSerialization.data(withJSONObject: value, options: [])
+                    let decoder = JSONDecoder()
+                    let tripFileResponse = try decoder.decode(TripFileResponse.self, from: data)
+                    DispatchQueue.main.async {
+                        self.tripFiles = tripFileResponse.data.tripFiles
+                    }
+                } catch {
+                    print("Decoding error: \(error)")
+                }
+            case .failure(let error):
+                print("Failed to fetch with error: \(error)")
+            }
         }
     }
 
-
-}
-
-
-
-
-extension HomeViewModel {
-    // 가장 가까운 여행의 상태와 이름을 반환하는 함수
     func tripStatusAndNameForToday() -> (status: String, name: String?) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy. MM. dd"
@@ -199,27 +169,41 @@ extension HomeViewModel {
         }
         return ("어디로 떠나면 좋을까요?", nil)
     }
-    
-    
-    
-    
-    
+
     func fetchTrips() {
-           let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
-           AF.request("http://211.205.171.117:8000/core/trip/all", method: .get, headers: headers)
-               .responseDecodable(of: TripsResponse.self) { response in
-                   switch response.result {
-                   case .success(let data):
-                       self.items = data.data.trips.map { trip in
-                           Item(id: trip.id, tripName: trip.tripName, startdate: trip.startDate, enddate: trip.endDate)
-                       }
-                   case .failure(let error):
-                       print("Failed to fetch trips: \(error.localizedDescription)")
-                   }
-               }
-       }
-    
-    
+        let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
+        AF.request("http://211.205.171.117:8000/core/trip/all", method: .get, headers: headers)
+            .responseDecodable(of: TripsResponse.self) { response in
+                switch response.result {
+                case .success(let data):
+                    self.items = data.data.trips.map { trip in
+                        Item(id: trip.id, tripName: trip.tripName, startdate: trip.startDate, enddate: trip.endDate)
+                    }
+                    self.sortTrips()
+                case .failure(let error):
+                    print("Failed to fetch trips: \(error.localizedDescription)")
+                }
+            }
+    }
+
+    private func sortTrips() {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy. MM. dd"
+        
+        let currentDate = Date()
+        items.sort { (item1, item2) -> Bool in
+            guard let date1 = dateFormatter.date(from: item1.startdate),
+                  let date2 = dateFormatter.date(from: item2.startdate) else { return false }
+            
+            if date1 < currentDate && date2 < currentDate {
+                return date1 > date2
+            } else if date1 >= currentDate && date2 >= currentDate {
+                return date1 < date2
+            } else {
+                return date1 >= currentDate
+            }
+        }
+    }
 }
 
 
