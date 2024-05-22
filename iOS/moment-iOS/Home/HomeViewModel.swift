@@ -148,27 +148,27 @@ class HomeViewModel: ObservableObject {
             }
         }
     }
-
+    
     func tripStatusAndNameForToday() -> (status: String, name: String?) {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy. MM. dd"
-        
-        let today = Date()
-        if let closestTrip = items.min(by: { abs(dateFormatter.date(from: $0.startdate)!.distance(to: today)) < abs(dateFormatter.date(from: $1.startdate)!.distance(to: today)) }) {
-            if let startdate = dateFormatter.date(from: closestTrip.startdate), let enddate = dateFormatter.date(from: closestTrip.enddate) {
-                if startdate > today {
-                    let daysRemaining = Calendar.current.dateComponents([.day], from: today, to: startdate).day ?? 0
-                    return ("\(daysRemaining)일 남음", closestTrip.tripName)
-                } else if enddate > today {
-                    let dayNumber = Calendar.current.dateComponents([.day], from: startdate, to: today).day ?? 0
-                    return ("여행 \(dayNumber)일차", closestTrip.tripName)
-                } else {
-                    return ("여행 종료", closestTrip.tripName)
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy. MM. dd"
+            
+            let today = Date()
+            if let closestTrip = items.min(by: { abs(dateFormatter.date(from: $0.startdate)!.distance(to: today)) < abs(dateFormatter.date(from: $1.startdate)!.distance(to: today)) }) {
+                if let startdate = dateFormatter.date(from: closestTrip.startdate), let enddate = dateFormatter.date(from: closestTrip.enddate) {
+                    if startdate > today {
+                        let daysRemaining = Calendar.current.dateComponents([.day], from: today, to: startdate).day ?? 0
+                        return ("\(daysRemaining)일 남음", closestTrip.tripName)//
+                    } else if enddate > today {
+                        let dayNumber = Calendar.current.dateComponents([.day], from: startdate, to: today).day ?? 0
+                        return ("여행 \(dayNumber)일차", closestTrip.tripName)//
+                    } else {
+                        return ("여행 종료", closestTrip.tripName)//
+                    }
                 }
             }
+            return ("어디로 떠나면 좋을까요?", nil)
         }
-        return ("어디로 떠나면 좋을까요?", nil)
-    }
 
     func fetchTrips() {
         let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]

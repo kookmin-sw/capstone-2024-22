@@ -55,22 +55,30 @@ struct HomeView: View {
                     // 큰 숫자
                     VStack {
                         let (status, name) = homeviewModel.tripStatusAndNameForToday()
-                        Text(name ?? "No Trips")
+                        Text(name ?? "")
                             .font(.pretendardExtrabold14)
-                            .tint(.black)
+                            .foregroundColor(.black)
                             .padding(.top, 30)
-                            .offset(x: -45, y: 15)
+                            .offset(x:-75,y:15)
                         
-                        HStack {
-                            Text(status)
-                                .padding(.bottom, 20)
+                        HStack(alignment: .firstTextBaseline) {
+                            Text("출발까지")
                                 .font(.pretendardMedium16)
+                                .foregroundColor(.gray)
+                                .padding(.bottom, 20)
+                                .offset(y: -23)
                             
                             if status.contains("일 남음") {
-                                let daysRemaining = status.split(separator: "일")[0]
+                                let daysRemaining = status.split(separator: "일")[0].trimmingCharacters(in: .whitespaces)
                                 Text(daysRemaining)
                                     .foregroundColor(.homeRed)
                                     .font(.pretendardExtrabold45)
+                                    .padding(.horizontal, 5)
+                                
+                                Text("일 남았어요")
+                                    .font(.pretendardMedium16)
+                                    .foregroundColor(.gray)
+                                    .padding(.top, 10)
                             }
                         }
                     }
@@ -80,9 +88,7 @@ struct HomeView: View {
                     
                     
                     
-                    
-                    
-                    
+                    //  .offset(x: -45, y: 15)
                     
                     NavigationLink(destination: DailyView(audioRecorderManager: audioRecorderManager)) {
                         Text("일상기록")
