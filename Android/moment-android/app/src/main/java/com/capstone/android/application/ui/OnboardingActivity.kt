@@ -249,6 +249,7 @@ class OnboardingActivity:ComponentActivity() {
         // 인증코드 확인
         authViewModel.patchAuthAuthCodeConfirmSuccess.observe(this@OnboardingActivity){ response ->
             tokenSharedPreferences.edit().putString("accessToken",response.data.accessToken).apply()
+            MyFirebaseMessaging()
             if(navController.currentDestination?.route == OnboardingScreen.SignupNumber.name){
                 navController.navigate(OnboardingScreen.Signup.name)
             }
@@ -1066,6 +1067,7 @@ class OnboardingActivity:ComponentActivity() {
                     .padding(bottom = 45.dp)
             ) {
                 BigButton("시작하기", true) {
+
                     val intent = Intent(this@OnboardingActivity,MainActivity::class.java)
                     intent.flags =
                         Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP //액티비티 스택제거
