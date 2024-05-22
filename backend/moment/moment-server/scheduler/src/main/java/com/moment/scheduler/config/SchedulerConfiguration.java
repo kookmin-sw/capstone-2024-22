@@ -18,8 +18,8 @@ public class SchedulerConfiguration {
     private final UserRepository userRepository;
 
     // 매일 오후 1시에 알림 발송
-//    @Scheduled(cron = "0 0 13 * * *")
-    @Scheduled(cron = "22 06 * * * *")
+    @Scheduled(cron = "0 0 14 * * *")
+//    @Scheduled(cron = "22 06 * * * *")
     public void run() {
         log.info("Noti Scheduler is running");
         try {
