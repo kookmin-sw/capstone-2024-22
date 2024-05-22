@@ -476,6 +476,7 @@ class ReciptActivity : ComponentActivity() {
     @Composable
     fun MakeTripChoice(tripList: MutableList<ReceiptTrip>, mainIntent: Intent)
     {
+        val emptyTrip = remember{ mutableStateOf(true) }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -505,7 +506,7 @@ class ReciptActivity : ComponentActivity() {
                 }
 
                 
-                if (tripList.size == 0){
+                if (emptyTrip.value){
                     Column(Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center) {
@@ -525,6 +526,9 @@ class ReciptActivity : ComponentActivity() {
                                 if(tripList[index].analyzingCount==0 &&
                                     isDatePassed(LocalDate.parse(tripList[index].endDate)) &&
                                     tripList[index].numOfCard != 0 ){
+
+                                    emptyTrip.value = false
+
                                     ItemTrip(
                                         Trip(id=tripList[index].id,
                                             tripName = tripList[index].tripName,
@@ -874,7 +878,7 @@ class ReciptActivity : ComponentActivity() {
                         onValueChanged = { intro.value = it },
                         text = intro,
                         keyboardType = KeyboardType.Text,
-                        textcolor = neutral_500,
+                        textcolor = black,
                         fontweight = FontWeight.Medium,
                         fontsize = 14.sp,
                         type = "intro"
@@ -1011,7 +1015,7 @@ class ReciptActivity : ComponentActivity() {
                     P_Medium11(content = "여행 카드", color = neutral_500)
                     Spacer(modifier = Modifier.height(10.dp))
                     P_ExtraBold14(content =receiptcontent.cardnum.toString(), color = primary_500)
-                    Spacer(modifier = Modifier.height(30.dp))
+                    Spacer(modifier = Modifier.height(15.dp))
                     P_Medium11(content = "여행 날짜", color = neutral_500)
                     Spacer(modifier = Modifier.height(6.dp))
                     P_Medium11(content = receiptcontent.startdate, color = primary_500)
@@ -1114,7 +1118,7 @@ class ReciptActivity : ComponentActivity() {
                         onValueChanged = { intro.value = it },
                         text = it,
                         keyboardType = KeyboardType.Text,
-                        textcolor = neutral_500,
+                        textcolor = black,
                         fontweight = FontWeight.Medium,
                         fontsize = 14.sp,
                         type = "intro"
@@ -1129,7 +1133,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 470.dp, start = 28.dp, end = 10.dp),
+                    .padding(top = 488.dp, start = 28.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 P_Medium14(content = receiptcontent.tripName, color = black)
@@ -1545,7 +1549,7 @@ class ReciptActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    receiptcontent.intro?.let { P_Medium14(content = it, color = neutral_500)
+                    receiptcontent.intro?.let { P_Medium14(content = it, color = black)
                     }?: P_Medium14(content = "", color = white)
                 }
             }
@@ -1652,7 +1656,7 @@ class ReciptActivity : ComponentActivity() {
                     P_Medium11(content = "여행 카드", color = neutral_500)
                     Spacer(modifier = Modifier.height(10.dp))
                     P_ExtraBold14(content = receiptcontent.cardnum.toString(), color = primary_500)
-                    Spacer(modifier = Modifier.height(30.dp))
+                    Spacer(modifier = Modifier.height(15.dp))
                     P_Medium11(content = "여행 날짜", color = neutral_500)
                     Spacer(modifier = Modifier.height(6.dp))
                     receiptcontent.startdate?.let { P_Medium11(content = it, color = primary_500)
@@ -1738,7 +1742,7 @@ class ReciptActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(top = 21.dp, start = 36.dp)
             ) {
-                receiptcontent.intro?.let { P_Medium14(content = it, color = neutral_500)
+                receiptcontent.intro?.let { P_Medium14(content = it, color = black)
                 }?: P_Medium14(content = "", color = white)
             }
 
@@ -1749,7 +1753,7 @@ class ReciptActivity : ComponentActivity() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 470.dp, start = 28.dp, end = 10.dp),
+                    .padding(top = 488.dp, start = 28.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 receiptcontent.tripName?.let { P_Medium14(content = it, color = black)
@@ -2293,28 +2297,28 @@ class ReciptActivity : ComponentActivity() {
                 1 -> R.drawable.ic_receipt1_emotion_common_2
                 2 -> R.drawable.ic_receipt1_emotion_common_3
                 3 -> R.drawable.ic_receipt1_emotion_common_4
-                else -> R.drawable.ic_receipt1_emotion_common_1
+                else -> R.drawable.ic_receipt1_emotion_common5
             }
             "화가나요" -> return when(index){
                 0 -> R.drawable.ic_receipt1_emotion_angry_1
                 1 -> R.drawable.ic_receipt1_emotion_angry_2
                 2 -> R.drawable.ic_receipt1_emotion_angry_3
                 3 -> R.drawable.ic_receipt1_emotion_angry_4
-                else -> R.drawable.ic_receipt1_emotion_angry_1
+                else -> R.drawable.ic_receipt1_emotion_angry5
             }
             "즐거워요" -> return when(index){
                 0 -> R.drawable.ic_receipt1_emotion_happy_1
                 1 -> R.drawable.ic_receipt1_emotion_happy_2
                 2 -> R.drawable.ic_receipt1_emotion_happy_3
                 3 -> R.drawable.ic_receipt1_emotion_happy_4
-                else -> R.drawable.ic_receipt1_emotion_happy_1
+                else -> R.drawable.ic_receipt1_emotion_happy5
             }
             "우울해요" -> return when(index){
                 0 -> R.drawable.ic_receipt1_emotion_sad_1
                 1 -> R.drawable.ic_receipt1_emotion_sad_2
                 2 -> R.drawable.ic_receipt1_emotion_sad_3
                 3 -> R.drawable.ic_receipt1_emotion_sad_4
-                else -> R.drawable.ic_receipt1_emotion_sad_1
+                else -> R.drawable.ic_receipt1_emotion_sad5
             }
             "불쾌해요" -> return when(index){
                 0 -> R.drawable.ic_receipt1_emotion_disgust1
