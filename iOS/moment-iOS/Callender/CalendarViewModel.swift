@@ -23,8 +23,7 @@ class CalendarViewModel : ObservableObject {
     @Published var endTime: Date?
     @Published var selectedDays: [Date] = []
     // ui의 상태를 최신화해주는 published를 사용해준다.
-//    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTQyNDgzMiwiZXhwIjoxNzU4NjI0ODMyfQ.iHg2ACmOB_hzoSlwsTfzGc_1gn6OHYmAxD0b2wgqNJg"
-    
+
     var authToken: String {
         get {
             // 키체인에서 토큰을 가져옵니다
@@ -108,6 +107,38 @@ class CalendarViewModel : ObservableObject {
                 }
             }
     }
+    
+    func updateTrip(tripId: Int, tripName: String, startDate: Date, endDate: Date, completion: @escaping (Bool, String?) -> Void) {
+           let dateFormatter = DateFormatter()
+           dateFormatter.dateFormat = "yyyy-MM-dd"
+           let formattedStartDate = dateFormatter.string(from: startDate)
+           let formattedEndDate = dateFormatter.string(from: endDate)
+
+           let tripData: [String: Any] = [
+               "tripId": tripId,
+               "startDate": formattedStartDate,
+               "endDate": formattedEndDate,
+               "tripName": tripName
+           ]
+
+           let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
+
+           AF.request("http://211.205.171.117:8000/core/trip", method: .put, parameters: tripData, encoding: JSONEncoding.default, headers: headers)
+               .responseDecodable(of: TripRegistrationResponse.self) { response in
+                   switch response.result {
+                   case .success(let responseData):
+                       print("Response: \(responseData)")
+                       if responseData.status == 200 {
+                           completion(true, nil) // 성공 시
+                       } else {
+                           completion(false, responseData.msg) // 실패 시 메시지 반환
+                       }
+                   case .failure(let error):
+                       print("Error: \(error)")
+                       completion(false, error.localizedDescription)
+                   }
+               }
+       }
 
   
 }

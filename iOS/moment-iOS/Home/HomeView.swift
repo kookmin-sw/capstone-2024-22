@@ -180,6 +180,7 @@ struct ItemViewCell: View {
     @ObservedObject var cardViewModel : CardViewModel
     @StateObject var homeviewModel = HomeViewModel()
     @State var selectedItemId: Int?
+    @State private var isLinkActiveModify = false
     
     var body: some View {
         
@@ -202,6 +203,9 @@ struct ItemViewCell: View {
                 EmptyView()
             }
             
+            NavigationLink(destination: ModifySelectDayView(calendarViewModel: CalendarViewModel(), tripId: item.id, tripName: item.tripName, startDate: item.startdate, endDate: item.enddate), isActive: $isLinkActiveModify) {
+                            EmptyView()
+                        }
             
             HStack(spacing: 15) {
                 
@@ -321,8 +325,9 @@ extension ItemViewCell {
             
             // 새로운 버튼을 추가합니다.
             Button {
-                // 여기에 '즐겨찾기' 버튼을 눌렀을 때 수행할 동작을 추가합니다.
-                print("즐겨찾기 버튼이 눌렸습니다.")
+                self.isLinkActiveModify = true
+                // 여기에 '수정' 버튼을 눌렀을 때 수행할 동작을 추가합니다.
+                print("수정 버튼이 눌렸습니다.")
                 withAnimation {
                     self.item.offset = 0
                 }

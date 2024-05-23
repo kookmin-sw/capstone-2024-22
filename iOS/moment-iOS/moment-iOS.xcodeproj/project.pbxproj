@@ -64,6 +64,7 @@
 		8E8C17CA2BABF1A800BF1E1C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */; };
 		8E8C18062BAC379700BF1E1C /* SwipeItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E8C18052BAC379700BF1E1C /* SwipeItem.swift */; };
 		8E92E14B2BFE53E600D37BC9 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E92E14A2BFE53E600D37BC9 /* UserService.swift */; };
+		8E92E14D2BFEDA6800D37BC9 /* ModifySelectDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E92E14C2BFEDA6800D37BC9 /* ModifySelectDayView.swift */; };
 		8E970E172BC3E070003476C4 /* DailyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E162BC3E070003476C4 /* DailyView.swift */; };
 		8E970E192BC3E079003476C4 /* DailyViewmodel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E182BC3E079003476C4 /* DailyViewmodel.swift */; };
 		8E970E1B2BC3E865003476C4 /* DailyCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E1A2BC3E865003476C4 /* DailyCardViewModel.swift */; };
@@ -199,6 +200,7 @@
 		8E8C17C92BABF1A800BF1E1C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8E8C18052BAC379700BF1E1C /* SwipeItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeItem.swift; sourceTree = "<group>"; };
 		8E92E14A2BFE53E600D37BC9 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
+		8E92E14C2BFEDA6800D37BC9 /* ModifySelectDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifySelectDayView.swift; sourceTree = "<group>"; };
 		8E970E162BC3E070003476C4 /* DailyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyView.swift; sourceTree = "<group>"; };
 		8E970E182BC3E079003476C4 /* DailyViewmodel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyViewmodel.swift; sourceTree = "<group>"; };
 		8E970E1A2BC3E865003476C4 /* DailyCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCardViewModel.swift; sourceTree = "<group>"; };
@@ -346,6 +348,7 @@
 				8E5CAE552B970DD400A483B4 /* CalendarViewModel.swift */,
 				8E5CAE572B970DE600A483B4 /* SelectDayView.swift */,
 				8E2D273A2BA57DE7006248EA /* FSCalendarWrapper.swift */,
+				8E92E14C2BFEDA6800D37BC9 /* ModifySelectDayView.swift */,
 			);
 			path = Callender;
 			sourceTree = "<group>";
@@ -817,6 +820,7 @@
 				8EDC94E02BED3FB900B646AB /* ReceiptcompleteView.swift in Sources */,
 				8E970E1D2BC405C7003476C4 /* DailyCardView.swift in Sources */,
 				8E3E7D5E2BCD7C4B004C6AD1 /* Model.swift in Sources */,
+				8E92E14D2BFEDA6800D37BC9 /* ModifySelectDayView.swift in Sources */,
 				8ECCFBB22BB804B900C39125 /* ImagePicker.swift in Sources */,
 				8E5CAE3C2B970CB300A483B4 /* OnboardingView.swift in Sources */,
 			);

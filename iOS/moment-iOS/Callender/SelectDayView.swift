@@ -10,7 +10,6 @@ import UIKit
 import SwiftUI
 
 
-import SwiftUI
 
 struct SelectDayView: View {
     @ObservedObject var calendarViewModel: CalendarViewModel
