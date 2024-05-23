@@ -244,7 +244,7 @@ struct AccordionView: View {
         VStack {
             Spacer().frame(height: 40)
             locationAndTimeInfo
-            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItem.stt)", cardItem: cardItem)
+            DynamicGradientRectangleView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItem.stt ?? "분석중입니다! 잠시만 기다려주세요!")", cardItem: cardItem)
             DynamicGradientImagePicker(cardViewModel: cardViewModel, cardViewId: cardItem.id)
             Spacer().frame(height: 30)
             EmotionView(cardViewModel: cardViewModel, cardItem: cardItem)
@@ -281,7 +281,7 @@ struct AccordionView: View {
         
     }
 }
-import SwiftUI
+
 
 struct ScrollingTextView: View {
     var text: String
@@ -423,79 +423,6 @@ struct DynamicGradientRectangleView: View {
 }
 
 
-//
-//struct DynamicGradientImagePicker: View {
-//    @State private var showingImagePicker = false
-//    @State private var showingAddButton = false // 처음에는 추가 버튼이 보이지 않음
-//    @State private var selectedImages: [UIImage] = []
-//    @ObservedObject var cardViewModel: CardViewModel
-//    
-//
-//    var body: some View {
-//        VStack {
-//            HStack {
-//                Spacer() // HStack의 왼쪽에 Spacer를 추가하여 오른쪽으로 요소를 밀어냄
-//                Button(action: {
-//                    showingAddButton.toggle() // '이미지 추가하기' 버튼을 토글
-//                }) {
-//                    HStack {
-//                        Text("사진 추가")
-//                            .font(.pretendardMedium11)
-//                            .foregroundColor(.black)
-//                        Image("Imageadd")
-//                            .foregroundColor(.white)
-//                    }
-//                    .padding(.horizontal,10)
-//                }
-//            }
-//            
-//            if showingAddButton {
-//                // 이미지들과 추가 버튼을 보여주는 스크롤 뷰
-//                CustomDividerCardView()
-//                ScrollView(.horizontal, showsIndicators: false) {
-//                    HStack(spacing: 10) {
-//                        ForEach(selectedImages.indices, id: \.self) { index in
-//                            Image(uiImage: selectedImages[index])
-//                                .resizable()
-//                                .frame(width: 66, height: 77)
-//                                .cornerRadius(3)
-//                                .aspectRatio(contentMode: .fill)
-//                        }
-//                        addButton()
-//                    }
-//                }
-//                .background(Color.homeBack)
-//                .cornerRadius(3)
-//                .frame(width: 340) // 가로 크기 고정
-//            }
-//        }
-//        .sheet(isPresented: $showingImagePicker, onDismiss: loadImage) {
-//            ImagePicker(selectedImage: $selectedImage)
-//        }
-//    }
-//    
-//    private func addButton() -> some View {
-//        Button(action: {
-//            showingImagePicker = true
-//        }) {
-//            RoundedRectangle(cornerRadius: 3)
-//                .fill(Color.gray)
-//                .frame(width: 66, height: 77)
-//                .overlay(
-//                    Image(systemName: "plus")
-//                        .foregroundColor(.white)
-//                )
-//        }
-//    }
-//    
-//    @State private var selectedImage: UIImage?
-//    
-//    func loadImage() {
-//        guard let selectedImage = selectedImage else { return }
-//        selectedImages.append(selectedImage)
-//      
-//    }
-//}
 
 struct DynamicGradientImagePicker: View {
     @State private var showingImagePicker = false
@@ -601,7 +528,7 @@ struct EmotionView: View {
         }
         .padding(.horizontal, 1) // HStack에 패딩을 적용하여 내용이 화면 가장자리에 붙지 않도록 합니다.
         .onAppear{
-            cardViewModel.updateEmotions(happy: cardItem.happy, sad: cardItem.sad, angry: cardItem.angry, neutral: cardItem.neutral, disgust: cardItem.disgust)
+            cardViewModel.updateEmotions(happy: cardItem.happy ?? 20.0, sad: cardItem.sad ?? 20.0, angry: cardItem.angry ?? 20.0, neutral: cardItem.neutral ?? 20.0, disgust: cardItem.disgust ?? 20.0)
         }
     }
  
@@ -636,24 +563,6 @@ struct EmotionView: View {
    
 }
  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1170,8 +1170,8 @@
             filePath = "CardView/CardView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "552"
-            endingLineNumber = "552"
+            startingLineNumber = "479"
+            endingLineNumber = "479"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -1633,6 +1633,68 @@
             startingLineNumber = "128"
             endingLineNumber = "128"
             landmarkName = "updateTrip(tripId:tripName:startDate:endDate:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "79BC38FB-287C-45B0-B947-8CF0BE635055"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CardView/CardView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "155"
+            endingLineNumber = "155"
+            landmarkName = "deleteSelectedCardViews()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "79BC38FB-287C-45B0-B947-8CF0BE635055 - b9843cb946cb891f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "moment_iOS.CardView.deleteSelectedCardViews() -&gt; ()"
+                  moduleName = "moment-iOS"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/CardView/CardView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "155"
+                  endingLineNumber = "155">
+               </Location>
+               <Location
+                  uuid = "79BC38FB-287C-45B0-B947-8CF0BE635055 - 5560f7f418d85bbb"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;Swift.Bool, Swift.Error&gt;) -&gt; () in moment_iOS.CardView.deleteSelectedCardViews() -&gt; ()"
+                  moduleName = "moment-iOS"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/CardView/CardView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "151"
+                  endingLineNumber = "151">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5CE8ED3C-2152-4725-AF74-7891DFF77AB0"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "CardView/CardViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "268"
+            endingLineNumber = "268"
+            landmarkName = "deleteCardView(cardViewId:completion:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

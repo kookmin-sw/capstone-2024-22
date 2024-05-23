@@ -209,7 +209,7 @@ struct EmotionLikeView1: View {
         }
         .padding(.horizontal, 1) // HStack에 패딩을 적용하여 내용이 화면 가장자리에 붙지 않도록 합니다.
         .onAppear{
-            cardViewModel.updateEmotions(happy: cardItemLike.happy, sad: cardItemLike.sad, angry: cardItemLike.angry, neutral: cardItemLike.neutral, disgust: cardItemLike.disgust)
+            cardViewModel.updateEmotions(happy: cardItemLike.happy ?? 20.0, sad: cardItemLike.sad ?? 20.0, angry: cardItemLike.angry ?? 20.0, neutral: cardItemLike.neutral ?? 20.0, disgust: cardItemLike.disgust ?? 20.0)
         }
     }
  

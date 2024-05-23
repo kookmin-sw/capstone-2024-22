@@ -30,13 +30,13 @@ struct cardViews: Codable,Identifiable {
     let recordFileLength: Int
     let weather: String
     let temperature: String
-    let stt: String
-    let happy: Double
-    let sad: Double
-    let angry: Double
-    let neutral: Double
-    let disgust: Double
-    let question: String
+    let stt: String?
+    let happy: Double?
+    let sad: Double?
+    let angry: Double?
+    let neutral: Double?
+    let disgust: Double?
+    let question: String?
     let recordFileStatus: String
     let imageUrls: [String]
     let id: Int
@@ -214,12 +214,12 @@ class CardViewModel: ObservableObject {
                                                Location: \(cardView.location),
                                                Weather: \(cardView.weather),
                                                Temperature: \(cardView.temperature),
-                                               Happiness: \(cardView.happy),
-                                               Sadness: \(cardView.sad),
-                                               Anger: \(cardView.angry),
-                                               Neutral: \(cardView.neutral),
-                                               Disgust: \(cardView.disgust),
-                                               STT: \(cardView.stt),
+                                               Happiness: \(cardView.happy ?? 20.0),
+                                               Sadness: \(cardView.sad ?? 20.0),
+                                               Anger: \(cardView.angry ?? 20.0),
+                                               Neutral: \(cardView.neutral ?? 20.0),
+                                               Disgust: \(cardView.disgust ?? 20.0),
+                                               STT: \(cardView.stt ?? "분석중입니다! 조금만 기다려주세요!"),
                                                Loved Status: \(cardView.loved)
                                                """)
                     }
@@ -300,9 +300,10 @@ struct LikeCardViewData: Codable,Identifiable {
     let recordFileUrl: String
     let location: String
     let recordFileLength: Int
-    let weather, temperature, stt: String
-    let happy, sad, angry, neutral: Double
-    let disgust: Double
+    let weather, temperature : String
+    let stt: String?
+    let happy, sad, angry, neutral: Double?
+    let disgust: Double?
     let question, recordFileStatus: String
     let imageUrls: [String]
     let id: Int
