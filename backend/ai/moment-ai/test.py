@@ -40,7 +40,7 @@ parser.add_argument('--granularity', type=str, default="utterance", help='which 
 
 args = parser.parse_args()
 
-hallucination_list = ["이 영상은 유료광고를 포함하고 있습니다. 구독과 좋아요를 눌러주세요. 감사합니다."]
+hallucination_list = ["이 영상은 유료광고를 포함하고 있습니다.", "구독과 좋아요를 눌러주세요. 감사합니다."]
 
 def run_model_on_gpu(models:dict, source_file, output):
   if torch.cuda.is_available():
