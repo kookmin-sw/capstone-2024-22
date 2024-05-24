@@ -129,6 +129,22 @@ API 문서|<img src="https://img.shields.io/badge/swagger-%2385EA2D.svg?&style=f
 3. conda create --name moment --file packagelist.txt로 conda 환경을 구축합니다.
 4. python3 ai_server.py로 인공지능 서버를 실행합니다.
 - S3에 저장된 데이터를 불러오기 때문에 S3 구축이 필요합니다.
+  
+ **4.iOS 배포 가이드**(테스트 배포 완료)
+  1. yysskk99999@naver.com 이메일로 사용하려는 기기와 연결되어 있는 appleid 를
+     보냅니다.
+     1-1. 앱스토어에서 TestFlight App 을 다운로드 받습니다.
+     1-2. Appie 이메일로 들어가서 초대 링크를 클릭합니다.
+     1-3. 앱을 설치합니다.
+  2. App을 다운받았는데 앱이 깨지거나 기능이 메뉴얼대로 실행되지않을경우 밑 빌드
+     를 참고합니다.
+     2-1. 깃허브에서 clone 후 ios 파일경로로 들어가서 밑 사진 파일을 실행시킵
+     니다.
+     2-2. 로드되기를 기다린후 왼쪽 파일 인디케이터에서 프로젝트를 선택
+     하고 Signing & Capabilities 를 들어갑니다.
+     2-4. 팀에서 자신의 애플아이디 계정을 선택하여 왼쪽 상단에 빌드를
+     누릅니다.
+ 
    
 # 문서
 - [중간발표](https://drive.google.com/file/d/1ELYTpvr5rwQeEEy5aQ8zkQpWVYD6Tc5h/view?usp=sharing)
