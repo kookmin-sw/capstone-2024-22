@@ -95,16 +95,32 @@ API 문서|<img src="https://img.shields.io/badge/swagger-%2385EA2D.svg?&style=f
 
 # 배포가이드
 
-1. 서버 배포 가이드
+**1. 서버 배포 가이드**
 
   서버는 github action으로 CI/CD파이프라인을 구성해두었기 때문에 deploy/v1브랜피로 머지되면 자동으로 배포가 이뤄집니다. 
 1. [https://github.com/kookmin-sw/capstone-2024-22](https://github.com/kookmin-sw/capstone-2024-22%EC%9D%98)의 master 브랜치를 git pull 받는다.	
 2. cd backend/moment/moment-server
 3. 각 인스턴스의 src/main/resources에 있는 설정파일(application.properties, application.yml)을 자신이 원하는 대로 수정한다.
 4. capstone-2024-22/backend/moment/moment-server/docker-compose.yml파일의 DB 유저와 비밀번호를 설정한다.
-5. “docker-compose up —build -d”로 실행한다.
+5. “docker-compose up —build -d”로 실행한다.  
 
-1. 인공지능 서버 배포 가이드
+**2. 안드로이드 배포 가이드**
+  1. 안드로이드 스튜디오로 실행하는 법  
+    1-1. git clone https://github.com/kookmin-sw/capstone-2024-22.git  
+    1-2. cd capstone-2024-22  
+    1-2. git checkout master  
+    1-3. cd Android/moment-android  
+    1-4. 해당 경로에서 안드로이드 스튜디오로 폴더를 열어서 실행합니다.  
+  2. 테스트 배포링크로 다운로드 받아서 실행하는 법  
+    2-1. nex1223@naver.com (Moment-Android 공식 계정)로 본인의 구글  
+    플레이스토어 계정을 보냅니다.  
+    2-2. 해당 계정이 등록이 되었다고 nex1223@naver.com에서 응답이 옵  
+    니다.  
+    2-3. 해당 링크로 들어가서 앱을 다운로드 받습니다.  
+    https://play.google.com/store/apps/details?id=com.capstone.android.app  
+    lication  
+
+**3.인공지능 서버 배포 가이드**
 
   최소 RAM 12G 이상의 GPU를 보유하고 있는 상태에서 배포하는 것을 권장합니다.
   현재 AWS에 배포되어있고, lambda로 EC2 인스턴스 시작과 중지 함수가 작성되어있어야 합니다.
