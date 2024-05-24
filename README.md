@@ -133,9 +133,13 @@ API 문서|<img src="https://img.shields.io/badge/swagger-%2385EA2D.svg?&style=f
  **4.iOS 배포 가이드**(테스트 배포 완료)
   1. yysskk99999@naver.com 이메일로 사용하려는 기기와 연결되어 있는 appleid 를
      보냅니다.
+
      1-1. 앱스토어에서 TestFlight App 을 다운로드 받습니다.
+
      1-2. Appie 이메일로 들어가서 초대 링크를 클릭합니다.
+
      1-3. 앱을 설치합니다.
+
   2. App을 다운받았는데 앱이 깨지거나 기능이 메뉴얼대로 실행되지않을경우 밑 빌드를 참고합니다.
 
      2-1. 깃허브에서 clone 후 ios 파일경로로 들어가서 프로젝트를 실행시킵니다.
