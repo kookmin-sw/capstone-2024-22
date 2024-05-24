@@ -95,10 +95,25 @@ API 문서|<img src="https://img.shields.io/badge/swagger-%2385EA2D.svg?&style=f
 
 # 배포가이드
 
-소스코드제출시 설치법이나 사용법을 작성하세요.
+1. 서버 배포 가이드
 
-<br><br>
+  서버는 github action으로 CI/CD파이프라인을 구성해두었기 때문에 deploy/v1브랜피로 머지되면 자동으로 배포가 이뤄집니다. 
+1. [https://github.com/kookmin-sw/capstone-2024-22](https://github.com/kookmin-sw/capstone-2024-22%EC%9D%98)의 master 브랜치를 git pull 받는다.	
+2. cd backend/moment/moment-server
+3. 각 인스턴스의 src/main/resources에 있는 설정파일(application.properties, application.yml)을 자신이 원하는 대로 수정한다.
+4. capstone-2024-22/backend/moment/moment-server/docker-compose.yml파일의 DB 유저와 비밀번호를 설정한다.
+5. “docker-compose up —build -d”로 실행한다.
 
+1. 인공지능 서버 배포 가이드
+
+  최소 RAM 12G 이상의 GPU를 보유하고 있는 상태에서 배포하는 것을 권장합니다.
+  현재 AWS에 배포되어있고, lambda로 EC2 인스턴스 시작과 중지 함수가 작성되어있어야 합니다.
+1. [https://github.com/kookmin-sw/capstone-2024-22의](https://github.com/kookmin-sw/capstone-2024-22%EC%9D%98) ai/develop/v1 브랜치를 git pull받는다.
+2. cd backend/ai/moment-ai
+3. conda create --name moment --file packagelist.txt로 conda 환경을 구축합니다.
+4. python3 ai_server.py로 인공지능 서버를 실행합니다.
+- S3에 저장된 데이터를 불러오기 때문에 S3 구축이 필요합니다.
+   
 # 문서
 - [중간발표](https://drive.google.com/file/d/1ELYTpvr5rwQeEEy5aQ8zkQpWVYD6Tc5h/view?usp=sharing)
 - [중간보고서](https://docs.google.com/document/d/15EEr-d8ANUgzv2IuLtTUmPRXQ-5MzV7M/edit?usp=drive_link&ouid=100333300987560322826&rtpof=true&sd=true)
