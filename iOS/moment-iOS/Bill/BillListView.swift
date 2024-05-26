@@ -68,15 +68,16 @@ struct BillListView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 15) {
-                Spacer()
+                Spacer().frame(height: 20)
                 HStack{
                     Spacer()
                     NavigationLink(destination: ReceiptGroupView( isCheckedStates: [false]).environmentObject(homeBaseViewModel), isActive: $isShowingCreateView) {
                         Button("영수증 모아보기") {
                             isShowingCreateView = true
                         }
-                        .foregroundColor(.black)
                         .padding()
+                        .font(.yjObangBold15)
+                        .foregroundColor(Color.black)
                     }
                 }
                 Spacer().frame(height: 65)
