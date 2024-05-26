@@ -1,8 +1,19 @@
 {
   "images" : [
     {
-      "filename" : "Bill (法案) (3).png",
-      "idiom" : "universal"
+      "filename" : "Bill.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "Bill 1.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "Bill 2.png",
+      "idiom" : "universal",
+      "scale" : "3x"
     }
   ],
   "info" : {

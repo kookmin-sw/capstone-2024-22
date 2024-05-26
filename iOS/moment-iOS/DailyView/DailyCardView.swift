@@ -113,34 +113,60 @@ struct DailyCardView: View {
                 }.background(Color.homeBack)
                 
             }
+          
             if showConfirmationDialog {
                 CustomConfirmationDialog(
                     isActive: $showConfirmationDialog,
                     title: "\(selectedCardIDs.count)개의 녹음 카드를 정말 삭제할까요?",
                     message: "삭제된 녹음 카드는 복구할 수 없어요",
                     yesAction: {
-                        // 삭제 로직
-                        cardViewModel.cardItems.removeAll { selectedCardIDs.contains($0.id) }
-                        selectedCardIDs.removeAll()
-                        isEditing = false
-                        showConfirmationDialog = false
+                        deleteSelectedCardViews()
                     },
                     noAction: {
                         showConfirmationDialog = false
                     }
                 )
             }
-            
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
-                       // 특정 tripFileId를 사용하여 카드뷰 데이터 로드
-            cardViewModel.fetchAllCardViews(tripFileId: tripFileId
-            )
-                   }
-        
-        
+            cardViewModel.fetchAllCardViews(tripFileId: tripFileId)
+        }
     }
+
+    private func deleteSelectedCardViews() {
+        let group = DispatchGroup()
+        var failedDeletes = [Int]()
+
+        for cardViewId in selectedCardIDs {
+            group.enter()
+            cardViewModel.deleteCardView(cardViewId: cardViewId) { result in
+                switch result {
+                case .success(let success):
+                    if !success {
+                        failedDeletes.append(cardViewId)
+                    }
+                case .failure:
+                    failedDeletes.append(cardViewId)
+                }
+                group.leave()
+            }
+        }
+
+        group.notify(queue: .main) {
+            if failedDeletes.isEmpty {
+                // 성공적으로 삭제된 경우
+                cardViewModel.cardItems.removeAll { selectedCardIDs.contains($0.id) }
+                selectedCardIDs.removeAll()
+                isEditing = false
+                showConfirmationDialog = false
+            } else {
+                // 일부 삭제 실패한 경우, 사용자에게 알림 또는 다른 처리를 할 수 있습니다.
+                print("다음 카드뷰를 삭제하지 못했습니다: \(failedDeletes)")
+            }
+        }
+    }
+
     
 }
 
@@ -283,7 +309,7 @@ struct AccordionDailyView: View {
         VStack {
             Spacer().frame(height: 40)
             locationAndTimeInfo
-            DynamicGradientRectangleDailyView(audioRecorderManager: audioRecorderManager,cardViewModel: cardViewModel, longText: "\(cardItem.stt)", cardItem:  cardItem)
+            DynamicGradientRectangleDailyView(audioRecorderManager: audioRecorderManager,cardViewModel: cardViewModel, longText: "\(cardItem.stt ?? "분석중입니다! 조금만 기다려주세요!")", cardItem:  cardItem)
             DynamicGradientImagePicker(cardViewModel: cardViewModel, cardViewId: cardItem.id)
             Spacer().frame(height: 30)
             EmotionView(cardViewModel: cardViewModel, cardItem: cardItem)

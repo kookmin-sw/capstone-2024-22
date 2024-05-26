@@ -80,11 +80,11 @@ struct HomeBaseView: View {
                             TabButton(title: tab, selectedTab: $homeBaseViewModel.selectedTab, animation: animation, isRecording: $homeBaseViewModel.isRecording)
                             
                             if tab != Tab.allCases.last {
-                                Spacer(minLength: 0) // 탭 버튼 사이의 공간
+                                Spacer(minLength:   10) // 탭 버튼 사이의 공간
                             }
                         }
                     }
-                    .padding(.horizontal, 30)
+                    .padding(.horizontal, -5)
                     .padding(.bottom, edges?.bottom == 0 ? 15 : edges!.bottom)
                     
                     // 중앙 이미지 추가

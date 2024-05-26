@@ -1,8 +1,19 @@
 {
   "images" : [
     {
-      "filename" : "Home (首页).png",
-      "idiom" : "universal"
+      "filename" : "Home-1.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "Home-1 1.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "Home-1 2.png",
+      "idiom" : "universal",
+      "scale" : "3x"
     }
   ],
   "info" : {
