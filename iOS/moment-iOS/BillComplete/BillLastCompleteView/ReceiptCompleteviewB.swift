@@ -22,8 +22,24 @@ struct ReceiptCompleteviewB: View {
     @State private var tripnameEnd: String = ""
     @State private var tripExplaneEnd : String = ""
     
+    @State private var isEditing: Bool = false
+    @State private var saveButtonTitle = "저장"
+    @State private var backButtonTitle = "뒤로"
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
+        
+        VStack{
+            HStack{
+                backButton
+                    .padding(.leading,10)
+                Spacer()
+                exportButton
+                editButton
+                    .padding(.trailing,10)
+            }
+        }
+        
         
         VStack(spacing: 0) {
             Spacer().frame(height: 18)
@@ -159,7 +175,48 @@ struct ReceiptCompleteviewB: View {
                 .offset(y:130)
         )
         
+        .background(.homeBack)
+        .navigationBarBackButtonHidden()
+       Spacer()
         
+    }
+    private var backButton: some View {
+        Button(action: {
+            presentationMode.wrappedValue.dismiss()
+        }) {
+            HStack {
+                
+                Text(backButtonTitle)
+                    .padding()
+                    .font(.yjObangBold15)
+                    .tint(Color.black)
+            }
+        }
+    }
+    
+    private var exportButton: some View {
+        Button(action: {
+            print("Export functionality here")
+            // Implement export functionality here
+        }) {
+            Text("내보내기")
+                .padding()
+                .font(.yjObangBold15)
+                .tint(Color.black)
+        }
+    }
+    
+    private var editButton: some View {
+        Button(action: {
+            isEditing.toggle()
+            print("Editing mode: \(isEditing)")
+            // Implement editing related functionality here
+        }) {
+            Text("수정")
+                .padding()
+                .font(.yjObangBold15)
+                .tint(Color.black)
+        }
     }
     
 }
