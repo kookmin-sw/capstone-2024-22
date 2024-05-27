@@ -128,7 +128,7 @@ struct ReceiptGroupView: View {
                                     if isEditing {
                                         checkboxStates[receipt.id] = !(checkboxStates[receipt.id] ?? false)
                                     } else {
-                                        selectedReceiptId = receipt.id // Set the ID to navigate to the detail view
+                                        selectedReceiptId = receipt.id 
                                     }
                                 }
                             }

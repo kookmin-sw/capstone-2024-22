@@ -71,6 +71,8 @@
 		8E970E1D2BC405C7003476C4 /* DailyCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970E1C2BC405C7003476C4 /* DailyCardView.swift */; };
 		8E970F272BC96AC3003476C4 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970F262BC96AC3003476C4 /* LoginViewModel.swift */; };
 		8E970F292BC96EBF003476C4 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E970F282BC96EBF003476C4 /* AuthViewModel.swift */; };
+		8EC40EB42C04636F00465D36 /* ReceiptcompleteModifyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC40EB32C04636F00465D36 /* ReceiptcompleteModifyView.swift */; };
+		8EC40EB62C04638000465D36 /* ReceiptcompleteModifyViewB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC40EB52C04638000465D36 /* ReceiptcompleteModifyViewB.swift */; };
 		8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA922BAD6B3200C39125 /* PasswordView.swift */; };
 		8ECCFA982BAFE3BD00C39125 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */; };
 		8ECCFADF2BB066D600C39125 /* FloatingToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */; };
@@ -207,6 +209,8 @@
 		8E970E1C2BC405C7003476C4 /* DailyCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCardView.swift; sourceTree = "<group>"; };
 		8E970F262BC96AC3003476C4 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		8E970F282BC96EBF003476C4 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		8EC40EB32C04636F00465D36 /* ReceiptcompleteModifyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptcompleteModifyView.swift; sourceTree = "<group>"; };
+		8EC40EB52C04638000465D36 /* ReceiptcompleteModifyViewB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiptcompleteModifyViewB.swift; sourceTree = "<group>"; };
 		8ECCFA922BAD6B3200C39125 /* PasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordView.swift; sourceTree = "<group>"; };
 		8ECCFA972BAFE3BD00C39125 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
 		8ECCFADE2BB066D600C39125 /* FloatingToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingToastView.swift; sourceTree = "<group>"; };
@@ -581,7 +585,9 @@
 			isa = PBXGroup;
 			children = (
 				8EDC94DF2BED3FB900B646AB /* ReceiptcompleteView.swift */,
+				8EC40EB32C04636F00465D36 /* ReceiptcompleteModifyView.swift */,
 				8EDC94E12BEE881700B646AB /* ReceiptCompleteviewB.swift */,
+				8EC40EB52C04638000465D36 /* ReceiptcompleteModifyViewB.swift */,
 			);
 			path = BillLastCompleteView;
 			sourceTree = "<group>";
@@ -755,6 +761,7 @@
 			files = (
 				8E970E192BC3E079003476C4 /* DailyViewmodel.swift in Sources */,
 				8ECCFB612BB29D9100C39125 /* PasswordfindView.swift in Sources */,
+				8EC40EB62C04638000465D36 /* ReceiptcompleteModifyViewB.swift in Sources */,
 				8E5CAE3E2B970CCA00A483B4 /* PathType.swift in Sources */,
 				8ECCFADF2BB066D600C39125 /* FloatingToastView.swift in Sources */,
 				8E8C174F2BA97B4500BF1E1C /* AuthNumView.swift in Sources */,
@@ -772,6 +779,7 @@
 				8ECCFA932BAD6B3200C39125 /* PasswordView.swift in Sources */,
 				8E5CAE482B970D2700A483B4 /* Date+Extensions.swift in Sources */,
 				8E5CAE462B970D1000A483B4 /* Tab.swift in Sources */,
+				8EC40EB42C04636F00465D36 /* ReceiptcompleteModifyView.swift in Sources */,
 				8E5CAE682B970E8700A483B4 /* VoiceRecorderView.swift in Sources */,
 				8E970E1B2BC3E865003476C4 /* DailyCardViewModel.swift in Sources */,
 				8E8C17542BAAC59400BF1E1C /* AddUser.swift in Sources */,

@@ -1,16 +1,15 @@
 //
-//  ReceiptcompleteView.swift
+//  ReceiptcompleteModifyView.swift
 //  moment-iOS
 //
-//  Created by 양시관 on 5/10/24.
+//  Created by 양시관 on 5/27/24.
 //
 
 import Foundation
+import Swift
 import SwiftUI
 
-
-
-struct ReceiptcompleteView: View {
+struct ReceiptcompleteModifyView: View {
     var receipt: Receipt
     @EnvironmentObject var sharedViewModel: SharedViewModel
     @Environment(\.presentationMode) var presentationMode
@@ -30,7 +29,6 @@ struct ReceiptcompleteView: View {
     @State private var EndLocationend : String = ""
     @State private var selectedTab = 0
     @State private var forceUpdate = ""
-    @State private var isModify = false
     
     
     var body: some View{
@@ -40,13 +38,10 @@ struct ReceiptcompleteView: View {
                 backButton
                     .padding(.leading,10)
                 Spacer()
-                exportButton
-                editButton
+                saveButton
                     .padding(.trailing,10)
-                
-                NavigationLink(destination: ReceiptcompleteModifyView(receipt: receipt), isActive: $isModify) {
-                    EmptyView()
-                }
+              //  editButton
+                   // .padding(.trailing,10)
             }
         }
      
@@ -66,6 +61,9 @@ struct ReceiptcompleteView: View {
                             
                                 .font(.pretendardMedium14)
                                 .padding()
+                            
+                            //id 예시
+                            Text("\(receipt.id)")
                             Spacer()
                             Image("Logo")
                                 .padding()
@@ -218,9 +216,9 @@ struct ReceiptcompleteView: View {
     
     private var editButton: some View {
         Button(action: {
-           // isEditing.toggle()
-           
-            isModify = true
+            isEditing.toggle()
+            print("Editing mode: \(isEditing)")
+            // Implement editing related functionality here
         }) {
             Text("수정")
                 .padding()
@@ -229,117 +227,120 @@ struct ReceiptcompleteView: View {
         }
     }
     
-}
-
-
-struct StatsViewComplete: View {
-    //  @EnvironmentObject var sharedViewModel: SharedViewModel
-    var receipt : Receipt
-    
-    var emotions: [EmotionData] {
-        let rawEmotions = [
-            EmotionData(name: "Happy", score: receipt.happy, imageName: "fun", color: .gray),
-            EmotionData(name: "Sad", score: receipt.sad, imageName: "sad", color: .gray),
-            EmotionData(name: "Angry", score: receipt.angry, imageName: "angry", color: .gray),
-            EmotionData(name: "Neutral", score: receipt.neutral, imageName: "netral", color: .gray),
-            EmotionData(name: "Disgust", score: receipt.disgust, imageName: "disgustFace", color: .gray)
-        ]
-        let sortedEmotions = rawEmotions.sorted(by: { $0.score > $1.score })
-        var highestScoreColor = Color.homeRed  // 가장 높은 점수를 가진 감정의 색상
-        var emotionsWithColor = sortedEmotions
-        if let highest = emotionsWithColor.first {
-            emotionsWithColor[0].color = highestScoreColor  // 첫 번째 요소(가장 높은 점수)에 특별 색상 적용
-        }
-        return emotionsWithColor
-    }
-    
-    
-    var body: some View {
-        
-        HStack(spacing:30) {
-            VStack(spacing: 10) {
-                Text("여행 카드")
-                    .font(.pretendardMedium11)
-                    .foregroundColor(.gray500)
-                    .multilineTextAlignment(.center)
-                Text("\(receipt.numOfCard)")
-                    .font(.pretendardExtrabold14)
-                    .foregroundColor(.homeRed)
-                    .multilineTextAlignment(.center)
-                
-                Text("여행 날짜")
-                    .font(.pretendardMedium11)
-                    .foregroundColor(.gray500)
-                    .multilineTextAlignment(.center)
-                Text("\(receipt.stDate)")
-                    .font(.pretendardMedium11)
-                    .foregroundColor(.homeRed)
-                    .multilineTextAlignment(.center)
-                Text("\(receipt.edDate)")
-                    .font(.pretendardMedium11)
-                    .foregroundColor(.homeRed)
-                    .multilineTextAlignment(.center)
-            }
-            
-            VStack(alignment: .leading,spacing: 9) {
-                Text("여행 감정")
-                    .font(.pretendardMedium11)
-                    .foregroundColor(.gray500)
-                //.padding(.vertical,10)
-                    .padding(.top,25)
-                    .padding(.bottom,5)
-                
-                HStack{
-                    
-                    VStack(alignment: .leading) {
-                        ForEach(emotions, id: \.name) { emotion in
-                            emotionProgressView(emotion: emotion)
-                        }
-                    }.padding(.bottom,6)
-                }
-                
-                
-            }
-            
-        }
-        
-        
-        
-        
-        
-    }
-    
-    private func emotionProgressView(emotion: EmotionData) -> some View {
-        VStack(alignment: .leading) {
-            
-            
-            HStack {
-                ProgressView(value: emotion.score, total: totalEmotionValue())
-                    .frame(width: 109, height: 15)
-                    .cornerRadius(3)
-                    .scaleEffect(x: 1, y: 2, anchor: .center)
-                    .tint(emotion.color)  // 감정별 색상 적용
-                
-                Image(emotion.imageName)
-                
-                Text("\(Int(emotion.score))%")
-                    .font(.pretendardMedium11)
-                    .foregroundColor(emotion.color)  // 텍스트에도 감정별 색상 적용
-                    .frame(width: 30)
-            }
+    private var saveButton : some View {
+        Button(action : {
+            print("저장")
+        }){
+            Text("저장")
+                .padding()
+                .font(.yjObangBold15)
+                .tint(Color.black)
         }
     }
     
-    // 모든 감정 점수의 합을 계산
-    private func totalEmotionValue() -> Double {
-        receipt.happy + receipt.sad + receipt.angry + receipt.neutral + receipt.disgust
-    }
 }
 
-
-struct EmotionData {
-    var name: String
-    var score: Double
-    var imageName: String
-    var color: Color  // 감정에 따른 색상
-}
+//
+//struct StatsViewModifyComplete: View {
+//    //  @EnvironmentObject var sharedViewModel: SharedViewModel
+//    var receipt : Receipt
+//    
+//    var emotions: [EmotionData] {
+//        let rawEmotions = [
+//            EmotionData(name: "Happy", score: receipt.happy, imageName: "fun", color: .gray),
+//            EmotionData(name: "Sad", score: receipt.sad, imageName: "sad", color: .gray),
+//            EmotionData(name: "Angry", score: receipt.angry, imageName: "angry", color: .gray),
+//            EmotionData(name: "Neutral", score: receipt.neutral, imageName: "netral", color: .gray),
+//            EmotionData(name: "Disgust", score: receipt.disgust, imageName: "disgustFace", color: .gray)
+//        ]
+//        let sortedEmotions = rawEmotions.sorted(by: { $0.score > $1.score })
+//        var highestScoreColor = Color.homeRed  // 가장 높은 점수를 가진 감정의 색상
+//        var emotionsWithColor = sortedEmotions
+//        if let highest = emotionsWithColor.first {
+//            emotionsWithColor[0].color = highestScoreColor  // 첫 번째 요소(가장 높은 점수)에 특별 색상 적용
+//        }
+//        return emotionsWithColor
+//    }
+//    
+//    
+//    var body: some View {
+//        
+//        HStack(spacing:30) {
+//            VStack(spacing: 10) {
+//                Text("여행 카드")
+//                    .font(.pretendardMedium11)
+//                    .foregroundColor(.gray500)
+//                    .multilineTextAlignment(.center)
+//                Text("\(receipt.numOfCard)")
+//                    .font(.pretendardExtrabold14)
+//                    .foregroundColor(.homeRed)
+//                    .multilineTextAlignment(.center)
+//                
+//                Text("여행 날짜")
+//                    .font(.pretendardMedium11)
+//                    .foregroundColor(.gray500)
+//                    .multilineTextAlignment(.center)
+//                Text("\(receipt.stDate)")
+//                    .font(.pretendardMedium11)
+//                    .foregroundColor(.homeRed)
+//                    .multilineTextAlignment(.center)
+//                Text("\(receipt.edDate)")
+//                    .font(.pretendardMedium11)
+//                    .foregroundColor(.homeRed)
+//                    .multilineTextAlignment(.center)
+//            }
+//            
+//            VStack(alignment: .leading,spacing: 9) {
+//                Text("여행 감정")
+//                    .font(.pretendardMedium11)
+//                    .foregroundColor(.gray500)
+//                //.padding(.vertical,10)
+//                    .padding(.top,25)
+//                    .padding(.bottom,5)
+//                
+//                HStack{
+//                    
+//                    VStack(alignment: .leading) {
+//                        ForEach(emotions, id: \.name) { emotion in
+//                            emotionProgressView(emotion: emotion)
+//                        }
+//                    }.padding(.bottom,6)
+//                }
+//                
+//                
+//            }
+//            
+//        }
+//        
+//        
+//        
+//        
+//        
+//    }
+//    
+//    private func emotionProgressView(emotion: EmotionData) -> some View {
+//        VStack(alignment: .leading) {
+//            
+//            
+//            HStack {
+//                ProgressView(value: emotion.score, total: totalEmotionValue())
+//                    .frame(width: 109, height: 15)
+//                    .cornerRadius(3)
+//                    .scaleEffect(x: 1, y: 2, anchor: .center)
+//                    .tint(emotion.color)  // 감정별 색상 적용
+//                
+//                Image(emotion.imageName)
+//                
+//                Text("\(Int(emotion.score))%")
+//                    .font(.pretendardMedium11)
+//                    .foregroundColor(emotion.color)  // 텍스트에도 감정별 색상 적용
+//                    .frame(width: 30)
+//            }
+//        }
+//    }
+//    
+//    // 모든 감정 점수의 합을 계산
+//    private func totalEmotionValue() -> Double {
+//        receipt.happy + receipt.sad + receipt.angry + receipt.neutral + receipt.disgust
+//    }
+//}
