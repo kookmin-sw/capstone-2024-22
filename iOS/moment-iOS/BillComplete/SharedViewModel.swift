@@ -33,9 +33,9 @@ class SharedViewModel: ObservableObject {
     @Published var receiptsBillData : [TripData] = []
     @Published var tripData : TripData?
     
-//    
-//    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTQyNDgzMiwiZXhwIjoxNzU4NjI0ODMyfQ.iHg2ACmOB_hzoSlwsTfzGc_1gn6OHYmAxD0b2wgqNJg"
-//    
+    //
+    //    var authToken: String = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNb21lbnQiLCJpc3MiOiJNb21lbnQiLCJ1c2VySWQiOjIsInJvbGUiOiJST0xFX0FVVEhfVVNFUiIsImlhdCI6MTcxNTQyNDgzMiwiZXhwIjoxNzU4NjI0ODMyfQ.iHg2ACmOB_hzoSlwsTfzGc_1gn6OHYmAxD0b2wgqNJg"
+    //
     var authToken: String {
         get {
             // 키체인에서 토큰을 가져옵니다
@@ -60,32 +60,32 @@ class SharedViewModel: ObservableObject {
             "tripId": tripId,
             "receiptThemeType": themeType
         ]
-
+        
         
         switch themeType {
-           case "A":
-               parameters["mainDeparture"] = text
-               parameters["subDeparture"] = inputText
-               parameters["mainDestination"] = StartLocatio
-               parameters["subDestination"] = EndLocationend
-               parameters["oneLineMemo"] = EndLocation
-               
-           case "B":
-              
+        case "A":
+            parameters["mainDeparture"] = text
+            parameters["subDeparture"] = inputText
+            parameters["mainDestination"] = StartLocatio
+            parameters["subDestination"] = EndLocationend
+            parameters["oneLineMemo"] = EndLocation
+            
+        case "B":
+            
             parameters["mainDeparture"] = tripRecord
             parameters["subDeparture"] = tripExplaneStart
             parameters["mainDestination"] = tripnameStart
             parameters["subDestination"] = tripExplaneEnd
             parameters["oneLineMemo"] = tripnameEnd
-               
-           default:
-               break
-           }
-
+            
+        default:
+            break
+        }
+        
         AF.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
             if let statusCode = response.response?.statusCode {
-                       print("HTTP Status Code: \(statusCode)")
-                   }
+                print("HTTP Status Code: \(statusCode)")
+            }
             switch response.result {
             case .success(let data):
                 print("Receipt creation successful: \(data)")
@@ -96,53 +96,53 @@ class SharedViewModel: ObservableObject {
             }
         }
     }
-
-        func fetchReceipts() {
-            let url = "http://211.205.171.117:8000/core/receipt/all?page=0&size=100"
-            
-            let headers: HTTPHeaders = [
-                "Authorization": authToken,
-                "Content-Type": "application/json"
-            ]
-
-            AF.request(url, headers: headers).responseDecodable(of: ReceiptsResponse.self) { response in
-                switch response.result {
-                case .success(let receiptsResponse):
-                    DispatchQueue.main.async {
-                        self.receipts = receiptsResponse.data.receiptList
-                    }
-                  //  print("Received data: \(receiptsResponse)")  // 전체 응답 데이터 출력
-                case .failure(let error):
-                    print("Error fetching receipts: \(error.localizedDescription)")
+    
+    func fetchReceipts() {
+        let url = "http://211.205.171.117:8000/core/receipt/all?page=0&size=100"
+        
+        let headers: HTTPHeaders = [
+            "Authorization": authToken,
+            "Content-Type": "application/json"
+        ]
+        
+        AF.request(url, headers: headers).responseDecodable(of: ReceiptsResponse.self) { response in
+            switch response.result {
+            case .success(let receiptsResponse):
+                DispatchQueue.main.async {
+                    self.receipts = receiptsResponse.data.receiptList
                 }
+                //  print("Received data: \(receiptsResponse)")  // 전체 응답 데이터 출력
+            case .failure(let error):
+                print("Error fetching receipts: \(error.localizedDescription)")
             }
         }
+    }
     
     func deleteReceipts(with ids: [Int]) {
-           let url = "http://211.205.171.117:8000/core/receipt/delete"
-           let headers: HTTPHeaders = [
-               "Authorization": authToken,
-               "Content-Type": "application/json"
-           ]
-           let parameters: [String: Any] = [
-               "receiptIds": ids.map { ["receiptId": $0] }
-           ]
-
-           AF.request(url, method: .delete, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
-               switch response.result {
-               case .success(let data):
-                   print("Deletion successful: \(data)")
-                   // 성공 시, 로컬 데이터 업데이트
-                   DispatchQueue.main.async {
-                       self.receipts.removeAll { receipt in
-                           ids.contains(receipt.id)
-                       }
-                   }
-               case .failure(let error):
-                   print("Deletion failed: \(error)")
-               }
-           }
-       }
+        let url = "http://211.205.171.117:8000/core/receipt/delete"
+        let headers: HTTPHeaders = [
+            "Authorization": authToken,
+            "Content-Type": "application/json"
+        ]
+        let parameters: [String: Any] = [
+            "receiptIds": ids.map { ["receiptId": $0] }
+        ]
+        
+        AF.request(url, method: .delete, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+            switch response.result {
+            case .success(let data):
+                print("Deletion successful: \(data)")
+                // 성공 시, 로컬 데이터 업데이트
+                DispatchQueue.main.async {
+                    self.receipts.removeAll { receipt in
+                        ids.contains(receipt.id)
+                    }
+                }
+            case .failure(let error):
+                print("Deletion failed: \(error)")
+            }
+        }
+    }
     
     
     func fetchTripDetails(tripId: Int) {
@@ -150,7 +150,7 @@ class SharedViewModel: ObservableObject {
         let headers: HTTPHeaders = [
             "Content-Type": "application/json;charset=UTF-8",
             "Authorization": authToken
-           
+            
         ]
         
         AF.request(url, method: .get, headers: headers).responseDecodable(of: TripDetail.self) { response in
@@ -163,7 +163,36 @@ class SharedViewModel: ObservableObject {
         }
     }
     
-
+    
+    func updateReceipt(receipt: Receipt) {
+        let url = "http://211.205.171.117:8000/core/receipt"
+        let headers: HTTPHeaders = [
+            "Content-Type": "application/json;charset=UTF-8",
+            "Authorization": authToken
+        ]
+        
+        let parameters: [String: Any] = [
+            "id": receipt.id,
+            "mainDeparture":text,
+            "subDeparture": inputText,
+            "mainDestination": StartLocatio,
+            "subDestination": EndLocationend,
+            "oneLineMemo": EndLocation,
+            "receiptThemeType": receipt.receiptThemeType
+        ]
+        
+        // PUT 요청 수행
+        AF.request(url, method: .put, parameters: parameters, encoding: JSONEncoding.default, headers: headers).responseJSON { response in
+            switch response.result {
+            case .success(let value):
+                print("Update Successful: \(value)")
+            case .failure(let error):
+                print("Error occurred: \(error)")
+            }
+        }
+    }
+    
+    
 }
 
 struct TripDetail: Decodable {// 영수증 만드는 페이지에 대한 데이터모델
@@ -208,8 +237,8 @@ struct Receipt: Identifiable, Decodable {
     let stDate : String
     let edDate : String
     let tripName : String
-  
-
+    
+    
 }
 
 // API 응답을 위한 모델

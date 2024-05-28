@@ -11,7 +11,7 @@ import SwiftUI
 
 struct ReceiptcompleteModifyView: View {
     var receipt: Receipt
-    @EnvironmentObject var sharedViewModel: SharedViewModel
+    @StateObject var sharedViewModel: SharedViewModel
     @Environment(\.presentationMode) var presentationMode
     @State private var isDialogActive = false
     @State private var isDialogActiveBillCom = false
@@ -89,14 +89,19 @@ struct ReceiptcompleteModifyView: View {
                             Spacer()
                             
                             
-                            Text("\(receipt.mainDeparture)")
-                                .foregroundColor(.Natural200)
-                                .foregroundColor(.gray500)
-                                .font(.pretendardMedium14)
-                                .padding(.bottom,30)
-                                .multilineTextAlignment(.center)
+                            TextField("여행의 기록을 한줄로 기록하세요", text: $sharedViewModel.text, prompt: Text("여행의 기록을 한줄로 기록하세요")
+                                .foregroundColor(.Natural200))
                             
-                            
+                            .foregroundColor(.gray500)
+                            .font(.pretendardMedium14)
+                            .padding(.bottom,30)
+                            .multilineTextAlignment(.center)
+                            .onChange(of: sharedViewModel.text) { newValue in
+                                            // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                            if newValue.count > 14 {
+                                                sharedViewModel.text = String(newValue.prefix(14))
+                                            }
+                                        }
                             
                             
                             
@@ -112,25 +117,39 @@ struct ReceiptcompleteModifyView: View {
                                         .frame(width: 19, height: 19)
                                     
                                     
+                                    TextFieldDynamicWidth(title: "여행의 시작은 여기부터", text: $sharedViewModel.inputText, onEditingChanged: { isEditing in
+                                        
+                                    }, onCommit: {
+                                        
+                                    })
                                     
-                                    Text("\(receipt.subDeparture)")
-                                        .font(.pretendardMedium14)
-                                        .foregroundColor(.homeRed)
-                                        .multilineTextAlignment(.center)
-                                    
-                                    
-                                    
+                                    .font(.pretendardMedium14)
+                                    .foregroundColor(.homeRed)
+                                    .onChange(of: sharedViewModel.inputText) { newValue in
+                                        // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                        if newValue.count > 14 {
+                                            sharedViewModel.inputText = String(newValue.prefix(14))
+                                        }
+                                    }
                                 }
-                                .frame(maxWidth: .infinity)
-                                
-                                
+                                                
                                 
                                 HStack{
-                                    Text("\(receipt.mainDestination)")
                                     
-                                        .font(.pretendardExtrabold45)
-                                        .foregroundColor(.homeRed)  // 글씨
-                                        .multilineTextAlignment(.center)
+                                    TextField("출발지",text:$sharedViewModel.StartLocatio,prompt: Text("출발지")
+                                        .foregroundColor(.Natural200))
+                                    
+                                    
+                                    .foregroundColor(.homeRed)  // 글씨
+                                    .font(.pretendardExtrabold45)
+                                    
+                                    .multilineTextAlignment(.center)
+                                    .onChange(of: sharedViewModel.StartLocatio) { newValue in
+                                                    // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                                    if newValue.count > 7 {
+                                                        sharedViewModel.StartLocatio = String(newValue.prefix(7))
+                                                    }
+                                                }
                                 }
                             }
                             
@@ -146,20 +165,36 @@ struct ReceiptcompleteModifyView: View {
                                         .scaledToFit()
                                         .frame(width: 19, height: 19)
                                     
-                                    Text("\(receipt.subDestination)")
-                                        .font(.pretendardMedium14)
-                                        .foregroundColor(.homeRed)
+                                    TextFieldDynamicWidth(title: "기억속에 오래 저장할", text: $sharedViewModel.EndLocationend, onEditingChanged: { isEditing in
+                                        
+                                    }, onCommit: {
+                                        
+                                    })
+                                    .font(.pretendardMedium14)
+                                    .foregroundColor(.homeRed)
+                                    .onChange(of: sharedViewModel.EndLocationend) { newValue in
+                                                    // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                                    if newValue.count > 14 {
+                                                        sharedViewModel.EndLocationend = String(newValue.prefix(14))
+                                                    }
+                                                }
                                 }
                                 
                                 
                                 
                                 HStack{
                                     
-                                    Text("\(receipt.oneLineMemo)")
-                                    
-                                        .font(.pretendardExtrabold45)
-                                        .foregroundColor(.homeRed)  // 글씨
-                                        .multilineTextAlignment(.center)
+                                    TextField("도착지",text:$sharedViewModel.EndLocation,prompt: Text("도착지")
+                                        .foregroundColor(.Natural200))
+                                    .font(.pretendardExtrabold45)
+                                    .foregroundColor(.homeRed)  // 글씨
+                                    .multilineTextAlignment(.center)
+                                    .onChange(of: sharedViewModel.EndLocation) { newValue in
+                                                    // 텍스트가 최대 길이를 초과하는 경우 잘라냄
+                                                    if newValue.count > 7 {
+                                                        sharedViewModel.EndLocation = String(newValue.prefix(7))
+                                                    }
+                                                }
                                 }
                             }
                             
@@ -229,7 +264,29 @@ struct ReceiptcompleteModifyView: View {
     
     private var saveButton : some View {
         Button(action : {
-            print("저장")
+ 
+            let updatedReceipt = Receipt(
+                id: receipt.id,
+                    tripId: receipt.tripId,
+                    mainDeparture: StartLocation,
+                    subDeparture: inputText,
+                    mainDestination: EndLocationend,
+                    subDestination: EndLocation,
+                    oneLineMemo: text,
+                    receiptThemeType: receipt.receiptThemeType,
+                    createdAt: receipt.createdAt,
+                    happy: receipt.happy,
+                    sad: receipt.sad,
+                    angry: receipt.angry,
+                    neutral: receipt.neutral,
+                    disgust: receipt.disgust,
+                    numOfCard: receipt.numOfCard,
+                    stDate: receipt.stDate,
+                    edDate: receipt.edDate,
+                    tripName: receipt.tripName
+                   )
+            sharedViewModel.updateReceipt(receipt: updatedReceipt)
+                   presentationMode.wrappedValue.dismiss()
         }){
             Text("저장")
                 .padding()

@@ -99,7 +99,7 @@ struct ReceiptGroupView: View {
                             ZStack {
                                 // NavigationLink to navigate to detail view when a receipt is selected.
                                 if receipt.receiptThemeType == "A" {
-                                                              NavigationLink(destination: ReceiptcompleteView(receipt: receipt), tag: receipt.id, selection: $selectedReceiptId) {
+                                    NavigationLink(destination: ReceiptcompleteView(receipt: receipt, sharedViewModel: sharedViewModel), tag: receipt.id, selection: $selectedReceiptId) {
                                                                   EmptyView()
                                                               }
                                                           } else {

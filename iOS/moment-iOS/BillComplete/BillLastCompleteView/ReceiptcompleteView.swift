@@ -12,7 +12,7 @@ import SwiftUI
 
 struct ReceiptcompleteView: View {
     var receipt: Receipt
-    @EnvironmentObject var sharedViewModel: SharedViewModel
+    @StateObject var sharedViewModel: SharedViewModel
     @Environment(\.presentationMode) var presentationMode
     @State private var isDialogActive = false
     @State private var isDialogActiveBillCom = false
@@ -44,7 +44,7 @@ struct ReceiptcompleteView: View {
                 editButton
                     .padding(.trailing,10)
                 
-                NavigationLink(destination: ReceiptcompleteModifyView(receipt: receipt), isActive: $isModify) {
+                NavigationLink(destination: ReceiptcompleteModifyView(receipt: receipt, sharedViewModel: sharedViewModel), isActive: $isModify) {
                     EmptyView()
                 }
             }
