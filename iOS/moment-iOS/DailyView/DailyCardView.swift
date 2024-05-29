@@ -324,9 +324,11 @@ struct AccordionDailyView: View {
             ScrollingTextView(text: "\(cardItem.location)", maxWidth: 130)
                 .font(.pretendardMedium11)
             Spacer()
-            Text("\(cardItem.weather)")
+            
+            Text(translateWeatherCondition(cardItem.weather))
                 .font(.pretendardMedium11)
-            Image("Weather_Sunny")
+            
+            Image(weatherIconName(cardItem.weather))
         }
         HStack {
             let (date, time) = cardViewModel.formatDateAndTime(dateString: cardItem.recordedAt)
@@ -337,6 +339,46 @@ struct AccordionDailyView: View {
             Spacer()
             CustomCarbarDivider()
             Text("\(time)").font(.pretendardMedium11)
+        }
+    }
+    
+    private func translateWeatherCondition(_ weather: String) -> String {
+        let lowercasedWeather = weather.lowercased()
+        if lowercasedWeather.contains("clear") {
+            return "햇빛"
+        } else if lowercasedWeather.contains("clouds") {
+            return "구름"
+        } else if lowercasedWeather.contains("drizzle") {
+            return "이슬비"
+        } else if lowercasedWeather.contains("rain") {
+            return "비"
+        } else if lowercasedWeather.contains("thunderstorm") {
+            return "번개"
+        } else if lowercasedWeather.contains("snow") {
+            return "눈"
+        } else if lowercasedWeather.contains("atmosphere") {
+            return "안개"
+        } else {
+            return "날씨 정보 없음"
+        }
+    }
+
+    private func weatherIconName(_ weather: String) -> String {
+        let lowercasedWeather = weather.lowercased()
+        if lowercasedWeather.contains("clear") {
+            return "Weather_Sunny"
+        } else if lowercasedWeather.contains("clouds") {
+            return "Weather_Cloudy"
+        } else if lowercasedWeather.contains("drizzle") || lowercasedWeather.contains("rain") {
+            return "Weather_Rainy"
+        } else if lowercasedWeather.contains("thunderstorm") {
+            return "Weather_Thunderstorm"
+        } else if lowercasedWeather.contains("snow") {
+            return "Weather_Snowy"
+        } else if lowercasedWeather.contains("atmosphere") {
+            return "Weather_Foggy"
+        } else {
+            return "Weather_Unknown"
         }
     }
 }
