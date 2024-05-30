@@ -36,17 +36,17 @@ public class SchedulerConfiguration {
     }
 
     // 매 한시간마다 분석요청
-    @Scheduled(cron = "0 0 * * * *")
-    public void run2() {
-        log.info("Analysis Scheduler is running");
-        try {
-            // 만약 분석중인 카드뷰가 하나라도 있는 경우
-            if (!cardViewRepository.findAllByRecordFileStatusIn(List.of("WAIT")).isEmpty()) {
-                cardViewService.getIncompleteCardViews();
-            }
-
-        } catch (Exception e) {
-            log.error("Failed to send notification");
-        }
-    }
+//    @Scheduled(cron = "0 0 * * * *")
+//    public void run2() {
+//        log.info("Analysis Scheduler is running");
+//        try {
+//            // 만약 분석중인 카드뷰가 하나라도 있는 경우
+//            if (!cardViewRepository.findAllByRecordFileStatusIn(List.of("WAIT")).isEmpty()) {
+//                cardViewService.getIncompleteCardViews();
+//            }
+//
+//        } catch (Exception e) {
+//            log.error("Failed to send notification");
+//        }
+//    }
 }

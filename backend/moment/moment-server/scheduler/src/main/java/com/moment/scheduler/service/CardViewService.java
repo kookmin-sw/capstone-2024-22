@@ -38,10 +38,10 @@ public class CardViewService {
 
     public SchedulerResponseDTO.AIModelRunResponseDTO getIncompleteCardViews() throws InterruptedException {
         // ec2가 켜져있는지 확인
-        if (awsService.isEc2Running()){
-            throw new RuntimeException("EC2 is already running");
-        }
-        awsService.turnOnOrOff("moment-ai-t4", true);
+//        if (awsService.isEc2Running()){
+//            throw new RuntimeException("EC2 is already running");
+//        }
+//        awsService.turnOnOrOff("moment-ai-t4", true);
         log.info("EC2 trying to turn on");
         while (!awsService.isEc2Running()){
             log.info("sleep");
@@ -50,7 +50,7 @@ public class CardViewService {
         // 분석 완료 카드뷰 개수를 유저별로 저장
         Map<User, Integer> userCardViewCount = new HashMap<>();
 
-        sleep(31000);
+//        sleep(31000);
         // 경과 시간 체크를 위한 시작 시간
         long startTime = System.currentTimeMillis();
         List<CardView> cards = cardViewRepository.findAllByRecordFileStatusIn(List.of("WAIT"));
@@ -115,16 +115,16 @@ public class CardViewService {
         }
         long endTime = System.currentTimeMillis();
         log.info("AI model run time : " + (endTime - startTime) + "ms");
-        awsService.turnOnOrOff("moment-ai-t4", false);
+//        awsService.turnOnOrOff("moment-ai-t4", false);
 
         // 분석한만큼 유저에게 알림을 전송
         for (User user : userCardViewCount.keySet()){
             notiService.sendFinishNoti(user, userCardViewCount.get(user));
         }
 
-        while (awsService.isEc2Running()){
-            sleep(5000);
-        }
+//        while (awsService.isEc2Running()){
+//            sleep(5000);
+//        }
         return SchedulerResponseDTO.AIModelRunResponseDTO.builder()
                 .failRecordNum(failRecordNum)
                 .successRecordNum(successRecordNum)
