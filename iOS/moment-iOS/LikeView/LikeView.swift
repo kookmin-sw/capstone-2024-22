@@ -153,7 +153,7 @@ struct AccordionLikeView: View {
         VStack {
             Spacer().frame(height: 40)
             locationAndTimeInfo
-            DynamicGradientRectangleLikeView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItemLike.stt)", cardItemsLike: cardItemLike)
+            DynamicGradientRectangleLikeView(audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel, longText: "\(cardItemLike.stt ?? "분석중입니다! 잠시만 기다려주세요!")", cardItemsLike: cardItemLike)
             DynamicGradientImagePicker(cardViewModel: cardViewModel, cardViewId: cardItemLike.id)
             Spacer().frame(height: 30)
             EmotionLikeView1(cardViewModel: cardViewModel, cardItemLike: cardItemLike)

@@ -25,7 +25,7 @@ struct HomeView: View {
     @ObservedObject var cardViewModel : CardViewModel
     @State private var showSlideOverCard = false
     @State private var selectedItemId: Int?
-    @State private var item: Item = Item(id: 0, tripName: "", startdate: "", enddate: "")
+    @State private var item: Item = Item(id: 0, tripName: "", startdate: "", enddate: "", analyzingCount: 0)
     
     
     var body: some View {
@@ -49,41 +49,76 @@ struct HomeView: View {
                 
                 CustomHomeVDivider()
                 TabView(selection: $selectedSlideIndex) {
-                    
-                    // "여행 종료"의 경우
-                    
-                    // 큰 숫자
+                  
+//                    VStack {
+//                        let (status, name) = homeviewModel.tripStatusAndNameForToday()
+//                        Text(name ?? "")
+//                            .font(.pretendardExtrabold14)
+//                            .foregroundColor(.black)
+//                            .padding(.top, 30)
+//                            .offset(x:-80,y:15)// - 일수록 왼쪽으로 이동함
+//                        
+//                        HStack(alignment: .firstTextBaseline) {
+//                            Text("출발까지")
+//                                .font(.pretendardMedium16)
+//                                .foregroundColor(.gray)
+//                                .padding(.bottom, 20)
+//                                .offset(y: -23)
+//                            
+//                            if status.contains("일 남음") {
+//                                let daysRemaining = status.components(separatedBy: "일")[0].trimmingCharacters(in: .whitespaces)
+//                                           Text(daysRemaining)
+//                                    .foregroundColor(.homeRed)
+//                                    .font(.pretendardExtrabold45)
+//                                    .padding(.horizontal, 5)
+//                                
+//                                Text("일 남았어요")
+//                                    .font(.pretendardMedium16)
+//                                    .foregroundColor(.gray)
+//                                    .padding(.top, 10)
+//                            }
+//                        }
+//                    }
                     VStack {
-                        let (status, name) = homeviewModel.tripStatusAndNameForToday()
-                        Text(name ?? "")
-                            .font(.pretendardExtrabold14)
-                            .foregroundColor(.black)
-                            .padding(.top, 30)
-                            .offset(x:-80,y:15)// - 일수록 왼쪽으로 이동함
-                        
-                        HStack(alignment: .firstTextBaseline) {
-                            Text("출발까지")
-                                .font(.pretendardMedium16)
-                                .foregroundColor(.gray)
-                                .padding(.bottom, 20)
-                                .offset(y: -23)
-                            
-                            if status.contains("일 남음") {
-                                let daysRemaining = status.split(separator: "일")[0].trimmingCharacters(in: .whitespaces)
-                                Text(daysRemaining)
-                                    .foregroundColor(.homeRed)
-                                    .font(.pretendardExtrabold45)
-                                    .padding(.horizontal, 5)
-                                
-                                Text("일 남았어요")
-                                    .font(.pretendardMedium16)
-                                    .foregroundColor(.gray)
-                                    .padding(.top, 10)
-                            }
-                        }
-                    }
-                    .padding(.bottom, 10)
-                    .font(.pretendardMedium14)
+                              let tripInfo = homeviewModel.closestTripInfo()
+                              if let tripName = tripInfo.tripName {
+                                  VStack(alignment: .leading) {
+                                      Text(tripName)
+                                          .font(.pretendardExtrabold14)
+                                          .foregroundColor(.black)
+                                          .padding(.top, 30)
+                                          .offset(x: 0, y: 15)  // 왼쪽으로 이동
+
+                                      HStack(alignment: .firstTextBaseline) {
+                                          Text("출발까지")
+                                              .font(.pretendardMedium16)
+                                              .foregroundColor(.gray)
+                                              .padding(.bottom, 20)
+                                              .offset(y: -23)
+
+                                          if let daysUntil = tripInfo.daysUntil {
+                                              Text("\(daysUntil)")
+                                                  .foregroundColor(.homeRed)
+                                                  .font(.pretendardExtrabold45)
+                                                  .padding(.horizontal, 5)
+                                              Text(tripInfo.status)
+                                                  .font(.pretendardMedium16)
+                                                  .foregroundColor(.gray)
+                                                  .padding(.top, 10)
+                                          } else {
+                                              Text(tripInfo.status)
+                                                  .font(.pretendardExtrabold45)
+                                                  .foregroundColor(.homeRed)
+                                                  .padding(.horizontal, 5)
+                                          }
+                                      }
+                                  }
+                              } else {
+                                  Text(tripInfo.status)
+                                      .font(.pretendardMedium14)
+                                      .padding(.top, 30)
+                              }
+                          }
                     .tag(0)
                     
                     
@@ -181,6 +216,8 @@ struct ItemViewCell: View {
     @StateObject var homeviewModel = HomeViewModel()
     @State var selectedItemId: Int?
     @State private var isLinkActiveModify = false
+    @State private var showRectangle: Bool = true
+
     
     var body: some View {
         
@@ -197,6 +234,8 @@ struct ItemViewCell: View {
                     .zIndex(1)
             }
             
+            
+            
             deleteButton
             
             NavigationLink(destination:  DateRangeView1(item: item, audioRecorderManager: audioRecorderManager, cardViewModel: cardViewModel), isActive: $isLinkActive) {
@@ -204,63 +243,35 @@ struct ItemViewCell: View {
             }
             
             NavigationLink(destination: ModifySelectDayView(calendarViewModel: CalendarViewModel(), tripId: item.id, tripName: item.tripName, startDate: item.startdate, endDate: item.enddate), isActive: $isLinkActiveModify) {
-                            EmptyView()
-                        }
+                EmptyView()
+            }
+            //            ZStack {
+            //
+            //                           if item.analyzingCount > 0  && showRectangle {
+            //                               Rectangle()
+            //                                   .stroke(.black)
+            //                                   .frame(width: 385,height: 75)
+            //                                   .zIndex(1)
+            //
+            //                            }
             
             HStack(spacing: 15) {
                 
                 
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack{
-                        
-                        
-                        VStack{
-                            
-                            Text(item.startdate)
-                                .font(.pretendardMedium11)
-                                .foregroundColor(.black)
-                            
-                            
-                            Text(item.enddate)
-                                .font(.pretendardMedium11)
-                                .foregroundColor(.black)
-                        }
-                        Rectangle()
-                            .fill(Color.homeRed)
-                            .frame(width: 1, height: 42)
-                            .padding(.leading, 5)
-                            .padding(.trailing, 0)
-                        
-                    }
-                }.padding(.bottom,10)
-                
-                
-                
-                VStack{
-                    HStack(spacing: 10) {
-                        
-                        Spacer()
-                        
-                        
-                        
-                        Text(item.tripName)
-                            .font(.pretendardExtrabold14)
-                            .foregroundColor(.black)
-                            .zIndex(2)
-                        
-                        Rectangle()
-                            .fill(Color.homeRed)
-                            .frame(width: 1, height: 42)
-                            .padding(.leading, 3)
-                            .padding(.trailing, 0)
-                        
-                    }
+                if item.analyzingCount <= 0 {
+                    defalutView
+                    defaultView1
+                } else {
+                    
+                    defalutViewanalyzing
+                    defaultViewanalyzing1
+                    
                 }
-                
-                
-                
-                
             }
+            
+            
+        //}
+            
             .onTapGesture {
                 self.isLinkActive = true // 사용자가 셀을 탭하면 네비게이션 링크 활성화
                 
@@ -280,21 +291,32 @@ struct ItemViewCell: View {
         }.onAppear {
             homeviewModel.fetchTripFiles(for: item.id)  // 아이템 ID 사용하여 파일 데이터 로드
         }
+        
+
+        
     }
     
+    
+    func backgroundColor(for analyzingCount: Int) -> Color {
+           analyzingCount > 0 ? .red : .blue // 분석 중인 경우 빨간색, 아닌 경우 파란색
+       }
+
+
     
     
     
     func onChanged(value: DragGesture.Value) {
         if value.translation.width < 0 {
-            
             if item.isSwiped {
                 item.offset = value.translation.width - 90
             } else {
                 item.offset = value.translation.width
             }
+            // 슬라이드가 왼쪽으로 이동했을 때 사각형을 숨깁니다.
+            showRectangle = false
         }
     }
+
     
     func onEnd(value: DragGesture.Value) {
         withAnimation(.easeInOut) {
@@ -316,6 +338,8 @@ struct ItemViewCell: View {
         }
     }
 }
+
+
 
 extension ItemViewCell {
     
@@ -364,7 +388,142 @@ extension ItemViewCell {
             Spacer().frame(width: 50)
         }.background(Color.homeBack)
     }
+    
+    var defalutView : some View {
+        
+        VStack(alignment: .leading, spacing: 10) {
+            HStack{
+                
+                
+                VStack{
+                    
+                    
+                    
+                    Text(item.startdate)
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.black)
+                        .padding(.bottom,1)
+                    
+                    
+                    Text(item.enddate)
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.black)
+                        .padding(.top,1)
+                    
+                }
+                Rectangle()
+                    .fill(Color.homeRed)
+                    .frame(width: 1, height: 42)
+                    .padding(.leading, 5)
+                    .padding(.trailing, 0)
+                
+            }
+        }.padding(.bottom,10)
+        
+    }
+    
+    var defaultView1 : some View {
+        VStack{
+            HStack(spacing: 10) {
+                
+                Spacer()
+                
+                
+                
+                Text(item.tripName)
+                    .font(.pretendardExtrabold14)
+                    .foregroundColor(.black)
+                    .zIndex(2)
+                
+                Rectangle()
+                    .fill(Color.homeRed)
+                    .frame(width: 1, height: 42)
+                    .padding(.leading, 3)
+                    .padding(.trailing, 0)
+                
+            }
+        }
+    }
+    
+    
+    var defalutViewanalyzing : some View {
+        
+        VStack(alignment: .leading, spacing: 10) {
+            HStack{
+                
+                
+                VStack{
+                    
+                    
+                    
+                    Text(item.startdate)
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.black)
+                        .padding(.bottom,1)
+                    
+                    Text(item.enddate)
+                        .font(.pretendardMedium11)
+                        .foregroundColor(.black)
+                        .padding(.top,1)
+                    
+                }
+                Rectangle()
+                    .fill(Color.homeRed)
+                    .frame(width: 1, height: 42)
+                    .padding(.leading, 5)
+                    .padding(.trailing, 0)
+                
+            }
+        }.padding(.bottom,10)
+        
+    }
+    
+    
+    var defaultViewanalyzing1 : some View {
+        VStack{
+            HStack(spacing: 10) {
+                
+                Spacer()
+                
+                
+                
+                VStack(alignment:.trailing){
+                    Text(item.tripName)
+                        .font(.pretendardExtrabold14)
+                        .foregroundColor(.black)
+                        .zIndex(2)
+                    
+                    HStack{
+                        Image("analyzing")
+                            .zIndex(2)
+                        Text("분석중입니다")
+                            .font(.pretendardMedium8)
+                            .foregroundColor(.black)
+                            .zIndex(2)
+              
+                      
+                        
+                    }
+                }
+                
+                Rectangle()
+                    .fill(Color.homeRed)
+                    .frame(width: 1, height: 42)
+                    .padding(.leading, 3)
+                    .padding(.trailing, 0)
+                
+            }
+        }
+    }
+    
+    
+    
+    
 }
+
+    
+    
+
 //TODO: - 버튼 두개를 패딩으로 좀 더 밀어주고 스와이프 부분을 좀더 조정해야할듯
 
 

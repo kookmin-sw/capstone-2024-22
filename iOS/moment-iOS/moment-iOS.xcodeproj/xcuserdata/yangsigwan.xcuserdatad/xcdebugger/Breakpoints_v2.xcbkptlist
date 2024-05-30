@@ -110,8 +110,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "121"
-            endingLineNumber = "121"
+            startingLineNumber = "156"
+            endingLineNumber = "156"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -126,8 +126,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "122"
-            endingLineNumber = "122"
+            startingLineNumber = "157"
+            endingLineNumber = "157"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -142,8 +142,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "527"
-            endingLineNumber = "527"
+            startingLineNumber = "686"
+            endingLineNumber = "686"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -158,8 +158,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "610"
-            endingLineNumber = "610"
+            startingLineNumber = "769"
+            endingLineNumber = "769"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -174,8 +174,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "522"
-            endingLineNumber = "522"
+            startingLineNumber = "681"
+            endingLineNumber = "681"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -190,8 +190,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "528"
-            endingLineNumber = "528"
+            startingLineNumber = "687"
+            endingLineNumber = "687"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -206,8 +206,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "600"
-            endingLineNumber = "600"
+            startingLineNumber = "759"
+            endingLineNumber = "759"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -222,8 +222,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "503"
-            endingLineNumber = "503"
+            startingLineNumber = "662"
+            endingLineNumber = "662"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -238,8 +238,8 @@
             filePath = "Home/HomeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "504"
-            endingLineNumber = "504"
+            startingLineNumber = "663"
+            endingLineNumber = "663"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -514,36 +514,6 @@
             endingLineNumber = "168"
             landmarkName = "updateCardViewLikeStatus(cardViewId:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "B593CEF1-21AC-46D7-AC6E-6B7F8A3E8FF7 - ac7cd0f62dac0878"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "moment_iOS.CardViewModel.updateCardViewLikeStatus(cardViewId: Swift.Int) -&gt; ()"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/CardView/CardViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "168"
-                  endingLineNumber = "168">
-               </Location>
-               <Location
-                  uuid = "B593CEF1-21AC-46D7-AC6E-6B7F8A3E8FF7 - f578e75712b93108"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Alamofire.DataResponse&lt;Any, Alamofire.AFError&gt;) -&gt; () in moment_iOS.CardViewModel.updateCardViewLikeStatus(cardViewId: Swift.Int) -&gt; ()"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/CardView/CardViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "168"
-                  endingLineNumber = "168">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -560,36 +530,6 @@
             endingLineNumber = "170"
             landmarkName = "updateCardViewLikeStatus(cardViewId:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "9F68B5E7-3645-4A48-9F73-64A93F71DD7B - f578e75712b9314a"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Alamofire.DataResponse&lt;Any, Alamofire.AFError&gt;) -&gt; () in moment_iOS.CardViewModel.updateCardViewLikeStatus(cardViewId: Swift.Int) -&gt; ()"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/CardView/CardViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "170"
-                  endingLineNumber = "170">
-               </Location>
-               <Location
-                  uuid = "9F68B5E7-3645-4A48-9F73-64A93F71DD7B - f578e75712b9314a"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Alamofire.DataResponse&lt;Any, Alamofire.AFError&gt;) -&gt; () in moment_iOS.CardViewModel.updateCardViewLikeStatus(cardViewId: Swift.Int) -&gt; ()"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/CardView/CardViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "170"
-                  endingLineNumber = "170">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -750,36 +690,6 @@
             endingLineNumber = "74"
             landmarkName = "body"
             landmarkType = "24">
-            <Locations>
-               <Location
-                  uuid = "0D2512FC-5C3D-47A5-9F11-ED1F1CE21A83 - b01e34d60330d327"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "moment_iOS.DailyView.body.getter : some"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/DailyView/DailyView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "74"
-                  endingLineNumber = "74">
-               </Location>
-               <Location
-                  uuid = "0D2512FC-5C3D-47A5-9F11-ED1F1CE21A83 - c3badfc0dc17f52a"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 () -&gt; () in moment_iOS.DailyView.body.getter : some"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/DailyView/DailyView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "74"
-                  endingLineNumber = "74">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -860,36 +770,6 @@
             endingLineNumber = "240"
             landmarkName = "uploadImages(_:to:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "27E493AF-2CE3-43FB-A74F-E9199D6FBE96 - 84a503bc29ce21ed"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "moment_iOS.CardViewModel.uploadImages(_: Swift.Array&lt;__C.UIImage&gt;, to: Swift.Int) -&gt; ()"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/CardView/CardViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "240"
-                  endingLineNumber = "240">
-               </Location>
-               <Location
-                  uuid = "27E493AF-2CE3-43FB-A74F-E9199D6FBE96 - fcd052c90eac3062"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Alamofire.MultipartFormData) -&gt; () in moment_iOS.CardViewModel.uploadImages(_: Swift.Array&lt;__C.UIImage&gt;, to: Swift.Int) -&gt; ()"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/CardView/CardViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "240"
-                  endingLineNumber = "240">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1178,36 +1058,6 @@
             endingLineNumber = "73"
             landmarkName = "body"
             landmarkType = "24">
-            <Locations>
-               <Location
-                  uuid = "97FFC6F5-542D-4CA1-B818-1BC56755E81C - 7cde08698d30aa53"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #3 () -&gt; () in closure #1 () -&gt; SwiftUI.TupleView&lt;(SwiftUI.Button&lt;SwiftUI.Text&gt;, SwiftUI.Spacer, &lt;&lt;opaque return type of SwiftUI.View.foregroundColor(Swift.Optional&lt;SwiftUI.Color&gt;) -&gt; some&gt;&gt;.0)&gt; in closure #2 () -&gt; SwiftUI.TupleView&lt;(SwiftUI.Spacer, &lt;&lt;opaque return type of SwiftUI.View.padding(SwiftUI.Edge.Set, Swift.Optional&lt;CoreGraphics.CGFloat&gt;) -&gt; some&gt;&gt;.0, moment_iOS.CustomSlectedVDividerCard, &lt;&lt;opaque return type of SwiftUI.View.frame(width: Swift.Optional&lt;CoreGraphics.CGFloat&gt;, height: Swift.Optional&lt;CoreGraphics.CGFloat&gt;, alignment: SwiftUI.Alignment) -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of SwiftUI.View.onTapGesture(count: Swift.Int, perform: () -&gt; ()) -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of SwiftUI.View.padding(SwiftUI.Edge.Set, Swift.Optional&lt;CoreGraphics.CGFloat&gt;) -&gt; some&gt;&gt;.0, SwiftUI._ConditionalContent&lt;SwiftUI.TupleView&lt;(&lt;&lt;opaque return type of SwiftUI.View.onChange&lt;&#x3c4;_0_0 where &#x3c4;_1_0: Swift.Equatable&gt;(of: &#x3c4;_1_0, perform: (&#x3c4;_1_0) -&gt; ()) -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of SwiftUI.View.frame(width: Swift.Optional&lt;CoreGraphics.CGFloat&gt;, height: Swift.Optional&lt;CoreGraphics.CGFloat&gt;, alignment: SwiftUI.Alignment) -&gt; some&gt;&gt;.0)&gt;, &lt;&lt;opaque return type of SwiftUI.View.frame(width: Swift.Optional&lt;CoreGraphics.CGFloat&gt;, height: Swift.Optional&lt;CoreGraphics.CGFloat&gt;, alignment: SwiftUI.Alignment) -&gt; some&gt;&gt;.0&gt;)&gt; in closure #1 () -&gt; SwiftUI.TupleView&lt;(&lt;&lt;opaque return type of SwiftUI.View.onTapGesture(count: Swift.Int, perform: () -&gt; ()) -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of SwiftUI.View.padding(SwiftUI.Edge.Set, Swift.Optional&lt;CoreGraphics.CGFloat&gt;) -&gt; some&gt;&gt;.0)&gt; in moment_iOS.ModifySelectDayView.body.getter : some"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/Callender/ModifySelectDayView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "73"
-                  endingLineNumber = "73">
-               </Location>
-               <Location
-                  uuid = "97FFC6F5-542D-4CA1-B818-1BC56755E81C - d62a800c2adf4af6"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Bool, Swift.Optional&lt;Swift.String&gt;) -&gt; () in closure #3 () -&gt; () in closure #1 () -&gt; SwiftUI.TupleView&lt;(SwiftUI.Button&lt;SwiftUI.Text&gt;, SwiftUI.Spacer, &lt;&lt;opaque return type of SwiftUI.View.foregroundColor(Swift.Optional&lt;SwiftUI.Color&gt;) -&gt; some&gt;&gt;.0)&gt; in closure #2 () -&gt; SwiftUI.TupleView&lt;(SwiftUI.Spacer, &lt;&lt;opaque return type of SwiftUI.View.padding(SwiftUI.Edge.Set, Swift.Optional&lt;CoreGraphics.CGFloat&gt;) -&gt; some&gt;&gt;.0, moment_iOS.CustomSlectedVDividerCard, &lt;&lt;opaque return type of SwiftUI.View.frame(width: Swift.Optional&lt;CoreGraphics.CGFloat&gt;, height: Swift.Optional&lt;CoreGraphics.CGFloat&gt;, alignment: SwiftUI.Alignment) -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of SwiftUI.View.onTapGesture(count: Swift.Int, perform: () -&gt; ()) -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of SwiftUI.View.padding(SwiftUI.Edge.Set, Swift.Optional&lt;CoreGraphics.CGFloat&gt;) -&gt; some&gt;&gt;.0, SwiftUI._ConditionalContent&lt;SwiftUI.TupleView&lt;(&lt;&lt;opaque return type of SwiftUI.View.onChange&lt;&#x3c4;_0_0 where &#x3c4;_1_0: Swift.Equatable&gt;(of: &#x3c4;_1_0, perform: (&#x3c4;_1_0) -&gt; ()) -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of SwiftUI.View.frame(width: Swift.Optional&lt;CoreGraphics.CGFloat&gt;, height: Swift.Optional&lt;CoreGraphics.CGFloat&gt;, alignment: SwiftUI.Alignment) -&gt; some&gt;&gt;.0)&gt;, &lt;&lt;opaque return type of SwiftUI.View.frame(width: Swift.Optional&lt;CoreGraphics.CGFloat&gt;, height: Swift.Optional&lt;CoreGraphics.CGFloat&gt;, alignment: SwiftUI.Alignment) -&gt; some&gt;&gt;.0&gt;)&gt; in closure #1 () -&gt; SwiftUI.TupleView&lt;(&lt;&lt;opaque return type of SwiftUI.View.onTapGesture(count: Swift.Int, perform: () -&gt; ()) -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of SwiftUI.View.padding(SwiftUI.Edge.Set, Swift.Optional&lt;CoreGraphics.CGFloat&gt;) -&gt; some&gt;&gt;.0)&gt; in moment_iOS.ModifySelectDayView.body.getter : some"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/Callender/ModifySelectDayView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "73"
-                  endingLineNumber = "73">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1240,36 +1090,6 @@
             endingLineNumber = "155"
             landmarkName = "deleteSelectedCardViews()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "79BC38FB-287C-45B0-B947-8CF0BE635055 - b9843cb946cb891f"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "moment_iOS.CardView.deleteSelectedCardViews() -&gt; ()"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/CardView/CardView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "155"
-                  endingLineNumber = "155">
-               </Location>
-               <Location
-                  uuid = "79BC38FB-287C-45B0-B947-8CF0BE635055 - 5560f7f418d85bbb"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Result&lt;Swift.Bool, Swift.Error&gt;) -&gt; () in moment_iOS.CardView.deleteSelectedCardViews() -&gt; ()"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/CardView/CardView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "151"
-                  endingLineNumber = "151">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1414,36 +1234,6 @@
             endingLineNumber = "189"
             landmarkName = "loginUser()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "A4CA3E8C-6A71-4BDA-B03E-BE7762F10D6D - 2a22daf1fac4ca39"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Alamofire.DataResponse&lt;Any, Alamofire.AFError&gt;) -&gt; () in moment_iOS.AuthViewModel.loginUser() -&gt; ()"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/Auth/AuthViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "189"
-                  endingLineNumber = "189">
-               </Location>
-               <Location
-                  uuid = "A4CA3E8C-6A71-4BDA-B03E-BE7762F10D6D - 2a22daf1fac4ca39"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Alamofire.DataResponse&lt;Any, Alamofire.AFError&gt;) -&gt; () in moment_iOS.AuthViewModel.loginUser() -&gt; ()"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/Auth/AuthViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "189"
-                  endingLineNumber = "189">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1460,36 +1250,6 @@
             endingLineNumber = "190"
             landmarkName = "loginUser()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "B7B5750C-0403-4170-B61E-D3517AA66DE4 - 2a22daf1fac4c9d8"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Alamofire.DataResponse&lt;Any, Alamofire.AFError&gt;) -&gt; () in moment_iOS.AuthViewModel.loginUser() -&gt; ()"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/Auth/AuthViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "190"
-                  endingLineNumber = "190">
-               </Location>
-               <Location
-                  uuid = "B7B5750C-0403-4170-B61E-D3517AA66DE4 - cdff8058c80cfd18"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 @Swift.MainActor () -&gt; () in closure #1 (Alamofire.DataResponse&lt;Any, Alamofire.AFError&gt;) -&gt; () in moment_iOS.AuthViewModel.loginUser() -&gt; ()"
-                  moduleName = "moment-iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/yangsigwan/Downloads/capstone/capstone-2024-22/iOS/moment-iOS/Auth/AuthViewModel.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "190"
-                  endingLineNumber = "190">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

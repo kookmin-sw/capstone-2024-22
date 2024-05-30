@@ -15,12 +15,14 @@ struct Item: Identifiable,Equatable {
     let enddate: String
     var offset: CGFloat = 0
     var isSwiped: Bool = false
+    let analyzingCount: Int  // 추가된 필드
 
     // 생성자는 id를 Int로 받고 이를 String으로 변환하여 저장합니다.
-    init(id: Int, tripName: String, startdate: String, enddate: String) {
+    init(id: Int, tripName: String, startdate: String, enddate: String ,analyzingCount : Int ) {
         self.id = id
         self.tripName = tripName
         self.startdate = startdate
         self.enddate = enddate
+        self.analyzingCount = analyzingCount
     }
 }

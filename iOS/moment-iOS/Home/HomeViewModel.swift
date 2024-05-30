@@ -117,6 +117,7 @@ class HomeViewModel: ObservableObject {
                 }
             }
     }
+    
    
     func fetchTripFiles(for tripId: Int) {
         let urlString = "http://211.205.171.117:8000/core/tripfile/\(tripId)"
@@ -149,6 +150,45 @@ class HomeViewModel: ObservableObject {
         }
     }
     
+    
+    func closestTripInfo() -> (daysUntil: Int?, tripName: String?, status: String) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy. MM. dd"
+        let today = Date()
+
+        // 가까운 미래의 여행들을 필터링
+        let futureTrips = items.filter { dateFormatter.date(from: $0.startdate) ?? Date.distantPast >= today }
+
+        // 가장 가까운 여행 찾기
+        if let closestTrip = futureTrips.min(by: { (dateFormatter.date(from: $0.startdate) ?? Date.distantFuture).compare(dateFormatter.date(from: $1.startdate) ?? Date.distantFuture) == .orderedAscending }) {
+            let startDate = dateFormatter.date(from: closestTrip.startdate) ?? today
+            let endDate = dateFormatter.date(from: closestTrip.enddate) ?? today
+            let calendar = Calendar.current
+
+            if startDate == today {
+                // 여행이 오늘 시작
+                let dayNumber = calendar.dateComponents([.day], from: startDate, to: today).day ?? 0 + 1
+                return (nil, closestTrip.tripName, "여행 \(dayNumber)일차")
+            } else if today > startDate && today <= endDate {
+                // 여행 중
+                let dayNumber = calendar.dateComponents([.day], from: startDate, to: today).day ?? 0 + 1
+                return (nil, closestTrip.tripName, "여행 \(dayNumber)일차")
+            } else if today < startDate {
+                // 여행 시작 전
+                let daysUntil = calendar.dateComponents([.day], from: today, to: startDate).day
+                return (daysUntil, closestTrip.tripName, "일 남았어요")
+            } else {
+                // 여행 종료
+                return (nil, closestTrip.tripName, "여행 종료")
+            }
+        } else {
+            // 계획된 여행이 없을 때
+            return (nil, nil, "계획된 여행이 없습니다.")
+        }
+    }
+
+    
+    
     func tripStatusAndNameForToday() -> (status: String, name: String?) {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy. MM. dd"
@@ -170,6 +210,8 @@ class HomeViewModel: ObservableObject {
             return ("어디로 떠나면 좋을까요?", nil)
         }
 
+
+    
     func fetchTrips() {
         let headers: HTTPHeaders = ["Authorization": authToken, "Accept": "application/json"]
         AF.request("http://211.205.171.117:8000/core/trip/all", method: .get, headers: headers)
@@ -177,7 +219,7 @@ class HomeViewModel: ObservableObject {
                 switch response.result {
                 case .success(let data):
                     self.items = data.data.trips.map { trip in
-                        Item(id: trip.id, tripName: trip.tripName, startdate: trip.startDate, enddate: trip.endDate)
+                        Item(id: trip.id, tripName: trip.tripName, startdate: trip.startDate, enddate: trip.endDate , analyzingCount: trip.analyzingCount)
                     }
                     self.sortTrips()
                 case .failure(let error):
