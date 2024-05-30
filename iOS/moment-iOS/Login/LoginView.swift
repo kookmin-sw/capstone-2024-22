@@ -135,19 +135,19 @@ struct LoginView: View {
         Spacer()
         VStack {
             Button(action: {
-                // 로그인 버튼 동작 구현
-                authViewModel.loginUser()
-                pathModel.paths.append(.homeBaseView)
-            }, label: {
-                Text("로그인")
-                    .font(.pretendardSemiBold18)
-                    .frame(minWidth: 0, maxWidth: .infinity)
-                    .padding()
-                    .background(email.isEmpty || password.isEmpty ? Color.homeRed : Color.homeRed)
-                    .foregroundColor(.white)
-                    .cornerRadius(3)
-            })
-           // .disabled(email.isEmpty || password.isEmpty)  // 이메일과 비밀번호 입력 여부에 따라 버튼 활성화
+                        self.authViewModel.loginUser()
+                    }, label: {
+                        Text("로그인")
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(authViewModel.email.isEmpty || authViewModel.password.isEmpty ? Color.gray : Color.homeRed)
+                            .cornerRadius(3)
+                    })
+                    .disabled(authViewModel.email.isEmpty || authViewModel.password.isEmpty)
+                    .alert(isPresented: $authViewModel.showAlert) {
+                        Alert(title: Text("로그인 실패"), message: Text("잘못된 이메일 또는 비밀번호입니다."), dismissButton: .default(Text("확인")))
+                    }
             .padding(.bottom, 20)
             
             Button(action: {
@@ -184,13 +184,7 @@ struct IsLoginView: View {
         }
     }
     
-//    private func loginUser() {
-//        // 로그인 로직 구현. 예시로 2초 후에 로그인이 완료되었다고 가정
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//            isLoading = false  // 로그인 시도 후 isLoading 상태 업데이트
-//            pathModel.paths.append(.homeBaseView) // 로그인 성공 시 홈 뷰로 전환
-//        }
-//    }
+
 }
 
 
@@ -210,7 +204,3 @@ struct LoadingView: View {
     }
 }
 
-
-#Preview {
-    LoginView()
-}

@@ -22,7 +22,7 @@ class AuthViewModel: ObservableObject {
     @Published var loginError: Bool = false
     @Published var pathword: String = ""
     
-    
+    @Published var showAlert: Bool = false
 
     @Published var refreshToken: String = ""
     @Published var userRole: String = ""
@@ -176,38 +176,34 @@ class AuthViewModel: ObservableObject {
        }
    
 
-    
     func loginUser() {
-        let parameters = [
-            "email": email,
-            "password": password
-        ]
-        //alexj99@naver.com
-        //1234
-        
-        AF.request("http://211.205.171.117:8000/auth/login", method: .post, parameters: parameters, encoder: JSONParameterEncoder.default)
-            .validate(statusCode: 200..<300)
-            .responseJSON { response in
-                switch response.result {
-                case .success(let value):
-                    DispatchQueue.main.async {
-                        self.isLoggedIn = true
-                        self.loginError = false
-                        print("Response JSON: \(value)")
-                    }
-                case .failure(let error):
-                    DispatchQueue.main.async {
-                        self.isLoggedIn = false
-                        self.loginError = true
-                        if let data = response.data, let errorString = String(data: data, encoding: .utf8) {
-                            print("Error: \(error) \nServer Response: \(errorString)")  // 에러와 서버 응답 함께 출력
+            let parameters = [
+                "email": email,
+                "password": password
+            ]
+            
+            AF.request("http://211.205.171.117:8000/auth/login", method: .post, parameters: parameters, encoder: JSONParameterEncoder.default)
+                .validate(statusCode: 200..<300)
+                .responseJSON { response in
+                    switch response.result {
+                    case .success(let value):
+                        DispatchQueue.main.async {
+                            self.isLoggedIn = true
+                            self.loginError = false
+                            print("Response JSON: \(value)")
+                        }
+                    case .failure(let error):
+                        DispatchQueue.main.async {
+                            self.isLoggedIn = false
+                            self.loginError = true
+                            self.showAlert = true
+                            if let data = response.data, let errorString = String(data: data, encoding: .utf8) {
+                                print("Error: \(error) \nServer Response: \(errorString)")
+                            }
                         }
                     }
                 }
-                print("Sending parameters: \(parameters)")
-
-            }
-    }
+        }
 }
 
 //

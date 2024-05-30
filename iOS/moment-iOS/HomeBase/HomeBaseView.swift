@@ -9,14 +9,6 @@ import Foundation
 import SwiftUI
 import PopupView
 
-//
-//  VoiceRecorderViewModel.swift
-//  moment-iOS
-//
-//  Created by 양시관 on 3/5/24.
-//
-
-
 
 struct HomeBaseView: View {
     @EnvironmentObject private var pathModel: PathModel
