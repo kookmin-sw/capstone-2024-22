@@ -87,18 +87,19 @@ public class NotiService {
                     log.error("Failed to send notification to user {}", user.getId());
                 }
             }
-        }
-        try {
-            ResponseEntity<Integer> ret = notiClient.pushMessage(
-                    FcmSendDto.builder()
-                            .token(user.getFirebaseToken())
-                            .title("moment")
-                            .body(question)
-                            .build()
-            );
-            log.info("Notification sent to user {} with response {}", user.getId(), ret);
-        } catch (Exception e){
-            log.error("Failed to send notification to user {}", user.getId());
+        }else{
+            try {
+                ResponseEntity<Integer> ret = notiClient.pushMessage(
+                        FcmSendDto.builder()
+                                .token(user.getFirebaseToken())
+                                .title("moment")
+                                .body(question)
+                                .build()
+                );
+                log.info("Notification sent to user {} with response {}", user.getId(), ret);
+            } catch (Exception e){
+                log.error("Failed to send notification to user {}", user.getId());
+            }
         }
     }
 
