@@ -23,7 +23,7 @@ struct ReceiptGroupView: View {
     @State private var navigateToTargetView = false
     @State var isCheckedStates: [Bool]
     @State private var checkboxStates: [Int: Bool] = [:]
-    
+    @State private var selectTripBill = false
     
     
     
@@ -50,6 +50,7 @@ struct ReceiptGroupView: View {
                             // 예: 뷰를 닫거나 이전 화면으로 이동
                             print("Going back")
                             presentationMode.wrappedValue.dismiss()
+                           // selectTripBill = true
                         }
                     }) {
                         HStack {
@@ -141,6 +142,149 @@ struct ReceiptGroupView: View {
             }
         }
         .navigationBarBackButtonHidden()
+        NavigationLink(destination:ReceiptsView(), isActive: $selectTripBill){
+            EmptyView()
+        }
+        .onAppear(){
+            sharedViewModel.fetchReceipts()
+        }
+    }
+}
+
+struct ReceiptGroupView1: View {
+    @EnvironmentObject var sharedViewModel: SharedViewModel
+    @EnvironmentObject var homeBaseViewModel : HomeBaseViewModel
+    @Environment(\.presentationMode) var presentationMode
+    @State private var isDeleteMode = false // 삭제 모드 상태
+    @State private var selectedReceiptId: Int?
+    @State private var isSelected = false // 체크박스 선택 여부
+    @State private var isEditing = false // 편집 모드 상태
+    @State private var showConfirmationDialog = false // 커스텀 다이얼로그 표시 여부
+    @State private var navigateToTargetView = false
+    @State var isCheckedStates: [Bool]
+    @State private var checkboxStates: [Int: Bool] = [:]
+    @State private var selectTripBill = false
+    
+    
+    
+    
+    
+    let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 2)
+    
+    var body: some View {
+        
+        //TODO: - 여기서는 뒤로가기버튼의 위치가 AnnounceView 여야함
+        NavigationView{
+            VStack{
+                HStack {
+                    Button(action: {
+                        if isEditing {
+                            // 완료 버튼 클릭 시 수행할 액션
+                            // 예: 편집 내용 저장
+                            print("Editing completed")
+                            isEditing.toggle() // 편집 상태를 비활성화
+                            checkboxStates = [:] // 모든 체크박스 상태 초기화
+                            
+                        } else {
+                            // 뒤로 버튼 클릭 시 수행할 액션
+                            // 예: 뷰를 닫거나 이전 화면으로 이동
+                            print("Going back")
+                            presentationMode.wrappedValue.dismiss()
+                           // selectTripBill = true
+                        }
+                    }) {
+                        HStack {
+                            Spacer().frame(width: 10)
+                            Text(isEditing ? "완료" : "뒤로")
+                                .font(.yjObangBold15)
+                                .tint(Color.black)
+                        }
+                    }
+                    
+                    
+                    
+                    // presentationMode.wrappedValue.dismiss()
+                    Spacer()
+                    
+                    if isEditing {
+                        Button("삭제") {
+                            
+                            self.showConfirmationDialog = true
+                            print("삭제")
+                            let idsToDelete = checkboxStates.compactMap { $0.value ? $0.key : nil }
+                            sharedViewModel.deleteReceipts(with: idsToDelete)
+                        }.font(.yjObangBold15)
+                            .tint(Color.black)
+                        Spacer().frame(width: 10)
+                    } else {
+                        Button("편집") { // 편집모드인 삭제
+                            isEditing.toggle()
+                        }.font(.yjObangBold15)
+                            .tint(Color.black)
+                        Spacer().frame(width: 10)
+                    }
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                }
+                .padding()
+                
+                
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 20) {
+                        ForEach(sharedViewModel.receipts) { receipt in
+                            ZStack {
+                                // NavigationLink to navigate to detail view when a receipt is selected.
+                                if receipt.receiptThemeType == "A" {
+                                    NavigationLink(destination: ReceiptcompleteView(receipt: receipt, sharedViewModel: sharedViewModel), tag: receipt.id, selection: $selectedReceiptId) {
+                                                                  EmptyView()
+                                                              }
+                                                          } else {
+                                                              NavigationLink(destination: ReceiptCompleteviewB(receipt: receipt), tag: receipt.id, selection: $selectedReceiptId) {
+                                                                  EmptyView()
+                                                              }
+                                                          }
+                              
+                               
+                                
+                                // Receipt view
+                                Group {
+                                    if receipt.receiptThemeType == "A" {
+                                        ReceiptATypeView(receipt: receipt, isEditing: isEditing, isChecked: Binding(
+                                            get: { checkboxStates[receipt.id, default: false] },
+                                            set: { newValue in checkboxStates[receipt.id] = newValue }
+                                        ))
+                                    } else {
+                                        ReceiptBTypeView(receipt: receipt, isEditing: isEditing, isChecked: Binding(
+                                            get: { checkboxStates[receipt.id, default: false] },
+                                            set: { newValue in checkboxStates[receipt.id] = newValue }
+                                        ))
+                                    }
+                                }
+                                .onTapGesture {
+                                    if isEditing {
+                                        checkboxStates[receipt.id] = !(checkboxStates[receipt.id] ?? false)
+                                    } else {
+                                        selectedReceiptId = receipt.id
+                                    }
+                                }
+                            }
+                            .frame(width: 125, height: 244)
+                            .padding()
+                        }
+                    }
+                }
+                
+            }
+        }
+        .navigationBarBackButtonHidden()
+//        NavigationLink(destination:ReceiptsView(), isActive: $selectTripBill){
+//            EmptyView()
+//        }
         .onAppear(){
             sharedViewModel.fetchReceipts()
         }

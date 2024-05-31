@@ -71,7 +71,7 @@ struct BillListView: View {
                 Spacer().frame(height: 20)
                 HStack{
                     Spacer()
-                    NavigationLink(destination: ReceiptGroupView( isCheckedStates: [false]).environmentObject(homeBaseViewModel), isActive: $isShowingCreateView) {
+                    NavigationLink(destination: ReceiptGroupView1( isCheckedStates: [false]).environmentObject(homeBaseViewModel), isActive: $isShowingCreateView) {
                         Button("영수증 모아보기") {
                             isShowingCreateView = true
                         }
@@ -674,10 +674,10 @@ struct ReceiptsView: View {
     var body: some View {
         ZStack {
             // 로딩 뷰 조건부 표시
-            if isLoading {
-                LoadingViewBill()
-            }
-
+                        if isLoading {
+                            LoadingViewBill()
+                        }
+            
             VStack {
                 Button(action: {
                     self.presentationMode.wrappedValue.dismiss()
@@ -697,6 +697,7 @@ struct ReceiptsView: View {
                         ForEach(homeViewModel.items) { item in
                             Button(action: {
                                 selectedItem = item
+                                isLoading = true
                                 triggerLoading()
                             }) {
                                 ReceiptCell(item: item)
@@ -713,24 +714,27 @@ struct ReceiptsView: View {
             
             // 자동 이동 로직
             if let selectedItem = selectedItem {
-               
-                    NavigationLink("", destination: ReceiptDetailView(item: selectedItem)
-                        .environmentObject(billListViewModel), isActive: $isLoading)
+                
+                NavigationLink("", destination: ReceiptDetailView(item: selectedItem)
+                    .environmentObject(billListViewModel), isActive: $isLoading)
                 
             }
         }
         .navigationBarBackButtonHidden()
     }
+    
+
 
     // 로딩 트리거 함수
     func triggerLoading() {
         isLoading = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
             isLoading = false // 이 부분에서 NavigationLink가 활성화됩니다.
         }
     }
 }
 
+//
 struct LoadingViewBill: View {
     var body: some View {
         VStack {
