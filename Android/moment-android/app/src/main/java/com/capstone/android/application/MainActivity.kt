@@ -810,7 +810,8 @@ class MainActivity : ComponentActivity() {
                         actions = {
 
                         },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth(),
                         title = {
                             Row(
                                 modifier = Modifier
