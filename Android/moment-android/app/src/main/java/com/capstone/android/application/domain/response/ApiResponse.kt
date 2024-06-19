@@ -10,4 +10,8 @@ sealed class ApiResponse <T>(
         val exception: Exception
     ) : ApiResponse<T>(null, exception)
 
+    data class MomentError <T>(
+        val data:T,
+    ) : ApiResponse<T>(data = data)
+
 }
