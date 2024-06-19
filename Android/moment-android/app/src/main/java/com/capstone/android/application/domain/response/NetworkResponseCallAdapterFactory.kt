@@ -44,10 +44,17 @@ private class ApiResponseCall<T>(
     ) = delegate.enqueue(
         object : Callback<T> {
             private fun Response<T>.toNetworkResponse(): ApiResponse<T> {
-                return ApiResponse.Success(data = this.body()!!)
+                if(this.isSuccessful){
+                    return ApiResponse.Success(data = this.body()!!)
+                }else{
+                    return ApiResponse.Error(exception = java.lang.Exception())
+                }
+
             }
 
             override fun onResponse(call: Call<T>, response: Response<T>) {
+                Log.d("awegaweg","onResponse")
+
                 callback.onResponse(
                     this@ApiResponseCall,
                     Response.success(response.toNetworkResponse())
@@ -55,6 +62,7 @@ private class ApiResponseCall<T>(
             }
 
             override fun onFailure(call: Call<T>, throwable: Throwable) {
+                Log.d("awegaweg","failure : ${throwable.message}")
                 callback.onResponse(
                     this@ApiResponseCall,
                     Response.success(ApiResponse.Error(throwable as Exception))
