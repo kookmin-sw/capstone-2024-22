@@ -2,6 +2,7 @@ package com.capstone.android.application.ui
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -28,6 +29,9 @@ class PostTripActivity:ComponentActivity() {
         tripViewModel.postTripRegisterSuccess.observe(this@PostTripActivity){
             setResult(1,mainIntent)
             finish()
+        }
+        tripViewModel.postTripRegisterFailure.observe(this@PostTripActivity){
+            Toast.makeText(this@PostTripActivity,"해당 날짜는 이미 존재합니다.",Toast.LENGTH_SHORT).show()
         }
         alreadyBookedDateViewModel.getAlreadyBookedDateAll()
 
@@ -57,7 +61,11 @@ class PostTripActivity:ComponentActivity() {
                     )
 
                 )
-            })
+            },
+                onBackClicked = {
+                    finish()
+                }
+            )
         }
 
     }
