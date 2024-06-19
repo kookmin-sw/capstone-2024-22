@@ -181,6 +181,7 @@ class ReciptActivity : ComponentActivity() {
             }
             tripViewModel.getTripAllFailure.observe(this@ReciptActivity){ response->
                 Log.d("tripListtripList", "fail")
+                finish()
             }
 
             // 영수증 전체 받기 성공
@@ -506,7 +507,7 @@ class ReciptActivity : ComponentActivity() {
                 }
 
                 
-                if (emptyTrip.value){
+                if (!emptyTrip.value){
                     Column(Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center) {
@@ -526,8 +527,8 @@ class ReciptActivity : ComponentActivity() {
                                 if(tripList[index].analyzingCount==0 &&
                                     isDatePassed(LocalDate.parse(tripList[index].endDate)) &&
                                     tripList[index].numOfCard != 0 ){
-
-                                    emptyTrip.value = false
+                                    Log.d("ewagewagwae","ee")
+//                                    emptyTrip.value = false
 
                                     ItemTrip(
                                         Trip(id=tripList[index].id,
