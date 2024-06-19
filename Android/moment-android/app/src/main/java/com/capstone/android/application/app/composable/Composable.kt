@@ -59,6 +59,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -134,6 +135,8 @@ fun MomentTextField(
     BasicTextField(
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         maxLines = 1,
+        visualTransformation = if(keyboardType == KeyboardType.Password) PasswordVisualTransformation()
+        else VisualTransformation.None,
         value = if(text.value.length>30) text.value.removeRange(10,text.value.length) else text.value,
         onValueChange = onValueChanged,
         singleLine = true,
@@ -167,7 +170,8 @@ fun MomentTextField(
         Row(){
             TextFieldDefaults.TextFieldDecorationBox(
                 value = /*if(text.value.length>20) text.value.removeRange(10,text.value.length) else */text.value,
-                visualTransformation = VisualTransformation.None,
+                visualTransformation = if(keyboardType == KeyboardType.Password) PasswordVisualTransformation()
+                else VisualTransformation.None,
                 innerTextField = it,
                 singleLine = true,
                 enabled = true,
@@ -355,7 +359,8 @@ fun FancyProgressBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String>,endDate:MutableState<String>,onClicked: () -> Unit){
+fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String>,
+                     endDate:MutableState<String>,onClicked: () -> Unit, onBackClicked:()->Unit){
 
         Scaffold(
             modifier = Modifier
@@ -379,6 +384,7 @@ fun MomentUiTripInfo(tripName:MutableState<String>,startDate:MutableState<String
                             androidx.compose.material.Text(
                                 modifier = Modifier
                                     .clickable {
+                                        onBackClicked()
                                     },
                                 text = "취소",
                                 fontFamily = FontMoment.obangFont,
