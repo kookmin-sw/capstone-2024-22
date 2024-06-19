@@ -70,7 +70,11 @@ class PatchTripActivity:ComponentActivity() {
                     )
 
                 )
-            })
+            },
+                onBackClicked = {
+                    finish()
+                }
+            )
         }
     }
 }
