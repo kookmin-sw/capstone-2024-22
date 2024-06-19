@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.gms.wearable.CapabilityClient
@@ -54,26 +55,6 @@ class ApplicationClass: Application() {
         notificationManager.createNotificationChannel(notificationChannel)
 
 
-        Wearable.getCapabilityClient(this@ApplicationClass)
-            .getCapability("wear_app", CapabilityClient.FILTER_ALL)
-            .addOnSuccessListener {
-                Log.d("waegaewg","success, ${it.nodes.size}")
-                it.nodes.forEach {
-                    transactionId = it.id
-                    Log.d("waegaewg","${it.id} , ${it.displayName}")
-                }
-            }
-            .addOnFailureListener{
-                Log.d("waegaewg","afilure")
-            }.addOnCanceledListener {
-                Log.d("waegaewg","cancled")
-            }
-            .addOnCompleteListener {
-                Log.d("waegaewg","complete, ${it.result.nodes.size}")
-                it.result.nodes.forEach {
-                    Log.d("waegaewg","${it.id} , ${it.displayName}")
-                }
-            }
 
 
         tokenSharedPreferences =
@@ -86,11 +67,29 @@ class ApplicationClass: Application() {
 //        }
 
 
-        if(true){
-            Timber.plant(Timber.DebugTree())
-            Timber.i("ApplicationClass Success")
-        }else{
-//            Timber.plant(ReleaseTree())
+//        if(true){
+//            Timber.plant(Timber.DebugTree())
+//            Timber.i("ApplicationClass Success")
+//        }else{
+////            Timber.plant(ReleaseTree())
+//        }
+
+        try {
+            Wearable.getCapabilityClient(this@ApplicationClass)
+                .getCapability("wear_app", CapabilityClient.FILTER_ALL)
+                .addOnSuccessListener {
+                    it.nodes.forEach {
+                        transactionId = it.id
+                    }
+                }
+                .addOnFailureListener{
+                }.addOnCanceledListener {
+                }
+                .addOnCompleteListener {
+
+                }
+        }catch (e:Exception){
+            Toast.makeText(this@ApplicationClass,"워치가 지원이 안되는 기기에요!",Toast.LENGTH_SHORT).show()
         }
     }
 
