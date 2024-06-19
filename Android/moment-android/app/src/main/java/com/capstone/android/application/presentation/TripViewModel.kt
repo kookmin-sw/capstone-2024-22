@@ -115,7 +115,7 @@ class TripViewModel @Inject constructor(private val tripRepository:TripRepositor
                 if(response is ApiResponse.Success){
                     postTripRegisterSuccess.postValue(response.data)
                 }else{
-
+                    postTripRegisterFailure.postValue(ApiResponse.Error(exception = java.lang.Exception()))
                 }
 
 

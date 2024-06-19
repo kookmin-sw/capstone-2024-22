@@ -124,7 +124,7 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
                     patchAuthChangePasswordSuccess.value=response.data
 
                 }else{
-
+                    patchAuthChangePasswordFailure.postValue(ApiResponse.Error(exception = java.lang.Exception()))
 //                    val error = (data.body() as MomentNetworkError)
 //                    authFailure.value=MomentNetworkError(
 //                        errors =
