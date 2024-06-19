@@ -228,7 +228,7 @@ class OnboardingActivity:ComponentActivity() {
 
         // 로그인 실패
         authViewModel.postAuthLoginFailure.observe(this@OnboardingActivity){ response->
-            Toast.makeText(this@OnboardingActivity,"로그인에 실패",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@OnboardingActivity,"이메일이나 비밀번호를 다시 입력해주세요",Toast.LENGTH_SHORT).show()
         }
 
         // 인증코드 요청
@@ -278,7 +278,8 @@ class OnboardingActivity:ComponentActivity() {
 
         // 비밀번호 변경 실패
         authViewModel.patchAuthChangePasswordFailure.observe(this@OnboardingActivity){ response->
-            Toast.makeText(this@OnboardingActivity,"서버오류.",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@OnboardingActivity,"복구코드가 맞지않습니다.",Toast.LENGTH_SHORT).show()
+            navController.navigate(OnboardingScreen.FindPasswordNumber.name)
         }
 
         settingViewModel.patchFcmTokenSuccess.observe(this@OnboardingActivity){
@@ -390,7 +391,10 @@ class OnboardingActivity:ComponentActivity() {
                 ) {
                     Column(modifier = Modifier
                         .width(76.dp)
-                        .clickable { navController.navigate(OnboardingScreen.FindPassword.name) }) {
+                        .clickable {
+//                            navController.navigate(OnboardingScreen.FindPassword.name)
+                            Toast.makeText(this@OnboardingActivity,"서버오류",Toast.LENGTH_SHORT).show()
+                        }) {
                         Column(modifier = Modifier
                             .padding(horizontal = 8.dp)) {
                             P_Medium11(
@@ -1162,6 +1166,15 @@ class OnboardingActivity:ComponentActivity() {
                             isSignUp = "false"
                         )
                     )
+                    if(navController.currentDestination?.route == OnboardingScreen.SignupEmail.name){
+                        navController.navigate(OnboardingScreen.SignupNumber.name)
+                    }
+
+                    if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
+                        navController.navigate(OnboardingScreen.FindPasswordNumber.name)
+                    }
+
+                    Toast.makeText(this@OnboardingActivity,"인증번호를 보냈습니다.",Toast.LENGTH_SHORT).show()
                 }
             }else{
                 BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPasswordNumber.name) }            }
@@ -1432,6 +1445,7 @@ class OnboardingActivity:ComponentActivity() {
                 if (password.value.isNotEmpty() && passwordcheck.value.isNotEmpty()) {
                     BigButton("로그인하기", true) {
                         if (password.value == passwordcheck.value) {
+                            Log.d("awgtaewgewag",code)
                             authViewModel.patchAuthChangePassword(
                                 body = PatchAuthChangePasswordRequest(
                                     code = code,
