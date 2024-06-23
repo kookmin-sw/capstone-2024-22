@@ -1502,6 +1502,43 @@ class OnboardingActivity:ComponentActivity() {
     }*/
 
 
+    @Composable
+    fun TopSpeechBubble(text : String){
+        Box(
+            contentAlignment = Alignment.TopCenter
+        ){
+            Spacer(modifier = Modifier.width(18.dp))
+            Image(
+                modifier = Modifier
+                    .width(205.dp)
+                    .height(42.dp),
+                painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
+            )
+            Column(modifier = Modifier
+                .padding(top = 5.dp)) {
+                P_Medium11(content = text, color = white)
+            }
+        }
+    }
+
+    @Composable
+    fun BottomSpeechBubble(text : String){
+        Box(
+            contentAlignment = Alignment.BottomCenter
+        ){
+            Spacer(modifier = Modifier.width(18.dp))
+            Image(
+                modifier = Modifier
+                    .width(155.dp)
+                    .height(26.dp),
+                painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
+            )
+            Column(modifier = Modifier
+                .padding(bottom = 5.dp)) {
+                P_Medium11(content = text, color = white)
+            }
+        }
+    }
 
 
     @Preview
