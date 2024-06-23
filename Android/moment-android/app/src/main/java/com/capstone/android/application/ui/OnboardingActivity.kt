@@ -98,6 +98,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 enum class OnboardingScreen(){
@@ -392,8 +393,8 @@ class OnboardingActivity:ComponentActivity() {
                     Column(modifier = Modifier
                         .width(76.dp)
                         .clickable {
-//                            navController.navigate(OnboardingScreen.FindPassword.name)
-                            Toast.makeText(this@OnboardingActivity,"서버오류",Toast.LENGTH_SHORT).show()
+                            navController.navigate(OnboardingScreen.FindPassword.name)
+                            //Toast.makeText(this@OnboardingActivity,"서버오류",Toast.LENGTH_SHORT).show()
                         }) {
                         Column(modifier = Modifier
                             .padding(horizontal = 8.dp)) {
@@ -1194,6 +1195,21 @@ class OnboardingActivity:ComponentActivity() {
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
         }
+
+        val topshowBubble = remember {mutableStateOf(true)}
+        val bottomshowBubble = remember {mutableStateOf(false)}
+
+        LaunchedEffect(Unit) {
+            delay(5000) // 5초 동안 말풍선 표시
+            topshowBubble.value = false
+        }
+        if (bottomshowBubble.value){
+            LaunchedEffect(Unit) {
+                delay(2000) // 2초 동안 말풍선 표시
+                bottomshowBubble.value = false
+            }
+        }
+
         Box(modifier = Modifier
             .fillMaxSize()
             .background(color = tertiary_500)
@@ -1212,20 +1228,12 @@ class OnboardingActivity:ComponentActivity() {
             Column(modifier = Modifier.fillMaxHeight(),
                 verticalArrangement = Arrangement.Center) {
                 Column(modifier = Modifier
+                    .height(42.dp)
                     .padding(horizontal = 24.dp)) {
-                    Box(
-                        contentAlignment = Alignment.Center
-                    ){
-                        Spacer(modifier = Modifier.width(18.dp))
-                        Image(
-                            modifier = Modifier
-                                .width(205.dp)
-                                .height(42.dp),
-                            painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
-                        )
-                        P_Medium11(content = "입력하신 이메일로 복구코드가 전송되었어요\n" +
-                                "메일함을 확인해 주세요", color = white
-                        )
+
+                    if (topshowBubble.value) {
+                        val toptext = "입력하신 이메일로 인증번호가 전송되었어요\n" + "메일함을 확인해 주세요"
+                        TopSpeechBubble(toptext)
                     }
                 }
 
@@ -1281,6 +1289,7 @@ class OnboardingActivity:ComponentActivity() {
                                     isSignUp = "false"
                                 )
                             )
+                            bottomshowBubble.value = true
                         }) {
                         Column {
                             Column(modifier = Modifier
@@ -1295,23 +1304,14 @@ class OnboardingActivity:ComponentActivity() {
                         }
                     }
                     Row(modifier = Modifier
+                        .height(26.dp)
                         .padding(horizontal = 8.dp)
                         .align(Alignment.End)
 
                 ) {
-
-                        Box(
-                            contentAlignment = Alignment.Center
-                        ){
-                            Spacer(modifier = Modifier.width(18.dp))
-                            Image(
-                                modifier = Modifier
-                                    .width(155.dp)
-                                    .height(26.dp),
-                                painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
-                            )
-
-                            P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
+                        if (bottomshowBubble.value){
+                            val bottomtext = "동일한 이메일로 재전송되었어요"
+                            BottomSpeechBubble(text = bottomtext)
                         }
                     }
                 }
