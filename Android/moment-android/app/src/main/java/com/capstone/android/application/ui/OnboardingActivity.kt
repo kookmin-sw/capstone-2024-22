@@ -631,9 +631,6 @@ class OnboardingActivity:ComponentActivity() {
                     if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
                         navController.navigate(OnboardingScreen.FindPasswordNumber.name)
                     }
-
-                    Toast.makeText(this@OnboardingActivity,"인증번호를 보냈습니다.",Toast.LENGTH_SHORT).show()
-
                 }
             }else{
                 BigButton("다음", false) { navController.navigate(OnboardingScreen.SignupNumber.name) }            }
@@ -1173,8 +1170,6 @@ class OnboardingActivity:ComponentActivity() {
                     if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
                         navController.navigate(OnboardingScreen.FindPasswordNumber.name)
                     }
-
-                    Toast.makeText(this@OnboardingActivity,"인증번호를 보냈습니다.",Toast.LENGTH_SHORT).show()
                 }
             }else{
                 BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPasswordNumber.name) }            }
