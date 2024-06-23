@@ -10,6 +10,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
@@ -757,6 +758,12 @@ class OnboardingActivity:ComponentActivity() {
     @Composable
     fun SignupNumber(countViewModel: CountViewModel = viewModel(), authCode:MutableState<String>,
                      email : MutableState<String>){
+        BackHandler {
+            navController.navigate(OnboardingScreen.SignupEmail.name, navOptions {
+                popUpTo(OnboardingScreen.SignupEmail.name) { inclusive = true }
+                launchSingleTop = true
+            })
+        }
 
         val timeLeft by countViewModel.timeLeft.collectAsState()
         val number = remember{mutableStateOf("")}
@@ -924,6 +931,13 @@ class OnboardingActivity:ComponentActivity() {
 
     @Composable
     fun Signup(emailAuthCode:MutableState<String>, email : MutableState<String>){
+
+        BackHandler {
+            navController.navigate(OnboardingScreen.SignupNumber.name, navOptions {
+                popUpTo(OnboardingScreen.SignupNumber.name) { inclusive = true }
+                launchSingleTop = true
+            })
+        }
         val password = remember{
             mutableStateOf("")
         }
@@ -1061,6 +1075,14 @@ class OnboardingActivity:ComponentActivity() {
 
     @Composable
     fun SignupComplete(){
+
+        BackHandler {
+            navController.navigate(OnboardingScreen.Login.name, navOptions {
+                popUpTo(0) { inclusive = true }
+                launchSingleTop = true
+            })
+        }
+
         Box(modifier = Modifier
             .fillMaxSize()
             .background(color = tertiary_500)
@@ -1194,6 +1216,13 @@ class OnboardingActivity:ComponentActivity() {
     // 비밀번호 찾기에서 인증코드 확인
     @Composable
     fun FindPasswordNumber(authCode:MutableState<String>, id: MutableState<String>){
+
+        BackHandler {
+            navController.navigate(OnboardingScreen.FindPassword.name, navOptions {
+                popUpTo(OnboardingScreen.FindPassword.name) { inclusive = true }
+                launchSingleTop = true
+            })
+        }
 
         val findpwnumState = remember{
             mutableStateOf(true)
@@ -1350,6 +1379,13 @@ class OnboardingActivity:ComponentActivity() {
 
     @Composable
     fun  FindPasswordSignup(code:String) {
+
+        BackHandler {
+            navController.navigate(OnboardingScreen.FindPasswordNumber.name, navOptions {
+                popUpTo(OnboardingScreen.FindPasswordNumber.name) { inclusive = true }
+                launchSingleTop = true
+            })
+        }
 
         val password = remember {
             mutableStateOf("")
