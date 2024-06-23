@@ -64,6 +64,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
 import com.capstone.android.application.app.ApplicationClass.Companion.tokenSharedPreferences
@@ -256,7 +257,10 @@ class OnboardingActivity:ComponentActivity() {
             }
 
             if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
-                navController.navigate(OnboardingScreen.Login.name)
+                navController.navigate(OnboardingScreen.Login.name, navOptions {
+                    popUpTo(0) { inclusive = true }
+                    launchSingleTop = true
+                })
             }
         }
 
@@ -270,7 +274,11 @@ class OnboardingActivity:ComponentActivity() {
         authViewModel.patchAuthChangePasswordSuccess.observe(this@OnboardingActivity){ response->
             Log.d("patchAuthChangePasswordSuccess", "initApi: ${navController.currentDestination?.route}")
             if(navController.currentDestination?.route == OnboardingScreen.FindPasswordSignup.name){
-                navController.navigate(OnboardingScreen.Login.name)
+                navController.navigate(OnboardingScreen.Login.name, navOptions {
+                    popUpTo(0) { inclusive = true }
+                    launchSingleTop = true
+                })
+
             }
             if(navController.currentDestination?.route == OnboardingScreen.Signup.name){
                 navController.navigate(OnboardingScreen.SignupComplete.name)
@@ -536,7 +544,10 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Login.name)
+                    navController.navigate(OnboardingScreen.Login.name, navOptions {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    })
                 }, "회원가입")
             }
 
@@ -1104,7 +1115,10 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Login.name)
+                    navController.navigate(OnboardingScreen.Login.name, navOptions {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    })
                 }, "비밀번호 찾기")
             }
 
