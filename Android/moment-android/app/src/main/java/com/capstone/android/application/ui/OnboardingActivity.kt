@@ -786,7 +786,7 @@ class OnboardingActivity:ComponentActivity() {
                 Column(modifier = Modifier
                     .padding(horizontal = 24.dp)) {
                     Box(
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.TopCenter
                     ){
                         Spacer(modifier = Modifier.width(18.dp))
                         Image(
@@ -795,8 +795,11 @@ class OnboardingActivity:ComponentActivity() {
                                 .height(42.dp),
                             painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
                         )
-                        P_Medium11(content = "입력하신 이메일로 인증번호가 전송되었어요\n" +
-                                "메일함을 확인해 주세요", color = white)
+                        Column(modifier = Modifier
+                            .padding(top = 5.dp)) {
+                            P_Medium11(content = "입력하신 이메일로 인증번호가 전송되었어요\n" +
+                                    "메일함을 확인해 주세요", color = white)
+                        }
                     }
                 }
 
@@ -874,7 +877,7 @@ class OnboardingActivity:ComponentActivity() {
                         .padding(horizontal = 8.dp)
                         .align(Alignment.End)){
                         Box(
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.BottomCenter
                         ){
                             Spacer(modifier = Modifier.width(18.dp))
                             Image(
@@ -883,7 +886,10 @@ class OnboardingActivity:ComponentActivity() {
                                     .height(26.dp),
                                 painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
                             )
-                            P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
+                            Column(modifier = Modifier
+                                .padding(bottom = 5.dp)) {
+                                P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
+                            }
                         }
                     }
                 }
@@ -1501,6 +1507,11 @@ class OnboardingActivity:ComponentActivity() {
     @Preview
     @Composable
     fun OnboardingPreView(){
-        Login()
+        val authCodeInSignup = remember {
+            mutableStateOf("")
+        }
+
+        val email = remember{mutableStateOf("")}
+        SignupNumber(authCode=authCodeInSignup, email = email)
     }
 }
