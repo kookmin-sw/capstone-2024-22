@@ -639,10 +639,6 @@ class OnboardingActivity:ComponentActivity() {
                     if(navController.currentDestination?.route == OnboardingScreen.SignupEmail.name){
                         navController.navigate(OnboardingScreen.SignupNumber.name)
                     }
-
-                    if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
-                        navController.navigate(OnboardingScreen.FindPasswordNumber.name)
-                    }
                 }
             }else{
                 BigButton("다음", false) { navController.navigate(OnboardingScreen.SignupNumber.name) }            }
@@ -1205,9 +1201,6 @@ class OnboardingActivity:ComponentActivity() {
                             isSignUp = "false"
                         )
                     )
-                    if(navController.currentDestination?.route == OnboardingScreen.SignupEmail.name){
-                        navController.navigate(OnboardingScreen.SignupNumber.name)
-                    }
 
                     if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
                         navController.navigate(OnboardingScreen.FindPasswordNumber.name)
@@ -1376,7 +1369,7 @@ class OnboardingActivity:ComponentActivity() {
                                 code = authCode.value
                             )
                         )
-                        navController.navigate(OnboardingScreen.FindPasswordSignup.name)
+                        //navController.navigate(OnboardingScreen.FindPasswordSignup.name)
                     }
                 }else{
                     BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPasswordSignup.name) }
