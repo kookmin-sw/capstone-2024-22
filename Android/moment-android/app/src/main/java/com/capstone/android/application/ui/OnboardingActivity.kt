@@ -755,6 +755,19 @@ class OnboardingActivity:ComponentActivity() {
         val focusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
         authCode.value = number.value
+        val topshowBubble = remember {mutableStateOf(true)}
+        val bottomshowBubble = remember {mutableStateOf(false)}
+
+        LaunchedEffect(Unit) {
+            delay(5000) // 5초 동안 말풍선 표시
+            topshowBubble.value = false
+        }
+        if (bottomshowBubble.value){
+            LaunchedEffect(Unit) {
+                delay(2000) // 2초 동안 말풍선 표시
+                bottomshowBubble.value = false
+            }
+        }
 
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
@@ -784,22 +797,11 @@ class OnboardingActivity:ComponentActivity() {
             Column(modifier = Modifier.fillMaxHeight(),
                 verticalArrangement = Arrangement.Center) {
                 Column(modifier = Modifier
+                    .height(42.dp)
                     .padding(horizontal = 24.dp)) {
-                    Box(
-                        contentAlignment = Alignment.TopCenter
-                    ){
-                        Spacer(modifier = Modifier.width(18.dp))
-                        Image(
-                            modifier = Modifier
-                                .width(205.dp)
-                                .height(42.dp),
-                            painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
-                        )
-                        Column(modifier = Modifier
-                            .padding(top = 5.dp)) {
-                            P_Medium11(content = "입력하신 이메일로 인증번호가 전송되었어요\n" +
-                                    "메일함을 확인해 주세요", color = white)
-                        }
+                    if (topshowBubble.value) {
+                        val toptext = "입력하신 이메일로 인증번호가 전송되었어요\n" + "메일함을 확인해 주세요"
+                        TopSpeechBubble(toptext)
                     }
                 }
 
@@ -860,6 +862,7 @@ class OnboardingActivity:ComponentActivity() {
                                     isSignUp = "false"
                                 )
                             )
+                            bottomshowBubble.value = true
                         }){
                         Column {
                             Column(modifier = Modifier
@@ -874,22 +877,12 @@ class OnboardingActivity:ComponentActivity() {
                         }
                     }
                     Row(modifier = Modifier
+                        .height(26.dp)
                         .padding(horizontal = 8.dp)
                         .align(Alignment.End)){
-                        Box(
-                            contentAlignment = Alignment.BottomCenter
-                        ){
-                            Spacer(modifier = Modifier.width(18.dp))
-                            Image(
-                                modifier = Modifier
-                                    .width(155.dp)
-                                    .height(26.dp),
-                                painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
-                            )
-                            Column(modifier = Modifier
-                                .padding(bottom = 5.dp)) {
-                                P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
-                            }
+                        if (bottomshowBubble.value){
+                            val bottomtext = "동일한 이메일로 재전송되었어요"
+                            BottomSpeechBubble(text = bottomtext)
                         }
                     }
                 }
