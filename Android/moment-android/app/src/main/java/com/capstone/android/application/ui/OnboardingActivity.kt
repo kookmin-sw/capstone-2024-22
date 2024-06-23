@@ -257,9 +257,9 @@ class OnboardingActivity:ComponentActivity() {
                 navController.navigate(OnboardingScreen.Signup.name)
             }
 
-            if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
-                navController.navigate(OnboardingScreen.Login.name, navOptions {
-                    popUpTo(0) { inclusive = true }
+            if(navController.currentDestination?.route == OnboardingScreen.FindPasswordNumber.name){
+                navController.navigate(OnboardingScreen.FindPasswordSignup.name, navOptions {
+                    popUpTo(OnboardingScreen.FindPasswordSignup.name) { inclusive = true }
                     launchSingleTop = true
                 })
             }
@@ -806,7 +806,10 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.SignupEmail.name)
+                    navController.navigate(OnboardingScreen.SignupEmail.name, navOptions {
+                        popUpTo(OnboardingScreen.SignupEmail.name) { inclusive = true }
+                        launchSingleTop = true
+                    })
                 }, "회원가입")
             }
 
@@ -967,7 +970,10 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.SignupNumber.name)
+                    navController.navigate(OnboardingScreen.SignupNumber.name, navOptions {
+                        popUpTo(OnboardingScreen.SignupNumber.name) { inclusive = true }
+                        launchSingleTop = true
+                    })
                 }, "회원가입")
             }
 
@@ -1259,7 +1265,10 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.SignupEmail.name)
+                    navController.navigate(OnboardingScreen.FindPassword.name, navOptions {
+                        popUpTo(OnboardingScreen.FindPassword.name) { inclusive = true }
+                        launchSingleTop = true
+                    })
                 }, "비밀번호 찾기")
             }
 
@@ -1415,7 +1424,10 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.SignupNumber.name)
+                    navController.navigate(OnboardingScreen.FindPasswordNumber.name, navOptions {
+                        popUpTo(OnboardingScreen.FindPasswordNumber.name) { inclusive = true }
+                        launchSingleTop = true
+                    })
                 }, "비밀번호 찾기")
             }
 
