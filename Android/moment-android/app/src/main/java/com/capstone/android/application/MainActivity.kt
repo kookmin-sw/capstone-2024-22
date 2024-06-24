@@ -15,8 +15,11 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -121,6 +124,7 @@ import com.capstone.android.application.app.utile.firebase.MyFirebaseMessagingSe
 import com.capstone.android.application.app.utile.loading.LinearDeterminateIndicator
 import com.capstone.android.application.app.utile.loading.loadProgress
 import com.capstone.android.application.app.utile.location.MomentLocation
+import com.capstone.android.application.app.utile.network.NetworkManager
 import com.capstone.android.application.app.utile.permission.MomentPermission
 import com.capstone.android.application.app.utile.recorder.MomentAudioPlayer
 import com.capstone.android.application.app.utile.recorder.MomentAudioRecorder
@@ -235,16 +239,19 @@ class MainActivity : ComponentActivity() {
     @Inject lateinit var recorder: MomentAudioRecorder
     @Inject lateinit var player: MomentAudioPlayer
     @Inject lateinit var momentAudioPlayer:MomentAudioPlayer
+    @Inject lateinit var networkManager:NetworkManager
     private var audioFile: File? = null
 
 
-
+    override fun onStart() {
+        super.onStart()
+        momentPermission.requestPermission()
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var currentDate:String=""
-        momentPermission.requestPermission()
 
 
 
@@ -499,7 +506,7 @@ class MainActivity : ComponentActivity() {
                                 )
                                 ApplicationClass.tripName = it.tripName
                                 return@breaker
-                            } else if (currentDate.compareTo(format.parse(it.endDate)) < 0) {
+                            } else if (currentDate.compareTo(format.parse(it.endDate)) <= 0) {
                                 mainTrip.value = MainTrip(
                                     state = TripState.ING,
                                     tripName = it.tripName,
@@ -791,15 +798,23 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier
                                 .height(90.dp)
                                 .clickable {
-                                    recordOpen.value = true
-                                    isRecorderIng.value = recorder.isActivity()
+                                    Log.d("awegweagewa","${networkManager.checkNetworkState()}")
+                                    if(networkManager.checkNetworkState()){
+                                        File(cacheDir, "audio.mp3").also {
+                                            recorder.start(it)
+                                            audioFile = it
+                                        }
+                                        recordOpen.value = true
+                                        isRecorderIng.value = recorder.isActivity()
+                                    }else{
+                                        Toast.makeText(this@MainActivity,"네트워크가 원활하지 않습니다.",Toast.LENGTH_SHORT).show()
+                                    }
+
                                 }
                         ) {
                             Image(
                                 modifier = Modifier.size(50.dp),
-                                painter = if (isRecorderIng.value) painterResource(id = R.drawable.ic_record_ing) else painterResource(
-                                    id = R.drawable.ic_record_before
-                                ),
+                                painter = painterResource(id = R.drawable.ic_record_before),
                                 contentDescription = ""
                             )
                         }
@@ -1003,7 +1018,9 @@ class MainActivity : ComponentActivity() {
                 if (recordOpen.value) {
                     RecordNavigatesheet(
                         sheetState = sheetState,
-                        closeSheet = { recordOpen.value = false },
+                        closeSheet = {
+                            recordOpen.value = false
+                        },
                         lat = lat,
                         lon = lon,
                         temp = temp,
@@ -1902,6 +1919,13 @@ class MainActivity : ComponentActivity() {
         val customTimerDuration = remember {
             mutableStateOf(0)
         }
+        val durationCount = remember{
+            mutableStateOf(0)
+        }
+
+        val recordNotiTitleVisable=remember{
+            mutableStateOf(true)
+        }
 
 
         val isPasused = remember {
@@ -1909,15 +1933,19 @@ class MainActivity : ComponentActivity() {
         }
 
         val isRecording=remember{
-            mutableStateOf(false)
+            mutableStateOf(true)
         }
 
 
         val timerJob: Job = CoroutineScope(Dispatchers.Main).launch(start = CoroutineStart.LAZY) {
             withContext(Dispatchers.IO) {
 
-                while (customTimerDuration.value >= 0) {
+                while (durationCount.value <= 300) {
+                    if(durationCount.value>5){
+                        recordNotiTitleVisable.value=false
+                    }
 
+                    durationCount.value+=1
                     if(!isPasused.value){
                         delay(1000L)
                         customTimerDuration.value+=1
@@ -1941,7 +1969,7 @@ class MainActivity : ComponentActivity() {
 
 
 
-
+        timerJob.start()
         var currentDate:String=""
 
 
@@ -1962,7 +1990,11 @@ class MainActivity : ComponentActivity() {
 
 
         ModalBottomSheet(
-            onDismissRequest = closeSheet,
+            onDismissRequest = {
+                closeSheet()
+                recorder.stop()
+                timerJob.cancel()
+            },
             sheetState = sheetState,
             shape = RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp),
             containerColor = tertiary_500,
@@ -1981,13 +2013,29 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.width(213.dp),
                         contentAlignment = Alignment.Center
                     ){
-                        Image(modifier = Modifier
-                            .height(42.dp)
-                            .width(213.dp),
-                            painter =  painterResource(R.drawable.img_alarm_center_grey),
-                            contentDescription = "record")
-                        P_Medium11(content = "녹음은 한번에 최대 10분까지 가능해요\n" +
-                                "최대 시간을 넘어가면 자동 종료 후 저장됩니다", color = white )
+
+
+                        this@Column.AnimatedVisibility(
+                            modifier = Modifier.align(Alignment.Center),
+                            visible = recordNotiTitleVisable.value,
+                            enter = fadeIn(
+                                // Overwrites the initial value of alpha to 0.4f for fade in, 0 by default
+                                initialAlpha = 0.4f
+                            ),
+                            exit = fadeOut(
+                                // Overwrites the default animation with tween
+                                animationSpec = tween(durationMillis = 250)
+                            )
+                        ){
+                            Image(modifier = Modifier
+                                .height(42.dp)
+                                .width(213.dp),
+                                painter =  painterResource(R.drawable.img_alarm_center_grey),
+                                contentDescription = "record")
+                            P_Medium11(content = "녹음은 한번에 최대 10분까지 가능해요\n" +
+                                    "최대 시간을 넘어가면 자동 종료 후 저장됩니다", color = white )
+                        }
+
                     }
                 }
 
@@ -2009,7 +2057,7 @@ class MainActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(32.dp))
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        if(isRecording.value){
+                        if(!isRecording.value){
                             Column(Modifier.clickable {
                                 isRecording.value = false
                                 player.playFile(audioFile ?: return@clickable)
@@ -2035,28 +2083,33 @@ class MainActivity : ComponentActivity() {
                                     if (!momentPermission.checkPermission()) {
                                         momentPermission.requestPermission()
                                     } else {
-                                        isRecording.value = true
-                                        Log.d("awegewagaew", "${isRecording.value}")
-                                        if (timerJob.isActive) {
-                                            isPasused.value = !isPasused.value
-
-                                        } else {
-                                            File(cacheDir, "audio.mp3").also {
-                                                recorder.start(it)
-                                                audioFile = it
+                                        if(isRecording.value){
+                                            if(durationCount.value<5){
+                                                Toast.makeText(this@MainActivity,"최소 5초이상 녹음을 해야합니다.",Toast.LENGTH_SHORT).show()
+                                            }else{
+                                                isPasused.value = !isPasused.value
+                                                isRecording.value = false
                                             }
-                                            timerJob.start()
+
+
+//                                            File(cacheDir, "audio.mp3").also {
+//                                                recorder.start(it)
+//                                                audioFile = it
+//                                            }
+//                                            timerJob.start()
+                                        }else{
 
                                         }
+
                                     }
 
 
                                 },
-                            painter =  if(!isRecording.value) painterResource(R.drawable.ic_record_ing) else painterResource(R.drawable.ic_ellipse),
+                            painter =  if(isRecording.value) painterResource(R.drawable.ic_record_ing) else painterResource(R.drawable.ic_ellipse),
                             contentDescription = "record")
                         Spacer(modifier = Modifier.width(46.dp))
 
-                        if(isRecording.value){
+                        if(!isRecording.value){
                             Column(
                                 Modifier.clickable {
                                     recorder.stop()
@@ -2091,8 +2144,8 @@ class MainActivity : ComponentActivity() {
 
 
                                 }) {
-                                YJ_Bold15("저장", primary_500)
-                            }
+                                    YJ_Bold15("저장", primary_500)
+                                }
                         }
 
 
@@ -2721,7 +2774,7 @@ class MainActivity : ComponentActivity() {
                 }
 
 
-
+                /* 데이터 허용 관련 기능은 잠시 보류
                 Column(modifier = Modifier
                     .width(99.dp)
                     .clickable { databtnState.value = !databtnState.value }){
@@ -2745,6 +2798,7 @@ class MainActivity : ComponentActivity() {
                 else{
                     Spacer(modifier = Modifier.height(40.dp))
                 }
+                 */
 
 
                 Column(modifier = Modifier
