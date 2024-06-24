@@ -10,6 +10,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
@@ -64,6 +65,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import com.capstone.android.application.MainActivity
 import com.capstone.android.application.R
 import com.capstone.android.application.app.ApplicationClass.Companion.tokenSharedPreferences
@@ -98,6 +100,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 enum class OnboardingScreen(){
@@ -254,8 +257,11 @@ class OnboardingActivity:ComponentActivity() {
                 navController.navigate(OnboardingScreen.Signup.name)
             }
 
-            if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
-                navController.navigate(OnboardingScreen.Login.name)
+            if(navController.currentDestination?.route == OnboardingScreen.FindPasswordNumber.name){
+                navController.navigate(OnboardingScreen.FindPasswordSignup.name, navOptions {
+                    popUpTo(OnboardingScreen.FindPasswordSignup.name) { inclusive = true }
+                    launchSingleTop = true
+                })
             }
         }
 
@@ -269,7 +275,11 @@ class OnboardingActivity:ComponentActivity() {
         authViewModel.patchAuthChangePasswordSuccess.observe(this@OnboardingActivity){ response->
             Log.d("patchAuthChangePasswordSuccess", "initApi: ${navController.currentDestination?.route}")
             if(navController.currentDestination?.route == OnboardingScreen.FindPasswordSignup.name){
-                navController.navigate(OnboardingScreen.Login.name)
+                navController.navigate(OnboardingScreen.Login.name, navOptions {
+                    popUpTo(0) { inclusive = true }
+                    launchSingleTop = true
+                })
+
             }
             if(navController.currentDestination?.route == OnboardingScreen.Signup.name){
                 navController.navigate(OnboardingScreen.SignupComplete.name)
@@ -392,8 +402,8 @@ class OnboardingActivity:ComponentActivity() {
                     Column(modifier = Modifier
                         .width(76.dp)
                         .clickable {
-//                            navController.navigate(OnboardingScreen.FindPassword.name)
-                            Toast.makeText(this@OnboardingActivity,"서버오류",Toast.LENGTH_SHORT).show()
+                            navController.navigate(OnboardingScreen.FindPassword.name)
+                            //Toast.makeText(this@OnboardingActivity,"서버오류",Toast.LENGTH_SHORT).show()
                         }) {
                         Column(modifier = Modifier
                             .padding(horizontal = 8.dp)) {
@@ -535,7 +545,10 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Login.name)
+                    navController.navigate(OnboardingScreen.Login.name, navOptions {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    })
                 }, "회원가입")
             }
 
@@ -626,13 +639,6 @@ class OnboardingActivity:ComponentActivity() {
                     if(navController.currentDestination?.route == OnboardingScreen.SignupEmail.name){
                         navController.navigate(OnboardingScreen.SignupNumber.name)
                     }
-
-                    if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
-                        navController.navigate(OnboardingScreen.FindPasswordNumber.name)
-                    }
-
-                    Toast.makeText(this@OnboardingActivity,"인증번호를 보냈습니다.",Toast.LENGTH_SHORT).show()
-
                 }
             }else{
                 BigButton("다음", false) { navController.navigate(OnboardingScreen.SignupNumber.name) }            }
@@ -748,6 +754,12 @@ class OnboardingActivity:ComponentActivity() {
     @Composable
     fun SignupNumber(countViewModel: CountViewModel = viewModel(), authCode:MutableState<String>,
                      email : MutableState<String>){
+        BackHandler {
+            navController.navigate(OnboardingScreen.SignupEmail.name, navOptions {
+                popUpTo(OnboardingScreen.SignupEmail.name) { inclusive = true }
+                launchSingleTop = true
+            })
+        }
 
         val timeLeft by countViewModel.timeLeft.collectAsState()
         val number = remember{mutableStateOf("")}
@@ -755,6 +767,19 @@ class OnboardingActivity:ComponentActivity() {
         val focusRequester = remember { FocusRequester() }
         val focusManager = LocalFocusManager.current
         authCode.value = number.value
+        val topshowBubble = remember {mutableStateOf(true)}
+        val bottomshowBubble = remember {mutableStateOf(false)}
+
+        LaunchedEffect(Unit) {
+            delay(5000) // 5초 동안 말풍선 표시
+            topshowBubble.value = false
+        }
+        if (bottomshowBubble.value){
+            LaunchedEffect(Unit) {
+                delay(2000) // 2초 동안 말풍선 표시
+                bottomshowBubble.value = false
+            }
+        }
 
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
@@ -777,26 +802,21 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.SignupEmail.name)
+                    navController.navigate(OnboardingScreen.SignupEmail.name, navOptions {
+                        popUpTo(OnboardingScreen.SignupEmail.name) { inclusive = true }
+                        launchSingleTop = true
+                    })
                 }, "회원가입")
             }
 
             Column(modifier = Modifier.fillMaxHeight(),
                 verticalArrangement = Arrangement.Center) {
                 Column(modifier = Modifier
+                    .height(42.dp)
                     .padding(horizontal = 24.dp)) {
-                    Box(
-                        contentAlignment = Alignment.Center
-                    ){
-                        Spacer(modifier = Modifier.width(18.dp))
-                        Image(
-                            modifier = Modifier
-                                .width(205.dp)
-                                .height(42.dp),
-                            painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
-                        )
-                        P_Medium11(content = "입력하신 이메일로 인증번호가 전송되었어요\n" +
-                                "메일함을 확인해 주세요", color = white)
+                    if (topshowBubble.value) {
+                        val toptext = "입력하신 이메일로 인증번호가 전송되었어요\n" + "메일함을 확인해 주세요"
+                        TopSpeechBubble(toptext)
                     }
                 }
 
@@ -857,6 +877,7 @@ class OnboardingActivity:ComponentActivity() {
                                     isSignUp = "false"
                                 )
                             )
+                            bottomshowBubble.value = true
                         }){
                         Column {
                             Column(modifier = Modifier
@@ -871,19 +892,12 @@ class OnboardingActivity:ComponentActivity() {
                         }
                     }
                     Row(modifier = Modifier
+                        .height(26.dp)
                         .padding(horizontal = 8.dp)
                         .align(Alignment.End)){
-                        Box(
-                            contentAlignment = Alignment.Center
-                        ){
-                            Spacer(modifier = Modifier.width(18.dp))
-                            Image(
-                                modifier = Modifier
-                                    .width(155.dp)
-                                    .height(26.dp),
-                                painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
-                            )
-                            P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
+                        if (bottomshowBubble.value){
+                            val bottomtext = "동일한 이메일로 재전송되었어요"
+                            BottomSpeechBubble(text = bottomtext)
                         }
                     }
                 }
@@ -916,6 +930,13 @@ class OnboardingActivity:ComponentActivity() {
 
     @Composable
     fun Signup(emailAuthCode:MutableState<String>, email : MutableState<String>){
+
+        BackHandler {
+            navController.navigate(OnboardingScreen.SignupNumber.name, navOptions {
+                popUpTo(OnboardingScreen.SignupNumber.name) { inclusive = true }
+                launchSingleTop = true
+            })
+        }
         val password = remember{
             mutableStateOf("")
         }
@@ -945,7 +966,10 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.SignupNumber.name)
+                    navController.navigate(OnboardingScreen.SignupNumber.name, navOptions {
+                        popUpTo(OnboardingScreen.SignupNumber.name) { inclusive = true }
+                        launchSingleTop = true
+                    })
                 }, "회원가입")
             }
 
@@ -1053,6 +1077,14 @@ class OnboardingActivity:ComponentActivity() {
 
     @Composable
     fun SignupComplete(){
+
+        BackHandler {
+            navController.navigate(OnboardingScreen.Login.name, navOptions {
+                popUpTo(0) { inclusive = true }
+                launchSingleTop = true
+            })
+        }
+
         Box(modifier = Modifier
             .fillMaxSize()
             .background(color = tertiary_500)
@@ -1107,7 +1139,10 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.Login.name)
+                    navController.navigate(OnboardingScreen.Login.name, navOptions {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    })
                 }, "비밀번호 찾기")
             }
 
@@ -1166,15 +1201,10 @@ class OnboardingActivity:ComponentActivity() {
                             isSignUp = "false"
                         )
                     )
-                    if(navController.currentDestination?.route == OnboardingScreen.SignupEmail.name){
-                        navController.navigate(OnboardingScreen.SignupNumber.name)
-                    }
 
                     if(navController.currentDestination?.route == OnboardingScreen.FindPassword.name){
                         navController.navigate(OnboardingScreen.FindPasswordNumber.name)
                     }
-
-                    Toast.makeText(this@OnboardingActivity,"인증번호를 보냈습니다.",Toast.LENGTH_SHORT).show()
                 }
             }else{
                 BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPasswordNumber.name) }            }
@@ -1186,6 +1216,13 @@ class OnboardingActivity:ComponentActivity() {
     @Composable
     fun FindPasswordNumber(authCode:MutableState<String>, id: MutableState<String>){
 
+        BackHandler {
+            navController.navigate(OnboardingScreen.FindPassword.name, navOptions {
+                popUpTo(OnboardingScreen.FindPassword.name) { inclusive = true }
+                launchSingleTop = true
+            })
+        }
+
         val findpwnumState = remember{
             mutableStateOf(true)
         }
@@ -1195,6 +1232,21 @@ class OnboardingActivity:ComponentActivity() {
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
         }
+
+        val topshowBubble = remember {mutableStateOf(true)}
+        val bottomshowBubble = remember {mutableStateOf(false)}
+
+        LaunchedEffect(Unit) {
+            delay(5000) // 5초 동안 말풍선 표시
+            topshowBubble.value = false
+        }
+        if (bottomshowBubble.value){
+            LaunchedEffect(Unit) {
+                delay(2000) // 2초 동안 말풍선 표시
+                bottomshowBubble.value = false
+            }
+        }
+
         Box(modifier = Modifier
             .fillMaxSize()
             .background(color = tertiary_500)
@@ -1206,27 +1258,22 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.SignupEmail.name)
+                    navController.navigate(OnboardingScreen.FindPassword.name, navOptions {
+                        popUpTo(OnboardingScreen.FindPassword.name) { inclusive = true }
+                        launchSingleTop = true
+                    })
                 }, "비밀번호 찾기")
             }
 
             Column(modifier = Modifier.fillMaxHeight(),
                 verticalArrangement = Arrangement.Center) {
                 Column(modifier = Modifier
+                    .height(42.dp)
                     .padding(horizontal = 24.dp)) {
-                    Box(
-                        contentAlignment = Alignment.Center
-                    ){
-                        Spacer(modifier = Modifier.width(18.dp))
-                        Image(
-                            modifier = Modifier
-                                .width(205.dp)
-                                .height(42.dp),
-                            painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
-                        )
-                        P_Medium11(content = "입력하신 이메일로 복구코드가 전송되었어요\n" +
-                                "메일함을 확인해 주세요", color = white
-                        )
+
+                    if (topshowBubble.value) {
+                        val toptext = "입력하신 이메일로 인증번호가 전송되었어요\n" + "메일함을 확인해 주세요"
+                        TopSpeechBubble(toptext)
                     }
                 }
 
@@ -1282,6 +1329,7 @@ class OnboardingActivity:ComponentActivity() {
                                     isSignUp = "false"
                                 )
                             )
+                            bottomshowBubble.value = true
                         }) {
                         Column {
                             Column(modifier = Modifier
@@ -1296,23 +1344,14 @@ class OnboardingActivity:ComponentActivity() {
                         }
                     }
                     Row(modifier = Modifier
+                        .height(26.dp)
                         .padding(horizontal = 8.dp)
                         .align(Alignment.End)
 
                 ) {
-
-                        Box(
-                            contentAlignment = Alignment.Center
-                        ){
-                            Spacer(modifier = Modifier.width(18.dp))
-                            Image(
-                                modifier = Modifier
-                                    .width(155.dp)
-                                    .height(26.dp),
-                                painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
-                            )
-
-                            P_Medium11(content = "동일한 이메일로 재전송되었어요", color = white)
+                        if (bottomshowBubble.value){
+                            val bottomtext = "동일한 이메일로 재전송되었어요"
+                            BottomSpeechBubble(text = bottomtext)
                         }
                     }
                 }
@@ -1330,7 +1369,7 @@ class OnboardingActivity:ComponentActivity() {
                                 code = authCode.value
                             )
                         )
-                        navController.navigate(OnboardingScreen.FindPasswordSignup.name)
+                        //navController.navigate(OnboardingScreen.FindPasswordSignup.name)
                     }
                 }else{
                     BigButton("다음", false) { navController.navigate(OnboardingScreen.FindPasswordSignup.name) }
@@ -1342,6 +1381,13 @@ class OnboardingActivity:ComponentActivity() {
 
     @Composable
     fun  FindPasswordSignup(code:String) {
+
+        BackHandler {
+            navController.navigate(OnboardingScreen.FindPasswordNumber.name, navOptions {
+                popUpTo(OnboardingScreen.FindPasswordNumber.name) { inclusive = true }
+                launchSingleTop = true
+            })
+        }
 
         val password = remember {
             mutableStateOf("")
@@ -1371,7 +1417,10 @@ class OnboardingActivity:ComponentActivity() {
                     .wrapContentSize()
             ) {
                 ImgBackButton(onClick = {
-                    navController.navigate(OnboardingScreen.SignupNumber.name)
+                    navController.navigate(OnboardingScreen.FindPasswordNumber.name, navOptions {
+                        popUpTo(OnboardingScreen.FindPasswordNumber.name) { inclusive = true }
+                        launchSingleTop = true
+                    })
                 }, "비밀번호 찾기")
             }
 
@@ -1496,11 +1545,53 @@ class OnboardingActivity:ComponentActivity() {
     }*/
 
 
+    @Composable
+    fun TopSpeechBubble(text : String){
+        Box(
+            contentAlignment = Alignment.TopCenter
+        ){
+            Spacer(modifier = Modifier.width(18.dp))
+            Image(
+                modifier = Modifier
+                    .width(205.dp)
+                    .height(42.dp),
+                painter = painterResource(id = R.drawable.img_alarm_grey), contentDescription = ""
+            )
+            Column(modifier = Modifier
+                .padding(top = 5.dp)) {
+                P_Medium11(content = text, color = white)
+            }
+        }
+    }
+
+    @Composable
+    fun BottomSpeechBubble(text : String){
+        Box(
+            contentAlignment = Alignment.BottomCenter
+        ){
+            Spacer(modifier = Modifier.width(18.dp))
+            Image(
+                modifier = Modifier
+                    .width(155.dp)
+                    .height(26.dp),
+                painter = painterResource(id = R.drawable.img_alarmup_grey), contentDescription = ""
+            )
+            Column(modifier = Modifier
+                .padding(bottom = 5.dp)) {
+                P_Medium11(content = text, color = white)
+            }
+        }
+    }
 
 
     @Preview
     @Composable
     fun OnboardingPreView(){
-        Login()
+        val authCodeInSignup = remember {
+            mutableStateOf("")
+        }
+
+        val email = remember{mutableStateOf("")}
+        SignupNumber(authCode=authCodeInSignup, email = email)
     }
 }
