@@ -41,7 +41,7 @@ public class CardViewService {
         if (awsService.isEc2Running()){
             throw new RuntimeException("EC2 is already running");
         }
-        awsService.turnOnOrOff("moment-ai-t4", true);
+        awsService.turnOnOrOff("moment", true);
         log.info("EC2 trying to turn on");
         while (!awsService.isEc2Running()){
             log.info("sleep");
@@ -115,7 +115,7 @@ public class CardViewService {
         }
         long endTime = System.currentTimeMillis();
         log.info("AI model run time : " + (endTime - startTime) + "ms");
-        awsService.turnOnOrOff("moment-ai-t4", false);
+        awsService.turnOnOrOff("moment", false);
 
         // 분석한만큼 유저에게 알림을 전송
         for (User user : userCardViewCount.keySet()){
