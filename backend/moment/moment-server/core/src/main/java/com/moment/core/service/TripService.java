@@ -73,9 +73,9 @@ public class TripService {
     public void update(Long userId, TripRequestDTO.UpdateTrip trip) {
         Trip oldTrip = this.delete(trip.getTripId());
         this.register(TripRequestDTO.RegisterTrip.builder()
-                .startDate(oldTrip.getStartDate())
-                .endDate(oldTrip.getEndDate())
-                .tripName(oldTrip.getTripName())
+                .startDate(trip.getStartDate())
+                .endDate(trip.getEndDate())
+                .tripName(trip.getTripName())
                 .build(), userId);
     }
 

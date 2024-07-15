@@ -95,7 +95,7 @@ public class UserService {
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
         // S3 먼저 전부 삭제
-//        s3Service.deleteFile("", String.valueOf(userId));
+        s3Service.deleteFile("", String.valueOf(userId));
         // 유저의 영수증 전부 삭제
         receiptRepository.deleteAllByUser(user);
         // 유저의 imageFile 전부 삭제

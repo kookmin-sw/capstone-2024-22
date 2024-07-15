@@ -71,19 +71,35 @@ public class NotiService {
         }
         if (!isTraveling){
             log.info("User {} is not traveling today", user.getId());
-            return;
-        }
-        try {
-            ResponseEntity<Integer> ret = notiClient.pushMessage(
-                    FcmSendDto.builder()
-                            .token(user.getFirebaseToken())
-                            .title("moment")
-                            .body(question)
-                            .build()
-            );
-            log.info("Notification sent to user {} with response {}", user.getId(), ret);
-        } catch (Exception e){
-            log.error("Failed to send notification to user {}", user.getId());
+            int rand = (int) (Math.random() * 10);
+            if (rand % 2 == 0){
+                    log.info("Sending random notification to user {}", user.getId());
+                try {
+                    ResponseEntity<Integer> ret = notiClient.pushMessage(
+                            FcmSendDto.builder()
+                                    .token(user.getFirebaseToken())
+                                    .title("moment")
+                                    .body("문득 갑자기 떠나보는건 어때요?")
+                                    .build()
+                    );
+                    log.info("Notification sent to user {} with response {}", user.getId(), ret);
+                } catch (Exception e){
+                    log.error("Failed to send notification to user {}", user.getId());
+                }
+            }
+        }else{
+            try {
+                ResponseEntity<Integer> ret = notiClient.pushMessage(
+                        FcmSendDto.builder()
+                                .token(user.getFirebaseToken())
+                                .title("moment")
+                                .body(question)
+                                .build()
+                );
+                log.info("Notification sent to user {} with response {}", user.getId(), ret);
+            } catch (Exception e){
+                log.error("Failed to send notification to user {}", user.getId());
+            }
         }
     }
 
